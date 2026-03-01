@@ -1,0 +1,1336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pahadi Roots — Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=JetBrains+Mono:wght@400;600&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --g:#1a3a1e;--g2:#2d5233;--gd:#c8920a;--gd2:#e8b84b;
+  --bg:#0d1117;--bg2:#161b22;--bg3:#21262d;--bg4:#2d333b;
+  --bd:#30363d;--tx:#e6edf3;--tx2:#8b949e;--tx3:#484f58;
+  --red:#f85149;--grn:#3fb950;--blu:#58a6ff;--org:#d29922;
+}
+body{font-family:'Lato',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;display:flex;flex-direction:column}
+/* TOPBAR */
+.topbar{background:var(--bg2);border-bottom:1px solid var(--bd);height:54px;display:flex;align-items:center;justify-content:space-between;padding:0 22px;position:sticky;top:0;z-index:200}
+.t-left{display:flex;align-items:center;gap:12px}
+.logo-pill{background:var(--g);color:var(--gd2);font-family:'Playfair Display',serif;font-size:13px;font-weight:700;padding:5px 13px;border-radius:20px;letter-spacing:.5px}
+.top-title{font-size:11px;color:var(--tx3);letter-spacing:1.5px;text-transform:uppercase;font-weight:700}
+.t-right{display:flex;align-items:center;gap:9px}
+.sb-pill{font-size:11px;padding:4px 11px;border-radius:12px;font-weight:700;letter-spacing:.4px;white-space:nowrap}
+.sb-pill.off{background:rgba(248,81,73,.12);color:var(--red);border:1px solid rgba(248,81,73,.25)}
+.sb-pill.on{background:rgba(63,185,80,.12);color:var(--grn);border:1px solid rgba(63,185,80,.25)}
+.sb-pill.chk{background:rgba(88,166,255,.1);color:var(--blu);border:1px solid rgba(88,166,255,.2)}
+.btn-link{background:var(--g);color:#fff;border:none;padding:6px 13px;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:5px;transition:background .2s}
+.btn-link:hover{background:var(--g2)}
+/* LAYOUT */
+.layout{display:flex;flex:1}
+.sidebar{width:200px;background:var(--bg2);border-right:1px solid var(--bd);padding:14px 0;flex-shrink:0;position:sticky;top:54px;height:calc(100vh - 54px);overflow-y:auto}
+.nav-sec-lbl{font-size:9px;color:var(--tx3);letter-spacing:2px;text-transform:uppercase;font-weight:700;padding:10px 16px 4px}
+.nv{display:flex;align-items:center;gap:8px;padding:8px 14px;cursor:pointer;font-size:13px;color:var(--tx2);transition:all .15s;border:none;background:none;width:100%;text-align:left;font-family:'Lato',sans-serif}
+.nv:hover{background:var(--bg3);color:var(--tx)}
+.nv.active{background:rgba(200,146,10,.1);color:var(--gd2);font-weight:700;border-right:2px solid var(--gd)}
+.nv-ico{font-size:14px;width:16px;text-align:center;flex-shrink:0}
+.nb{margin-left:auto;background:var(--bg4);color:var(--tx3);font-size:10px;font-weight:700;padding:1px 7px;border-radius:10px;font-family:'JetBrains Mono',monospace;min-width:22px;text-align:center}
+.nb.live{background:rgba(63,185,80,.12);color:var(--grn)}
+/* MAIN */
+.main{flex:1;padding:22px 26px;overflow-y:auto;min-width:0}
+.pg{display:none}.pg.active{display:block}
+/* PH */
+.ph{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:18px;gap:10px;flex-wrap:wrap}
+.ph h1{font-family:'Playfair Display',serif;font-size:21px;color:var(--tx);font-weight:700}
+.ph p{font-size:12px;color:var(--tx2);margin-top:3px}
+.ph-r{display:flex;gap:7px;align-items:center;flex-shrink:0}
+/* BTNS */
+.btn{border:none;padding:8px 15px;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:.3px;display:inline-flex;align-items:center;gap:6px;transition:all .18s;font-family:'Lato',sans-serif;white-space:nowrap}
+.bp{background:var(--gd);color:#fff}.bp:hover{background:var(--gd2);color:#111}
+.bg{background:var(--bg3);color:var(--tx2);border:1px solid var(--bd)}.bg:hover{background:var(--bg4);color:var(--tx)}
+.bd-{background:rgba(248,81,73,.1);color:var(--red);border:1px solid rgba(248,81,73,.2)}.bd-:hover{background:rgba(248,81,73,.2)}
+.btn-s{padding:5px 10px;font-size:11px}
+.bs2{background:rgba(63,185,80,.12);color:var(--grn);border:1px solid rgba(63,185,80,.25)}.bs2:hover{background:rgba(63,185,80,.22)}
+/* STATS */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;margin-bottom:20px}
+.stat{background:var(--bg2);border:1px solid var(--bd);border-radius:9px;padding:15px 17px;position:relative;overflow:hidden}
+.stat::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.s1::before{background:var(--gd)}.s2::before{background:var(--blu)}.s3::before{background:var(--grn)}.s4::before{background:var(--org)}
+.sv{font-family:'JetBrains Mono',monospace;font-size:24px;font-weight:600;color:var(--tx);line-height:1}
+.sl{font-size:10px;color:var(--tx2);margin-top:5px;letter-spacing:.5px;text-transform:uppercase}
+.si{position:absolute;right:13px;top:13px;font-size:20px;opacity:.22}
+/* TABLE */
+.tw{background:var(--bg2);border:1px solid var(--bd);border-radius:9px;overflow:hidden;margin-bottom:18px}
+.th{display:flex;align-items:center;justify-content:space-between;padding:13px 17px;border-bottom:1px solid var(--bd);gap:9px;flex-wrap:wrap}
+.tt{font-size:13px;font-weight:700;color:var(--tx)}
+.tact{display:flex;gap:7px;align-items:center}
+.sb{background:var(--bg3);border:1px solid var(--bd);border-radius:7px;padding:6px 11px;font-size:12px;color:var(--tx);font-family:'Lato',sans-serif;width:190px;outline:none}
+.sb:focus{border-color:var(--gd)}.sb::placeholder{color:var(--tx3)}
+table{width:100%;border-collapse:collapse}
+thead tr{background:var(--bg3)}
+th{padding:9px 13px;text-align:left;font-size:9.5px;color:var(--tx3);letter-spacing:1.2px;text-transform:uppercase;font-weight:700;border-bottom:1px solid var(--bd);white-space:nowrap}
+td{padding:10px 13px;font-size:12.5px;color:var(--tx2);border-bottom:1px solid rgba(48,54,61,.45);vertical-align:middle}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover td{background:rgba(255,255,255,.015);color:var(--tx)}
+.tn{color:var(--tx);font-weight:600;font-size:13px}
+.tp{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--gd2)}
+.to{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--tx3);text-decoration:line-through}
+.tm{font-family:'JetBrains Mono',monospace;font-size:11px}
+.ts{font-size:9.5px;background:rgba(200,146,10,.1);color:var(--gd2);padding:2px 7px;border-radius:9px;font-weight:700;letter-spacing:.3px;display:inline-block}
+.tact-row{display:flex;gap:5px;justify-content:flex-end}
+.ib{background:none;border:1px solid var(--bd);border-radius:6px;padding:4px 7px;cursor:pointer;font-size:12px;color:var(--tx2);transition:all .15s;line-height:1}
+.ib:hover{background:var(--bg3);color:var(--tx)}
+.ib.del:hover{border-color:var(--red);color:var(--red);background:rgba(248,81,73,.08)}
+.thumb{width:34px;height:34px;border-radius:6px;object-fit:cover;background:var(--bg3);display:block}
+.thumb-ph{width:34px;height:34px;border-radius:6px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.adot{width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:5px}
+.adot.on{background:var(--grn)}.adot.off{background:var(--tx3)}
+/* STATUS BADGES */
+.ostatus{font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:9px;letter-spacing:.3px;text-transform:uppercase}
+.ostatus.pending{background:rgba(210,153,34,.15);color:var(--org)}
+.ostatus.confirmed{background:rgba(88,166,255,.12);color:var(--blu)}
+.ostatus.shipped{background:rgba(63,185,80,.12);color:var(--grn)}
+.ostatus.delivered{background:rgba(63,185,80,.2);color:var(--grn)}
+.ostatus.cancelled{background:rgba(248,81,73,.1);color:var(--red)}
+/* STATE CARDS */
+.sg{display:grid;grid-template-columns:repeat(4,1fr);gap:11px}
+.sc{background:var(--bg2);border:1px solid var(--bd);border-radius:9px;overflow:hidden;transition:border-color .18s}
+.sc:hover{border-color:var(--gd)}
+.sc-img{height:76px;object-fit:cover;width:100%;display:block;background:var(--bg3)}
+.sc-ph{height:76px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:30px}
+.sc-body{padding:9px 11px}
+.sc-name{font-weight:700;font-size:12.5px;color:var(--tx);margin-bottom:1px}
+.sc-tag{font-size:10.5px;color:var(--tx2);font-style:italic;margin-bottom:7px}
+.sc-meta{display:flex;align-items:center;justify-content:space-between}
+.sc-count{font-size:10px;color:var(--tx3)}
+.sc-acts{display:flex;gap:4px}
+/* MODAL */
+.mo{position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:500;display:none;align-items:center;justify-content:center;padding:14px}
+.mo.open{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--bd);border-radius:12px;width:100%;max-width:560px;max-height:92vh;overflow-y:auto;box-shadow:0 24px 60px rgba(0,0,0,.7)}
+.mh{padding:17px 21px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--bg2);z-index:1}
+.mt{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:var(--tx)}
+.mc{background:none;border:none;color:var(--tx2);font-size:18px;cursor:pointer;padding:4px;border-radius:6px;line-height:1;transition:color .15s}
+.mc:hover{color:var(--tx)}
+.mb{padding:19px 21px}
+.mf{padding:13px 21px;border-top:1px solid var(--bd);display:flex;justify-content:flex-end;gap:8px;position:sticky;bottom:0;background:var(--bg2)}
+/* FORM */
+.fr{margin-bottom:15px}
+.fr2{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:15px}
+.fr3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:11px;margin-bottom:15px}
+label{display:block;font-size:10.5px;color:var(--tx2);letter-spacing:.8px;text-transform:uppercase;font-weight:700;margin-bottom:5px}
+.hint{font-size:10.5px;color:var(--tx3);margin-top:3px;font-style:italic}
+input[type=text],input[type=number],input[type=email],select,textarea{width:100%;background:var(--bg3);border:1px solid var(--bd);border-radius:7px;padding:8px 11px;font-size:12.5px;color:var(--tx);font-family:'Lato',sans-serif;outline:none;transition:border-color .15s}
+input:focus,select:focus,textarea:focus{border-color:var(--gd)}
+select option{background:var(--bg3)}
+textarea{resize:vertical;min-height:72px;line-height:1.5}
+.cr{display:flex;gap:7px;flex-wrap:wrap;margin-top:6px}
+.cc{width:28px;height:28px;border-radius:6px;cursor:pointer;border:2px solid transparent;transition:transform .15s;flex-shrink:0}
+.cc.sel{border-color:#fff;transform:scale(1.1)}
+.pi-box{display:flex;gap:6px;flex-wrap:wrap;align-items:center;background:var(--bg3);border:1px solid var(--bd);border-radius:7px;padding:7px;min-height:40px;cursor:text;transition:border-color .15s}
+.pi-box:focus-within{border-color:var(--gd)}
+.ptag{background:rgba(200,146,10,.14);color:var(--gd2);font-size:10.5px;padding:3px 8px;border-radius:11px;display:flex;align-items:center;gap:4px;font-weight:600}
+.ptag button{background:none;border:none;color:var(--gd2);cursor:pointer;font-size:12px;line-height:1;padding:0;opacity:.7}
+.ptag button:hover{opacity:1}
+.pin{background:none;border:none;outline:none;font-size:12px;color:var(--tx);font-family:'Lato',sans-serif;min-width:90px;padding:2px 4px;flex:1}
+.sd{border:none;border-top:1px solid var(--bd);margin:16px 0}
+.ss{font-size:10px;color:var(--tx3);letter-spacing:1.5px;text-transform:uppercase;font-weight:700;margin-bottom:11px}
+.ib2{background:rgba(88,166,255,.05);border:1px solid rgba(88,166,255,.18);border-radius:8px;padding:10px 13px;font-size:11.5px;color:#8bc4ff;line-height:1.55;margin-bottom:14px}
+.ib2 strong{color:var(--blu)}
+.trw{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid rgba(48,54,61,.35)}
+.trw:last-child{border-bottom:none}
+.trl{font-size:12.5px;color:var(--tx2)}
+.tog{position:relative;width:37px;height:20px;flex-shrink:0}
+.tog input{opacity:0;width:0;height:0}
+.ts2{position:absolute;inset:0;background:var(--bg4);border-radius:10px;cursor:pointer;transition:.22s;border:1px solid var(--bd)}
+.tog input:checked+.ts2{background:var(--grn);border-color:var(--grn)}
+.ts2::before{content:'';position:absolute;width:14px;height:14px;left:2px;top:2px;background:#fff;border-radius:50%;transition:.22s}
+.tog input:checked+.ts2::before{transform:translateX(17px)}
+/* ORDER DETAIL */
+.od-g{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:14px}
+.od-f label{font-size:10px;color:var(--tx3);letter-spacing:.7px;text-transform:uppercase;font-weight:700;margin-bottom:3px;display:block}
+.od-f p{font-size:13px;color:var(--tx);font-weight:600}
+.od-item{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid rgba(48,54,61,.35);font-size:12.5px;color:var(--tx2)}
+.od-item:last-child{border-bottom:none}
+/* EMPTY */
+.empty{text-align:center;padding:46px 20px}
+.empty-ico{font-size:40px;opacity:.13;display:block;margin-bottom:11px}
+.empty p{color:var(--tx3);font-size:12.5px}
+/* TOAST */
+.toast{position:fixed;bottom:20px;right:20px;background:var(--bg4);border:1px solid var(--bd);color:var(--tx);padding:10px 15px;border-radius:9px;font-size:12.5px;z-index:9999;opacity:0;transform:translateY(8px);transition:all .25s;pointer-events:none;box-shadow:0 8px 24px rgba(0,0,0,.5)}
+.toast.show{opacity:1;transform:translateY(0)}
+.toast.ok{border-color:rgba(63,185,80,.4);color:var(--grn)}
+.toast.er{border-color:rgba(248,81,73,.4);color:var(--red)}
+/* SPIN */
+.spin{display:inline-block;width:13px;height:13px;border:2px solid var(--bd);border-top-color:var(--gd);border-radius:50%;animation:sp .7s linear infinite;vertical-align:middle}
+@keyframes sp{to{transform:rotate(360deg)}}
+@media(max-width:900px){.stats{grid-template-columns:1fr 1fr}.sg{grid-template-columns:1fr 1fr}.sidebar{width:54px}.nv span:not(.nv-ico){display:none}.nb{display:none}.nav-sec-lbl{display:none}}
+</style>
+</head>
+<body>
+
+<!-- ══ LOGIN GATE ══ -->
+<div id="login-gate" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:9999;align-items:center;justify-content:center">
+  <div style="background:var(--bg2);border:1px solid var(--bd);border-radius:14px;padding:36px 40px;width:100%;max-width:400px;box-shadow:0 24px 60px rgba(0,0,0,.7)">
+    <div style="text-align:center;margin-bottom:28px">
+      <div style="font-family:'Playfair Display',serif;font-size:22px;color:var(--tx);font-weight:700;margin-bottom:6px">🌿 Pahadi Roots</div>
+      <div style="font-size:11px;color:var(--tx3);letter-spacing:2px;text-transform:uppercase">Admin Panel</div>
+    </div>
+    <div style="margin-bottom:14px">
+      <label style="font-size:10px;color:var(--tx2);letter-spacing:.8px;text-transform:uppercase;font-weight:700;display:block;margin-bottom:6px">Admin Password</label>
+      <input type="password" id="login-pw" placeholder="Enter admin password"
+        style="width:100%;background:var(--bg3);border:1px solid var(--bd);border-radius:8px;padding:11px 14px;font-size:14px;color:var(--tx);font-family:'Lato',sans-serif;outline:none;transition:border-color .15s"
+        onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <div id="login-err" style="display:none;background:rgba(248,81,73,.08);border:1px solid rgba(248,81,73,.2);border-radius:7px;padding:9px 12px;font-size:12px;color:var(--red);margin-bottom:12px"></div>
+    <button id="login-btn" onclick="doLogin()"
+      style="width:100%;background:var(--gd);color:#1a0800;border:none;padding:12px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Lato',sans-serif">
+      → Login
+    </button>
+    <div style="margin-top:16px;background:rgba(88,166,255,.06);border:1px solid rgba(88,166,255,.15);border-radius:7px;padding:11px 14px;font-size:11px;color:#8bc4ff;line-height:1.7">
+      <strong>Password = </strong><code>ADMIN_PASSWORD</code> env var in Netlify Dashboard
+    </div>
+  </div>
+</div>
+
+<!-- ══ APP (hidden until logged in) ══ -->
+<div id="app" style="display:none;flex-direction:column;min-height:100vh">
+
+<div class="topbar">
+  <div class="t-left">
+    <span class="logo-pill">🌿 Pahadi Roots</span>
+    <span class="top-title">Admin Panel</span>
+  </div>
+  <div class="t-right">
+    <span class="sb-pill chk" id="sbBadge"><span class="spin"></span> Connecting…</span>
+    <a href="index.html" target="_blank" class="btn-link">↗ Store</a>
+    <button onclick="doLogout()" style="background:rgba(248,81,73,.1);color:var(--red);border:1px solid rgba(248,81,73,.2);padding:5px 11px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Lato',sans-serif">Logout</button>
+  </div>
+</div>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="nav-sec-lbl">Overview</div>
+    <button class="nv active" onclick="nav('dashboard')"><span class="nv-ico">📊</span><span>Dashboard</span></button>
+    <div class="nav-sec-lbl">Catalogue</div>
+    <button class="nv" onclick="nav('products')"><span class="nv-ico">📦</span><span>Products</span><span class="nb" id="nb-p">—</span></button>
+    <button class="nv" onclick="nav('states')"><span class="nv-ico">🗺️</span><span>States</span><span class="nb" id="nb-s">—</span></button>
+    <button class="nv" onclick="nav('categories')"><span class="nv-ico">🏷️</span><span>Categories</span><span class="nb" id="nb-c">—</span></button>
+    <div class="nav-sec-lbl">Commerce</div>
+    <button class="nv" onclick="nav('orders')"><span class="nv-ico">🛒</span><span>Orders</span><span class="nb" id="nb-o">—</span></button>
+    <button class="nv" onclick="nav('subscribers')"><span class="nv-ico">📧</span><span>Subscribers</span><span class="nb" id="nb-sub">—</span></button>
+    <div class="nav-sec-lbl">Admin</div>
+    <button class="nv" onclick="nav('setup')"><span class="nv-ico">🔌</span><span>Supabase Connect</span></button>
+    <button class="nv" onclick="nav('settings')"><span class="nv-ico">⚙️</span><span>Site Settings</span></button>
+  </aside>
+
+  <main class="main">
+
+    <!-- DASHBOARD -->
+    <div class="pg active" id="pg-dashboard">
+      <div class="ph"><div><h1>Dashboard</h1><p>Live data from Supabase · pahadi-roots</p></div></div>
+      <div class="stats">
+        <div class="stat s1"><div class="si">📦</div><div class="sv" id="d-p">—</div><div class="sl">Products</div></div>
+        <div class="stat s2"><div class="si">🛒</div><div class="sv" id="d-o">—</div><div class="sl">Orders</div></div>
+        <div class="stat s3"><div class="si">📧</div><div class="sv" id="d-sub">—</div><div class="sl">Subscribers</div></div>
+        <div class="stat s4"><div class="si">💰</div><div class="sv" id="d-rev">₹—</div><div class="sl">Revenue</div></div>
+      </div>
+      <div class="tw">
+        <div class="th"><span class="tt">Recent Orders</span><button class="btn bg btn-s" onclick="nav('orders')">View all →</button></div>
+        <table><thead><tr><th>#</th><th>Customer</th><th>Phone</th><th>Amount</th><th>Status</th><th>Date</th></tr></thead>
+        <tbody id="d-orders"></tbody></table>
+      </div>
+    </div>
+
+    <!-- PRODUCTS -->
+    <div class="pg" id="pg-products">
+      <div class="ph">
+        <div><h1>Products</h1><p>Full CRUD — changes go live on Supabase instantly</p></div>
+        <div class="ph-r">
+          <button class="btn bg btn-s" onclick="loadProducts()">↻</button>
+          <button class="btn bp" onclick="openPM()">+ Add Product</button>
+        </div>
+      </div>
+      <div class="tw">
+        <div class="th">
+          <span class="tt" id="plbl">Products</span>
+          <div class="tact"><input class="sb" placeholder="🔍 Search name / state…" oninput="filterP(this.value)"></div>
+        </div>
+        <table><thead><tr><th></th><th>Name</th><th>State</th><th>Price / Stock</th><th>Category</th><th>Active</th><th style="text-align:right">Actions</th></tr></thead>
+        <tbody id="p-tbody"></tbody></table>
+      </div>
+    </div>
+
+    <!-- STATES -->
+    <div class="pg" id="pg-states">
+      <div class="ph">
+        <div><h1>States & Regions</h1><p>Edit name, description and cover photo — saved to Supabase. Emoji/colours/pills stored locally.</p></div>
+        <div class="ph-r">
+          <button class="btn bg btn-s" onclick="loadStates()">↻</button>
+          <button class="btn bp" onclick="openSM()">+ Add State</button>
+        </div>
+      </div>
+      <div class="sg" id="s-grid"></div>
+    </div>
+
+    <!-- CATEGORIES -->
+    <div class="pg" id="pg-categories">
+      <div class="ph">
+        <div><h1>Categories</h1><p>Browse categories for products</p></div>
+        <button class="btn bp" onclick="openCM()">+ Add Category</button>
+      </div>
+      <div class="tw">
+        <table><thead><tr><th>ID</th><th>Name</th><th>Slug</th><th>Active</th><th style="text-align:right">Actions</th></tr></thead>
+        <tbody id="c-tbody"></tbody></table>
+      </div>
+    </div>
+
+    <!-- ORDERS -->
+    <div class="pg" id="pg-orders">
+      <div class="ph">
+        <div><h1>Orders</h1><p>All customer orders — update status and delivery date</p></div>
+        <div class="ph-r">
+          <select style="width:150px;font-size:12px" onchange="filterO(this.value)">
+            <option value="">All statuses</option>
+            <option value="pending">Pending</option>
+            <option value="confirmed">Confirmed</option>
+            <option value="shipped">Shipped</option>
+            <option value="delivered">Delivered</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+          <button class="btn bg btn-s" onclick="loadOrders()">↻</button>
+        </div>
+      </div>
+      <div class="tw">
+        <div class="th"><span class="tt" id="olbl">Orders</span></div>
+        <table><thead><tr><th>#</th><th>Customer</th><th>Phone</th><th>State</th><th>Amount</th><th>Payment</th><th>Status</th><th>Date</th><th style="text-align:right"></th></tr></thead>
+        <tbody id="o-tbody"></tbody></table>
+      </div>
+    </div>
+
+    <!-- SUBSCRIBERS -->
+    <div class="pg" id="pg-subscribers">
+      <div class="ph">
+        <div><h1>Subscribers</h1><p>Email list from your store</p></div>
+        <div class="ph-r">
+          <button class="btn bg btn-s" onclick="loadSubs()">↻</button>
+          <button class="btn bs2" onclick="exportCSV()">↓ Export CSV</button>
+        </div>
+      </div>
+      <div class="tw">
+        <table><thead><tr><th>ID</th><th>Email</th><th>Status</th><th>Joined</th><th style="text-align:right">Actions</th></tr></thead>
+        <tbody id="sub-tbody"></tbody></table>
+      </div>
+    </div>
+
+    <!-- SETUP -->
+    <div class="pg" id="pg-setup">
+      <div class="ph"><div><h1>Supabase Connect</h1><p>Production security — service key lives only in Netlify, never in browser</p></div>
+        <button class="btn bg btn-s" onclick="testConn()">✓ Test Connection</button>
+      </div>
+
+      <div id="conn-result" style="margin-bottom:16px;display:none"></div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:960px;align-items:start">
+
+        <!-- Netlify env vars setup -->
+        <div style="background:var(--bg2);border:1px solid var(--bd);border-radius:10px;padding:22px">
+          <div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:700;margin-bottom:4px;color:var(--tx)">1️⃣ Netlify Environment Variables</div>
+          <div style="font-size:11.5px;color:var(--tx2);margin-bottom:16px">Netlify Dashboard → Your site → Site Configuration → Environment Variables → Add variable</div>
+
+          <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px">
+            <div style="background:var(--bg3);border:1px solid var(--bd);border-radius:8px;padding:12px 14px">
+              <div style="font-size:10px;color:var(--tx3);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px">Variable name</div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--gd2);margin-bottom:6px">SUPABASE_URL</div>
+              <div style="font-size:10px;color:var(--tx3);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px">Value</div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--tx2)">Your project URL from Supabase Dashboard → Project Settings → API</div>
+            </div>
+            <div style="background:var(--bg3);border:1px solid var(--bd);border-radius:8px;padding:12px 14px">
+              <div style="font-size:10px;color:var(--tx3);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px">Variable name</div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--gd2);margin-bottom:6px">SUPABASE_SERVICE_KEY</div>
+              <div style="font-size:10px;color:var(--tx3);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px">Value</div>
+              <div style="font-size:11px;color:var(--tx2)">Supabase Dashboard → Project Settings → API → <b>service_role</b> (secret) key</div>
+            </div>
+            <div style="background:var(--bg3);border:1px solid var(--bd);border-radius:8px;padding:12px 14px">
+              <div style="font-size:10px;color:var(--tx3);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px">Variable name</div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--gd2);margin-bottom:6px">ADMIN_PASSWORD</div>
+              <div style="font-size:10px;color:var(--tx3);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px">Value</div>
+              <div style="font-size:11px;color:var(--tx2)">Your chosen admin password — you type this at the login screen</div>
+            </div>
+          </div>
+
+          <div style="background:rgba(63,185,80,.06);border:1px solid rgba(63,185,80,.2);border-radius:8px;padding:12px 14px;font-size:11.5px;color:#7ee787;line-height:1.75">
+            <strong style="color:var(--grn)">✅ Why this is safe on Netlify:</strong><br>
+            · Service key = Netlify server env var → never in browser JS<br>
+            · Admin calls a secure serverless function on your host<br>
+            · Function checks your password before touching DB<br>
+            · Even if someone finds admin.html — they cannot do anything without the password<br>
+            · Password is never stored — only in your session memory
+          </div>
+        </div>
+
+        <!-- Right column: architecture + RLS + storage -->
+        <div style="display:flex;flex-direction:column;gap:14px">
+
+          <div style="background:var(--bg2);border:1px solid var(--bd);border-radius:10px;padding:18px">
+            <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;margin-bottom:12px;color:var(--tx)">2️⃣ Correct RLS Policies</div>
+            <div style="font-size:11px;color:var(--tx2);margin-bottom:10px">Supabase → Authentication → Policies</div>
+            <div style="display:flex;flex-direction:column;gap:7px">
+              <div style="background:var(--bg3);border:1px solid var(--bd);border-radius:7px;padding:9px 12px">
+                <div style="font-size:12px;font-weight:700;color:var(--tx);margin-bottom:3px">products · states · categories</div>
+                <div style="font-size:11px;color:var(--grn)">✅ anon: SELECT only (store can read)</div>
+                <div style="font-size:11px;color:var(--org)">🔑 service_role: all (admin writes, bypasses RLS)</div>
+              </div>
+              <div style="background:var(--bg3);border:1px solid var(--bd);border-radius:7px;padding:9px 12px">
+                <div style="font-size:12px;font-weight:700;color:var(--tx);margin-bottom:3px">orders · order_items</div>
+                <div style="font-size:11px;color:var(--grn)">✅ anon: INSERT (customers can checkout)</div>
+                <div style="font-size:11px;color:var(--red)">✗ anon: no SELECT / UPDATE / DELETE</div>
+              </div>
+              <div style="background:var(--bg3);border:1px solid var(--bd);border-radius:7px;padding:9px 12px">
+                <div style="font-size:12px;font-weight:700;color:var(--tx);margin-bottom:3px">subscribers</div>
+                <div style="font-size:11px;color:var(--grn)">✅ anon: INSERT (newsletter signup)</div>
+                <div style="font-size:11px;color:var(--red)">✗ anon: no SELECT / DELETE</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="background:var(--bg2);border:1px solid var(--bd);border-radius:10px;padding:18px">
+            <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;margin-bottom:12px;color:var(--tx)">3️⃣ Storage Buckets</div>
+            <div style="font-size:11px;color:var(--tx2);margin-bottom:10px">Supabase → Storage → New bucket</div>
+            <div style="display:flex;flex-direction:column;gap:7px">
+              <div style="background:var(--bg3);border:1px solid var(--bd);border-radius:7px;padding:9px 12px;display:flex;align-items:center;justify-content:space-between">
+                <div><div style="font-size:12.5px;font-weight:700;color:var(--tx);font-family:'JetBrains Mono',monospace">state-photos</div><div style="font-size:10px;color:var(--tx3);margin-top:2px">600×400px WebP cultural photos</div></div>
+                <span style="font-size:9.5px;background:rgba(63,185,80,.1);color:var(--grn);padding:2px 8px;border-radius:6px;font-weight:700">PUBLIC</span>
+              </div>
+              <div style="background:var(--bg3);border:1px solid var(--bd);border-radius:7px;padding:9px 12px;display:flex;align-items:center;justify-content:space-between">
+                <div><div style="font-size:12.5px;font-weight:700;color:var(--tx);font-family:'JetBrains Mono',monospace">product-photos</div><div style="font-size:10px;color:var(--tx3);margin-top:2px">400×400px WebP product images</div></div>
+                <span style="font-size:9.5px;background:rgba(63,185,80,.1);color:var(--grn);padding:2px 8px;border-radius:6px;font-weight:700">PUBLIC</span>
+              </div>
+            </div>
+          </div>
+
+          <div style="background:var(--bg2);border:1px solid var(--bd);border-radius:10px;padding:18px">
+            <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;margin-bottom:12px;color:var(--tx)">4️⃣ Deploy to Netlify</div>
+            <div style="display:flex;flex-direction:column;gap:6px;font-size:11.5px;color:var(--tx2);line-height:1.7">
+              <div>① Push your folder to <b>GitHub</b></div>
+              <div>② Connect repo to Netlify (Import project)</div>
+              <div>③ Add the 3 env vars above</div>
+              <div>④ Deploy — done, no localhost ever needed</div>
+              <div style="margin-top:4px;padding:8px 10px;background:var(--bg3);border-radius:6px;font-family:'JetBrains Mono',monospace;font-size:10.5px;color:#7ee787">
+                Build command: (leave blank)<br>
+                Publish dir: . (dot — root folder)
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div class="pg" id="pg-settings">
+      <div class="ph">
+        <div><h1>Site Settings</h1><p>Store configuration, founder photo and display options</p></div>
+        <button class="btn bp" onclick="saveSettings()">💾 Save Settings</button>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:800px;align-items:start">
+        <div style="background:var(--bg2);border:1px solid var(--bd);border-radius:10px;overflow:hidden">
+          <div style="padding:12px 18px;border-bottom:1px solid var(--bd);font-size:13px;font-weight:700;color:var(--tx)">Store Config</div>
+          <div style="padding:18px">
+            <div class="fr"><label>WhatsApp Number</label><input type="text" id="cfg-phone" placeholder="+91 98765 43210"></div>
+            <div class="fr"><label>Free Shipping Above (₹)</label><input type="number" id="cfg-thresh" placeholder="799"></div>
+            <div class="trw"><span class="trl">Show free shipping banner</span><label class="tog"><input type="checkbox" id="cfg-ship" checked><span class="ts2"></span></label></div>
+            <div class="trw"><span class="trl">Show discount % badges</span><label class="tog"><input type="checkbox" id="cfg-disc" checked><span class="ts2"></span></label></div>
+          </div>
+        </div>
+        <div style="background:var(--bg2);border:1px solid var(--bd);border-radius:10px;overflow:hidden">
+          <div style="padding:12px 18px;border-bottom:1px solid var(--bd);font-size:13px;font-weight:700;color:var(--tx)">Founder Photo</div>
+          <div style="padding:18px">
+            <div id="founder-zone" style="border:2px dashed var(--bd);border-radius:8px;padding:20px;text-align:center;background:var(--bg3);position:relative;cursor:pointer;transition:all .18s" onclick="document.getElementById('founder-file').click()">
+              <div style="font-size:30px;opacity:.3;margin-bottom:7px">🧑‍🌾</div>
+              <div style="font-size:12px;color:var(--tx3)">Click to upload founder photo</div>
+              <div style="font-size:10.5px;color:var(--tx3);margin-top:4px">WebP/JPG · &lt;200KB · shown in Our Story</div>
+              <input type="file" id="founder-file" accept="image/*" style="display:none" onchange="previewFounder(this)">
+            </div>
+            <img id="founder-prev" style="width:100%;height:110px;object-fit:cover;border-radius:7px;display:none;margin-top:10px" alt="Founder">
+            <button class="btn bp" style="width:100%;margin-top:10px;justify-content:center" onclick="saveFounderPhoto()">Save to localStorage</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- PRODUCT MODAL -->
+<div class="mo" id="pm">
+  <div class="modal">
+    <div class="mh"><span class="mt" id="pm-title">Add Product</span><button class="mc" onclick="CM('pm')">✕</button></div>
+    <div class="mb">
+      <div class="ib2"><strong>DB fields:</strong> state_id · name · description · price · stock · Product Origin State · image_url · category_id · is_active</div>
+      <input type="hidden" id="p-id">
+      <div class="fr"><label>Product Name *</label><input type="text" id="p-name" placeholder="e.g. Kumaoni Wild Forest Honey"></div>
+      <div class="fr3">
+        <div><label>State *</label><select id="p-state"></select></div>
+        <div><label>Category</label><select id="p-cat"><option value="">None</option></select></div>
+        <div><label>Emoji (UI)</label><input type="text" id="p-emo" placeholder="🍯" maxlength="4"></div>
+      </div>
+      <div class="fr3">
+        <div><label>Price (₹) *</label><input type="number" id="p-price" placeholder="549"></div>
+        <div><label>Stock</label><input type="number" id="p-stock" placeholder="50"></div>
+        <div><label>Unit (UI)</label><input type="text" id="p-unit" placeholder="/500g"></div>
+      </div>
+      <div class="fr"><label>Product Origin State</label><input type="text" id="p-orig" placeholder="e.g. Kumaoni Forests, Uttarakhand"></div>
+      <div class="fr"><label>Description *</label><textarea id="p-desc" placeholder="Short description for product card…"></textarea></div>
+      <div class="fr"><label>Product Image</label>
+        <!-- IMAGE UPLOAD ZONE — Step 1: pick file → Step 2: auto-uploads to product-photos → Step 3: URL saved to image_url -->
+        <div id="p-img-zone" style="border:2px dashed var(--bd);border-radius:8px;padding:16px;background:var(--bg3);text-align:center;position:relative;cursor:pointer;transition:all .18s" onclick="document.getElementById('p-img-file').click()">
+          <div style="font-size:24px;opacity:.3;margin-bottom:5px">📷</div>
+          <div style="font-size:12px;color:var(--tx3)">Click to upload product photo</div>
+          <div style="font-size:10.5px;color:var(--tx3);margin-top:3px">WebP/JPG · 400×400px · &lt;80KB · uploads to Supabase Storage</div>
+          <input type="file" id="p-img-file" accept="image/*" style="display:none" onchange="handleProdImgUpload(this)">
+        </div>
+        <div id="p-img-status" style="font-size:11px;margin-top:5px;display:none"></div>
+        <img id="p-img-preview" style="width:100%;height:100px;object-fit:cover;border-radius:7px;margin-top:8px;display:none" alt="Preview">
+        <div style="margin-top:8px;display:flex;align-items:center;gap:8px">
+          <span style="font-size:10px;color:var(--tx3);white-space:nowrap">or paste URL:</span>
+          <input type="text" id="p-img" placeholder="https://…supabase.co/storage/v1/…" style="font-size:11px" oninput="updateProdImgPreview(this.value)">
+        </div>
+        <div class="hint">Uploading auto-sets the URL and saves to Supabase instantly ✓</div>
+      </div>
+      <hr class="sd"><div class="ss">UI Display (local)</div>
+      <div class="fr2">
+        <div><label>Badge</label>
+          <select id="p-badge">
+            <option value="bs">⭐ Bestseller</option><option value="og">🌱 Organic</option>
+            <option value="pm">💎 Premium</option><option value="nw">🆕 New Arrival</option>
+          </select>
+        </div>
+        <div><label>Original Price (for discount %)</label><input type="number" id="p-oprice" placeholder="699"></div>
+      </div>
+      <div class="fr"><label>Card Background</label>
+        <div class="cr" id="p-cr">
+          <div class="cc sel" data-c="#fdf3e3" style="background:#fdf3e3" onclick="PC(this,'p-bg')"></div>
+          <div class="cc" data-c="#f5f5e6" style="background:#f5f5e6" onclick="PC(this,'p-bg')"></div>
+          <div class="cc" data-c="#fff0f5" style="background:#fff0f5" onclick="PC(this,'p-bg')"></div>
+          <div class="cc" data-c="#fff8e1" style="background:#fff8e1" onclick="PC(this,'p-bg')"></div>
+          <div class="cc" data-c="#e8f5e8" style="background:#e8f5e8" onclick="PC(this,'p-bg')"></div>
+          <div class="cc" data-c="#f5ecd8" style="background:#f5ecd8" onclick="PC(this,'p-bg')"></div>
+          <div class="cc" data-c="#e8eaf6" style="background:#e8eaf6" onclick="PC(this,'p-bg')"></div>
+        </div>
+        <input type="hidden" id="p-bg" value="#fdf3e3">
+      </div>
+      <div class="trw"><span class="trl">Active (visible on store)</span><label class="tog"><input type="checkbox" id="p-act" checked><span class="ts2"></span></label></div>
+    </div>
+    <div class="mf"><button class="btn bg" onclick="CM('pm')">Cancel</button><button class="btn bp" id="p-sbtn" onclick="saveProduct()">💾 Save to Supabase</button></div>
+  </div>
+</div>
+
+<!-- STATE MODAL -->
+<div class="mo" id="sm">
+  <div class="modal">
+    <div class="mh"><span class="mt" id="sm-title">Edit State</span><button class="mc" onclick="CM('sm')">✕</button></div>
+    <div class="mb">
+      <div class="ib2"><strong>DB fields:</strong> id · name · description · image_path · is_active &nbsp;|&nbsp; Emoji/tagline/pills/colours saved locally.</div>
+      <div class="fr2">
+        <div><label>State ID * (e.g. hp)</label><input type="text" id="s-id" placeholder="hp" maxlength="4"></div>
+        <div><label>State Name *</label><input type="text" id="s-name" placeholder="Himachal Pradesh"></div>
+      </div>
+      <div class="fr"><label>Description</label><textarea id="s-desc" rows="3" placeholder="Cultural description shown on the state panel…"></textarea></div>
+      <div class="fr"><label>Cover Photo (image_path)</label>
+        <!-- IMAGE UPLOAD ZONE — uploads to state-photos bucket → URL auto-saved to states.image_path in DB -->
+        <div id="s-img-zone" style="border:2px dashed var(--bd);border-radius:8px;padding:16px;background:var(--bg3);text-align:center;position:relative;cursor:pointer;transition:all .18s" onclick="document.getElementById('s-img-file').click()">
+          <div style="font-size:24px;opacity:.3;margin-bottom:5px">🖼️</div>
+          <div style="font-size:12px;color:var(--tx3)">Click to upload cultural cover photo</div>
+          <div style="font-size:10.5px;color:var(--tx3);margin-top:3px">WebP · 600×400px · &lt;100KB · uploads to Supabase state-photos bucket</div>
+          <input type="file" id="s-img-file" accept="image/*" style="display:none" onchange="handleStateImgUpload(this)">
+        </div>
+        <div id="s-img-status" style="font-size:11px;margin-top:5px;display:none"></div>
+        <img id="s-img-preview" style="width:100%;height:100px;object-fit:cover;border-radius:7px;margin-top:8px;display:none" alt="Preview">
+        <div style="margin-top:8px;display:flex;align-items:center;gap:8px">
+          <span style="font-size:10px;color:var(--tx3);white-space:nowrap">or paste URL / local path:</span>
+          <input type="text" id="s-img" placeholder="images/states/hp.webp  or  https://…" style="font-size:11px" oninput="updateStateImgPreview(this.value)">
+        </div>
+        <div class="hint">Uploading auto-updates image_path in DB and goes live immediately ✓</div>
+      </div>
+      <hr class="sd"><div class="ss">UI Only — Saved Locally</div>
+      <div class="fr2">
+        <div><label>Emoji</label><input type="text" id="s-emo" placeholder="🏔️" maxlength="4"></div>
+        <div><label>Tagline</label><input type="text" id="s-tag" placeholder="Dev Bhoomi"></div>
+      </div>
+      <div class="fr"><label>Product Pills (Enter to add)</label>
+        <div class="pi-box" id="s-pbox" onclick="document.getElementById('s-pin').focus()">
+          <input class="pin" id="s-pin" placeholder="e.g. 🍎 Apple & ACV" onkeydown="AP(event)">
+        </div>
+        <div class="hint">Emoji + label format · shown as tags on state panel</div>
+      </div>
+      <div class="fr"><label>Panel Gradient</label>
+        <div class="cr" id="s-cr">
+          <div class="cc sel" data-c="linear-gradient(135deg,#1a3a1e,#2d5233)" style="background:linear-gradient(135deg,#1a3a1e,#2d5233)" onclick="PC(this,'s-bg')"></div>
+          <div class="cc" data-c="linear-gradient(135deg,#1e3a8a,#2d4fa3)" style="background:linear-gradient(135deg,#1e3a8a,#2d4fa3)" onclick="PC(this,'s-bg')"></div>
+          <div class="cc" data-c="linear-gradient(135deg,#4a2c10,#6b3a18)" style="background:linear-gradient(135deg,#4a2c10,#6b3a18)" onclick="PC(this,'s-bg')"></div>
+          <div class="cc" data-c="linear-gradient(135deg,#3a0a0a,#5c1a1a)" style="background:linear-gradient(135deg,#3a0a0a,#5c1a1a)" onclick="PC(this,'s-bg')"></div>
+          <div class="cc" data-c="linear-gradient(135deg,#1a2a4a,#2d3f6b)" style="background:linear-gradient(135deg,#1a2a4a,#2d3f6b)" onclick="PC(this,'s-bg')"></div>
+          <div class="cc" data-c="linear-gradient(135deg,#2a1a4a,#4a2a7a)" style="background:linear-gradient(135deg,#2a1a4a,#4a2a7a)" onclick="PC(this,'s-bg')"></div>
+        </div>
+        <input type="hidden" id="s-bg" value="linear-gradient(135deg,#1a3a1e,#2d5233)">
+      </div>
+      <div class="trw"><span class="trl">Active</span><label class="tog"><input type="checkbox" id="s-act" checked><span class="ts2"></span></label></div>
+    </div>
+    <div class="mf"><button class="btn bg" onclick="CM('sm')">Cancel</button><button class="btn bp" id="s-sbtn" onclick="saveState()">💾 Save to Supabase</button></div>
+  </div>
+</div>
+
+<!-- CATEGORY MODAL -->
+<div class="mo" id="cm">
+  <div class="modal" style="max-width:400px">
+    <div class="mh"><span class="mt" id="cm-title">Add Category</span><button class="mc" onclick="CM('cm')">✕</button></div>
+    <div class="mb">
+      <input type="hidden" id="c-id">
+      <div class="fr"><label>Name *</label><input type="text" id="c-name" placeholder="e.g. Honey & Sweeteners" oninput="autoSlug()"></div>
+      <div class="fr"><label>Slug *</label><input type="text" id="c-slug" placeholder="honey-sweeteners"></div>
+      <div class="trw"><span class="trl">Active</span><label class="tog"><input type="checkbox" id="c-act" checked><span class="ts2"></span></label></div>
+    </div>
+    <div class="mf"><button class="btn bg" onclick="CM('cm')">Cancel</button><button class="btn bp" onclick="saveCat()">💾 Save</button></div>
+  </div>
+</div>
+
+<!-- ORDER MODAL -->
+<div class="mo" id="om">
+  <div class="modal">
+    <div class="mh"><span class="mt" id="om-title">Order Details</span><button class="mc" onclick="CM('om')">✕</button></div>
+    <div class="mb">
+      <input type="hidden" id="o-id">
+      <div class="od-g" id="o-detail"></div>
+      <div style="font-size:10px;color:var(--tx3);letter-spacing:1px;text-transform:uppercase;font-weight:700;margin-bottom:9px">Order Items</div>
+      <div id="o-items"></div>
+      <hr class="sd">
+      <div class="fr2">
+        <div><label>Order Status</label>
+          <select id="o-status">
+            <option value="pending">Pending</option><option value="confirmed">Confirmed</option>
+            <option value="shipped">Shipped</option><option value="delivered">Delivered</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+        </div>
+        <div><label>Delivery Date</label><input type="text" id="o-del" placeholder="YYYY-MM-DD"></div>
+      </div>
+    </div>
+    <div class="mf"><button class="btn bg" onclick="CM('om')">Close</button><button class="btn bp" onclick="updateOrder()">💾 Update Status</button></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════════════════════════════════
+// PRODUCTION-SECURE ARCHITECTURE — works on Netlify, no localhost needed
+// ══════════════════════════════════════════════════════════════════════
+//
+//  index.html  →  anon key (hardcoded, read-only)  →  Supabase directly
+//  admin.html  →  admin password (session only)    →  Netlify Function
+//                                                  →  service key (env var)
+//                                                  →  Supabase
+//
+//  The service key NEVER touches the browser. Ever.
+//  Even if someone finds admin.html, they need the password.
+//  Even if they have the password, they still cannot get the service key.
+// ══════════════════════════════════════════════════════════════════════
+
+// ── Login gate ──────────────────────────────────────────────────────────────
+// Password lives in Netlify env var ADMIN_PASSWORD (set in Netlify dashboard)
+// We store it in sessionStorage only — cleared when tab closes
+// ─────────────────────────────────────────────────────────────────────────────
+let _adminPw = sessionStorage.getItem('_apr_pw') || '';
+
+function getAdminPw(){ return _adminPw; }
+
+function isLoggedIn(){ return _adminPw.length > 0; }
+
+function showLoginGate(){
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('login-gate').style.display = 'flex';
+}
+
+function hideLoginGate(){
+  document.getElementById('login-gate').style.display = 'none';
+  document.getElementById('app').style.display = 'flex';
+}
+
+async function doLogin(){
+  const pw = document.getElementById('login-pw').value.trim();
+  if(!pw){ showLoginErr('Enter your admin password'); return; }
+  const btn = document.getElementById('login-btn');
+  btn.disabled = true; btn.textContent = 'Checking…';
+  // Test the password by making a real API call through the proxy
+  try {
+    const r = await callProxy('GET','states','limit=1', null, pw);
+    if(r === null || Array.isArray(r)){
+      // Success — password accepted by the Netlify function
+      _adminPw = pw;
+      sessionStorage.setItem('_apr_pw', pw);
+      hideLoginGate();
+      init();
+    }
+  } catch(e){
+    if(e.message.includes('401') || e.message.includes('Unauthorized')){
+      showLoginErr('Wrong password. Try again.');
+    } else {
+      showLoginErr('Error: ' + e.message);
+    }
+    btn.disabled = false; btn.textContent = '→ Login';
+  }
+}
+
+function showLoginErr(msg){
+  const el = document.getElementById('login-err');
+  el.textContent = msg; el.style.display = 'block';
+  document.getElementById('login-btn').disabled = false;
+  document.getElementById('login-btn').textContent = '→ Login';
+}
+
+function doLogout(){
+  _adminPw = '';
+  sessionStorage.removeItem('_apr_pw');
+  location.reload();
+}
+
+// ── Platform-agnostic API endpoint ─────────────────────────────────────────
+// Works on Netlify today. Move to Vercel, Render, Railway, or custom VPS
+// tomorrow — just update PLATFORM in one place, or use the localStorage override.
+//
+// To override for any custom backend:
+//   localStorage.setItem('pr_api_base', 'https://your-api.com/api')
+// ──────────────────────────────────────────────────────────────────────────────
+function getApiBase(){
+  const override = localStorage.getItem('pr_api_base');
+  if(override) return override.replace(/\/$/, ''); // trim trailing slash
+
+  const host = location.hostname;
+  if(host.includes('.vercel.app') || host.includes('.vercel.sh')) return '/api';
+  // Netlify, localhost with netlify dev, custom domain on Netlify — all use same path
+  return '/.netlify/functions';
+}
+
+// ── Secure proxy — service key NEVER in browser ───────────────────────────
+async function callProxy(method, table, query='', body=null, pwOverride=null){
+  const pw = pwOverride || getAdminPw();
+  const r = await fetch(getApiBase()+'/admin-api', {
+    method: 'POST',
+    headers: { 'Content-Type':'application/json', 'x-admin-password': pw },
+    body: JSON.stringify({ method, table, query, body }),
+  });
+  if(r.status === 401) throw new Error('401: Unauthorized — wrong password');
+  if(!r.ok){ const t = await r.text(); throw new Error(r.status+': '+t); }
+  const t = await r.text(); return t ? JSON.parse(t) : null;
+}
+
+const GET  = (t,q)   => callProxy('GET',   t, q,    null);
+const POST = (t,b)   => callProxy('POST',  t, '',   b);
+const PATCH= (t,b,q) => callProxy('PATCH', t, q,    b);
+const DEL  = (t,q)   => callProxy('DELETE',t, q,    null);
+
+// ── Storage upload — file never leaves your server ────────────────────────
+async function uploadToStorage(file, bucket, fileName){
+  const path = fileName || `${Date.now()}-${file.name.replace(/\s+/g,'-')}`;
+  const base64 = await new Promise((res,rej)=>{
+    const r = new FileReader();
+    r.onload  = e => res(e.target.result.split(',')[1]);
+    r.onerror = rej;
+    r.readAsDataURL(file);
+  });
+  const r = await fetch(getApiBase()+'/storage-upload', {
+    method: 'POST',
+    headers: { 'Content-Type':'application/json', 'x-admin-password': getAdminPw() },
+    body: JSON.stringify({ bucket, path, base64, mimeType: file.type }),
+  });
+  if(r.status === 401) throw new Error('Unauthorized — check admin password');
+  if(!r.ok){ const t = await r.text(); throw new Error('Upload failed: '+t); }
+  const data = await r.json();
+  return data.url;
+}
+
+// ══════════════════════════════════════════════════
+// LOCAL UI META (emoji, tagline, pills, panel_bg)
+// ══════════════════════════════════════════════════
+const DEF_UI = {
+  hp:{emoji:'🏔️',tagline:'Dev Bhoomi',panel_bg:'linear-gradient(135deg,#1a3a1e,#2d5233)',pills:['🍎 Apple & ACV','🍯 Pine Honey','🍵 Kangra Tea','🥛 Bilona Ghee','🌰 Chilgoza Nuts']},
+  uk:{emoji:'🏔️',tagline:'Dev Bhoomi',panel_bg:'linear-gradient(135deg,#1a3a1e,#2d5233)',pills:['🍯 Wild Honey','🌾 Pahadi Rajma','🌸 Buransh Juice','🥛 Badri Ghee','🌿 Jakhiya']},
+  jk:{emoji:'🌷',tagline:'Paradise on Earth',panel_bg:'linear-gradient(135deg,#1e3a8a,#2d4fa3)',pills:['🌸 Kashmiri Kesar','🌰 Kagzi Walnuts','🍵 Kahwa Tea','🌶️ Kashmiri Mirchi','🥜 Almonds']},
+  la:{emoji:'❄️',tagline:'Land of High Passes',panel_bg:'linear-gradient(135deg,#4a2c10,#6b3a18)',pills:['🫐 Seabuckthorn','🪨 Shilajit','🍑 Wild Apricots','⚡ Black Buckwheat','🧂 Rock Salt']},
+  sk:{emoji:'🌺',tagline:"India's First Organic State",panel_bg:'linear-gradient(135deg,#1a3a1e,#2a5230)',pills:['🫚 Large Cardamom','🌿 Organic Turmeric','🍵 Temi Tea','🌱 Organic Ginger','🥬 Gundruk']},
+  as:{emoji:'🍵',tagline:'Tea Capital of the World',panel_bg:'linear-gradient(135deg,#1a3a1e,#2d5233)',pills:['🍵 Orthodox Tea','⚡ Black Joha Rice','🫙 Bamboo Pickle','🍯 Forest Honey','🍍 Queen Pineapple']},
+  ml:{emoji:'🌧️',tagline:'Abode of Clouds',panel_bg:'linear-gradient(135deg,#1e3a8a,#2d4fa3)',pills:['🌿 Lakadong Turmeric','🌑 Wild Black Pepper','🍯 Wild Honey','🍃 Bay Leaf','🫚 Hill Ginger']},
+  nl:{emoji:'🌶️',tagline:'Land of Festivals & Fire',panel_bg:'linear-gradient(135deg,#3a0a0a,#5c1a1a)',pills:['🌶️ Bhut Jolokia','🍯 Wild Hill Honey','🫙 Axone (Fermented)','🌿 Wild Herbs','🧂 Tribal Salt']},
+};
+function getUI(id){ return {...(DEF_UI[id]||{}),...JSON.parse(localStorage.getItem('ui_'+id)||'{}')}; }
+function setUI(id,d){ localStorage.setItem('ui_'+id, JSON.stringify({...getUI(id),...d})); }
+function getPUI(id){ return JSON.parse(localStorage.getItem('pui_'+id)||'{}'); }
+function setPUI(id,d){ localStorage.setItem('pui_'+id, JSON.stringify({...getPUI(id),...d})); }
+
+// ══════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════
+let PRODS=[], STATES=[], CATS=[], ORDERS=[], SUBS=[];
+let pFilter='', oFilter='', pillsArr=[];
+
+// ══════════════════════════════════════════════════
+// NAV
+// ══════════════════════════════════════════════════
+const LOADS={products:loadProducts,states:loadStates,categories:loadCats,orders:loadOrders,subscribers:loadSubs,dashboard:loadDash,setup:loadSetupPage,settings:loadSettingsPage};
+function nav(id){
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nv').forEach(n=>n.classList.remove('active'));
+  document.getElementById('pg-'+id).classList.add('active');
+  document.querySelectorAll('.nv').forEach(n=>{ if(n.getAttribute('onclick')?.includes("'"+id+"'")) n.classList.add('active'); });
+  if(LOADS[id]) LOADS[id]();
+}
+
+// ══════════════════════════════════════════════════
+// DASHBOARD
+// ══════════════════════════════════════════════════
+async function loadDash(){
+  try{
+    const [p,o,sub]=await Promise.all([
+      GET('products','select=id'),
+      GET('orders','select=id,total_amount,customer_name,customer_phone,customer_state,order_status,created_at&order=created_at.desc&limit=25'),
+      GET('subscribers','select=id'),
+    ]);
+    ORDERS=o;
+    document.getElementById('d-p').textContent=p.length;
+    document.getElementById('d-o').textContent=o.length;
+    document.getElementById('d-sub').textContent=sub.length;
+    document.getElementById('d-rev').textContent='₹'+o.reduce((a,x)=>a+(x.total_amount||0),0).toLocaleString('en-IN');
+    document.getElementById('nb-p').textContent=p.length;
+    document.getElementById('nb-o').textContent=o.length;
+    document.getElementById('nb-sub').textContent=sub.length;
+    document.getElementById('d-orders').innerHTML=o.slice(0,8).map(x=>`<tr>
+      <td class="tm">#${x.id}</td><td class="tn">${x.customer_name||'—'}</td>
+      <td class="tm">${x.customer_phone||'—'}</td>
+      <td class="tp">₹${(x.total_amount||0).toLocaleString('en-IN')}</td>
+      <td><span class="ostatus ${x.order_status||'pending'}">${x.order_status||'pending'}</span></td>
+      <td style="font-size:11px;color:var(--tx3)">${fd(x.created_at)}</td>
+    </tr>`).join('');
+  }catch(e){ toast('Dashboard: '+e.message,'er'); }
+}
+
+// ══════════════════════════════════════════════════
+// PILLS
+// ══════════════════════════════════════════════════
+async function loadDash(){
+  try{
+    const [p,o,sub]=await Promise.all([
+      GET('products','select=id'),
+      GET('orders','select=id,total_amount,customer_name,customer_phone,customer_state,order_status,created_at&order=created_at.desc&limit=25'),
+      GET('subscribers','select=id'),
+    ]);
+    ORDERS=o;
+    document.getElementById('d-p').textContent=p.length;
+    document.getElementById('d-o').textContent=o.length;
+    document.getElementById('d-sub').textContent=sub.length;
+    document.getElementById('d-rev').textContent='₹'+o.reduce((a,x)=>a+(x.total_amount||0),0).toLocaleString('en-IN');
+    document.getElementById('nb-p').textContent=p.length;
+    document.getElementById('nb-o').textContent=o.length;
+    document.getElementById('nb-sub').textContent=sub.length;
+    document.getElementById('d-orders').innerHTML=o.slice(0,8).map(x=>`<tr>
+      <td class="tm">#${x.id}</td><td class="tn">${x.customer_name||'—'}</td>
+      <td class="tm">${x.customer_phone||'—'}</td>
+      <td class="tp">₹${(x.total_amount||0).toLocaleString('en-IN')}</td>
+      <td><span class="ostatus ${x.order_status||'pending'}">${x.order_status||'pending'}</span></td>
+      <td style="font-size:11px;color:var(--tx3)">${fd(x.created_at)}</td>
+    </tr>`).join('');
+  }catch(e){ toast('Dashboard: '+e.message,'er'); }
+}
+
+// ══════════════════════════════════════════════════
+// PRODUCTS
+// ══════════════════════════════════════════════════
+async function loadProducts(){
+  document.getElementById('p-tbody').innerHTML=LR(7);
+  try{
+    const [p,s,c]=await Promise.all([GET('products','order=id'),GET('states','order=name'),GET('categories','order=name')]);
+    PRODS=p; STATES=s; CATS=c;
+    document.getElementById('nb-p').textContent=p.length;
+    document.getElementById('nb-s').textContent=s.length;
+    document.getElementById('nb-c').textContent=c.length;
+    fillSel('p-state',s); fillCatSel('p-cat',c);
+    renderProds();
+  }catch(e){ document.getElementById('p-tbody').innerHTML=ER(7,e); }
+}
+function renderProds(){
+  const list=pFilter?PRODS.filter(p=>p.name?.toLowerCase().includes(pFilter)||p.state_id?.includes(pFilter)):PRODS;
+  document.getElementById('plbl').textContent=list.length+' products';
+  document.getElementById('p-tbody').innerHTML=list.map(p=>{
+    const ui=getPUI(p.id);
+    return `<tr>
+      <td>${p.image_url?`<img class="thumb" src="${p.image_url}" onerror="this.style.display='none'" alt="">`:
+        `<div class="thumb-ph">${ui.emoji||'🌿'}</div>`}</td>
+      <td><div class="tn">${p.name}</div><div style="font-size:10.5px;color:var(--tx3);margin-top:2px">📍 ${p['Product Origin State']||'—'}</div></td>
+      <td><span class="ts">${p.state_id||'—'}</span></td>
+      <td><span class="tp">₹${p.price}</span><br><span style="font-size:10px;color:var(--tx3)">stock: ${p.stock??'—'}</span></td>
+      <td class="tm" style="font-size:11px">${p.category_id||'—'}</td>
+      <td><label class="tog" style="margin:0 auto"><input type="checkbox" ${p.is_active?'checked':''} onchange="toggleP(${p.id},this.checked)"><span class="ts2"></span></label></td>
+      <td><div class="tact-row">
+        <button class="ib" onclick="openPM(${p.id})">✏️</button>
+        <button class="ib del" onclick="delProd(${p.id},'${(p.name||'').replace(/'/g,'')}')">🗑️</button>
+      </div></td>
+    </tr>`;
+  }).join('')||`<tr><td colspan="7"><div class="empty"><span class="empty-ico">📦</span><p>No products yet</p></div></td></tr>`;
+}
+function filterP(q){ pFilter=q.toLowerCase(); renderProds(); }
+async function toggleP(id,val){
+  try{ await PATCH('products',{is_active:val},`id=eq.${id}`); const p=PRODS.find(x=>x.id===id); if(p)p.is_active=val; toast(val?'✅ Activated':'Hidden','ok'); }
+  catch(e){ toast('❌ '+e.message,'er'); }
+}
+async function delProd(id,name){
+  if(!confirm(`Delete "${name}"? Cannot be undone.`)) return;
+  try{ await DEL('products',`id=eq.${id}`); PRODS=PRODS.filter(p=>p.id!==id); renderProds(); toast('🗑️ Deleted','ok'); }
+  catch(e){ toast('❌ '+e.message,'er'); }
+}
+function openPM(id=null){
+  const p=id?PRODS.find(x=>x.id===id):null;
+  const ui=id?getPUI(id):{};
+  document.getElementById('pm-title').textContent=id?'Edit Product':'Add Product';
+  document.getElementById('p-id').value=id||'';
+  V('p-name',p?.name||''); V('p-desc',p?.description||''); V('p-price',p?.price||'');
+  V('p-stock',p?.stock||''); V('p-orig',p?.['Product Origin State']||'');
+  V('p-img',p?.image_url||''); V('p-emo',ui.emoji||''); V('p-unit',ui.unit||'/unit');
+  V('p-oprice',ui.original_price||''); document.getElementById('p-act').checked=p?.is_active!==false;
+  document.getElementById('p-badge').value=ui.badge_type||'bs';
+  document.getElementById('p-bg').value=ui.card_bg||'#fdf3e3';
+  if(STATES.length) fillSel('p-state',STATES,p?.state_id);
+  if(CATS.length) fillCatSel('p-cat',CATS,p?.category_id);
+  document.querySelectorAll('#p-cr .cc').forEach(c=>c.classList.toggle('sel',c.dataset.c===(ui.card_bg||'#fdf3e3')));
+  document.getElementById('pm').classList.add('open');
+}
+async function saveProduct(){
+  const name=g('p-name').trim(), price=parseInt(g('p-price'));
+  if(!name||!price){ toast('❌ Name and price required','er'); return; }
+  const id=g('p-id');
+  const db={name,price,description:g('p-desc'),stock:parseInt(g('p-stock'))||0,
+    state_id:g('p-state'),category_id:parseInt(g('p-cat'))||null,
+    'Product Origin State':g('p-orig'),image_url:g('p-img'),is_active:document.getElementById('p-act').checked};
+  const ui={emoji:g('p-emo')||'🌿',unit:g('p-unit')||'/unit',
+    original_price:parseInt(g('p-oprice'))||null,badge_type:g('p-badge'),card_bg:g('p-bg')};
+  BL('p-sbtn',true);
+  try{
+    if(id){
+      await PATCH('products',db,`id=eq.${id}`);
+      setPUI(id,ui); const i=PRODS.findIndex(p=>p.id==id); if(i>-1) PRODS[i]={...PRODS[i],...db};
+      toast('✅ Product updated','ok');
+    } else {
+      const [c]=await POST('products',db);
+      setPUI(c.id,ui); PRODS.push(c);
+      toast('✅ Product added','ok');
+    }
+    CM('pm'); renderProds();
+  }catch(e){ toast('❌ '+e.message,'er'); }
+  finally{ BL('p-sbtn',false); }
+}
+
+// ══════════════════════════════════════════════════
+// STATES
+// ══════════════════════════════════════════════════
+async function loadStates(){
+  document.getElementById('s-grid').innerHTML=`<div style="grid-column:1/-1;padding:40px;text-align:center;color:var(--tx3)"><span class="spin"></span> Loading…</div>`;
+  try{
+    STATES=await GET('states','order=id');
+    document.getElementById('nb-s').textContent=STATES.length;
+    renderStates();
+  }catch(e){ document.getElementById('s-grid').innerHTML=`<div style="grid-column:1/-1;padding:30px;text-align:center;color:var(--red)">${e.message}</div>`; }
+}
+function renderStates(){
+  const pc={}; PRODS.forEach(p=>{ pc[p.state_id]=(pc[p.state_id]||0)+1; });
+  document.getElementById('s-grid').innerHTML=STATES.map(s=>{
+    const ui=getUI(s.id);
+    const img=s.image_path||`images/states/${s.id}.webp`;
+    return `<div class="sc">
+      <img class="sc-img" src="${img}" alt="${s.name}" onerror="this.style.display='none'">
+      <div class="sc-body">
+        <div class="sc-name">${ui.emoji||'🗺️'} ${s.name}</div>
+        <div class="sc-tag">${ui.tagline||''}</div>
+        <div class="sc-meta">
+          <span class="sc-count">📦 ${pc[s.id]||0} products · ${s.is_active?'<span style="color:var(--grn)">active</span>':'<span style="color:var(--tx3)">hidden</span>'}</span>
+          <div class="sc-acts">
+            <button class="ib btn-s" onclick="openSM('${s.id}')">✏️</button>
+            <button class="ib del btn-s" onclick="delState('${s.id}','${s.name.replace(/'/g,'')}')">🗑️</button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join('')||`<div style="grid-column:1/-1"><div class="empty"><span class="empty-ico">🗺️</span><p>No states</p></div></div>`;
+}
+function openSM(id=null){
+  const s=id?STATES.find(x=>x.id===id):null;
+  const ui=id?getUI(id):{};
+  document.getElementById('sm-title').textContent=id?`Edit — ${s?.name}`:'Add New State';
+  document.getElementById('s-id').value=s?.id||''; document.getElementById('s-id').disabled=!!id;
+  V('s-name',s?.name||''); V('s-desc',s?.description||'');
+  V('s-img',s?.image_path||`images/states/${id||''}.webp`);
+  V('s-emo',ui.emoji||''); V('s-tag',ui.tagline||'');
+  document.getElementById('s-act').checked=s?.is_active!==false;
+  document.getElementById('s-bg').value=ui.panel_bg||'linear-gradient(135deg,#1a3a1e,#2d5233)';
+  pillsArr=[...(ui.pills||[])]; RP();
+  document.querySelectorAll('#s-cr .cc').forEach(c=>c.classList.toggle('sel',c.dataset.c===(ui.panel_bg||'linear-gradient(135deg,#1a3a1e,#2d5233)')));
+  document.getElementById('sm').classList.add('open');
+}
+async function saveState(){
+  const id=g('s-id').trim().toLowerCase(), name=g('s-name').trim();
+  if(!id||!name){ toast('❌ ID and Name required','er'); return; }
+  const db={id,name,description:g('s-desc'),image_path:g('s-img')||null,is_active:document.getElementById('s-act').checked};
+  const ui={emoji:g('s-emo'),tagline:g('s-tag'),pills:pillsArr,panel_bg:g('s-bg')};
+  BL('s-sbtn',true);
+  try{
+    const ex=STATES.find(s=>s.id===id);
+    if(ex){ await PATCH('states',db,`id=eq.${id}`); Object.assign(ex,db); }
+    else { const [c]=await POST('states',db); STATES.push(c); }
+    setUI(id,ui); toast('✅ State saved','ok'); CM('sm'); renderStates();
+  }catch(e){ toast('❌ '+e.message,'er'); }
+  finally{ BL('s-sbtn',false); }
+}
+async function delState(id,name){
+  if(!confirm(`Delete state "${name}"?`)) return;
+  try{ await DEL('states',`id=eq.${id}`); STATES=STATES.filter(s=>s.id!==id); renderStates(); toast('🗑️ Deleted','ok'); }
+  catch(e){ toast('❌ '+e.message,'er'); }
+}
+
+// ══════════════════════════════════════════════════
+// CATEGORIES
+// ══════════════════════════════════════════════════
+async function loadCats(){
+  document.getElementById('c-tbody').innerHTML=LR(5);
+  try{
+    CATS=await GET('categories','order=name');
+    document.getElementById('nb-c').textContent=CATS.length;
+    renderCats();
+  }catch(e){ document.getElementById('c-tbody').innerHTML=ER(5,e); }
+}
+function renderCats(){
+  document.getElementById('c-tbody').innerHTML=CATS.map(c=>`<tr>
+    <td class="tm">${c.id}</td><td class="tn">${c.name}</td>
+    <td class="tm" style="font-size:11px">${c.slug}</td>
+    <td><span class="adot ${c.is_active?'on':'off'}"></span>${c.is_active?'Active':'Hidden'}</td>
+    <td><div class="tact-row"><button class="ib" onclick="openCM(${c.id})">✏️</button><button class="ib del" onclick="delCat(${c.id},'${c.name.replace(/'/g,'')}')">🗑️</button></div></td>
+  </tr>`).join('')||`<tr><td colspan="5"><div class="empty"><span class="empty-ico">🏷️</span><p>No categories yet</p></div></td></tr>`;
+}
+function openCM(id=null){ const c=id?CATS.find(x=>x.id===id):null; document.getElementById('cm-title').textContent=id?'Edit Category':'Add Category'; document.getElementById('c-id').value=id||''; V('c-name',c?.name||''); V('c-slug',c?.slug||''); document.getElementById('c-act').checked=c?.is_active!==false; document.getElementById('cm').classList.add('open'); }
+function autoSlug(){ document.getElementById('c-slug').value=g('c-name').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,''); }
+async function saveCat(){
+  const name=g('c-name').trim(),slug=g('c-slug').trim();
+  if(!name||!slug){ toast('❌ Name and slug required','er'); return; }
+  const id=g('c-id'); const data={name,slug,is_active:document.getElementById('c-act').checked};
+  try{
+    if(id){ await PATCH('categories',data,`id=eq.${id}`); const c=CATS.find(x=>x.id==id); if(c)Object.assign(c,data); }
+    else { const [c]=await POST('categories',data); CATS.push(c); }
+    toast('✅ Saved','ok'); CM('cm'); renderCats();
+  }catch(e){ toast('❌ '+e.message,'er'); }
+}
+async function delCat(id,name){
+  if(!confirm(`Delete category "${name}"?`)) return;
+  try{ await DEL('categories',`id=eq.${id}`); CATS=CATS.filter(c=>c.id!==id); renderCats(); toast('🗑️ Deleted','ok'); }
+  catch(e){ toast('❌ '+e.message,'er'); }
+}
+
+// ══════════════════════════════════════════════════
+// ORDERS
+// ══════════════════════════════════════════════════
+async function loadOrders(){
+  document.getElementById('o-tbody').innerHTML=LR(9);
+  try{
+    ORDERS=await GET('orders','order=created_at.desc');
+    document.getElementById('nb-o').textContent=ORDERS.length;
+    renderOrders();
+  }catch(e){ document.getElementById('o-tbody').innerHTML=ER(9,e); }
+}
+function filterO(s){ oFilter=s; renderOrders(); }
+function renderOrders(){
+  const list=oFilter?ORDERS.filter(o=>o.order_status===oFilter):ORDERS;
+  document.getElementById('olbl').textContent=list.length+' orders';
+  document.getElementById('o-tbody').innerHTML=list.map(o=>`<tr>
+    <td class="tm">#${o.id}</td><td class="tn">${o.customer_name||'—'}</td>
+    <td class="tm" style="font-size:11px">${o.customer_phone||'—'}</td>
+    <td style="font-size:12px">${o.customer_state||'—'}</td>
+    <td class="tp">₹${(o.total_amount||0).toLocaleString('en-IN')}</td>
+    <td><span style="font-size:9.5px;font-weight:700;padding:2px 7px;border-radius:9px;background:rgba(200,146,10,.1);color:var(--org)">${o.payment_status||'COD'}</span></td>
+    <td><span class="ostatus ${o.order_status||'pending'}">${o.order_status||'pending'}</span></td>
+    <td style="font-size:11px;color:var(--tx3)">${fd(o.created_at)}</td>
+    <td><div class="tact-row"><button class="ib" onclick="openOM(${o.id})">📋</button></div></td>
+  </tr>`).join('')||`<tr><td colspan="9"><div class="empty"><span class="empty-ico">🛒</span><p>No orders yet</p></div></td></tr>`;
+}
+async function openOM(id){
+  const o=ORDERS.find(x=>x.id===id); if(!o) return;
+  document.getElementById('om-title').textContent='Order #'+id;
+  document.getElementById('o-id').value=id;
+  document.getElementById('o-status').value=o.order_status||'pending';
+  document.getElementById('o-del').value=o.delivery_date||'';
+  document.getElementById('o-detail').innerHTML=`
+    <div class="od-f"><label>Customer</label><p>${o.customer_name||'—'}</p></div>
+    <div class="od-f"><label>Phone</label><p>${o.customer_phone||'—'}</p></div>
+    <div class="od-f" style="grid-column:1/-1"><label>Address</label><p>${o.customer_address||'—'}</p></div>
+    <div class="od-f"><label>State</label><p>${o.customer_state||'—'}</p></div>
+    <div class="od-f"><label>Total</label><p style="color:var(--gd2)">₹${(o.total_amount||0).toLocaleString('en-IN')}</p></div>`;
+  document.getElementById('o-items').innerHTML=`<div style="color:var(--tx3);font-size:12px"><span class="spin"></span> Loading items…</div>`;
+  document.getElementById('om').classList.add('open');
+  try{
+    const items=await GET('order_items',`order_id=eq.${id}`);
+    document.getElementById('o-items').innerHTML=items.length
+      ? items.map(i=>`<div class="od-item"><span>Product #${i.product_id} × ${i.quantity}</span><span class="tp">₹${((i.price_at_time||0)*i.quantity).toLocaleString('en-IN')}</span></div>`).join('')
+      : '<div style="color:var(--tx3);font-size:12px;padding:6px 0">No items found</div>';
+  }catch{ document.getElementById('o-items').innerHTML='<div style="color:var(--red);font-size:12px">Could not load items</div>'; }
+}
+async function updateOrder(){
+  const id=g('o-id'); const status=g('o-status'); const del=g('o-del');
+  try{
+    await PATCH('orders',{order_status:status,delivery_date:del||null},`id=eq.${id}`);
+    const o=ORDERS.find(x=>x.id==id); if(o){ o.order_status=status; o.delivery_date=del; }
+    toast('✅ Order updated','ok'); CM('om'); renderOrders();
+  }catch(e){ toast('❌ '+e.message,'er'); }
+}
+
+// ══════════════════════════════════════════════════
+// SUBSCRIBERS
+// ══════════════════════════════════════════════════
+async function loadSubs(){
+  document.getElementById('sub-tbody').innerHTML=LR(4);
+  try{
+    SUBS=await GET('subscribers','order=created_at.desc');
+    document.getElementById('nb-sub').textContent=SUBS.length;
+    document.getElementById('sub-tbody').innerHTML=SUBS.map(s=>`<tr>
+      <td class="tm">${s.id}</td><td class="tn">${s.email}</td>
+      <td><span class="adot ${s.is_active?'on':'off'}"></span>${s.is_active?'Subscribed':'Unsubscribed'}</td>
+      <td style="font-size:11px;color:var(--tx3)">${fd(s.created_at)}</td>
+    </tr>`).join('')||`<tr><td colspan="4"><div class="empty"><span class="empty-ico">📧</span><p>No subscribers yet</p></div></td></tr>`;
+  }catch(e){ document.getElementById('sub-tbody').innerHTML=ER(4,e); }
+}
+
+// ══════════════════════════════════════════════════
+// IMAGE UPLOAD HANDLERS
+// Final flow: select file → upload to Storage → get public URL
+//             → PATCH DB (image_url / image_path) → preview shown → store live
+// ══════════════════════════════════════════════════
+
+// PRODUCT IMAGE — uploads to product-photos bucket
+async function handleProdImgUpload(input){
+  if(!input.files[0]) return;
+  const file = input.files[0];
+  const status = document.getElementById('p-img-status');
+  const prev   = document.getElementById('p-img-preview');
+  const zone   = document.getElementById('p-img-zone');
+
+  // Show preview immediately from local file
+  const reader = new FileReader();
+  reader.onload = e => { prev.src=e.target.result; prev.style.display='block'; };
+  reader.readAsDataURL(file);
+
+  status.style.display='block'; status.style.color='var(--org)'; status.textContent='⟳ Uploading to Supabase Storage…';
+  zone.style.borderColor='var(--org)';
+
+  try {
+    const url = await uploadToStorage(file, 'product-photos', `${Date.now()}-${file.name}`);
+    document.getElementById('p-img').value = url;
+    status.style.color='var(--grn)'; status.textContent='✅ Uploaded! URL auto-set below.';
+    zone.style.borderColor='var(--grn)';
+
+    // If editing an existing product, auto-PATCH image_url in DB right now
+    const prodId = g('p-id');
+    if(prodId){
+      await PATCH('products',{image_url:url},`id=eq.${prodId}`);
+      const p=PRODS.find(x=>x.id==prodId); if(p) p.image_url=url;
+      status.textContent='✅ Uploaded + saved to DB! Image live on store.';
+      renderProds();
+    }
+  } catch(e){
+    status.style.color='var(--red)'; status.textContent='❌ '+e.message;
+    zone.style.borderColor='var(--red)';
+  }
+}
+function updateProdImgPreview(url){
+  const prev=document.getElementById('p-img-preview');
+  if(url){ prev.src=url; prev.style.display='block'; }
+  else prev.style.display='none';
+}
+
+// STATE IMAGE — uploads to state-photos bucket → PATCH states.image_path → immediately live
+async function handleStateImgUpload(input){
+  if(!input.files[0]) return;
+  const file = input.files[0];
+  const status = document.getElementById('s-img-status');
+  const prev   = document.getElementById('s-img-preview');
+  const zone   = document.getElementById('s-img-zone');
+  const stateId= g('s-id');
+
+  const reader = new FileReader();
+  reader.onload = e => { prev.src=e.target.result; prev.style.display='block'; };
+  reader.readAsDataURL(file);
+
+  status.style.display='block'; status.style.color='var(--org)'; status.textContent='⟳ Uploading to state-photos bucket…';
+  zone.style.borderColor='var(--org)';
+
+  try {
+    const fname = `${stateId||'state'}-${Date.now()}.${file.name.split('.').pop()}`;
+    const url = await uploadToStorage(file, 'state-photos', fname);
+    document.getElementById('s-img').value = url;
+    status.style.color='var(--grn)';
+
+    // Auto-PATCH the DB if editing an existing state — image live immediately
+    if(stateId && STATES.find(x=>x.id===stateId)){
+      await PATCH('states',{image_path:url},`id=eq.${stateId}`);
+      const s=STATES.find(x=>x.id===stateId); if(s) s.image_path=url;
+      status.textContent='✅ Uploaded + saved to states.image_path! Image live on store now.';
+      loadStates(); // refresh state grid
+    } else {
+      status.textContent='✅ Uploaded! URL set — will save when you click Save.';
+    }
+    zone.style.borderColor='var(--grn)';
+  } catch(e){
+    status.style.color='var(--red)'; status.textContent='❌ '+e.message;
+    zone.style.borderColor='var(--red)';
+  }
+}
+function updateStateImgPreview(url){
+  const prev=document.getElementById('s-img-preview');
+  if(url){ prev.src=url; prev.style.display='block'; }
+  else prev.style.display='none';
+}
+
+// ══════════════════════════════════════════════════
+// SETUP PAGE FUNCTIONS
+// ══════════════════════════════════════════════════
+// No keys stored in browser — service key lives in Netlify env vars only
+async function testConn(){
+  const res = document.getElementById('conn-result');
+  if(res){ res.style.display='block'; res.style.color='var(--org)'; res.textContent='Testing…'; }
+  try{
+    await GET('states','limit=1');
+    setBadge('on','⬤ Supabase Live');
+    if(res){ res.style.color='var(--grn)'; res.innerHTML='<div style="background:rgba(63,185,80,.06);border:1px solid rgba(63,185,80,.2);border-radius:8px;padding:11px 14px;font-size:12px;line-height:1.7">✅ <strong>Connected!</strong> Netlify Function → Supabase is working. Service key active.</div>'; }
+    toast('✅ Supabase connected','ok');
+  }catch(e){
+    setBadge('off','⬤ DB Error');
+    if(res){ res.style.color='var(--red)'; res.innerHTML='❌ '+e.message+(e.message.includes('401')?'<br><span style="font-size:11px;color:var(--tx3)">Check ADMIN_PASSWORD env var in Netlify</span>':'<br><span style="font-size:11px;color:var(--tx3)">Check SUPABASE_URL + SUPABASE_SERVICE_KEY env vars in Netlify</span>'); }
+    toast('❌ '+e.message,'er');
+  }
+}
+
+// ══════════════════════════════════════════════════
+// SETTINGS PAGE FUNCTIONS
+// ══════════════════════════════════════════════════
+function loadSettings(){
+  try {
+    const c = JSON.parse(localStorage.getItem('pr_settings')||'{}');
+    if(document.getElementById('cfg-phone')) document.getElementById('cfg-phone').value=c.phone||'';
+    if(document.getElementById('cfg-thresh')) document.getElementById('cfg-thresh').value=c.threshold||'';
+    if(document.getElementById('cfg-ship')) document.getElementById('cfg-ship').checked=c.shipping!==false;
+    if(document.getElementById('cfg-disc')) document.getElementById('cfg-disc').checked=c.discount!==false;
+  } catch{}
+}
+function saveSettings(){
+  const cfg={
+    phone:document.getElementById('cfg-phone')?.value||'',
+    threshold:document.getElementById('cfg-thresh')?.value||'',
+    shipping:document.getElementById('cfg-ship')?.checked!==false,
+    discount:document.getElementById('cfg-disc')?.checked!==false,
+  };
+  localStorage.setItem('pr_settings',JSON.stringify(cfg));
+  toast('✅ Settings saved','ok');
+}
+function previewFounder(input){
+  if(!input.files[0]) return;
+  const r=new FileReader(); r.onload=e=>{const p=document.getElementById('founder-prev');p.src=e.target.result;p.style.display='block';}; r.readAsDataURL(input.files[0]);
+}
+function saveFounderPhoto(){
+  const p=document.getElementById('founder-prev');
+  if(!p||!p.src||p.src===location.href){ toast('❌ Upload a photo first','er'); return; }
+  localStorage.setItem('pr_founder_image',p.src);
+  toast('✅ Founder photo saved — will show on store','ok');
+}
+
+// ══════════════════════════════════════════════════
+// SUBSCRIBERS — with delete + CSV export
+// ══════════════════════════════════════════════════
+async function loadSubs(){
+  document.getElementById('sub-tbody').innerHTML=LR(5);
+  try{
+    SUBS=await GET('subscribers','order=created_at.desc');
+    document.getElementById('nb-sub').textContent=SUBS.length;
+    renderSubs();
+  }catch(e){ document.getElementById('sub-tbody').innerHTML=ER(5,e); }
+}
+function renderSubs(){
+  document.getElementById('sub-tbody').innerHTML=SUBS.map(s=>`<tr>
+    <td class="tm">${s.id}</td>
+    <td class="tn">${s.email}</td>
+    <td><span class="adot ${s.is_active?'on':'off'}"></span>${s.is_active?'Active':'Unsubscribed'}</td>
+    <td style="font-size:11px;color:var(--tx3)">${fd(s.created_at)}</td>
+    <td><div class="tact-row"><button class="ib del" onclick="delSub(${s.id},'${s.email.replace(/'/g,'')}')">🗑️</button></div></td>
+  </tr>`).join('')||`<tr><td colspan="5"><div class="empty"><span class="empty-ico">📧</span><p>No subscribers yet</p></div></td></tr>`;
+}
+async function delSub(id,email){
+  if(!confirm('Remove subscriber '+email+'?')) return;
+  try{ await DEL('subscribers',`id=eq.${id}`); SUBS=SUBS.filter(s=>s.id!==id); renderSubs(); toast('🗑️ Removed','ok'); }
+  catch(e){ toast('❌ '+e.message,'er'); }
+}
+function exportCSV(){
+  const rows=[['ID','Email','Active','Joined'],...SUBS.map(s=>[s.id,s.email,s.is_active,s.created_at])];
+  const a=document.createElement('a'); a.href='data:text/csv,'+encodeURIComponent(rows.map(r=>r.join(',')).join('\n')); a.download='pahadi-roots-subscribers.csv'; a.click();
+  toast('✅ CSV exported','ok');
+}
+function RP(){
+  const box=document.getElementById('s-pbox'), inp=document.getElementById('s-pin');
+  box.querySelectorAll('.ptag').forEach(e=>e.remove());
+  pillsArr.forEach((p,i)=>{ const t=document.createElement('span'); t.className='ptag'; t.innerHTML=`${p}<button onclick="DP(${i})" type="button">×</button>`; box.insertBefore(t,inp); });
+}
+function AP(e){ if(e.key!=='Enter') return; e.preventDefault(); const v=e.target.value.trim(); if(v&&!pillsArr.includes(v)){ pillsArr.push(v); RP(); e.target.value=''; } }
+function DP(i){ pillsArr.splice(i,1); RP(); }
+
+// ══════════════════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════════════════
+function g(id){ return document.getElementById(id)?.value||''; }
+function V(id,val){ const el=document.getElementById(id); if(el) el.value=val; }
+function PC(el,fId){ el.closest('.cr').querySelectorAll('.cc').forEach(c=>c.classList.remove('sel')); el.classList.add('sel'); document.getElementById(fId).value=el.dataset.c; }
+function fillSel(id,states,sel=''){ document.getElementById(id).innerHTML=states.map(s=>`<option value="${s.id}" ${s.id===sel?'selected':''}>${s.name}</option>`).join(''); }
+function fillCatSel(id,cats,sel=''){ document.getElementById(id).innerHTML=`<option value="">None</option>`+cats.map(c=>`<option value="${c.id}" ${c.id==sel?'selected':''}>${c.name}</option>`).join(''); }
+function CM(id){ document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.mo').forEach(o=>o.addEventListener('click',e=>{ if(e.target===o) o.classList.remove('open'); }));
+let _tt; function toast(msg,type=''){ const t=document.getElementById('toast'); t.textContent=msg; t.className='toast show '+(type||''); clearTimeout(_tt); _tt=setTimeout(()=>t.className='toast',3200); }
+function fd(d){ if(!d) return '—'; return new Date(d).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}); }
+function LR(c){ return `<tr><td colspan="${c}" style="text-align:center;padding:30px;color:var(--tx3)"><span class="spin"></span> Loading from Supabase…</td></tr>`; }
+function ER(c,e){ return `<tr><td colspan="${c}" style="text-align:center;padding:28px;color:var(--red)">❌ ${e.message}</td></tr>`; }
+function BL(id,on){ const b=document.getElementById(id); if(!b) return; b.disabled=on; b.innerHTML=on?'<span class="spin"></span> Saving…':'💾 Save to Supabase'; }
+
+// ══════════════════════════════════════════════════
+// CONNECTION + INIT
+// ══════════════════════════════════════════════════
+async function init(){
+  document.getElementById('app').style.display = 'flex';
+  try{
+    await GET('states','limit=1');
+    setBadge('on','⬤ Supabase Live');
+    loadDash();
+  }catch(e){
+    setBadge('off','⬤ DB Error');
+    toast('❌ DB error: '+e.message,'er');
+  }
+}
+function setBadge(cls,txt){ const b=document.getElementById('sbBadge'); b.className='sb-pill '+cls; b.textContent=txt; }
+
+function loadSetupPage(){} // Setup page is now just documentation — no keys stored in browser
+function loadSettingsPage(){ loadSettings(); }
+
+// ── Boot: check session, show login or go straight in ──────────────────────
+(function boot(){
+  if(isLoggedIn()){
+    hideLoginGate();
+    init();
+  } else {
+    document.getElementById('login-gate').style.display = 'flex';
+    document.getElementById('app').style.display = 'none';
+  }
+  loadSettings();
+})();
+</script>
+
+</div><!-- /app -->
+</body>
+</html>
