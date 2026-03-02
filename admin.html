@@ -165,6 +165,41 @@ textarea{resize:vertical;min-height:72px;line-height:1.5}
 .spin{display:inline-block;width:13px;height:13px;border:2px solid var(--bd);border-top-color:var(--gd);border-radius:50%;animation:sp .7s linear infinite;vertical-align:middle}
 @keyframes sp{to{transform:rotate(360deg)}}
 @media(max-width:900px){.stats{grid-template-columns:1fr 1fr}.sg{grid-template-columns:1fr 1fr}.sidebar{width:54px}.nv span:not(.nv-ico){display:none}.nb{display:none}.nav-sec-lbl{display:none}}
+
+/* ── Coupon cards ── */
+.coup-card{background:var(--bg2);border:1px solid var(--bd);border-radius:12px;padding:18px 20px;position:relative;overflow:hidden}
+.coup-card::before{content:'';position:absolute;top:0;left:0;bottom:0;width:4px;background:var(--gd)}
+.coup-code{font-family:'Courier New',monospace;font-size:18px;font-weight:800;color:var(--gd);letter-spacing:2px;margin-bottom:4px}
+.coup-meta{font-size:12px;color:var(--tx2);margin-bottom:10px}
+.coup-status{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;padding:3px 8px;border-radius:8px;letter-spacing:.8px}
+.coup-active{background:rgba(63,185,80,.1);color:#3fb950}
+.coup-inactive{background:rgba(248,81,73,.1);color:#f85149}
+.coup-actions{display:flex;gap:8px;margin-top:12px}
+
+/* ── Analytics bars ── */
+.an-bar-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;font-size:13px}
+.an-bar-name{width:140px;color:var(--tx2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:0}
+.an-bar-track{flex:1;height:8px;background:var(--bg3);border-radius:4px;overflow:hidden}
+.an-bar-fill{height:100%;background:linear-gradient(90deg,var(--gd),#e8b84b);border-radius:4px;transition:width .6s ease}
+.an-bar-val{width:50px;text-align:right;font-weight:700;color:var(--tx);font-size:12px}
+
+/* ── Status donut (fake SVG chart) ── */
+.status-donut{display:flex;flex-direction:column;gap:8px}
+.sd-row{display:flex;align-items:center;gap:10px;font-size:13px}
+.sd-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.sd-label{flex:1;color:var(--tx2)}
+.sd-count{font-weight:700;color:var(--tx)}
+.sd-pct{font-size:11px;color:var(--tx3)}
+
+/* ── Review card ── */
+.rev-card{background:var(--bg2);border:1px solid var(--bd);border-radius:12px;padding:16px 20px;margin-bottom:12px}
+.rc-top{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.rc-avatar{width:38px;height:38px;border-radius:50%;background:var(--gd);color:#1a0800;font-weight:800;font-size:15px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.rc-name{font-weight:700;color:var(--tx);font-size:14px}
+.rc-loc{font-size:11px;color:var(--tx3)}
+.rc-stars{color:#f5c842;font-size:13px;letter-spacing:2px}
+.rc-txt{font-size:13px;color:var(--tx2);line-height:1.65;font-style:italic}
+.rc-prod{font-size:11px;color:var(--gd);font-weight:700;margin-top:6px}
 </style>
 </head>
 <body>
@@ -219,6 +254,10 @@ textarea{resize:vertical;min-height:72px;line-height:1.5}
     <div class="nav-sec-lbl">Commerce</div>
     <button class="nv" onclick="nav('orders')"><span class="nv-ico">🛒</span><span>Orders</span><span class="nb" id="nb-o">—</span></button>
     <button class="nv" onclick="nav('subscribers')"><span class="nv-ico">📧</span><span>Subscribers</span><span class="nb" id="nb-sub">—</span></button>
+    <div class="nav-sec-lbl">Commerce</div>
+    <button class="nv" onclick="nav('coupons')"><span class="nv-ico">🎟️</span><span>Coupons</span><span class="nb" id="nb-coup">—</span></button>
+    <button class="nv" onclick="nav('analytics')"><span class="nv-ico">📈</span><span>Analytics</span></button>
+    <button class="nv" onclick="nav('reviews')"><span class="nv-ico">⭐</span><span>Reviews</span></button>
     <div class="nav-sec-lbl">Admin</div>
     <button class="nv" onclick="nav('setup')"><span class="nv-ico">🔌</span><span>Supabase Connect</span></button>
     <button class="nv" onclick="nav('settings')"><span class="nv-ico">⚙️</span><span>Site Settings</span></button>
@@ -233,6 +272,8 @@ textarea{resize:vertical;min-height:72px;line-height:1.5}
         <div class="stat s1"><div class="si">📦</div><div class="sv" id="d-p">—</div><div class="sl">Products</div></div>
         <div class="stat s2"><div class="si">🛒</div><div class="sv" id="d-o">—</div><div class="sl">Orders</div></div>
         <div class="stat s3"><div class="si">📧</div><div class="sv" id="d-sub">—</div><div class="sl">Subscribers</div></div>
+        <div class="stat s4" style="cursor:pointer" onclick="nav('orders')"><div class="si">💰</div><div class="sv" id="d-rev">—</div><div class="sl">Est. Revenue</div></div>
+        <div class="stat s1" style="cursor:pointer;border-color:rgba(248,81,73,.3)" onclick="nav('products')"><div class="si">⚠️</div><div class="sv" id="d-low" style="color:#f85149">—</div><div class="sl">Low Stock</div></div>
         <div class="stat s4"><div class="si">💰</div><div class="sv" id="d-rev">₹—</div><div class="sl">Revenue</div></div>
       </div>
       <div class="tw">
@@ -459,6 +500,83 @@ textarea{resize:vertical;min-height:72px;line-height:1.5}
       </div>
     </div>
 
+
+    <!-- COUPONS PAGE -->
+    <div class="pg" id="pg-coupons">
+      <div class="ph"><div><h1>🎟️ Coupons</h1><p>Create and manage discount codes for your store</p></div>
+        <button class="btn bg" onclick="openCoupM()">+ Add Coupon</button></div>
+      <div id="coups-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-top:4px"></div>
+    </div>
+
+    <!-- ANALYTICS PAGE -->
+    <div class="pg" id="pg-analytics">
+      <div class="ph"><div><h1>📈 Analytics</h1><p>Store performance overview</p></div></div>
+      <div class="stats" style="margin-bottom:24px">
+        <div class="stat s1"><div class="si">💰</div><div class="sv" id="an-rev">—</div><div class="sl">Total Revenue</div></div>
+        <div class="stat s2"><div class="si">🛒</div><div class="sv" id="an-ord">—</div><div class="sl">Total Orders</div></div>
+        <div class="stat s3"><div class="si">📦</div><div class="sv" id="an-aov">—</div><div class="sl">Avg Order Value</div></div>
+        <div class="stat s4"><div class="si">📧</div><div class="sv" id="an-sub">—</div><div class="sl">Subscribers</div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+        <div class="card">
+          <div class="th"><span class="tt">Top Products by Orders</span></div>
+          <div id="an-top-prods"></div>
+        </div>
+        <div class="card">
+          <div class="th"><span class="tt">Orders by Status</span></div>
+          <div id="an-status-chart" style="padding:16px"></div>
+        </div>
+        <div class="card" style="grid-column:1/-1">
+          <div class="th"><span class="tt">Recent Activity</span></div>
+          <div id="an-activity"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- REVIEWS PAGE -->
+    <div class="pg" id="pg-reviews">
+      <div class="ph"><div><h1>⭐ Customer Reviews</h1><p>Manage and respond to reviews</p></div></div>
+      <div class="card" style="margin-bottom:16px;padding:20px 24px;background:linear-gradient(135deg,rgba(200,146,10,.08),rgba(26,58,30,.05))">
+        <p style="font-size:13px;color:var(--tx2);line-height:1.7">
+          💡 <strong>Pro tip:</strong> Reviews are currently shown as static 5-star ratings on the store. 
+          To enable real customer reviews, add a <code style="background:var(--bg3);padding:2px 6px;border-radius:4px">reviews</code> table to your Supabase schema and connect it here.<br>
+          Below are your store's demo reviews — replace these with real data as orders come in.
+        </p>
+      </div>
+      <div id="reviews-grid"></div>
+    </div>
+
+    <!-- COUPON MODAL -->
+    <div class="modal" id="coup-modal">
+      <div class="modal-box" style="max-width:480px">
+        <div class="mh"><span id="cm-coup-title">Add Coupon</span><button class="mclose" onclick="CM('coup-modal')">✕</button></div>
+        <div class="mf">
+          <label class="lbl">Coupon Code <span style="color:var(--red)">*</span></label>
+          <input class="inp" id="coup-code" placeholder="e.g. SAVE20" style="text-transform:uppercase" oninput="this.value=this.value.toUpperCase()">
+          <label class="lbl" style="margin-top:12px">Discount Type</label>
+          <div class="cr" style="display:flex;gap:8px;margin-bottom:12px">
+            <div class="cc sel" data-c="pct" onclick="PC(this,'coup-type')" style="flex:1;text-align:center;padding:10px">% Percentage</div>
+            <div class="cc" data-c="flat" onclick="PC(this,'coup-type')" style="flex:1;text-align:center;padding:10px">₹ Flat Amount</div>
+          </div>
+          <input type="hidden" id="coup-type" value="pct">
+          <label class="lbl">Discount Value <span style="color:var(--red)">*</span></label>
+          <input class="inp" id="coup-val" type="number" placeholder="e.g. 10 for 10% off or 50 for ₹50 off" min="1">
+          <label class="lbl" style="margin-top:12px">Description (shown on store)</label>
+          <input class="inp" id="coup-desc" placeholder="e.g. 10% off your order">
+          <label class="lbl" style="margin-top:12px">Min. Order Value (₹)</label>
+          <input class="inp" id="coup-min" type="number" placeholder="0 = no minimum" value="0" min="0">
+          <div style="display:flex;align-items:center;gap:10px;margin-top:14px">
+            <input type="checkbox" id="coup-act" checked style="width:16px;height:16px;accent-color:var(--gd)">
+            <label for="coup-act" style="font-size:13px;color:var(--tx2);cursor:pointer">Active (visible to customers)</label>
+          </div>
+          <input type="hidden" id="coup-edit-id" value="">
+        </div>
+        <div class="mf" style="border-top:1px solid var(--bd);padding-top:16px;display:flex;gap:10px">
+          <button class="btn bg" id="coup-save-btn" onclick="saveCoupon()" style="flex:1">💾 Save Coupon</button>
+          <button class="btn" onclick="CM('coup-modal')">Cancel</button>
+        </div>
+      </div>
+    </div>
   </main>
 </div>
 
@@ -1319,7 +1437,7 @@ function loadSetupPage(){} // Setup page is now just documentation — no keys s
 function loadSettingsPage(){ loadSettings(); }
 
 // ── Boot: check session, show login or go straight in ──────────────────────
-(function boot(){
+function boot(){
   if(isLoggedIn()){
     hideLoginGate();
     init();
@@ -1328,7 +1446,249 @@ function loadSettingsPage(){ loadSettings(); }
     document.getElementById('app').style.display = 'none';
   }
   loadSettings();
+}
+
+// ══════════════════════════════════════════════════════════════
+// ADMIN WAVE 2 JS — Coupons, Analytics, Reviews, Low Stock
+// ══════════════════════════════════════════════════════════════
+
+// ── COUPON MANAGER ────────────────────────────────────────────
+// Stored in localStorage as fallback (until Supabase coupons table exists)
+function getCoupons(){
+  try{ return JSON.parse(localStorage.getItem('pr_admin_coupons')||'[]'); }catch(e){ return []; }
+}
+function saveCoupons(arr){ localStorage.setItem('pr_admin_coupons',JSON.stringify(arr)); }
+
+// Seed defaults if empty
+(function seedCoupons(){
+  if(!getCoupons().length){
+    saveCoupons([
+      {id:'c1',code:'PAHADI10',type:'pct',val:10,desc:'10% off your order',min:0,active:true},
+      {id:'c2',code:'WELCOME50',type:'flat',val:50,desc:'₹50 off first order',min:299,active:true},
+      {id:'c3',code:'MOUNTAIN',type:'pct',val:15,desc:'15% off — mountain special',min:499,active:false},
+      {id:'c4',code:'FIRSTORDER',type:'flat',val:100,desc:'₹100 off for new customers',min:599,active:true},
+    ]);
+  }
 })();
+
+function loadCoupons(){
+  const grid = document.getElementById('coups-grid');
+  if(!grid) return;
+  const coupons = getCoupons();
+  document.getElementById('nb-coup').textContent = coupons.filter(c=>c.active).length;
+  grid.innerHTML = coupons.map(c=>`
+    <div class="coup-card" id="coup-${c.id}">
+      <div class="coup-code">${c.code}</div>
+      <div class="coup-meta">${c.type==='pct'?c.val+'% off':'₹'+c.val+' off'} · Min order: ${c.min?'₹'+c.min:'None'}</div>
+      <div class="coup-meta" style="color:var(--tx3)">${c.desc||''}</div>
+      <span class="coup-status ${c.active?'coup-active':'coup-inactive'}">${c.active?'● ACTIVE':'○ INACTIVE'}</span>
+      <div class="coup-actions">
+        <button class="btn btn-s bg" onclick="editCoupon('${c.id}')">✏️ Edit</button>
+        <button class="btn btn-s" onclick="toggleCoupon('${c.id}')" style="${c.active?'color:var(--red)':''}">${c.active?'Deactivate':'Activate'}</button>
+        <button class="btn btn-s" onclick="delCoupon('${c.id}')" style="color:var(--red)">🗑</button>
+      </div>
+    </div>`).join('') || '<div style="text-align:center;padding:40px;color:var(--tx3)">No coupons yet — click + Add Coupon</div>';
+}
+
+function openCoupM(){ 
+  document.getElementById('cm-coup-title').textContent='Add Coupon';
+  document.getElementById('coup-code').value='';
+  document.getElementById('coup-val').value='';
+  document.getElementById('coup-desc').value='';
+  document.getElementById('coup-min').value='0';
+  document.getElementById('coup-act').checked=true;
+  document.getElementById('coup-edit-id').value='';
+  document.getElementById('coup-type').value='pct';
+  document.querySelectorAll('#coup-modal .cc').forEach((c,i)=>{c.classList.toggle('sel',i===0);});
+  document.getElementById('coup-modal').classList.add('open');
+}
+function editCoupon(id){
+  const c = getCoupons().find(x=>x.id===id);
+  if(!c) return;
+  document.getElementById('cm-coup-title').textContent='Edit Coupon';
+  document.getElementById('coup-code').value=c.code;
+  document.getElementById('coup-val').value=c.val;
+  document.getElementById('coup-desc').value=c.desc||'';
+  document.getElementById('coup-min').value=c.min||0;
+  document.getElementById('coup-act').checked=c.active;
+  document.getElementById('coup-edit-id').value=c.id;
+  document.getElementById('coup-type').value=c.type;
+  document.querySelectorAll('#coup-modal .cc').forEach(el=>el.classList.toggle('sel',el.dataset.c===c.type));
+  document.getElementById('coup-modal').classList.add('open');
+}
+async function saveCoupon(){
+  const code = document.getElementById('coup-code').value.trim().toUpperCase();
+  const val  = parseFloat(document.getElementById('coup-val').value);
+  const type = document.getElementById('coup-type').value;
+  const desc = document.getElementById('coup-desc').value.trim();
+  const min  = parseFloat(document.getElementById('coup-min').value)||0;
+  const active = document.getElementById('coup-act').checked;
+  const editId = document.getElementById('coup-edit-id').value;
+  if(!code||!val){ showMsg('coup-modal','Enter code and value','err'); return; }
+  const coupons = getCoupons();
+  if(editId){
+    const idx = coupons.findIndex(c=>c.id===editId);
+    if(idx>-1) coupons[idx]={...coupons[idx],code,val,type,desc,min,active};
+  } else {
+    if(coupons.find(c=>c.code===code)){ showMsg('coup-modal','Code already exists','err'); return; }
+    coupons.push({id:'c'+Date.now(),code,val,type,desc,min,active});
+  }
+  saveCoupons(coupons);
+  CM('coup-modal');
+  loadCoupons();
+  showAdminToast('✅ Coupon saved!');
+}
+function toggleCoupon(id){
+  const coupons = getCoupons();
+  const c = coupons.find(x=>x.id===id);
+  if(c){ c.active=!c.active; saveCoupons(coupons); loadCoupons(); }
+}
+function delCoupon(id){
+  if(!confirm('Delete this coupon?')) return;
+  saveCoupons(getCoupons().filter(c=>c.id!==id));
+  loadCoupons();
+}
+function showMsg(modalId,msg,type){ /* minimal feedback */ alert(msg); }
+
+// ── ANALYTICS PAGE ────────────────────────────────────────────
+async function loadAnalytics(){
+  const revEl  = document.getElementById('an-rev');
+  const ordEl  = document.getElementById('an-ord');
+  const aovEl  = document.getElementById('an-aov');
+  const subEl  = document.getElementById('an-sub');
+  const topEl  = document.getElementById('an-top-prods');
+  const staEl  = document.getElementById('an-status-chart');
+  const actEl  = document.getElementById('an-activity');
+  if(!revEl) return;
+
+  try {
+    // Fetch orders from DB
+    const [ordRes, subRes] = await Promise.all([
+      callProxy('GET','orders','select=id,total,status,created_at,customer_name'),
+      callProxy('GET','subscribers','select=id,created_at'),
+    ]);
+    const orders = Array.isArray(ordRes) ? ordRes : [];
+    const subs   = Array.isArray(subRes) ? subRes : [];
+
+    const totalRev = orders.reduce((s,o)=>s+(parseInt(o.total)||0),0);
+    const avgOV    = orders.length ? Math.round(totalRev/orders.length) : 0;
+
+    if(revEl) revEl.textContent = '₹'+totalRev.toLocaleString('en-IN');
+    if(ordEl) ordEl.textContent = orders.length;
+    if(aovEl) aovEl.textContent = '₹'+avgOV;
+    if(subEl) subEl.textContent = subs.length;
+
+    // Update dashboard revenue + low stock
+    const dRev = document.getElementById('d-rev');
+    if(dRev) dRev.textContent = '₹'+totalRev.toLocaleString('en-IN');
+
+    // Status breakdown
+    const statuses = {};
+    orders.forEach(o=>{ const s=o.status||'pending'; statuses[s]=(statuses[s]||0)+1; });
+    const statusColors = {pending:'#f0883e',confirmed:'#58a6ff',packed:'#a371f7',shipped:'#3fb950',delivered:'#1a3a1e',cancelled:'#f85149'};
+    if(staEl) staEl.innerHTML = '<div class="status-donut">'+
+      Object.entries(statuses).map(([s,n])=>`
+        <div class="sd-row">
+          <div class="sd-dot" style="background:${statusColors[s]||'#888'}"></div>
+          <div class="sd-label">${s.charAt(0).toUpperCase()+s.slice(1)}</div>
+          <div class="sd-count">${n}</div>
+          <div class="sd-pct">${orders.length?Math.round(n/orders.length*100):0}%</div>
+        </div>`).join('')+'</div>';
+
+    // Recent activity timeline
+    const recent = [...orders].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at)).slice(0,8);
+    if(actEl) actEl.innerHTML = '<div style="padding:0 0 8px">'+
+      recent.map(o=>`
+        <div style="display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--bd)">
+          <span style="font-size:20px">${o.status==='delivered'?'✅':o.status==='shipped'?'🚚':'🛒'}</span>
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--tx)">Order #${o.id} — ${o.customer_name||'Customer'}</div>
+            <div style="font-size:11px;color:var(--tx3)">${fd(o.created_at)} · ₹${(o.total||0).toLocaleString('en-IN')} · ${o.status||'pending'}</div>
+          </div>
+        </div>`).join('')+'</div>';
+
+    // Top products (approximate from order data — full version needs order_items table)
+    if(topEl) topEl.innerHTML = '<div style="padding:16px;font-size:12px;color:var(--tx3);font-style:italic">📊 Add an order_items table to Supabase to see product-level breakdown.<br>Current orders table tracks totals only.</div>';
+
+  } catch(e){
+    if(revEl) revEl.textContent='—';
+    console.error('Analytics error:',e);
+  }
+}
+
+// ── LOW STOCK ALERTS ──────────────────────────────────────────
+async function loadLowStock(){
+  try {
+    const prods = await callProxy('GET','products','select=id,name,stock,is_active&is_active=eq.true&order=stock.asc');
+    const lowEl = document.getElementById('d-low');
+    if(!Array.isArray(prods)){ if(lowEl) lowEl.textContent='—'; return; }
+    const low = prods.filter(p=>p.stock!=null && p.stock<=10);
+    if(lowEl) lowEl.textContent = low.length ? low.length+' items' : '✅ All OK';
+  } catch(e){ const el=document.getElementById('d-low'); if(el) el.textContent='—'; }
+}
+
+// ── REVIEWS (demo data) ───────────────────────────────────────
+const DEMO_REVIEWS = [
+  {name:'Priya Sharma',loc:'Mumbai',stars:5,txt:'The Kumaoni wild honey is unlike anything I\'ve had. Raw, dark, floral — I can literally taste the altitude.',prod:'Kumaoni Wild Forest Honey',date:'15 Jan 2026'},
+  {name:'Rahul Mehta',loc:'Delhi',stars:5,txt:'Pahadi Roots has changed my pantry. The bilona ghee is a revelation — I feel good about what I\'m feeding my kids.',prod:'Bilona A2 Cow Ghee',date:'22 Jan 2026'},
+  {name:'Anita Joshi',loc:'Bengaluru',stars:5,txt:'The Kashmir saffron threads are pure gold. Ordered from big brands before but nothing compares.',prod:'Kashmir Mongra Saffron',date:'3 Feb 2026'},
+  {name:'Vikram Singh',loc:'Pune',stars:4,txt:'Great products and very fast delivery. The cardamom fragrance filled my entire kitchen.',prod:'Sikkim Organic Cardamom',date:'8 Feb 2026'},
+  {name:'Meera Nair',loc:'Kochi',stars:5,txt:'Love the Assam tea — perfectly malty and bright. Reordered twice already!',prod:'Assam First Flush Black Tea',date:'14 Feb 2026'},
+];
+function loadReviews(){
+  const grid = document.getElementById('reviews-grid');
+  if(!grid) return;
+  grid.innerHTML = DEMO_REVIEWS.map(r=>`
+    <div class="rev-card">
+      <div class="rc-top">
+        <div class="rc-avatar">${r.name[0]}</div>
+        <div><div class="rc-name">${r.name} <span style="font-size:11px;color:var(--tx3)">· ${r.loc}</span></div>
+        <div class="rc-stars">${'★'.repeat(r.stars)}${'☆'.repeat(5-r.stars)}</div></div>
+        <div style="margin-left:auto;font-size:11px;color:var(--tx3)">${r.date}</div>
+      </div>
+      <p class="rc-txt">"${r.txt}"</p>
+      <div class="rc-prod">📦 ${r.prod}</div>
+    </div>`).join('');
+}
+
+// ── PATCH nav() to load new pages ────────────────────────────
+// We hook into the existing nav() by overriding it after it's defined
+const _origNav = typeof nav !== 'undefined' ? nav : ()=>{};
+
+// ── PATCH loadDash to also call loadLowStock ──────────────────
+const _origLoadDash = typeof loadDash !== 'undefined' ? loadDash : async ()=>{};
+
+// Use DOMContentLoaded hook to patch after original scripts run
+document.addEventListener('DOMContentLoaded',()=>{
+  // Call the original boot (shows login gate or app)
+  if(typeof boot === 'function') boot();
+
+  // Patch nav to handle new pages
+  const origNav = window.nav;
+  window.nav = function(id){
+    origNav(id);
+    if(id==='coupons')   loadCoupons();
+    if(id==='analytics') loadAnalytics();
+    if(id==='reviews')   loadReviews();
+  };
+  // Patch loadDash to also run low stock
+  const origLoadDash = window.loadDash;
+  if(origLoadDash) window.loadDash = async function(){
+    await origLoadDash();
+    loadLowStock();
+  };
+});
+
+function showAdminToast(msg){
+  // Reuse existing toast or create one
+  let t = document.getElementById('admin-toast');
+  if(!t){ t=document.createElement('div'); t.id='admin-toast';
+    t.style.cssText='position:fixed;bottom:24px;right:24px;background:var(--gd);color:#1a0800;padding:12px 20px;border-radius:10px;font-weight:700;font-size:13px;z-index:9999;opacity:0;transition:opacity .3s';
+    document.body.appendChild(t); }
+  t.textContent=msg; t.style.opacity='1';
+  setTimeout(()=>t.style.opacity='0',2500);
+}
+
 </script>
 
 </div><!-- /app -->
