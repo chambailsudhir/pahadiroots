@@ -705,6 +705,10 @@ const S = {
   lowStockThreshold: parseInt(localStorage.getItem('pr_low_stock') || '10'),
   currentPage: 'dashboard',
 };
+// ── Column-name-safe accessors (handles schema variations) ──
+const getOrdStatus = o => (o||{}).status || (o||{}).order_status || (o||{}).state || '';
+const getOrdAmount = o => parseFloat((o||{}).total_amount || (o||{}).amount || (o||{}).total || 0);
+
 
 // ══════════════════════════════════════════════════════════════
 // AUTH
@@ -825,7 +829,7 @@ async function init(){
     ]);
     await loadDash();
     // Check pending orders for badge
-    const pending = await callProxy('GET','orders','status=eq.pending&select=id').catch(()=>[]);
+    const pending = await callProxy('GET','orders','select=*').catch(()=>[]);
     if(pending && pending.length > 0){
       const b = document.getElementById('badge-orders');
       b.textContent = pending.length; b.style.display='inline';
@@ -842,12 +846,12 @@ async function init(){
 async function loadDash(){
   try{
     const [orders, customers, products] = await Promise.all([
-      callProxy('GET','orders','select=id,total_amount,status,created_at,customer_id').catch(()=>[]),
+      callProxy('GET','orders','select=*').catch(()=>[]),
       callProxy('GET','customers','select=id').catch(()=>[]),
       callProxy('GET','products','select=id,name,stock_quantity').catch(()=>[]),
     ]);
-    const rev = (orders||[]).filter(o=>o.status!='cancelled').reduce((s,o)=>s+(parseFloat(o.total_amount)||0),0);
-    const pend = (orders||[]).filter(o=>o.status==='pending').length;
+    const rev = (orders||[]).filter(o=>getOrdStatus(o)!='cancelled').reduce((s,o)=>s+(parseFloat(o.total_amount)||0),0);
+    const pend = (orders||[]).filter(o=>getOrdStatus(o)==='pending').length;
     document.getElementById('d-rev').textContent = '₹'+Math.round(rev).toLocaleString('en-IN');
     document.getElementById('d-ord').textContent = (orders||[]).length;
     document.getElementById('d-pend').textContent = pend;
@@ -871,7 +875,7 @@ async function loadDash(){
         <td class="td-mono">#${String(o.id).slice(-6).toUpperCase()}</td>
         <td class="td-name">${c?c.name:'Guest'}<br><span style="font-size:10px;color:var(--tx3)">${c?c.phone||'':''}</span></td>
         <td>₹${(parseFloat(o.total_amount)||0).toLocaleString('en-IN')}</td>
-        <td><span class="badge ${statusClass(o.status)}">${o.status}</span></td>
+        <td><span class="badge ${statusClass(getOrdStatus(o))}">${getOrdStatus(o)}</span></td>
       </tr>`;
     }).join('') : '<tr><td colspan="4" class="empty-row">No orders yet</td></tr>';
 
@@ -892,7 +896,7 @@ function renderRevChart(orders){
   const data = Array.from({length:days},(_,i)=>{
     const d=new Date(now); d.setDate(d.getDate()-(days-1-i));
     const ds=d.toDateString();
-    const rev = orders.filter(o=>new Date(o.created_at).toDateString()===ds&&o.status!=='cancelled').reduce((s,o)=>s+(parseFloat(o.total_amount)||0),0);
+    const rev = orders.filter(o=>new Date(o.created_at).toDateString()===ds&&getOrdStatus(o)!=='cancelled').reduce((s,o)=>s+(parseFloat(o.total_amount)||0),0);
     return {lbl:d.toLocaleDateString('en-IN',{weekday:'short'}), rev};
   });
   const max = Math.max(...data.map(d=>d.rev), 1);
@@ -1201,7 +1205,7 @@ function filterOrders(q){
   const status = document.getElementById('ord-status-filter').value;
   S._filteredOrders = S.orders.filter(o=>{
     const c = o.customers||{};
-    if(status && o.status!==status) return false;
+    if(status && getOrdStatus(o)!==status) return false;
     if(query){
       const hay = [o.id,c.name,c.email,c.phone,c.city].join(' ').toLowerCase();
       if(!hay.includes(query)) return false;
@@ -1223,7 +1227,7 @@ function renderOrders(){
       <td style="font-size:11.5px">${c.phone||'—'}<br><span style="color:var(--tx3)">${c.city||''}</span></td>
       <td>${o.total_items||'—'}</td>
       <td>₹${(parseFloat(o.total_amount)||0).toLocaleString('en-IN')}</td>
-      <td><span class="badge ${statusClass(o.status)} os-${o.status}">${o.status||'pending'}</span></td>
+      <td><span class="badge ${statusClass(getOrdStatus(o))} os-${getOrdStatus(o)}">${getOrdStatus(o)||'pending'}</span></td>
       <td style="font-size:11px;color:var(--tx3)">${date.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'2-digit'})}</td>
       <td><button class="btn btn-s btn-sm" onclick="openOrder('${o.id}')">View</button></td>
     </tr>`;
@@ -1263,7 +1267,7 @@ async function openOrder(id){
         <div class="sep"></div>
         <div class="fg" style="margin:0"><label>Update Status</label>
           <select class="fi" id="ord-status-edit">
-            ${['pending','confirmed','packed','shipped','delivered','cancelled'].map(s=>`<option value="${s}" ${o.status===s?'selected':''}>${s}</option>`).join('')}
+            ${['pending','confirmed','packed','shipped','delivered','cancelled'].map(s=>`<option value="${s}" ${getOrdStatus(o)===s?'selected':''}>${s}</option>`).join('')}
           </select>
         </div>
         <div class="fg" style="margin-top:8px"><label>Tracking Number</label>
@@ -1275,7 +1279,7 @@ async function openOrder(id){
       <h4>🛒 Items (${items.length})</h4>
       <table><thead><tr><th>Product</th><th>Qty</th><th>Price</th><th>Total</th></tr></thead>
       <tbody>${items.map(it=>`<tr>
-        <td class="td-name">${it.products?.name||'Product #'+it.product_id}</td>
+        <td class="td-name">${(ST.prods.find(p=>String(p.id)===String(it.product_id))||{}).name||'Product #'+it.product_id}</td>
         <td>${it.quantity}</td>
         <td>₹${it.unit_price||0}</td>
         <td>₹${(it.quantity*(it.unit_price||0)).toLocaleString('en-IN')}</td>
@@ -1306,7 +1310,7 @@ function exportOrders(){
   const rows=[['Order ID','Customer','Email','Phone','City','State','Pincode','Address','Amount','Status','Payment','Date','Tracking']];
   list.forEach(o=>{
     const c=o.customers||{};
-    rows.push([String(o.id).slice(-8).toUpperCase(),c.name||'',c.email||'',c.phone||'',c.city||'',c.state||'',c.pincode||'',[c.address_line1,c.address_line2].filter(Boolean).join(' ')||(o.total_amount||0),o.status||'',o.payment_method||'',new Date(o.created_at).toLocaleDateString('en-IN'),o.tracking_number||'']);
+    rows.push([String(o.id).slice(-8).toUpperCase(),c.name||'',c.email||'',c.phone||'',c.city||'',c.state||'',c.pincode||'',[c.address_line1,c.address_line2].filter(Boolean).join(' ')||(o.total_amount||0),getOrdStatus(o)||'',o.payment_method||'',new Date(o.created_at).toLocaleDateString('en-IN'),o.tracking_number||'']);
   });
   dlCSV(rows,'pahadi-orders-'+Date.now()+'.csv');
 }
@@ -1318,13 +1322,13 @@ async function loadCustomers(){
   try{
     S.customers = await callProxy('GET','customers','order=created_at.desc&select=*');
     // Get order counts per customer
-    const ordData = await callProxy('GET','orders','select=customer_id,total_amount,status').catch(()=>[]);
+    const ordData = await callProxy('GET','orders','select=*').catch(()=>[]);
     S._custOrds={};
     (ordData||[]).forEach(o=>{
       if(!o.customer_id) return;
       if(!S._custOrds[o.customer_id]) S._custOrds[o.customer_id]={count:0,total:0};
       S._custOrds[o.customer_id].count++;
-      if(o.status!=='cancelled') S._custOrds[o.customer_id].total+=(parseFloat(o.total_amount)||0);
+      if(getOrdStatus(o)!=='cancelled') S._custOrds[o.customer_id].total+=(parseFloat(o.total_amount)||0);
     });
     renderCustomers();
   }catch(e){ toast('Customers error: '+e.message,'er'); }
@@ -1363,7 +1367,7 @@ async function openCust(id){
   const c = S.customers.find(x=>String(x.id)===String(id));
   if(!c) return;
   let orders=[];
-  try{ orders = await callProxy('GET','orders',`customer_id=eq.${id}&order=created_at.desc&select=id,created_at,total_amount,status`); }catch(e){}
+  try{ orders = await callProxy('GET','orders',`customer_id=eq.${id}&order=created_at.desc&select=*`); }catch(e){}
   document.getElementById('cust-modal-title').textContent = c.name||'Customer';
   document.getElementById('cust-modal-body').innerHTML = `
     <div class="grid-2" style="gap:12px">
@@ -1390,7 +1394,7 @@ async function openCust(id){
             </div>
             <div style="text-align:right">
               <div style="font-weight:600;color:var(--grn)">₹${(parseFloat(o.total_amount)||0).toLocaleString('en-IN')}</div>
-              <span class="badge ${statusClass(o.status)}">${o.status}</span>
+              <span class="badge ${statusClass(getOrdStatus(o))}">${getOrdStatus(o)}</span>
             </div>
           </div>`).join('') : '<div class="empty-row">No orders</div>'}
       </div>
@@ -1493,12 +1497,12 @@ function exportSubs(){
 // ══════════════════════════════════════════════════════════════
 async function loadReviews(){
   try{
-    S.reviews = await callProxy('GET','reviews','order=created_at.desc&select=*,products(name)');
+    S.reviews = await callProxy('GET','reviews','order=created_at.desc&select=*');
     fillSel('rv-prod', S.prods.length?S.prods:await callProxy('GET','products','select=id,name').catch(()=>[]), 'id','name');
     document.getElementById('rev-tbody').innerHTML = S.reviews.length ? S.reviews.map(r=>`
       <tr>
         <td class="td-name">${r.customer_name||'—'}<br><span style="font-size:10.5px;color:var(--tx3)">${r.location||''}</span></td>
-        <td style="font-size:12px">${r.products?.name||'General'}</td>
+        <td style="font-size:12px">${(ST.prods.find(p=>String(p.id)===String(r.product_id))||{}).name||'General'}</td>
         <td>${'⭐'.repeat(r.rating||5)}</td>
         <td style="font-size:12px;max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.review_text||'—'}</td>
         <td><span class="badge ${r.status==='approved'?'badge-g':r.status==='pending'?'badge-y':'badge-r'}">${r.status||'pending'}</span></td>
@@ -1544,38 +1548,56 @@ async function loadAnalytics(){
   const since = new Date(); since.setDate(since.getDate()-days);
   const sinceStr = since.toISOString();
   try{
+    // Use select=* to avoid hardcoded column name errors (42703)
     const [orders, items] = await Promise.all([
-      callProxy('GET','orders',`created_at=gte.${sinceStr}&select=id,total_amount,status,created_at`),
-      callProxy('GET','order_items',`select=product_id,quantity,unit_price,products(name)`).catch(()=>[]),
+      callProxy('GET','orders',`created_at=gte.${sinceStr}&select=*`),
+      callProxy('GET','order_items','select=product_id,quantity,unit_price').catch(()=>[]),
     ]);
-    const valid = (orders||[]).filter(o=>o.status!=='cancelled');
-    const rev = valid.reduce((s,o)=>s+(parseFloat(o.total_amount)||0),0);
+
+    // Gracefully handle if status column has different name in DB
+    const getStatus = o => getOrdStatus(o) || o.order_status || o.state || '';
+    const getAmount = o => parseFloat(o.total_amount || o.amount || o.total || 0);
+
+    const valid = (orders||[]).filter(o=>getStatus(o)!=='cancelled');
+    const rev = valid.reduce((s,o)=>s+getAmount(o),0);
     const ord = (orders||[]).length;
     const aov = ord ? rev/ord : 0;
-    const del = (orders||[]).filter(o=>o.status==='delivered').length;
+    const del = (orders||[]).filter(o=>getStatus(o)==='delivered').length;
     document.getElementById('an-rev').textContent='₹'+Math.round(rev).toLocaleString('en-IN');
     document.getElementById('an-ord').textContent=ord;
     document.getElementById('an-aov').textContent='₹'+Math.round(aov).toLocaleString('en-IN');
     document.getElementById('an-del').textContent=ord?Math.round(del/ord*100)+'%':'—';
 
-    // Top products by revenue
+    // Top products by revenue — cross-ref with loaded ST.prods
     const prodRev={};
-    (items||[]).forEach(it=>{ if(!it.product_id) return; prodRev[it.product_id]={name:it.products?.name||'#'+it.product_id, rev:(prodRev[it.product_id]?.rev||0)+(it.quantity*(it.unit_price||0))}; });
+    (items||[]).forEach(it=>{
+      if(!it.product_id) return;
+      const name = (ST.prods.find(p=>String(p.id)===String(it.product_id))||{}).name || 'Product #'+it.product_id;
+      if(!prodRev[it.product_id]) prodRev[it.product_id]={name, rev:0};
+      prodRev[it.product_id].rev += (it.quantity||1)*(parseFloat(it.unit_price)||0);
+    });
     const topProds = Object.values(prodRev).sort((a,b)=>b.rev-a.rev).slice(0,8);
+    const maxRev = topProds[0]?.rev || 1;
     document.getElementById('an-top-prods').innerHTML = topProds.length ? topProds.map((p,i)=>`
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--bd)">
-        <div style="display:flex;align-items:center;gap:8px"><span style="font-size:11px;color:var(--tx3);width:16px">${i+1}</span><span style="font-size:12.5px;font-weight:600">${p.name}</span></div>
-        <span style="font-size:12.5px;color:var(--grn);font-weight:600">₹${Math.round(p.rev).toLocaleString('en-IN')}</span>
-      </div>`).join('') : '<div class="empty-row">No data</div>';
+      <div style="margin-bottom:10px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:3px">
+          <span style="font-size:12.5px;font-weight:600">${i+1}. ${p.name}</span>
+          <span style="font-weight:700;color:var(--grn)">₹${Math.round(p.rev).toLocaleString('en-IN')}</span>
+        </div>
+        <div style="height:4px;background:var(--bg4);border-radius:4px">
+          <div style="height:100%;width:${Math.round(p.rev/maxRev*100)}%;background:linear-gradient(90deg,var(--g),var(--g2));border-radius:4px"></div>
+        </div>
+      </div>`).join('') : '<div class="empty-row">No data yet</div>';
 
     // By status
     const statusCount={};
-    (orders||[]).forEach(o=>{ statusCount[o.status]=(statusCount[o.status]||0)+1; });
-    document.getElementById('an-by-status').innerHTML = Object.entries(statusCount).map(([st,cnt])=>`
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--bd)">
+    (orders||[]).forEach(o=>{ const s=getStatus(o)||'unknown'; statusCount[s]=(statusCount[s]||0)+1; });
+    document.getElementById('an-by-status').innerHTML = Object.entries(statusCount).length ? Object.entries(statusCount).map(([st,cnt])=>`
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--bd)">
         <span class="badge ${statusClass(st)}">${st}</span>
-        <span style="font-weight:700;font-size:12.5px">${cnt} orders</span>
-      </div>`).join('')||'<div class="empty-row">No data</div>';
+        <span style="font-weight:700;font-size:13px">${cnt} orders</span>
+      </div>`).join('') : '<div class="empty-row">No orders in this period</div>';
+
   }catch(e){ toast('Analytics error: '+e.message,'er'); }
 }
 
