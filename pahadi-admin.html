@@ -1,0 +1,1365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pahadi Roots — Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --g:#1a5c2a;--g2:#2d8a45;--bg:#0d1117;--bg2:#161b22;--bg3:#21262d;--bg4:#2d333b;
+  --bd:#30363d;--tx:#e6edf3;--tx2:#8b949e;--tx3:#6e7681;
+  --red:#f85149;--grn:#3fb950;--org:#d29922;--blu:#58a6ff;--r:10px;--r2:7px;
+}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--tx);font-size:13.5px;min-height:100vh}
+button{cursor:pointer;font-family:'Inter',sans-serif}
+input,select,textarea{font-family:'Inter',sans-serif}
+
+/* LAYOUT */
+#app{display:none;height:100vh;overflow:hidden}
+.layout{display:flex;height:100%}
+.sidebar{width:224px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--bd);display:flex;flex-direction:column;overflow-y:auto}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{height:52px;background:var(--bg2);border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;padding:0 20px;flex-shrink:0}
+.content{flex:1;overflow-y:auto;padding:24px}
+
+/* SIDEBAR */
+.sb-logo{padding:16px 16px 12px;border-bottom:1px solid var(--bd)}
+.sb-logo-name{font-size:15px;font-weight:700}
+.sb-logo-sub{font-size:10px;color:var(--tx3);margin-top:2px}
+.sb-sec{padding:14px 14px 4px;font-size:9px;font-weight:700;letter-spacing:1.5px;color:var(--tx3);text-transform:uppercase}
+.nv{display:flex;align-items:center;gap:9px;width:calc(100% - 16px);margin:1px 8px;padding:8px 12px;background:none;border:none;border-radius:6px;color:var(--tx2);font-size:12.5px;font-weight:500;text-align:left;transition:all .15s}
+.nv:hover{background:var(--bg3);color:var(--tx)}
+.nv.active{background:rgba(63,185,80,.12);color:var(--grn);font-weight:600}
+.nv-ico{font-size:14px;width:18px;text-align:center}
+.sb-badge{background:var(--red);color:#fff;font-size:9px;font-weight:800;padding:1px 5px;border-radius:8px;margin-left:auto}
+.sb-bottom{margin-top:auto;padding:12px 8px;border-top:1px solid var(--bd)}
+.db-dot{display:flex;align-items:center;gap:6px;padding:6px 10px;border-radius:6px;font-size:11px;font-weight:600}
+.db-dot.on{color:var(--grn);background:rgba(63,185,80,.1)}
+.db-dot.off{color:var(--red);background:rgba(248,81,73,.1)}
+.db-dot.wait{color:var(--org);background:rgba(210,153,34,.1)}
+
+/* PAGES */
+.pg{display:none}.pg.active{display:block}
+.ph{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px}
+.ph h1{font-size:19px;font-weight:700}
+.ph p{font-size:12px;color:var(--tx3);margin-top:3px}
+.ph-r{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:var(--r2);font-size:12.5px;font-weight:600;border:none;transition:all .15s;cursor:pointer}
+.btn-p{background:var(--g);color:#fff}.btn-p:hover{background:var(--g2)}
+.btn-s{background:var(--bg3);color:var(--tx);border:1px solid var(--bd)}.btn-s:hover{background:var(--bg4)}
+.btn-d{background:rgba(248,81,73,.1);color:var(--red);border:1px solid rgba(248,81,73,.25)}.btn-d:hover{background:rgba(248,81,73,.2)}
+.btn-sm{padding:4px 10px;font-size:11.5px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+
+/* STATS */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
+.stat{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);padding:16px 18px}
+.stat-lbl{font-size:10.5px;color:var(--tx3);margin-bottom:6px;font-weight:700;letter-spacing:.5px;text-transform:uppercase}
+.stat-val{font-size:24px;font-weight:700;font-variant-numeric:tabular-nums}
+.stat-sub{font-size:11px;color:var(--tx3);margin-top:4px}
+.up{color:var(--grn)}
+
+/* TABLE */
+.tbl-wrap{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);overflow:hidden}
+.tbl-head{padding:12px 16px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.tbl-search{background:var(--bg3);border:1px solid var(--bd);border-radius:var(--r2);padding:6px 11px;color:var(--tx);font-size:12.5px;width:210px}
+.tbl-search:focus{outline:none;border-color:var(--g2)}
+.tbl-sel{background:var(--bg3);border:1px solid var(--bd);border-radius:var(--r2);padding:6px 10px;color:var(--tx);font-size:12.5px}
+table{width:100%;border-collapse:collapse}
+th{padding:9px 14px;text-align:left;font-size:10.5px;font-weight:700;color:var(--tx3);letter-spacing:.5px;text-transform:uppercase;border-bottom:1px solid var(--bd)}
+td{padding:10px 14px;font-size:12.5px;color:var(--tx2);border-bottom:1px solid rgba(48,54,61,.5);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,.02)}
+.td-main{color:var(--tx);font-weight:600}
+.td-sub{font-size:10.5px;color:var(--tx3);margin-top:2px}
+.mono{font-family:'JetBrains Mono',monospace;font-size:11.5px}
+.empty{text-align:center;padding:32px;color:var(--tx3);font-style:italic}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:700}
+.bg{background:rgba(63,185,80,.12);color:var(--grn)}
+.br{background:rgba(248,81,73,.12);color:var(--red)}
+.by{background:rgba(210,153,34,.12);color:var(--org)}
+.bb{background:rgba(88,166,255,.12);color:var(--blu)}
+.bgr{background:rgba(139,148,158,.12);color:var(--tx3)}
+.bp{background:rgba(167,139,250,.12);color:#a78bfa}
+
+/* MODAL */
+.ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:1000;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)}
+.ov.open{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);width:100%;max-width:560px;max-height:92vh;overflow-y:auto;box-shadow:0 24px 60px rgba(0,0,0,.6)}
+.modal-lg{max-width:740px}
+.m-hdr{padding:18px 20px;border-bottom:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center}
+.m-hdr h3{font-size:15px;font-weight:700}
+.m-cls{background:none;border:none;color:var(--tx3);font-size:20px;cursor:pointer;padding:2px 6px;border-radius:4px}
+.m-cls:hover{background:var(--bg3)}
+.m-body{padding:20px}
+.m-foot{padding:14px 20px;border-top:1px solid var(--bd);display:flex;justify-content:flex-end;gap:10px}
+
+/* FORM */
+.fg{margin-bottom:14px}
+.fg label{display:block;font-size:11.5px;font-weight:600;color:var(--tx2);margin-bottom:5px}
+.fi{width:100%;background:var(--bg3);border:1px solid var(--bd);border-radius:var(--r2);padding:8px 12px;color:var(--tx);font-size:13px}
+.fi:focus{outline:none;border-color:var(--g2)}
+textarea.fi{resize:vertical;min-height:80px}
+.gr{display:grid;gap:12px}
+.gr2{grid-template-columns:1fr 1fr}
+.gr3{grid-template-columns:1fr 1fr 1fr}
+.hint{font-size:11px;color:var(--tx3);margin-top:3px}
+.req{color:var(--red)}
+
+/* PAGING */
+.pag{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-top:1px solid var(--bd)}
+.pag-info{font-size:12px;color:var(--tx3)}
+.pag-btns{display:flex;gap:5px}
+.pb{background:var(--bg3);border:1px solid var(--bd);border-radius:5px;padding:4px 10px;font-size:12px;color:var(--tx2);cursor:pointer}
+.pb:hover{background:var(--bg4)}
+.pb.cur{background:var(--g);color:#fff;border-color:var(--g)}
+.pb:disabled{opacity:.4;cursor:not-allowed}
+
+/* TOAST */
+#toast{position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.ti{background:var(--bg4);border:1px solid var(--bd);border-radius:var(--r2);padding:10px 16px;font-size:12.5px;font-weight:600;box-shadow:0 4px 16px rgba(0,0,0,.5);opacity:0;transform:translateY(8px);transition:all .25s;max-width:340px}
+.ti.show{opacity:1;transform:none}
+.ti.ok{border-left:3px solid var(--grn);color:var(--grn)}
+.ti.er{border-left:3px solid var(--red);color:var(--red)}
+.ti.in{border-left:3px solid var(--blu);color:var(--blu)}
+
+/* LOGIN */
+#login-gate{display:flex;position:fixed;inset:0;background:var(--bg);z-index:9999;align-items:center;justify-content:center}
+.lb{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);padding:40px;width:380px;box-shadow:0 24px 60px rgba(0,0,0,.7)}
+.lb-logo{font-size:24px;font-weight:700;margin-bottom:4px}
+.lb-sub{font-size:12px;color:var(--tx3);margin-bottom:28px}
+.lb-err{background:rgba(248,81,73,.1);border:1px solid rgba(248,81,73,.3);color:var(--red);border-radius:var(--r2);padding:8px 12px;font-size:12.5px;margin-bottom:14px;display:none}
+
+/* MISC */
+.sep{height:1px;background:var(--bd);margin:14px 0}
+.loading{color:var(--tx3);font-style:italic;padding:20px;text-align:center}
+.g2c{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.sc{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);padding:18px;margin-bottom:16px}
+.sc h4{font-size:13px;font-weight:700;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--bd)}
+.ri{display:flex;gap:8px;margin-bottom:8px}
+.ri .l{font-size:11px;color:var(--tx3);min-width:120px;padding-top:1px}
+.ri .v{font-size:12.5px;color:var(--tx)}
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px}
+.card{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);padding:14px}
+.card-ico{font-size:32px;margin-bottom:8px}
+.card-name{font-size:13px;font-weight:700;margin-bottom:2px}
+.card-sub{font-size:11.5px;color:var(--tx3);margin-bottom:10px}
+.card-acts{display:flex;gap:6px}
+.chart-wrap{display:flex;align-items:flex-end;gap:5px;height:130px;margin-top:8px}
+.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px}
+.bar{width:100%;background:var(--g);border-radius:3px 3px 0 0;min-height:2px;transition:height .4s}
+.bar-lbl{font-size:9px;color:var(--tx3)}
+.bar-val{font-size:9px;color:var(--tx2)}
+.stok{color:var(--grn)}.stok-lo{color:var(--red);font-weight:700}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-gate">
+  <div class="lb">
+    <div class="lb-logo">🌿 Pahadi Roots</div>
+    <div class="lb-sub">Admin Panel · Secure Access</div>
+    <div class="lb-err" id="lg-err"></div>
+    <div class="fg">
+      <label>Admin Password</label>
+      <input type="password" class="fi" id="lg-pw" placeholder="Enter password" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <button class="btn btn-p" style="width:100%;justify-content:center;padding:10px" onclick="doLogin()">🔐 Sign In</button>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+<div class="layout">
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sb-logo"><div class="sb-logo-name">🌿 Pahadi Roots</div><div class="sb-logo-sub">Admin Panel</div></div>
+  <div class="sb-sec">Overview</div>
+  <button class="nv active" onclick="nav('dashboard')"><span class="nv-ico">📊</span>Dashboard</button>
+  <button class="nv" onclick="nav('analytics')"><span class="nv-ico">📈</span>Analytics</button>
+  <div class="sb-sec">Catalogue</div>
+  <button class="nv" onclick="nav('products')"><span class="nv-ico">📦</span>Products</button>
+  <button class="nv" onclick="nav('categories')"><span class="nv-ico">🏷️</span>Categories</button>
+  <div class="sb-sec">Orders</div>
+  <button class="nv" onclick="nav('orders')"><span class="nv-ico">🛒</span>Orders <span class="sb-badge" id="badge-ord" style="display:none">0</span></button>
+  <button class="nv" onclick="nav('customers')"><span class="nv-ico">👥</span>Customers</button>
+  <div class="sb-sec">Marketing</div>
+  <button class="nv" onclick="nav('coupons')"><span class="nv-ico">🎁</span>Coupons</button>
+  <button class="nv" onclick="nav('subscribers')"><span class="nv-ico">📧</span>Subscribers</button>
+  <button class="nv" onclick="nav('reviews')"><span class="nv-ico">⭐</span>Reviews</button>
+  <div class="sb-sec">Logs</div>
+  <button class="nv" onclick="nav('inventory_logs')"><span class="nv-ico">📋</span>Inventory Logs</button>
+  <button class="nv" onclick="nav('order_logs')"><span class="nv-ico">🔄</span>Order Logs</button>
+  <button class="nv" onclick="nav('admin_logs')"><span class="nv-ico">🔒</span>Admin Logs</button>
+  <div class="sb-sec">System</div>
+  <button class="nv" onclick="nav('settings')"><span class="nv-ico">⚙️</span>Settings</button>
+  <div class="sb-bottom">
+    <div class="db-dot wait" id="db-badge">⬤ Connecting…</div>
+    <button class="btn btn-s btn-sm" style="width:100%;margin-top:8px;justify-content:center" onclick="doLogout()">Sign Out</button>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+<div class="topbar">
+  <div style="font-size:14px;font-weight:700" id="page-title">Dashboard</div>
+  <div style="display:flex;align-items:center;gap:10px">
+    <span style="font-size:11px;color:var(--tx3)" id="topbar-info"></span>
+    <a href="https://pahadiroots.com" target="_blank" class="btn btn-s btn-sm">🌐 Live Site</a>
+  </div>
+</div>
+<div class="content">
+
+<!-- ── DASHBOARD ── -->
+<div class="pg active" id="pg-dashboard">
+  <div class="ph"><div><h1>Dashboard</h1><p id="dash-sub">Loading live data…</p></div>
+    <div class="ph-r"><button class="btn btn-s btn-sm" onclick="loadDash()">↻ Refresh</button></div></div>
+  <div class="stats">
+    <div class="stat"><div class="stat-lbl">Total Revenue</div><div class="stat-val" id="d-rev">—</div><div class="stat-sub">excl. cancelled</div></div>
+    <div class="stat"><div class="stat-lbl">Total Orders</div><div class="stat-val" id="d-ord">—</div><div class="stat-sub">all time</div></div>
+    <div class="stat"><div class="stat-lbl">Pending Orders</div><div class="stat-val" id="d-pend">—</div><div class="stat-sub up">needs action</div></div>
+    <div class="stat"><div class="stat-lbl">Customers</div><div class="stat-val" id="d-cust">—</div><div class="stat-sub">registered</div></div>
+  </div>
+  <div class="g2c">
+    <div>
+      <div class="tbl-wrap" style="margin-bottom:16px">
+        <div class="tbl-head"><span style="font-weight:700;font-size:13px">Recent Orders</span><button class="btn btn-s btn-sm" onclick="nav('orders')">View All →</button></div>
+        <table><thead><tr><th>Order #</th><th>Customer</th><th>Amount</th><th>Status</th></tr></thead>
+        <tbody id="dash-orders"><tr><td colspan="4" class="loading">Loading…</td></tr></tbody></table>
+      </div>
+      <div class="tbl-wrap">
+        <div class="tbl-head"><span style="font-weight:700;font-size:13px">⚠️ Low Stock Products</span></div>
+        <table><thead><tr><th>Product</th><th>Stock</th><th></th></tr></thead>
+        <tbody id="dash-low"><tr><td colspan="3" class="loading">Loading…</td></tr></tbody></table>
+      </div>
+    </div>
+    <div>
+      <div class="sc"><h4>Revenue — Last 7 Days</h4><div class="chart-wrap" id="rev-chart"></div></div>
+      <div class="sc">
+        <h4>Quick Actions</h4>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <button class="btn btn-p" style="justify-content:center" onclick="nav('products');setTimeout(openProdM,200)">+ Add Product</button>
+          <button class="btn btn-s" style="justify-content:center" onclick="nav('orders')">📋 Manage Orders</button>
+          <button class="btn btn-s" style="justify-content:center" onclick="nav('coupons');setTimeout(openCouponM,200)">🎁 Add Coupon</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── PRODUCTS ── -->
+<div class="pg" id="pg-products">
+  <div class="ph"><div><h1>Products</h1><p>Manage your catalogue</p></div>
+    <div class="ph-r">
+      <input class="tbl-search" placeholder="🔍 Search products…" oninput="filterProds()" id="prod-q">
+      <select class="tbl-sel" onchange="filterProds()" id="prod-cat-f"><option value="">All Categories</option></select>
+      <select class="tbl-sel" onchange="filterProds()" id="prod-status-f"><option value="">All Status</option><option>active</option><option>inactive</option><option>draft</option></select>
+      <button class="btn btn-p" onclick="openProdM()">+ Add Product</button>
+    </div>
+  </div>
+  <div class="tbl-wrap">
+    <table><thead><tr><th>Product</th><th>Category</th><th>Price</th><th>Stock</th><th>Status</th><th>Actions</th></tr></thead>
+    <tbody id="prod-tbody"><tr><td colspan="6" class="loading">Loading…</td></tr></tbody></table>
+    <div class="pag" id="prod-pag"></div>
+  </div>
+</div>
+
+<!-- ── CATEGORIES ── -->
+<div class="pg" id="pg-categories">
+  <div class="ph"><div><h1>Categories</h1><p>Product categories</p></div>
+    <div class="ph-r"><button class="btn btn-p" onclick="openCatM()">+ Add Category</button></div></div>
+  <div class="tbl-wrap">
+    <table><thead><tr><th>Name</th><th>Slug</th><th>Active</th><th>Created</th><th>Actions</th></tr></thead>
+    <tbody id="cat-tbody"><tr><td colspan="5" class="loading">Loading…</td></tr></tbody></table>
+  </div>
+</div>
+
+<!-- ── ORDERS ── -->
+<div class="pg" id="pg-orders">
+  <div class="ph"><div><h1>Orders</h1><p>Customer orders & fulfilment</p></div>
+    <div class="ph-r">
+      <input class="tbl-search" placeholder="🔍 Search…" oninput="filterOrders()" id="ord-q">
+      <select class="tbl-sel" onchange="filterOrders()" id="ord-status-f">
+        <option value="">All Status</option><option>pending</option><option>confirmed</option><option>packed</option><option>shipped</option><option>delivered</option><option>cancelled</option>
+      </select>
+      <select class="tbl-sel" onchange="filterOrders()" id="ord-pay-f">
+        <option value="">All Payment</option><option>pending</option><option>paid</option><option>failed</option><option>refunded</option>
+      </select>
+      <button class="btn btn-s btn-sm" onclick="exportOrders()">⬇ CSV</button>
+    </div>
+  </div>
+  <div class="tbl-wrap">
+    <table><thead><tr><th>Order #</th><th>Customer</th><th>Contact</th><th>Amount</th><th>Order Status</th><th>Payment</th><th>Date</th><th>Actions</th></tr></thead>
+    <tbody id="ord-tbody"><tr><td colspan="8" class="loading">Loading…</td></tr></tbody></table>
+    <div class="pag" id="ord-pag"></div>
+  </div>
+</div>
+
+<!-- ── CUSTOMERS ── -->
+<div class="pg" id="pg-customers">
+  <div class="ph"><div><h1>Customers</h1><p>Customer profiles & delivery info</p></div>
+    <div class="ph-r">
+      <input class="tbl-search" placeholder="🔍 Search…" oninput="filterCustomers()" id="cust-q">
+      <button class="btn btn-s btn-sm" onclick="exportCustomers()">⬇ CSV</button>
+    </div>
+  </div>
+  <div class="tbl-wrap">
+    <table><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>City</th><th>State</th><th>Orders</th><th>Total Spent</th><th>Actions</th></tr></thead>
+    <tbody id="cust-tbody"><tr><td colspan="8" class="loading">Loading…</td></tr></tbody></table>
+    <div class="pag" id="cust-pag"></div>
+  </div>
+</div>
+
+<!-- ── COUPONS ── -->
+<div class="pg" id="pg-coupons">
+  <div class="ph"><div><h1>Coupons</h1><p>Discount codes</p></div>
+    <div class="ph-r"><button class="btn btn-p" onclick="openCouponM()">+ Add Coupon</button></div></div>
+  <div class="tbl-wrap">
+    <table><thead><tr><th>Code</th><th>Type</th><th>Value</th><th>Min Order</th><th>Uses</th><th>Expires</th><th>Active</th><th>Actions</th></tr></thead>
+    <tbody id="coup-tbody"><tr><td colspan="8" class="loading">Loading…</td></tr></tbody></table>
+  </div>
+</div>
+
+<!-- ── SUBSCRIBERS ── -->
+<div class="pg" id="pg-subscribers">
+  <div class="ph"><div><h1>Subscribers</h1><p>Newsletter list</p></div>
+    <div class="ph-r"><button class="btn btn-s btn-sm" onclick="exportSubs()">⬇ CSV</button></div></div>
+  <div class="tbl-wrap">
+    <table><thead><tr><th>Email</th><th>Subscribed On</th><th>Actions</th></tr></thead>
+    <tbody id="sub-tbody"><tr><td colspan="3" class="loading">Loading…</td></tr></tbody></table>
+    <div class="pag" id="sub-pag"></div>
+  </div>
+</div>
+
+<!-- ── REVIEWS ── -->
+<div class="pg" id="pg-reviews">
+  <div class="ph"><div><h1>Reviews</h1><p>Customer reviews</p></div>
+    <div class="ph-r"><button class="btn btn-p" onclick="openReviewM()">+ Add Review</button></div></div>
+  <div class="tbl-wrap">
+    <table><thead><tr><th>Customer</th><th>Product</th><th>Rating</th><th>Review</th><th>Status</th><th>Actions</th></tr></thead>
+    <tbody id="rev-tbody"><tr><td colspan="6" class="loading">Loading…</td></tr></tbody></table>
+  </div>
+</div>
+
+<!-- ── INVENTORY LOGS ── -->
+<div class="pg" id="pg-inventory_logs">
+  <div class="ph"><div><h1>Inventory Logs</h1><p>Stock change history</p></div>
+    <div class="ph-r"><button class="btn btn-s btn-sm" onclick="loadInvLogs()">↻ Refresh</button></div></div>
+  <div class="tbl-wrap">
+    <table><thead><tr><th>Product</th><th>Change Type</th><th>Qty Change</th><th>Reference</th><th>Time</th></tr></thead>
+    <tbody id="invlog-tbody"><tr><td colspan="5" class="loading">Loading…</td></tr></tbody></table>
+    <div class="pag" id="invlog-pag"></div>
+  </div>
+</div>
+
+<!-- ── ORDER LOGS ── -->
+<div class="pg" id="pg-order_logs">
+  <div class="ph"><div><h1>Order Status Logs</h1><p>Status change history</p></div>
+    <div class="ph-r"><button class="btn btn-s btn-sm" onclick="loadOrdLogs()">↻ Refresh</button></div></div>
+  <div class="tbl-wrap">
+    <table><thead><tr><th>Order ID</th><th>Old Status</th><th>New Status</th><th>Changed At</th></tr></thead>
+    <tbody id="ordlog-tbody"><tr><td colspan="4" class="loading">Loading…</td></tr></tbody></table>
+    <div class="pag" id="ordlog-pag"></div>
+  </div>
+</div>
+
+<!-- ── ADMIN LOGS ── -->
+<div class="pg" id="pg-admin_logs">
+  <div class="ph"><div><h1>Admin Logs</h1><p>Admin action history</p></div>
+    <div class="ph-r"><button class="btn btn-s btn-sm" onclick="loadAdminLogs()">↻ Refresh</button></div></div>
+  <div class="tbl-wrap">
+    <table><thead><tr><th>Admin</th><th>Action</th><th>Table</th><th>Record ID</th><th>Time</th></tr></thead>
+    <tbody id="adminlog-tbody"><tr><td colspan="5" class="loading">Loading…</td></tr></tbody></table>
+    <div class="pag" id="adminlog-pag"></div>
+  </div>
+</div>
+
+<!-- ── ANALYTICS ── -->
+<div class="pg" id="pg-analytics">
+  <div class="ph"><div><h1>Analytics</h1><p>Sales & performance</p></div>
+    <div class="ph-r">
+      <select class="tbl-sel" id="an-range" onchange="loadAnalytics()">
+        <option value="7">Last 7 Days</option><option value="30" selected>Last 30 Days</option><option value="90">Last 90 Days</option>
+      </select>
+    </div>
+  </div>
+  <div class="stats">
+    <div class="stat"><div class="stat-lbl">Revenue</div><div class="stat-val" id="an-rev">—</div><div class="stat-sub">in period</div></div>
+    <div class="stat"><div class="stat-lbl">Orders</div><div class="stat-val" id="an-ord">—</div><div class="stat-sub">in period</div></div>
+    <div class="stat"><div class="stat-lbl">Avg Order</div><div class="stat-val" id="an-aov">—</div><div class="stat-sub">average value</div></div>
+    <div class="stat"><div class="stat-lbl">Delivered</div><div class="stat-val" id="an-del">—</div><div class="stat-sub">completion rate</div></div>
+  </div>
+  <div class="g2c">
+    <div class="sc"><h4>Top Products by Revenue</h4><div id="an-top"><div class="loading">Loading…</div></div></div>
+    <div class="sc"><h4>Orders by Status</h4><div id="an-status"><div class="loading">Loading…</div></div></div>
+  </div>
+  <div class="sc"><h4>Coupon Usage</h4><div id="an-coupons"><div class="loading">Loading…</div></div></div>
+</div>
+
+<!-- ── SETTINGS ── -->
+<div class="pg" id="pg-settings">
+  <div class="ph"><div><h1>Settings</h1><p>Configuration</p></div></div>
+  <div class="g2c">
+    <div>
+      <div class="sc">
+        <h4>⚙️ Thresholds</h4>
+        <div class="fg"><label>Low Stock Alert (qty)</label><input type="number" class="fi" id="cfg-low" value="10" min="1"></div>
+        <button class="btn btn-p" onclick="saveConfig()">💾 Save</button>
+      </div>
+      <div class="sc">
+        <h4>🔌 Connection Test</h4>
+        <button class="btn btn-s" onclick="testConn()">🔌 Test Connection</button>
+        <div id="conn-res" style="margin-top:10px;font-size:12.5px"></div>
+      </div>
+    </div>
+    <div class="sc">
+      <h4>📊 Table Status</h4>
+      <div id="tbl-status"><div class="loading">Loading…</div></div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /content -->
+</div><!-- /main -->
+</div><!-- /layout -->
+</div><!-- /app -->
+
+<!-- ══ MODALS ══ -->
+
+<!-- Product Modal -->
+<div class="ov" id="prod-modal">
+  <div class="modal modal-lg">
+    <div class="m-hdr"><h3 id="p-title">Add Product</h3><button class="m-cls" onclick="closeM('prod-modal')">✕</button></div>
+    <div class="m-body">
+      <input type="hidden" id="p-id">
+      <div class="gr gr2">
+        <div class="fg"><label>Name <span class="req">*</span></label><input class="fi" id="p-name" placeholder="Himalayan Wild Honey"></div>
+        <div class="fg"><label>SKU</label><input class="fi" id="p-sku" placeholder="HWH-001"></div>
+      </div>
+      <div class="gr gr3">
+        <div class="fg"><label>Category</label><select class="fi" id="p-cat"></select></div>
+        <div class="fg"><label>Status</label><select class="fi" id="p-status"><option value="active">Active</option><option value="inactive">Inactive</option><option value="draft">Draft</option></select></div>
+        <div class="fg"><label>Unit Label</label><input class="fi" id="p-unit" placeholder="250g"></div>
+      </div>
+      <div class="gr gr3">
+        <div class="fg"><label>Price (₹) <span class="req">*</span></label><input type="number" class="fi" id="p-price" placeholder="599"></div>
+        <div class="fg"><label>MRP (₹)</label><input type="number" class="fi" id="p-mrp" placeholder="799"></div>
+        <div class="fg"><label>Stock Qty</label><input type="number" class="fi" id="p-stock" placeholder="50"></div>
+      </div>
+      <div class="fg"><label>Short Description</label><textarea class="fi" id="p-desc" rows="2"></textarea></div>
+      <div class="gr gr2">
+        <div class="fg"><label>Image URL</label><input class="fi" id="p-img" placeholder="https://…"></div>
+        <div class="fg"><label>Emoji</label><input class="fi" id="p-emoji" placeholder="🍯" style="font-size:20px;width:80px"></div>
+      </div>
+      <div class="gr gr2">
+        <div class="fg"><label>Tags (comma separated)</label><input class="fi" id="p-tags" placeholder="organic, honey, himachal"></div>
+        <div class="fg">
+          <label>Badges</label>
+          <div style="display:flex;gap:14px;flex-wrap:wrap;margin-top:6px">
+            <label style="display:flex;gap:6px;align-items:center;font-size:12.5px;font-weight:400"><input type="checkbox" id="p-best"> Bestseller</label>
+            <label style="display:flex;gap:6px;align-items:center;font-size:12.5px;font-weight:400"><input type="checkbox" id="p-org"> Organic</label>
+            <label style="display:flex;gap:6px;align-items:center;font-size:12.5px;font-weight:400"><input type="checkbox" id="p-new"> New Launch</label>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="m-foot">
+      <button class="btn btn-s" onclick="closeM('prod-modal')">Cancel</button>
+      <button class="btn btn-p" id="p-save-btn" onclick="saveProd()">💾 Save Product</button>
+    </div>
+  </div>
+</div>
+
+<!-- Category Modal -->
+<div class="ov" id="cat-modal">
+  <div class="modal">
+    <div class="m-hdr"><h3 id="c-title">Add Category</h3><button class="m-cls" onclick="closeM('cat-modal')">✕</button></div>
+    <div class="m-body">
+      <input type="hidden" id="c-id">
+      <div class="fg"><label>Name <span class="req">*</span></label><input class="fi" id="c-name" oninput="autoSlug()" placeholder="Wild Honey"></div>
+      <div class="fg"><label>Slug</label><input class="fi" id="c-slug" placeholder="wild-honey"></div>
+      <div class="fg"><label><input type="checkbox" id="c-active" checked style="margin-right:6px"> Active</label></div>
+    </div>
+    <div class="m-foot">
+      <button class="btn btn-s" onclick="closeM('cat-modal')">Cancel</button>
+      <button class="btn btn-p" onclick="saveCat()">💾 Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Order Modal -->
+<div class="ov" id="order-modal">
+  <div class="modal modal-lg">
+    <div class="m-hdr"><h3 id="ord-m-title">Order Details</h3><button class="m-cls" onclick="closeM('order-modal')">✕</button></div>
+    <div class="m-body" id="ord-m-body">Loading…</div>
+    <div class="m-foot">
+      <button class="btn btn-s" onclick="closeM('order-modal')">Close</button>
+      <button class="btn btn-p" id="ord-save-btn" onclick="saveOrdStatus()">💾 Update Status</button>
+    </div>
+  </div>
+</div>
+
+<!-- Customer Modal -->
+<div class="ov" id="cust-modal">
+  <div class="modal modal-lg">
+    <div class="m-hdr"><h3 id="cust-m-title">Customer</h3><button class="m-cls" onclick="closeM('cust-modal')">✕</button></div>
+    <div class="m-body" id="cust-m-body">Loading…</div>
+    <div class="m-foot"><button class="btn btn-s" onclick="closeM('cust-modal')">Close</button></div>
+  </div>
+</div>
+
+<!-- Coupon Modal -->
+<div class="ov" id="coupon-modal">
+  <div class="modal">
+    <div class="m-hdr"><h3 id="coup-title">Add Coupon</h3><button class="m-cls" onclick="closeM('coupon-modal')">✕</button></div>
+    <div class="m-body">
+      <input type="hidden" id="coup-id">
+      <div class="fg"><label>Code <span class="req">*</span></label><input class="fi" id="coup-code" placeholder="WELCOME50" oninput="this.value=this.value.toUpperCase()"></div>
+      <div class="gr gr2">
+        <div class="fg"><label>Type</label><select class="fi" id="coup-type"><option value="flat">Flat ₹ Off</option><option value="percent">% Off</option><option value="free_shipping">Free Shipping</option></select></div>
+        <div class="fg"><label>Value</label><input type="number" class="fi" id="coup-val" placeholder="50"></div>
+      </div>
+      <div class="gr gr2">
+        <div class="fg"><label>Min Order (₹)</label><input type="number" class="fi" id="coup-min" placeholder="0"></div>
+        <div class="fg"><label>Max Uses</label><input type="number" class="fi" id="coup-max" placeholder="Unlimited"></div>
+      </div>
+      <div class="fg"><label>Expires On</label><input type="date" class="fi" id="coup-exp"></div>
+      <div class="fg"><label><input type="checkbox" id="coup-active" checked style="margin-right:6px"> Active</label></div>
+    </div>
+    <div class="m-foot">
+      <button class="btn btn-s" onclick="closeM('coupon-modal')">Cancel</button>
+      <button class="btn btn-p" onclick="saveCoupon()">💾 Save Coupon</button>
+    </div>
+  </div>
+</div>
+
+<!-- Review Modal -->
+<div class="ov" id="review-modal">
+  <div class="modal">
+    <div class="m-hdr"><h3>Review</h3><button class="m-cls" onclick="closeM('review-modal')">✕</button></div>
+    <div class="m-body">
+      <input type="hidden" id="rv-id">
+      <div class="gr gr2">
+        <div class="fg"><label>Customer Name</label><input class="fi" id="rv-name" placeholder="Priya S."></div>
+        <div class="fg"><label>Location</label><input class="fi" id="rv-loc" placeholder="Delhi"></div>
+      </div>
+      <div class="gr gr2">
+        <div class="fg"><label>Rating</label><select class="fi" id="rv-rating"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option></select></div>
+        <div class="fg"><label>Product</label><select class="fi" id="rv-prod"><option value="">General</option></select></div>
+      </div>
+      <div class="fg"><label>Review Text</label><textarea class="fi" id="rv-text" rows="3"></textarea></div>
+      <div class="fg"><label>Status</label><select class="fi" id="rv-status"><option value="approved">Approved</option><option value="pending">Pending</option><option value="hidden">Hidden</option></select></div>
+    </div>
+    <div class="m-foot">
+      <button class="btn btn-s" onclick="closeM('review-modal')">Cancel</button>
+      <button class="btn btn-p" onclick="saveReview()">💾 Save</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+'use strict';
+
+// ══════════════════════════════════════════
+// CONFIG — hardcoded Supabase credentials
+// ══════════════════════════════════════════
+const SB_URL = 'https://ulyrhnpoiyuvarulqqi.supabase.co';
+const SB_KEY = 'sb_publishable_yr_3pvEKoWk8rYPtKfa07Q_aQycceph'; // replace with service_role key for full access
+const ADMIN_PW = localStorage.getItem('pr_pw') || ''; // set via first login
+
+// ══ STATE ══
+const S = {
+  prods:[], cats:[], orders:[], customers:[], coupons:[], subs:[], reviews:[],
+  invLogs:[], ordLogs:[], adminLogs:[],
+  currentOrder:null,
+  prodPage:1, ordPage:1, custPage:1, subPage:1, invLogPage:1, ordLogPage:1, adminLogPage:1,
+  PAGE:25, lowStock:parseInt(localStorage.getItem('pr_low_stock')||'10'),
+  _fProds:null, _fOrds:null, _fCusts:null, _custCache:{}, _custOrds:{},
+};
+
+// ══ SUPABASE DIRECT API ══
+function sbHeaders(){
+  return {
+    'apikey': SB_KEY,
+    'Authorization': 'Bearer '+SB_KEY,
+    'Content-Type': 'application/json',
+    'Prefer': 'return=representation'
+  };
+}
+async function sb(method, table, query='', body=null){
+  let url = SB_URL+'/rest/v1/'+table;
+  if(query) url += '?'+query;
+  const r = await fetch(url, {method, headers:sbHeaders(), body:body?JSON.stringify(body):null});
+  if(!r.ok){
+    let msg='';
+    try{ const d=await r.json(); msg=d.message||d.hint||d.error||JSON.stringify(d); }catch(e){ msg=await r.text(); }
+    throw new Error('['+r.status+'] '+msg);
+  }
+  const txt=await r.text();
+  return txt?JSON.parse(txt):null;
+}
+const GET=(t,q)=>sb('GET',t,q);
+const POST=(t,b)=>sb('POST',t,'',b);
+const PATCH=(t,q,b)=>sb('PATCH',t,q,b);
+const DEL=(t,q)=>sb('DELETE',t,q);
+
+// ══ AUTH ══
+async function doLogin(){
+  const pw = document.getElementById('lg-pw').value.trim();
+  if(!pw){ showErr('Enter password'); return; }
+  // Test connection first
+  try{
+    await GET('categories','limit=1');
+    localStorage.setItem('pr_pw', pw);
+    document.getElementById('login-gate').style.display='none';
+    document.getElementById('app').style.display='block';
+    await init();
+  }catch(e){
+    showErr('Connection failed: '+e.message+' — Try using the service_role key in SB_KEY');
+  }
+}
+function showErr(m){ const el=document.getElementById('lg-err'); el.textContent=m; el.style.display='block'; }
+function doLogout(){ localStorage.removeItem('pr_pw'); location.reload(); }
+
+// ══ INIT ══
+async function init(){
+  const b=document.getElementById('db-badge');
+  b.className='db-dot wait'; b.textContent='⬤ Connecting…';
+  try{
+    document.getElementById('topbar-info').textContent=new Date().toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'});
+    S.cats = await GET('categories','order=name.asc').catch(()=>[]);
+    b.className='db-dot on'; b.textContent='⬤ Supabase Live';
+    await loadDash();
+    const pend=await GET('orders','order_status=eq.pending&select=id').catch(()=>[]);
+    if(pend?.length){ const bd=document.getElementById('badge-ord'); bd.textContent=pend.length; bd.style.display='inline'; }
+  }catch(e){ b.className='db-dot off'; b.textContent='⬤ DB Error'; toast('DB: '+e.message,'er'); }
+}
+
+// ══ NAV ══
+function nav(pg){
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nv').forEach(b=>b.classList.remove('active'));
+  document.getElementById('pg-'+pg)?.classList.add('active');
+  document.querySelectorAll('.nv').forEach(b=>{ if(b.getAttribute('onclick')?.includes("'"+pg+"'")) b.classList.add('active'); });
+  document.getElementById('page-title').textContent=pg.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
+  ({dashboard:loadDash,products:loadProducts,categories:loadCats,orders:loadOrders,customers:loadCustomers,coupons:loadCoupons,subscribers:loadSubs,reviews:loadReviews,analytics:loadAnalytics,settings:loadSettings,inventory_logs:loadInvLogs,order_logs:loadOrdLogs,admin_logs:loadAdminLogs})[pg]?.();
+}
+
+// ══ DASHBOARD ══
+async function loadDash(){
+  try{
+    const [orders,custs,prods]=await Promise.all([
+      GET('orders','select=id,total_amount,order_status,customer_id,created_at,order_number').catch(()=>[]),
+      GET('customers','select=id').catch(()=>[]),
+      GET('products','select=id,name,stock_quantity').catch(()=>[]),
+    ]);
+    const notCanc=(orders||[]).filter(o=>o.order_status!=='cancelled');
+    const rev=notCanc.reduce((s,o)=>s+(parseFloat(o.total_amount)||0),0);
+    const pend=(orders||[]).filter(o=>o.order_status==='pending').length;
+    document.getElementById('d-rev').textContent='₹'+Math.round(rev).toLocaleString('en-IN');
+    document.getElementById('d-ord').textContent=(orders||[]).length;
+    document.getElementById('d-pend').textContent=pend;
+    document.getElementById('d-cust').textContent=(custs||[]).length;
+    document.getElementById('dash-sub').textContent='Updated '+new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+
+    // Recent orders + customer names
+    const recent=[...(orders||[])].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at)).slice(0,6);
+    const ids=[...new Set(recent.map(o=>o.customer_id).filter(Boolean))];
+    let cm={};
+    if(ids.length){
+      const cs=await GET('customers',`id=in.(${ids.join(',')})&select=id,first_name,last_name,phone`).catch(()=>[]);
+      (cs||[]).forEach(c=>cm[c.id]=c);
+    }
+    document.getElementById('dash-orders').innerHTML=recent.length?recent.map(o=>{
+      const c=cm[o.customer_id]||{};
+      const name=c.first_name?c.first_name+' '+(c.last_name||''):'Guest';
+      return `<tr>
+        <td class="mono">#${o.order_number||String(o.id).slice(-6).toUpperCase()}</td>
+        <td class="td-main">${name.trim()}</td>
+        <td>₹${(parseFloat(o.total_amount)||0).toLocaleString('en-IN')}</td>
+        <td><span class="badge ${sClass(o.order_status)}">${o.order_status||'pending'}</span></td>
+      </tr>`;
+    }).join(''):'<tr><td colspan="4" class="empty">No orders yet</td></tr>';
+
+    // Low stock
+    const low=(prods||[]).filter(p=>(p.stock_quantity||0)<=S.lowStock).sort((a,b)=>a.stock_quantity-b.stock_quantity).slice(0,8);
+    document.getElementById('dash-low').innerHTML=low.length?low.map(p=>`
+      <tr>
+        <td class="td-main">${p.name}</td>
+        <td class="${(p.stock_quantity||0)<=0?'stok-lo':'stok-lo'}">${p.stock_quantity||0}</td>
+        <td><button class="btn btn-s btn-sm" onclick="nav('products')">View</button></td>
+      </tr>`).join(''):'<tr><td colspan="3" class="empty">All stocked ✓</td></tr>';
+
+    // Revenue chart
+    const now=new Date();
+    const cd=Array.from({length:7},(_,i)=>{
+      const d=new Date(now); d.setDate(d.getDate()-(6-i));
+      const ds=d.toDateString();
+      const r=(orders||[]).filter(o=>new Date(o.created_at).toDateString()===ds&&o.order_status!=='cancelled').reduce((s,o)=>s+(parseFloat(o.total_amount)||0),0);
+      return {lbl:d.toLocaleDateString('en-IN',{weekday:'short'}),r};
+    });
+    const maxR=Math.max(...cd.map(d=>d.r),1);
+    document.getElementById('rev-chart').innerHTML=cd.map(d=>`
+      <div class="bar-col">
+        <div class="bar-val">${d.r>0?'₹'+Math.round(d.r/1000)+'k':''}</div>
+        <div class="bar" style="height:${Math.max(4,Math.round(d.r/maxR*120))}px"></div>
+        <div class="bar-lbl">${d.lbl}</div>
+      </div>`).join('');
+  }catch(e){ toast('Dashboard: '+e.message,'er'); }
+}
+
+// ══ PRODUCTS ══
+async function loadProducts(){
+  try{
+    S.prods=await GET('products','order=name.asc&select=*');
+    document.getElementById('prod-cat-f').innerHTML='<option value="">All Categories</option>'+S.cats.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+    S._fProds=null; S.prodPage=1; renderProds();
+  }catch(e){ toast('Products: '+e.message,'er'); }
+}
+function filterProds(){
+  const q=(document.getElementById('prod-q').value||'').toLowerCase();
+  const cat=document.getElementById('prod-cat-f').value;
+  const st=document.getElementById('prod-status-f').value;
+  S._fProds=S.prods.filter(p=>{
+    if(q&&!(p.name||'').toLowerCase().includes(q)&&!(p.sku||'').toLowerCase().includes(q)) return false;
+    if(cat&&String(p.category_id)!==cat) return false;
+    if(st&&(p.status||'active')!==st) return false;
+    return true;
+  });
+  S.prodPage=1; renderProds();
+}
+function renderProds(){
+  const list=S._fProds||S.prods, total=list.length, pages=Math.ceil(total/S.PAGE);
+  const slice=list.slice((S.prodPage-1)*S.PAGE, S.prodPage*S.PAGE);
+  const cm={}; S.cats.forEach(c=>cm[c.id]=c.name);
+  document.getElementById('prod-tbody').innerHTML=slice.length?slice.map(p=>`
+    <tr>
+      <td><div class="td-main">${p.emoji||''} ${p.name}</div><div class="td-sub mono">${p.sku||''}</div></td>
+      <td>${cm[p.category_id]||'—'}</td>
+      <td>₹${p.price||0}${p.mrp&&p.mrp>p.price?' <span style="color:var(--tx3);text-decoration:line-through;font-size:11px">₹'+p.mrp+'</span>':''}</td>
+      <td class="${(p.stock_quantity||0)<=S.lowStock?'stok-lo':'stok'}">${p.stock_quantity||0}</td>
+      <td><span class="badge ${p.status==='active'?'bg':p.status==='draft'?'bgr':'br'}">${p.status||'active'}</span></td>
+      <td style="white-space:nowrap">
+        <button class="btn btn-s btn-sm" onclick="editProd('${p.id}')">Edit</button>
+        <button class="btn btn-d btn-sm" onclick="delProd('${p.id}','${esc(p.name)}')">Del</button>
+      </td>
+    </tr>`).join(''):'<tr><td colspan="6" class="empty">No products found</td></tr>';
+  renderPag('prod-pag',S.prodPage,pages,total,n=>{S.prodPage=n;renderProds();});
+}
+function openProdM(p){
+  p=p||{};
+  document.getElementById('p-title').textContent=p.id?'Edit Product':'Add Product';
+  document.getElementById('p-id').value=p.id||'';
+  document.getElementById('p-name').value=p.name||'';
+  document.getElementById('p-sku').value=p.sku||'';
+  document.getElementById('p-price').value=p.price||'';
+  document.getElementById('p-mrp').value=p.mrp||'';
+  document.getElementById('p-unit').value=p.unit_label||'';
+  document.getElementById('p-stock').value=p.stock_quantity||'';
+  document.getElementById('p-desc').value=p.short_description||'';
+  document.getElementById('p-emoji').value=p.emoji||'';
+  document.getElementById('p-img').value=p.image_url||'';
+  document.getElementById('p-tags').value=(p.tags||[]).join(', ');
+  document.getElementById('p-best').checked=!!(p.badges?.includes('bestseller'));
+  document.getElementById('p-org').checked=!!(p.badges?.includes('organic'));
+  document.getElementById('p-new').checked=!!(p.badges?.includes('new'));
+  document.getElementById('p-status').value=p.status||'active';
+  fillSel('p-cat',S.cats,'id','name',p.category_id);
+  openM('prod-modal');
+}
+function editProd(id){ openProdM(S.prods.find(x=>String(x.id)===String(id))); }
+async function saveProd(){
+  const id=document.getElementById('p-id').value;
+  const name=document.getElementById('p-name').value.trim();
+  const price=parseFloat(document.getElementById('p-price').value);
+  if(!name||!price){ toast('Name & price required','er'); return; }
+  const badges=[];
+  if(document.getElementById('p-best').checked) badges.push('bestseller');
+  if(document.getElementById('p-org').checked) badges.push('organic');
+  if(document.getElementById('p-new').checked) badges.push('new');
+  const tags=document.getElementById('p-tags').value.split(',').map(t=>t.trim()).filter(Boolean);
+  const body={name,price,sku:v('p-sku')||null,mrp:parseFloat(v('p-mrp'))||null,unit_label:v('p-unit')||null,stock_quantity:parseInt(v('p-stock'))||0,short_description:v('p-desc')||null,emoji:v('p-emoji')||null,image_url:v('p-img')||null,tags:tags.length?tags:null,badges:badges.length?badges:null,category_id:v('p-cat')||null,status:v('p-status')};
+  const btn=document.getElementById('p-save-btn');
+  btn.disabled=true; btn.textContent='Saving…';
+  try{
+    if(id) await PATCH('products',`id=eq.${id}`,body); else await POST('products',body);
+    toast('Product saved ✓','ok'); closeM('prod-modal'); await loadProducts();
+  }catch(e){ toast('Error: '+e.message,'er'); }
+  btn.disabled=false; btn.textContent='💾 Save Product';
+}
+async function delProd(id,name){
+  if(!confirm(`Delete "${name}"?`)) return;
+  try{ await DEL('products',`id=eq.${id}`); toast('Deleted','ok'); await loadProducts(); }
+  catch(e){ toast('Error: '+e.message,'er'); }
+}
+
+// ══ CATEGORIES ══
+async function loadCats(){
+  try{
+    S.cats=await GET('categories','order=name.asc&select=*');
+    const prods=await GET('products','select=category_id').catch(()=>[]);
+    const cm={}; (prods||[]).forEach(p=>{ if(p.category_id) cm[p.category_id]=(cm[p.category_id]||0)+1; });
+    document.getElementById('cat-tbody').innerHTML=S.cats.length?S.cats.map(c=>`
+      <tr>
+        <td class="td-main">${c.name}</td>
+        <td class="mono">${c.slug||'—'}</td>
+        <td><span class="badge ${c['is active']!==false?'bg':'br'}">${c['is active']!==false?'Yes':'No'}</span></td>
+        <td style="font-size:11.5px;color:var(--tx3)">${new Date(c.created_at).toLocaleDateString('en-IN')}</td>
+        <td>
+          <button class="btn btn-s btn-sm" onclick="editCat('${c.id}')">Edit</button>
+          <button class="btn btn-d btn-sm" onclick="delCat('${c.id}','${esc(c.name)}')">Del</button>
+        </td>
+      </tr>`).join(''):'<tr><td colspan="5" class="empty">No categories</td></tr>';
+  }catch(e){ toast('Categories: '+e.message,'er'); }
+}
+function openCatM(c){ c=c||{};
+  document.getElementById('c-title').textContent=c.id?'Edit Category':'Add Category';
+  document.getElementById('c-id').value=c.id||'';
+  document.getElementById('c-name').value=c.name||'';
+  document.getElementById('c-slug').value=c.slug||'';
+  document.getElementById('c-active').checked=c['is active']!==false;
+  openM('cat-modal');
+}
+function editCat(id){ openCatM(S.cats.find(x=>String(x.id)===String(id))); }
+function autoSlug(){ if(!document.getElementById('c-id').value) document.getElementById('c-slug').value=document.getElementById('c-name').value.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,''); }
+async function saveCat(){
+  const id=document.getElementById('c-id').value, name=document.getElementById('c-name').value.trim();
+  if(!name){ toast('Name required','er'); return; }
+  const body={name,slug:v('c-slug')||name.toLowerCase().replace(/\s+/g,'-'),'is active':document.getElementById('c-active').checked};
+  try{
+    if(id) await PATCH('categories',`id=eq.${id}`,body); else await POST('categories',body);
+    toast('Saved ✓','ok'); closeM('cat-modal'); await loadCats();
+  }catch(e){ toast('Error: '+e.message,'er'); }
+}
+async function delCat(id,name){
+  if(!confirm(`Delete "${name}"?`)) return;
+  try{ await DEL('categories',`id=eq.${id}`); toast('Deleted','ok'); await loadCats(); }
+  catch(e){ toast('Error: '+e.message,'er'); }
+}
+
+// ══ ORDERS ══
+async function loadOrders(){
+  try{
+    S.orders=await GET('orders','order=created_at.desc&select=*');
+    const ids=[...new Set(S.orders.map(o=>o.customer_id).filter(Boolean))];
+    S._custCache={};
+    if(ids.length){
+      const cs=await GET('customers',`id=in.(${ids.join(',')})&select=id,first_name,last_name,email,phone,city,state,postal_code,address_line1,address_line2`).catch(()=>[]);
+      (cs||[]).forEach(c=>S._custCache[c.id]=c);
+    }
+    S._fOrds=null; S.ordPage=1; renderOrders();
+  }catch(e){ toast('Orders: '+e.message,'er'); }
+}
+function filterOrders(){
+  const q=(document.getElementById('ord-q').value||'').toLowerCase();
+  const st=document.getElementById('ord-status-f').value;
+  const py=document.getElementById('ord-pay-f').value;
+  S._fOrds=S.orders.filter(o=>{
+    const c=S._custCache[o.customer_id]||{};
+    const name=(c.first_name||'')+' '+(c.last_name||'');
+    if(st&&o.order_status!==st) return false;
+    if(py&&o.payment_status!==py) return false;
+    if(q&&![o.order_number,o.id,name,c.email,c.phone,c.city].join(' ').toLowerCase().includes(q)) return false;
+    return true;
+  });
+  S.ordPage=1; renderOrders();
+}
+function renderOrders(){
+  const list=S._fOrds||S.orders, total=list.length, pages=Math.ceil(total/S.PAGE);
+  const slice=list.slice((S.ordPage-1)*S.PAGE, S.ordPage*S.PAGE);
+  document.getElementById('ord-tbody').innerHTML=slice.length?slice.map(o=>{
+    const c=S._custCache[o.customer_id]||{};
+    const name=((c.first_name||'')+' '+(c.last_name||'')).trim()||'Guest';
+    return `<tr>
+      <td class="mono" style="cursor:pointer;color:var(--blu)" onclick="openOrder('${o.id}')">${o.order_number||('#'+String(o.id).slice(-8).toUpperCase())}</td>
+      <td><div class="td-main">${name}</div><div class="td-sub">${c.email||''}</div></td>
+      <td style="font-size:11.5px">${c.phone||'—'}<br><span style="color:var(--tx3)">${c.city||''}</span></td>
+      <td>₹${(parseFloat(o.total_amount)||0).toLocaleString('en-IN')}</td>
+      <td><span class="badge ${sClass(o.order_status)}">${o.order_status||'pending'}</span></td>
+      <td><span class="badge ${pyClass(o.payment_status)}">${o.payment_status||'pending'}</span></td>
+      <td style="font-size:11px;color:var(--tx3)">${new Date(o.created_at).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'2-digit'})}</td>
+      <td><button class="btn btn-s btn-sm" onclick="openOrder('${o.id}')">View</button></td>
+    </tr>`;
+  }).join(''):'<tr><td colspan="8" class="empty">No orders found</td></tr>';
+  renderPag('ord-pag',S.ordPage,pages,total,n=>{S.ordPage=n;renderOrders();});
+}
+
+async function openOrder(id){
+  S.currentOrder=S.orders.find(o=>String(o.id)===String(id)); if(!S.currentOrder) return;
+  const o=S.currentOrder, c=S._custCache[o.customer_id]||{};
+  const name=((c.first_name||'')+' '+(c.last_name||'')).trim()||'Guest';
+  let items=[];
+  try{ items=await GET('order_items',`order_id=eq.${id}&select=*`); }catch(e){}
+  const pm={}; S.prods.forEach(p=>pm[p.id]=p.name);
+  document.getElementById('ord-m-title').textContent=(o.order_number||'Order #'+String(id).slice(-8).toUpperCase());
+  document.getElementById('ord-m-body').innerHTML=`
+    <div class="g2c" style="gap:12px;margin-bottom:14px">
+      <div class="sc" style="margin:0">
+        <h4>👤 Customer & Delivery</h4>
+        <div class="ri"><span class="l">Name</span><span class="v">${name}</span></div>
+        <div class="ri"><span class="l">Phone</span><span class="v">${c.phone||'—'}</span></div>
+        <div class="ri"><span class="l">Email</span><span class="v">${c.email||'—'}</span></div>
+        <div class="sep"></div>
+        <div class="ri"><span class="l">Address</span><span class="v">${[c.address_line1,c.address_line2].filter(Boolean).join(', ')||'—'}</span></div>
+        <div class="ri"><span class="l">City</span><span class="v">${c.city||'—'}</span></div>
+        <div class="ri"><span class="l">State</span><span class="v">${c.state||'—'}</span></div>
+        <div class="ri"><span class="l">Postal Code</span><span class="v">${c.postal_code||'—'}</span></div>
+      </div>
+      <div class="sc" style="margin:0">
+        <h4>📦 Order Info</h4>
+        <div class="ri"><span class="l">Order #</span><span class="v mono">${o.order_number||String(o.id).slice(-8).toUpperCase()}</span></div>
+        <div class="ri"><span class="l">Date</span><span class="v">${new Date(o.created_at).toLocaleString('en-IN')}</span></div>
+        <div class="ri"><span class="l">Subtotal</span><span class="v">₹${(parseFloat(o.subtotal)||0).toLocaleString('en-IN')}</span></div>
+        <div class="ri"><span class="l">Tax</span><span class="v">₹${(parseFloat(o.tax)||0).toLocaleString('en-IN')}</span></div>
+        <div class="ri"><span class="l">Shipping</span><span class="v">₹${(parseFloat(o.shipping_charge)||0).toLocaleString('en-IN')}</span></div>
+        <div class="ri"><span class="l">Total</span><span class="v" style="font-weight:700;color:var(--grn)">₹${(parseFloat(o.total_amount)||0).toLocaleString('en-IN')}</span></div>
+        <div class="ri"><span class="l">Payment</span><span class="v">${o.payment_method||'—'} <span class="badge ${pyClass(o.payment_status)}">${o.payment_status||'—'}</span></span></div>
+        <div class="ri"><span class="l">Payment ID</span><span class="v mono" style="font-size:11px">${o.payment_id||'—'}</span></div>
+        <div class="sep"></div>
+        <div class="fg" style="margin:0"><label style="font-size:11.5px;font-weight:600;color:var(--tx2);display:block;margin-bottom:5px">Update Order Status</label>
+          <select class="fi" id="ord-status-edit">
+            ${['pending','confirmed','packed','shipped','delivered','cancelled'].map(s=>`<option value="${s}" ${o.order_status===s?'selected':''}>${s}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="sc" style="margin:0">
+      <h4>🛒 Items (${(items||[]).length})</h4>
+      <table><thead><tr><th>Product</th><th>Qty</th><th>Unit Price</th><th>Total</th></tr></thead>
+      <tbody>${(items||[]).map(it=>`<tr>
+        <td class="td-main">${pm[it.product_id]||'Product #'+it.product_id}</td>
+        <td>${it.quantity}</td><td>₹${it.price_at_time||0}</td>
+        <td>₹${((it.quantity||1)*(parseFloat(it.price_at_time)||0)).toLocaleString('en-IN')}</td>
+      </tr>`).join('')||'<tr><td colspan="4" class="empty">No items</td></tr>'}</tbody></table>
+    </div>`;
+  openM('order-modal');
+}
+async function saveOrdStatus(){
+  if(!S.currentOrder) return;
+  const status=document.getElementById('ord-status-edit').value;
+  const btn=document.getElementById('ord-save-btn');
+  btn.disabled=true; btn.textContent='Saving…';
+  try{
+    await PATCH('orders',`id=eq.${S.currentOrder.id}`,{order_status:status,updated_at:new Date().toISOString()});
+    try{ await POST('order_logs',{order_id:S.currentOrder.id,old_status:S.currentOrder.order_status,new_status:status}); }catch(e){}
+    try{ await POST('order_status_history',{order_id:S.currentOrder.id,old_status:S.currentOrder.order_status,new_status:status}); }catch(e){}
+    toast('Order updated ✓','ok'); closeM('order-modal'); await loadOrders();
+  }catch(e){ toast('Error: '+e.message,'er'); }
+  btn.disabled=false; btn.textContent='💾 Update Status';
+}
+function exportOrders(){
+  const list=S._fOrds||S.orders;
+  const rows=[['Order #','Customer','Email','Phone','City','State','Postal Code','Subtotal','Tax','Shipping','Total','Order Status','Payment Status','Payment Method','Payment ID','Date','Delivery Date']];
+  list.forEach(o=>{
+    const c=S._custCache[o.customer_id]||{};
+    rows.push([o.order_number||String(o.id).slice(-8).toUpperCase(),(((c.first_name||'')+' '+(c.last_name||'')).trim()),c.email||'',c.phone||'',c.city||'',c.state||'',c.postal_code||'',o.subtotal||0,o.tax||0,o.shipping_charge||0,o.total_amount||0,o.order_status||'',o.payment_status||'',o.payment_method||'',o.payment_id||'',new Date(o.created_at).toLocaleDateString('en-IN'),o.delivery_date||'']);
+  });
+  dlCSV(rows,'pahadi-orders-'+Date.now()+'.csv');
+}
+
+// ══ CUSTOMERS ══
+async function loadCustomers(){
+  try{
+    S.customers=await GET('customers','order=created_at.desc&select=*&is_deleted=eq.false');
+    const ords=await GET('orders','select=customer_id,total_amount,order_status').catch(()=>[]);
+    S._custOrds={};
+    (ords||[]).forEach(o=>{
+      if(!o.customer_id) return;
+      if(!S._custOrds[o.customer_id]) S._custOrds[o.customer_id]={count:0,total:0};
+      S._custOrds[o.customer_id].count++;
+      if(o.order_status!=='cancelled') S._custOrds[o.customer_id].total+=(parseFloat(o.total_amount)||0);
+    });
+    S._fCusts=null; S.custPage=1; renderCustomers();
+  }catch(e){ toast('Customers: '+e.message,'er'); }
+}
+function filterCustomers(){
+  const q=(document.getElementById('cust-q').value||'').toLowerCase();
+  S._fCusts=q?S.customers.filter(c=>[(c.first_name||'')+' '+(c.last_name||''),c.email,c.phone,c.city,c.state,c.postal_code].join(' ').toLowerCase().includes(q)):null;
+  S.custPage=1; renderCustomers();
+}
+function renderCustomers(){
+  const list=S._fCusts||S.customers, total=list.length, pages=Math.ceil(total/S.PAGE);
+  const slice=list.slice((S.custPage-1)*S.PAGE, S.custPage*S.PAGE);
+  document.getElementById('cust-tbody').innerHTML=slice.length?slice.map(c=>{
+    const o=S._custOrds[c.id]||{count:0,total:0};
+    const name=((c.first_name||'')+' '+(c.last_name||'')).trim()||'—';
+    return `<tr>
+      <td class="td-main">${name}</td>
+      <td style="font-size:12px">${c.email||'—'}</td>
+      <td>${c.phone||'—'}</td>
+      <td>${c.city||'—'}</td>
+      <td>${c.state||'—'}</td>
+      <td>${o.count}</td>
+      <td style="color:var(--grn);font-weight:600">₹${Math.round(o.total).toLocaleString('en-IN')}</td>
+      <td><button class="btn btn-s btn-sm" onclick="openCust('${c.id}')">View</button></td>
+    </tr>`;
+  }).join(''):'<tr><td colspan="8" class="empty">No customers</td></tr>';
+  renderPag('cust-pag',S.custPage,pages,total,n=>{S.custPage=n;renderCustomers();});
+}
+async function openCust(id){
+  const c=S.customers.find(x=>String(x.id)===String(id)); if(!c) return;
+  let ords=[];
+  try{ ords=await GET('orders',`customer_id=eq.${id}&order=created_at.desc&select=*`); }catch(e){}
+  const name=((c.first_name||'')+' '+(c.last_name||'')).trim()||'Customer';
+  document.getElementById('cust-m-title').textContent=name;
+  document.getElementById('cust-m-body').innerHTML=`
+    <div class="g2c" style="gap:12px">
+      <div class="sc" style="margin:0">
+        <h4>👤 Profile</h4>
+        <div class="ri"><span class="l">Name</span><span class="v">${name}</span></div>
+        <div class="ri"><span class="l">Email</span><span class="v">${c.email||'—'}</span></div>
+        <div class="ri"><span class="l">Phone</span><span class="v">${c.phone||'—'}</span></div>
+        <div class="sep"></div>
+        <h4 style="margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid var(--bd)">📍 Address</h4>
+        <div class="ri"><span class="l">Address</span><span class="v">${[c.address_line1,c.address_line2].filter(Boolean).join(', ')||'—'}</span></div>
+        <div class="ri"><span class="l">City</span><span class="v">${c.city||'—'}</span></div>
+        <div class="ri"><span class="l">State</span><span class="v">${c.state||'—'}</span></div>
+        <div class="ri"><span class="l">Postal Code</span><span class="v">${c.postal_code||'—'}</span></div>
+        <div class="ri"><span class="l">Joined</span><span class="v">${new Date(c.created_at).toLocaleDateString('en-IN')}</span></div>
+      </div>
+      <div class="sc" style="margin:0">
+        <h4>🛒 Orders (${ords.length})</h4>
+        ${ords.length?ords.map(o=>`
+          <div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--bd)">
+            <div>
+              <div style="font-size:12px;font-weight:600;font-family:monospace">${o.order_number||'#'+String(o.id).slice(-8).toUpperCase()}</div>
+              <div style="font-size:10.5px;color:var(--tx3)">${new Date(o.created_at).toLocaleDateString('en-IN')}</div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-weight:600;color:var(--grn)">₹${(parseFloat(o.total_amount)||0).toLocaleString('en-IN')}</div>
+              <span class="badge ${sClass(o.order_status)}">${o.order_status}</span>
+            </div>
+          </div>`).join(''):'<div class="empty">No orders</div>'}
+      </div>
+    </div>`;
+  openM('cust-modal');
+}
+function exportCustomers(){
+  const list=S._fCusts||S.customers;
+  const rows=[['First Name','Last Name','Email','Phone','Address','City','State','Postal Code','Orders','Total Spent','Joined']];
+  list.forEach(c=>{
+    const o=S._custOrds[c.id]||{count:0,total:0};
+    rows.push([c.first_name||'',c.last_name||'',c.email||'',c.phone||'',[c.address_line1,c.address_line2].filter(Boolean).join(' '),c.city||'',c.state||'',c.postal_code||'',o.count,Math.round(o.total),new Date(c.created_at).toLocaleDateString('en-IN')]);
+  });
+  dlCSV(rows,'pahadi-customers-'+Date.now()+'.csv');
+}
+
+// ══ COUPONS ══
+async function loadCoupons(){
+  try{
+    S.coupons=await GET('coupons','order=created_at.desc&select=*');
+    // Also fetch usage counts
+    const usage=await GET('coupon_usage','select=coupon_id').catch(()=>[]);
+    const ucm={}; (usage||[]).forEach(u=>ucm[u.coupon_id]=(ucm[u.coupon_id]||0)+1);
+    document.getElementById('coup-tbody').innerHTML=S.coupons.length?S.coupons.map(c=>`
+      <tr>
+        <td class="td-main mono">${c.code}</td>
+        <td>${c.type||'flat'}</td>
+        <td>${c.type==='percent'?c.value+'%':'₹'+c.value}</td>
+        <td>₹${c.min_order||0}</td>
+        <td>${c.uses_count||ucm[c.id]||0}${c.max_uses?'/'+c.max_uses:''}</td>
+        <td>${c.expires_at?new Date(c.expires_at).toLocaleDateString('en-IN'):'Never'}</td>
+        <td><span class="badge ${c.is_active?'bg':'br'}">${c.is_active?'Active':'Off'}</span></td>
+        <td>
+          <button class="btn btn-s btn-sm" onclick="editCoupon('${c.id}')">Edit</button>
+          <button class="btn btn-d btn-sm" onclick="delCoupon('${c.id}','${c.code}')">Del</button>
+        </td>
+      </tr>`).join(''):'<tr><td colspan="8" class="empty">No coupons</td></tr>';
+  }catch(e){ toast('Coupons: '+e.message,'er'); }
+}
+function openCouponM(c){ c=c||{};
+  document.getElementById('coup-title').textContent=c.id?'Edit Coupon':'Add Coupon';
+  document.getElementById('coup-id').value=c.id||'';
+  document.getElementById('coup-code').value=c.code||'';
+  document.getElementById('coup-type').value=c.type||'flat';
+  document.getElementById('coup-val').value=c.value||'';
+  document.getElementById('coup-min').value=c.min_order||'';
+  document.getElementById('coup-max').value=c.max_uses||'';
+  document.getElementById('coup-exp').value=c.expires_at?c.expires_at.split('T')[0]:'';
+  document.getElementById('coup-active').checked=c.id?!!c.is_active:true;
+  openM('coupon-modal');
+}
+function editCoupon(id){ openCouponM(S.coupons.find(x=>String(x.id)===String(id))); }
+async function saveCoupon(){
+  const id=document.getElementById('coup-id').value;
+  const code=document.getElementById('coup-code').value.trim().toUpperCase();
+  if(!code){ toast('Code required','er'); return; }
+  const body={code,type:v('coup-type'),value:parseFloat(v('coup-val'))||0,min_order:parseFloat(v('coup-min'))||0,max_uses:parseInt(v('coup-max'))||null,expires_at:v('coup-exp')||null,is_active:document.getElementById('coup-active').checked};
+  try{
+    if(id) await PATCH('coupons',`id=eq.${id}`,body); else await POST('coupons',body);
+    toast('Coupon saved ✓','ok'); closeM('coupon-modal'); await loadCoupons();
+  }catch(e){ toast('Error: '+e.message,'er'); }
+}
+async function delCoupon(id,code){
+  if(!confirm(`Delete "${code}"?`)) return;
+  try{ await DEL('coupons',`id=eq.${id}`); toast('Deleted','ok'); await loadCoupons(); }
+  catch(e){ toast('Error: '+e.message,'er'); }
+}
+
+// ══ SUBSCRIBERS ══
+async function loadSubs(){
+  try{
+    S.subs=await GET('subscribers','order=created_at.desc&select=*').catch(()=>{ throw new Error('subscribers table not found'); });
+    const total=S.subs.length, pages=Math.ceil(total/S.PAGE);
+    const slice=S.subs.slice((S.subPage-1)*S.PAGE, S.subPage*S.PAGE);
+    document.getElementById('sub-tbody').innerHTML=slice.length?slice.map(s=>`
+      <tr>
+        <td class="td-main">${s.email}</td>
+        <td style="font-size:12px;color:var(--tx3)">${new Date(s.created_at).toLocaleString('en-IN')}</td>
+        <td><button class="btn btn-d btn-sm" onclick="delSub('${s.id}','${s.email}')">Remove</button></td>
+      </tr>`).join(''):'<tr><td colspan="3" class="empty">No subscribers</td></tr>';
+    renderPag('sub-pag',S.subPage,pages,total,n=>{S.subPage=n;loadSubs();});
+  }catch(e){ document.getElementById('sub-tbody').innerHTML=`<tr><td colspan="3" class="empty">Table not found in schema</td></tr>`; }
+}
+async function delSub(id,email){
+  if(!confirm(`Remove ${email}?`)) return;
+  try{ await DEL('subscribers',`id=eq.${id}`); toast('Removed','ok'); await loadSubs(); }
+  catch(e){ toast('Error: '+e.message,'er'); }
+}
+function exportSubs(){
+  const rows=[['Email','Subscribed']];
+  S.subs.forEach(s=>rows.push([s.email,new Date(s.created_at).toLocaleDateString('en-IN')]));
+  dlCSV(rows,'subscribers-'+Date.now()+'.csv');
+}
+
+// ══ REVIEWS ══
+async function loadReviews(){
+  try{
+    S.reviews=await GET('reviews','order=created_at.desc&select=*').catch(()=>{ throw new Error('reviews table not found'); });
+    if(!S.prods.length) S.prods=await GET('products','select=id,name').catch(()=>[]);
+    const pm={}; S.prods.forEach(p=>pm[p.id]=p.name);
+    fillSel('rv-prod',S.prods,'id','name');
+    document.getElementById('rev-tbody').innerHTML=S.reviews.length?S.reviews.map(r=>`
+      <tr>
+        <td><div class="td-main">${r.customer_name||'—'}</div><div class="td-sub">${r.location||''}</div></td>
+        <td style="font-size:12px">${pm[r.product_id]||'General'}</td>
+        <td>${'⭐'.repeat(r.rating||5)}</td>
+        <td style="font-size:12px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.review_text||'—'}</td>
+        <td><span class="badge ${r.status==='approved'?'bg':r.status==='pending'?'by':'br'}">${r.status||'pending'}</span></td>
+        <td>
+          <button class="btn btn-s btn-sm" onclick="editReview('${r.id}')">Edit</button>
+          <button class="btn btn-d btn-sm" onclick="delReview('${r.id}')">Del</button>
+        </td>
+      </tr>`).join(''):'<tr><td colspan="6" class="empty">No reviews</td></tr>';
+  }catch(e){ document.getElementById('rev-tbody').innerHTML=`<tr><td colspan="6" class="empty">Table not found in schema</td></tr>`; }
+}
+function openReviewM(r){ r=r||{};
+  document.getElementById('rv-id').value=r.id||'';
+  document.getElementById('rv-name').value=r.customer_name||'';
+  document.getElementById('rv-loc').value=r.location||'';
+  document.getElementById('rv-rating').value=r.rating||5;
+  document.getElementById('rv-text').value=r.review_text||'';
+  document.getElementById('rv-status').value=r.status||'approved';
+  fillSel('rv-prod',S.prods,'id','name',r.product_id);
+  openM('review-modal');
+}
+function editReview(id){ openReviewM(S.reviews.find(x=>String(x.id)===String(id))); }
+async function saveReview(){
+  const id=document.getElementById('rv-id').value;
+  const body={customer_name:v('rv-name')||null,location:v('rv-loc')||null,rating:parseInt(v('rv-rating')),review_text:v('rv-text')||null,status:v('rv-status'),product_id:v('rv-prod')||null};
+  try{
+    if(id) await PATCH('reviews',`id=eq.${id}`,body); else await POST('reviews',body);
+    toast('Saved ✓','ok'); closeM('review-modal'); await loadReviews();
+  }catch(e){ toast('Error: '+e.message,'er'); }
+}
+async function delReview(id){
+  if(!confirm('Delete this review?')) return;
+  try{ await DEL('reviews',`id=eq.${id}`); toast('Deleted','ok'); await loadReviews(); }
+  catch(e){ toast('Error: '+e.message,'er'); }
+}
+
+// ══ INVENTORY LOGS ══
+async function loadInvLogs(){
+  try{
+    S.invLogs=await GET('inventory_logs','order=created_at.desc&select=*');
+    if(!S.prods.length) S.prods=await GET('products','select=id,name').catch(()=>[]);
+    const pm={}; S.prods.forEach(p=>pm[p.id]=p.name);
+    const total=S.invLogs.length, pages=Math.ceil(total/S.PAGE);
+    const slice=S.invLogs.slice((S.invLogPage-1)*S.PAGE, S.invLogPage*S.PAGE);
+    document.getElementById('invlog-tbody').innerHTML=slice.length?slice.map(l=>`
+      <tr>
+        <td class="td-main">${pm[l.product_id]||'Product #'+l.product_id}</td>
+        <td><span class="badge ${l.change_type==='restock'||l.change_type==='add'?'bg':l.change_type==='sale'||l.change_type==='remove'?'br':'by'}">${l.change_type||'—'}</span></td>
+        <td style="font-weight:700;color:${l.quantity_change>0?'var(--grn)':'var(--red)'}">${l.quantity_change>0?'+':''}${l.quantity_change||0}</td>
+        <td class="mono" style="font-size:11px">${l.reference_id||'—'}</td>
+        <td style="font-size:11px;color:var(--tx3)">${new Date(l.created_at).toLocaleString('en-IN')}</td>
+      </tr>`).join(''):'<tr><td colspan="5" class="empty">No logs</td></tr>';
+    renderPag('invlog-pag',S.invLogPage,pages,total,n=>{S.invLogPage=n;loadInvLogs();});
+  }catch(e){ toast('Inventory logs: '+e.message,'er'); }
+}
+
+// ══ ORDER LOGS ══
+async function loadOrdLogs(){
+  try{
+    S.ordLogs=await GET('order_status_history','order=changed_at.desc&select=*');
+    const total=S.ordLogs.length, pages=Math.ceil(total/S.PAGE);
+    const slice=S.ordLogs.slice((S.ordLogPage-1)*S.PAGE, S.ordLogPage*S.PAGE);
+    document.getElementById('ordlog-tbody').innerHTML=slice.length?slice.map(l=>`
+      <tr>
+        <td class="mono">${l.order_id}</td>
+        <td><span class="badge ${sClass(l.old_status)}">${l.old_status||'—'}</span></td>
+        <td><span class="badge ${sClass(l.new_status)}">${l.new_status||'—'}</span></td>
+        <td style="font-size:11px;color:var(--tx3)">${new Date(l.changed_at).toLocaleString('en-IN')}</td>
+      </tr>`).join(''):'<tr><td colspan="4" class="empty">No logs</td></tr>';
+    renderPag('ordlog-pag',S.ordLogPage,pages,total,n=>{S.ordLogPage=n;loadOrdLogs();});
+  }catch(e){ toast('Order logs: '+e.message,'er'); }
+}
+
+// ══ ADMIN LOGS ══
+async function loadAdminLogs(){
+  try{
+    S.adminLogs=await GET('admin_logs','order=created_at.desc&select=*');
+    const total=S.adminLogs.length, pages=Math.ceil(total/S.PAGE);
+    const slice=S.adminLogs.slice((S.adminLogPage-1)*S.PAGE, S.adminLogPage*S.PAGE);
+    document.getElementById('adminlog-tbody').innerHTML=slice.length?slice.map(l=>`
+      <tr>
+        <td class="td-main">${l.admin_email||'—'}</td>
+        <td>${l.action||'—'}</td>
+        <td class="mono" style="font-size:11.5px">${l.table_name||'—'}</td>
+        <td class="mono">${l.record_id||'—'}</td>
+        <td style="font-size:11px;color:var(--tx3)">${new Date(l.created_at).toLocaleString('en-IN')}</td>
+      </tr>`).join(''):'<tr><td colspan="5" class="empty">No logs</td></tr>';
+    renderPag('adminlog-pag',S.adminLogPage,pages,total,n=>{S.adminLogPage=n;loadAdminLogs();});
+  }catch(e){ toast('Admin logs: '+e.message,'er'); }
+}
+
+// ══ ANALYTICS ══
+async function loadAnalytics(){
+  const days=parseInt(document.getElementById('an-range').value)||30;
+  const since=new Date(); since.setDate(since.getDate()-days);
+  try{
+    const [orders,items,couponUsage]=await Promise.all([
+      GET('orders',`created_at=gte.${since.toISOString()}&select=*`),
+      GET('order_items','select=product_id,quantity,price_at_time').catch(()=>[]),
+      GET('coupon_usage',`used_at=gte.${since.toISOString()}&select=coupon_id,discount_amount`).catch(()=>[]),
+    ]);
+    const valid=(orders||[]).filter(o=>o.order_status!=='cancelled');
+    const rev=valid.reduce((s,o)=>s+(parseFloat(o.total_amount)||0),0);
+    const ord=(orders||[]).length;
+    const del=(orders||[]).filter(o=>o.order_status==='delivered').length;
+    document.getElementById('an-rev').textContent='₹'+Math.round(rev).toLocaleString('en-IN');
+    document.getElementById('an-ord').textContent=ord;
+    document.getElementById('an-aov').textContent='₹'+Math.round(ord?rev/ord:0).toLocaleString('en-IN');
+    document.getElementById('an-del').textContent=ord?Math.round(del/ord*100)+'%':'—';
+
+    // Top products
+    if(!S.prods.length) S.prods=await GET('products','select=id,name').catch(()=>[]);
+    const pm={}; S.prods.forEach(p=>pm[p.id]=p.name);
+    const pr={};
+    (items||[]).forEach(it=>{
+      if(!it.product_id) return;
+      if(!pr[it.product_id]) pr[it.product_id]={name:pm[it.product_id]||'#'+it.product_id,rev:0,qty:0};
+      pr[it.product_id].rev+=(it.quantity||1)*(parseFloat(it.price_at_time)||0);
+      pr[it.product_id].qty+=(it.quantity||0);
+    });
+    const top=Object.values(pr).sort((a,b)=>b.rev-a.rev).slice(0,8);
+    const maxR=top[0]?.rev||1;
+    document.getElementById('an-top').innerHTML=top.length?top.map((p,i)=>`
+      <div style="margin-bottom:10px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:3px">
+          <span style="font-size:12.5px;font-weight:600">${i+1}. ${p.name}</span>
+          <span style="font-weight:700;color:var(--grn)">₹${Math.round(p.rev).toLocaleString('en-IN')}</span>
+        </div>
+        <div style="height:4px;background:var(--bg4);border-radius:4px">
+          <div style="height:100%;width:${Math.round(p.rev/maxR*100)}%;background:linear-gradient(90deg,var(--g),var(--g2));border-radius:4px"></div>
+        </div>
+      </div>`).join(''):'<div class="empty">No item data</div>';
+
+    // By status
+    const sc={};
+    (orders||[]).forEach(o=>{ const s=o.order_status||'unknown'; sc[s]=(sc[s]||0)+1; });
+    document.getElementById('an-status').innerHTML=Object.entries(sc).length?Object.entries(sc).map(([st,cnt])=>`
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--bd)">
+        <span class="badge ${sClass(st)}">${st}</span><span style="font-weight:700">${cnt}</span>
+      </div>`).join(''):'<div class="empty">No orders</div>';
+
+    // Coupon usage
+    const cm={}; S.coupons.forEach(c=>cm[c.id]=c.code);
+    const cu={};
+    (couponUsage||[]).forEach(u=>{ const k=cm[u.coupon_id]||'#'+u.coupon_id; if(!cu[k])cu[k]={count:0,saved:0}; cu[k].count++; cu[k].saved+=(parseFloat(u.discount_amount)||0); });
+    document.getElementById('an-coupons').innerHTML=Object.entries(cu).length?`<table style="width:100%"><thead><tr><th>Code</th><th>Uses</th><th>Total Saved</th></tr></thead><tbody>${Object.entries(cu).map(([code,d])=>`<tr><td class="td-main mono">${code}</td><td>${d.count}</td><td style="color:var(--red)">-₹${Math.round(d.saved).toLocaleString('en-IN')}</td></tr>`).join('')}</tbody></table>`:'<div class="empty">No coupon usage in period</div>';
+  }catch(e){ toast('Analytics: '+e.message,'er'); }
+}
+
+// ══ SETTINGS ══
+async function loadSettings(){
+  document.getElementById('cfg-low').value=S.lowStock;
+  const tables=['products','categories','orders','order_items','customers','coupons','coupon_usage','subscribers','reviews','inventory_logs','order_logs','order_status_history','admin_logs','order_detailed','order_summary'];
+  const res=await Promise.all(tables.map(async t=>({t,ok:await GET(t,'limit=0').then(()=>true).catch(()=>false)})));
+  document.getElementById('tbl-status').innerHTML=res.map(r=>`
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--bd)">
+      <code style="font-size:12px;color:var(--tx2)">${r.t}</code>
+      <span class="badge ${r.ok?'bg':'br'}">${r.ok?'✓ OK':'✗ No access'}</span>
+    </div>`).join('');
+}
+async function saveConfig(){
+  S.lowStock=parseInt(document.getElementById('cfg-low').value)||10;
+  localStorage.setItem('pr_low_stock',S.lowStock);
+  toast('Saved ✓','ok');
+}
+async function testConn(){
+  const res=document.getElementById('conn-res');
+  res.textContent='Testing…';
+  try{
+    const t0=Date.now();
+    await GET('categories','limit=1');
+    res.innerHTML=`<span style="color:var(--grn)">✅ Connected in ${Date.now()-t0}ms</span>`;
+    document.getElementById('db-badge').className='db-dot on';
+    document.getElementById('db-badge').textContent='⬤ Supabase Live';
+  }catch(e){ res.innerHTML=`<span style="color:var(--red)">❌ ${e.message}</span>`; }
+}
+
+// ══ UTILS ══
+function sClass(s){ return {pending:'by',confirmed:'bb',packed:'bp',shipped:'bb',delivered:'bg',cancelled:'br'}[s]||'bgr'; }
+function pyClass(s){ return {paid:'bg',pending:'by',failed:'br',refunded:'bgr'}[s]||'bgr'; }
+function v(id){ return document.getElementById(id)?.value||''; }
+function esc(s){ return (s||'').replace(/'/g,"\\'"); }
+function fillSel(id,items,vk,lk,sel=''){
+  const el=document.getElementById(id); if(!el) return;
+  el.innerHTML='<option value="">— Select —</option>'+(items||[]).map(i=>`<option value="${i[vk]}" ${String(i[vk])===String(sel)?'selected':''}>${i[lk]}</option>`).join('');
+}
+function renderPag(cid,page,pages,total,cb){
+  const el=document.getElementById(cid);
+  if(!el||pages<=1){ if(el)el.innerHTML=''; return; }
+  const from=((page-1)*S.PAGE)+1, to=Math.min(page*S.PAGE,total);
+  let btns='';
+  const start=Math.max(1,page-3), end=Math.min(pages,start+6);
+  for(let i=start;i<=end;i++) btns+=`<button class="pb ${i===page?'cur':''}" onclick="(${cb})(${i})">${i}</button>`;
+  el.innerHTML=`<span class="pag-info">${from}–${to} of ${total}</span><div class="pag-btns"><button class="pb" onclick="(${cb})(${page-1})" ${page<=1?'disabled':''}>←</button>${btns}<button class="pb" onclick="(${cb})(${page+1})" ${page>=pages?'disabled':''}>→</button></div>`;
+}
+function openM(id){ document.getElementById(id).classList.add('open'); }
+function closeM(id){ document.getElementById(id).classList.remove('open'); }
+function toast(msg,type='in'){
+  const el=document.createElement('div');
+  el.className=`ti ${type}`; el.textContent=msg;
+  document.getElementById('toast').appendChild(el);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add('show')));
+  setTimeout(()=>{ el.classList.remove('show'); setTimeout(()=>el.remove(),300); },3500);
+}
+function dlCSV(rows,fn){
+  const csv=rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');
+  const a=document.createElement('a'); a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv); a.download=fn; a.click();
+}
+document.querySelectorAll('.ov').forEach(m=>m.addEventListener('click',function(e){ if(e.target===this) this.classList.remove('open'); }));
+
+// ══ BOOT ══
+(function boot(){
+  if(localStorage.getItem('pr_pw')){
+    document.getElementById('login-gate').style.display='none';
+    document.getElementById('app').style.display='block';
+    init();
+  }
+})();
+</script>
+</body>
+</html>
