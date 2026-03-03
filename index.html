@@ -660,9 +660,9 @@ footer{background:#0d1a0f;padding:44px 40px 24px}
 .rv-strip{display:flex;gap:12px;overflow-x:auto;padding-bottom:6px}
 
 /* ── FOUNDER — Full-width cinematic (Image 2 style) ── */
-.founder-sec{position:relative;min-height:500px;overflow:hidden;display:flex;align-items:stretch;background:linear-gradient(135deg,#030d04 0%,#071408 30%,#0a1e0c 55%,#0d2610 80%,#0e2b12 100%)}
-.founder-bg{position:absolute;inset:0;background-size:cover;background-position:center 35%;background-repeat:no-repeat;background-image:radial-gradient(ellipse at 70% 50%,rgba(26,58,26,.5) 0%,transparent 70%)}
-.founder-overlay{position:absolute;inset:0;background:linear-gradient(105deg,rgba(0,0,0,.45) 0%,rgba(0,0,0,.3) 50%,rgba(0,0,0,.1) 100%)}
+.founder-sec{position:relative;min-height:500px;overflow:hidden;display:flex;align-items:stretch;background:#071408}
+.founder-bg{position:absolute;inset:0;background-size:cover;background-position:center top;background-repeat:no-repeat;image-rendering:crisp-edges}
+.founder-overlay{position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,0,0,.62) 0%,rgba(0,0,0,.42) 35%,rgba(0,0,0,.12) 60%,rgba(0,0,0,0) 100%)}
 .founder-content{position:relative;z-index:1;width:100%;display:flex;align-items:flex-end;justify-content:space-between;padding:60px 64px 52px;gap:32px}
 .founder-left{max-width:520px;flex:1}
 .founder-right{flex-shrink:0;display:flex;align-items:flex-end;padding-bottom:4px}
@@ -1932,10 +1932,9 @@ function loadFI() {
     var fi = localStorage.getItem('pr_founder_image');
     var bg = document.getElementById('founderBg');
     if (bg && fi) {
-      bg.style.backgroundImage = 'url(' + fi + ')';
-      bg.style.opacity = '1';
+      // Use <img> tag instead of background-image for full quality, no compression
+      bg.innerHTML = '<img src="' + fi + '" alt="Sudhir Chambail" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;display:block;image-rendering:high-quality">';
     }
-    // No image = CSS gradient fallback (looks good by default)
   } catch(e) {}
 }
 
