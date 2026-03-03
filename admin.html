@@ -496,7 +496,7 @@ textarea{resize:vertical;min-height:72px;line-height:1.5}
               <input type="file" id="founder-file" accept="image/*" style="display:none" onchange="previewFounder(this)">
             </div>
             <img id="founder-prev" style="width:100%;height:110px;object-fit:cover;border-radius:7px;display:none;margin-top:10px" alt="Founder">
-            <button class="btn bp" style="width:100%;margin-top:10px;justify-content:center" onclick="saveFounderPhoto()">Save to localStorage</button>
+            <button class="btn bp" style="width:100%;margin-top:10px;justify-content:center" onclick="saveFounderPhoto()">💾 Save Founder Photo</button>
           </div>
         </div>
       </div>
@@ -1359,11 +1359,34 @@ function previewFounder(input){
   if(!input.files[0]) return;
   const r=new FileReader(); r.onload=e=>{const p=document.getElementById('founder-prev');p.src=e.target.result;p.style.display='block';}; r.readAsDataURL(input.files[0]);
 }
-function saveFounderPhoto(){
-  const p=document.getElementById('founder-prev');
-  if(!p||!p.src||p.src===location.href){ toast('❌ Upload a photo first','er'); return; }
-  localStorage.setItem('pr_founder_image',p.src);
-  toast('✅ Founder photo saved — will show on store','ok');
+async function saveFounderPhoto(){
+  const file = document.getElementById('founder-file').files[0];
+  if(!file){ toast('❌ Choose a photo first','er'); return; }
+  const btn = document.querySelector('[onclick="saveFounderPhoto()"]');
+  if(btn){ btn.textContent='⟳ Uploading…'; btn.disabled=true; }
+  try {
+    const fname = 'founder-' + Date.now() + '.' + file.name.split('.').pop();
+    const url = await uploadToStorage(file, 'state-photos', fname);
+    // Upsert to Supabase site_settings — permanent, shows for all visitors
+    // Try PATCH first (update existing), then POST (insert new)
+    try {
+      const existing = await callProxy('GET','site_settings','key=eq.founder_image_url');
+      if(existing && existing.length > 0){
+        await callProxy('PATCH','site_settings','key=eq.founder_image_url',{value:url});
+      } else {
+        await callProxy('POST','site_settings','',{key:'founder_image_url',value:url});
+      }
+    } catch(dbErr) {
+      console.warn('site_settings save failed:', dbErr.message);
+      // Still works via localStorage cache
+    }
+    try { localStorage.setItem('pr_founder_image', url); } catch(e){}
+    if(btn){ btn.textContent='💾 Save Founder Photo'; btn.disabled=false; }
+    toast('✅ Founder photo uploaded — live on site for all visitors!','ok');
+  } catch(e) {
+    if(btn){ btn.textContent='💾 Save Founder Photo'; btn.disabled=false; }
+    toast('❌ ' + e.message,'er');
+  }
 }
 
 // ══════════════════════════════════════════════════

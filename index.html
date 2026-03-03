@@ -1930,18 +1930,37 @@ function observeRv() {
 
 function loadFI() {
   try {
-    var fi = localStorage.getItem('pr_founder_image');
     var bg = document.getElementById('founderBg');
     if (!bg) return;
-    if (fi) {
-      // Natural-size image — no stretch, section expands to fit
-      bg.innerHTML = '<img src="' + fi + '" alt="Sudhir Chambail" '
-        + 'style="width:100%;height:auto;display:block;max-height:780px;'
-        + 'object-fit:cover;object-position:center 20%">';
-    } else {
-      // No image: show rich gradient background with fixed height
-      // gradient already in CSS
+
+    function applyFounderImg(url) {
+      if (!url) return;
+      bg.style.cssText = 'position:relative;width:100%;line-height:0;display:block';
+      // width:100%, height:auto = natural aspect ratio, zero stretch
+      bg.innerHTML = '<img src="' + url + '" alt="Sudhir Chambail" '
+        + 'style="width:100%;height:auto;max-height:760px;display:block;'
+        + 'object-fit:cover;object-position:40% center">';
     }
+
+    // 1. Try Supabase site_settings (permanent, works for ALL visitors)
+    fetch('https://ixblnpgwvitjtcalleaw.supabase.co/rest/v1/site_settings?key=eq.founder_image_url&select=value', {
+      headers: {
+        'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml4Ymxucmd3dml0anRjYWxsZWF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM3NjIzNjYsImV4cCI6MjA1OTMzODM2Nn0.2MWQ0sIzRKCGWT7F-xnMNBnBNWJJpFzC1fFncXbP-jI',
+        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml4Ymxucmd3dml0anRjYWxsZWF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM3NjIzNjYsImV4cCI6MjA1OTMzODM2Nn0.2MWQ0sIzRKCGWT7F-xnMNBnBNWJJpFzC1fFncXbP-jI'
+      }
+    }).then(function(r){ return r.json(); })
+    .then(function(data){
+      if (data && data[0] && data[0].value) {
+        applyFounderImg(data[0].value);
+        try { localStorage.setItem('pr_founder_image', data[0].value); } catch(e){}
+      } else {
+        var cached = ''; try { cached = localStorage.getItem('pr_founder_image')||''; } catch(e){}
+        applyFounderImg(cached);
+      }
+    }).catch(function(){
+      var cached = ''; try { cached = localStorage.getItem('pr_founder_image')||''; } catch(e){}
+      applyFounderImg(cached);
+    });
   } catch(e) {}
 }
 
