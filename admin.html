@@ -15,16 +15,12 @@
 body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--tx);font-size:13.5px;min-height:100vh}
 button{cursor:pointer;font-family:'Inter',sans-serif}
 input,select,textarea{font-family:'Inter',sans-serif}
-
-/* LAYOUT */
 #app{display:none;height:100vh;overflow:hidden}
 .layout{display:flex;height:100%}
 .sidebar{width:224px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--bd);display:flex;flex-direction:column;overflow-y:auto}
 .main{flex:1;display:flex;flex-direction:column;overflow:hidden}
 .topbar{height:52px;background:var(--bg2);border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;padding:0 20px;flex-shrink:0}
 .content{flex:1;overflow-y:auto;padding:24px}
-
-/* SIDEBAR */
 .sb-logo{padding:16px 16px 12px;border-bottom:1px solid var(--bd)}
 .sb-logo-name{font-size:15px;font-weight:700}
 .sb-logo-sub{font-size:10px;color:var(--tx3);margin-top:2px}
@@ -39,31 +35,23 @@ input,select,textarea{font-family:'Inter',sans-serif}
 .db-dot.on{color:var(--grn);background:rgba(63,185,80,.1)}
 .db-dot.off{color:var(--red);background:rgba(248,81,73,.1)}
 .db-dot.wait{color:var(--org);background:rgba(210,153,34,.1)}
-
-/* PAGES */
 .pg{display:none}.pg.active{display:block}
 .ph{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px}
 .ph h1{font-size:19px;font-weight:700}
 .ph p{font-size:12px;color:var(--tx3);margin-top:3px}
 .ph-r{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-
-/* BUTTONS */
 .btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:var(--r2);font-size:12.5px;font-weight:600;border:none;transition:all .15s;cursor:pointer}
 .btn-p{background:var(--g);color:#fff}.btn-p:hover{background:var(--g2)}
 .btn-s{background:var(--bg3);color:var(--tx);border:1px solid var(--bd)}.btn-s:hover{background:var(--bg4)}
 .btn-d{background:rgba(248,81,73,.1);color:var(--red);border:1px solid rgba(248,81,73,.25)}.btn-d:hover{background:rgba(248,81,73,.2)}
 .btn-sm{padding:4px 10px;font-size:11.5px}
 .btn:disabled{opacity:.5;cursor:not-allowed}
-
-/* STATS */
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
 .stat{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);padding:16px 18px}
 .stat-lbl{font-size:10.5px;color:var(--tx3);margin-bottom:6px;font-weight:700;letter-spacing:.5px;text-transform:uppercase}
 .stat-val{font-size:24px;font-weight:700;font-variant-numeric:tabular-nums}
 .stat-sub{font-size:11px;color:var(--tx3);margin-top:4px}
 .up{color:var(--grn)}
-
-/* TABLE */
 .tbl-wrap{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);overflow:hidden}
 .tbl-head{padding:12px 16px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
 .tbl-search{background:var(--bg3);border:1px solid var(--bd);border-radius:var(--r2);padding:6px 11px;color:var(--tx);font-size:12.5px;width:210px}
@@ -78,8 +66,6 @@ tr:hover td{background:rgba(255,255,255,.02)}
 .td-sub{font-size:10.5px;color:var(--tx3);margin-top:2px}
 .mono{font-family:'JetBrains Mono',monospace;font-size:11.5px}
 .empty{text-align:center;padding:32px;color:var(--tx3);font-style:italic}
-
-/* BADGES */
 .badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:700}
 .bg{background:rgba(63,185,80,.12);color:var(--grn)}
 .br{background:rgba(248,81,73,.12);color:var(--red)}
@@ -87,8 +73,6 @@ tr:hover td{background:rgba(255,255,255,.02)}
 .bb{background:rgba(88,166,255,.12);color:var(--blu)}
 .bgr{background:rgba(139,148,158,.12);color:var(--tx3)}
 .bp{background:rgba(167,139,250,.12);color:#a78bfa}
-
-/* MODAL */
 .ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:1000;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)}
 .ov.open{display:flex}
 .modal{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);width:100%;max-width:560px;max-height:92vh;overflow-y:auto;box-shadow:0 24px 60px rgba(0,0,0,.6)}
@@ -99,8 +83,6 @@ tr:hover td{background:rgba(255,255,255,.02)}
 .m-cls:hover{background:var(--bg3)}
 .m-body{padding:20px}
 .m-foot{padding:14px 20px;border-top:1px solid var(--bd);display:flex;justify-content:flex-end;gap:10px}
-
-/* FORM */
 .fg{margin-bottom:14px}
 .fg label{display:block;font-size:11.5px;font-weight:600;color:var(--tx2);margin-bottom:5px}
 .fi{width:100%;background:var(--bg3);border:1px solid var(--bd);border-radius:var(--r2);padding:8px 12px;color:var(--tx);font-size:13px}
@@ -111,8 +93,6 @@ textarea.fi{resize:vertical;min-height:80px}
 .gr3{grid-template-columns:1fr 1fr 1fr}
 .hint{font-size:11px;color:var(--tx3);margin-top:3px}
 .req{color:var(--red)}
-
-/* PAGING */
 .pag{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-top:1px solid var(--bd)}
 .pag-info{font-size:12px;color:var(--tx3)}
 .pag-btns{display:flex;gap:5px}
@@ -120,23 +100,17 @@ textarea.fi{resize:vertical;min-height:80px}
 .pb:hover{background:var(--bg4)}
 .pb.cur{background:var(--g);color:#fff;border-color:var(--g)}
 .pb:disabled{opacity:.4;cursor:not-allowed}
-
-/* TOAST */
 #toast{position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none}
 .ti{background:var(--bg4);border:1px solid var(--bd);border-radius:var(--r2);padding:10px 16px;font-size:12.5px;font-weight:600;box-shadow:0 4px 16px rgba(0,0,0,.5);opacity:0;transform:translateY(8px);transition:all .25s;max-width:340px}
 .ti.show{opacity:1;transform:none}
 .ti.ok{border-left:3px solid var(--grn);color:var(--grn)}
 .ti.er{border-left:3px solid var(--red);color:var(--red)}
 .ti.in{border-left:3px solid var(--blu);color:var(--blu)}
-
-/* LOGIN */
 #login-gate{display:flex;position:fixed;inset:0;background:var(--bg);z-index:9999;align-items:center;justify-content:center}
 .lb{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);padding:40px;width:380px;box-shadow:0 24px 60px rgba(0,0,0,.7)}
 .lb-logo{font-size:24px;font-weight:700;margin-bottom:4px}
 .lb-sub{font-size:12px;color:var(--tx3);margin-bottom:28px}
 .lb-err{background:rgba(248,81,73,.1);border:1px solid rgba(248,81,73,.3);color:var(--red);border-radius:var(--r2);padding:8px 12px;font-size:12.5px;margin-bottom:14px;display:none}
-
-/* MISC */
 .sep{height:1px;background:var(--bd);margin:14px 0}
 .loading{color:var(--tx3);font-style:italic;padding:20px;text-align:center}
 .g2c{display:grid;grid-template-columns:1fr 1fr;gap:16px}
@@ -147,13 +121,9 @@ textarea.fi{resize:vertical;min-height:80px}
 .ri .v{font-size:12.5px;color:var(--tx)}
 .cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px}
 .card{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);padding:14px}
-.card-ico{font-size:32px;margin-bottom:8px}
-.card-name{font-size:13px;font-weight:700;margin-bottom:2px}
-.card-sub{font-size:11.5px;color:var(--tx3);margin-bottom:10px}
-.card-acts{display:flex;gap:6px}
 .chart-wrap{display:flex;align-items:flex-end;gap:5px;height:130px;margin-top:8px}
 .bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px}
-.bar{width:100%;background:var(--g);border-radius:3px 3px 0 0;min-height:2px;transition:height .4s}
+.bar{width:100%;background:var(--g);border-radius:3px 3px 0 0;min-height:2px}
 .bar-lbl{font-size:9px;color:var(--tx3)}
 .bar-val{font-size:9px;color:var(--tx2)}
 .stok{color:var(--grn)}.stok-lo{color:var(--red);font-weight:700}
@@ -169,17 +139,16 @@ textarea.fi{resize:vertical;min-height:80px}
     <div class="lb-err" id="lg-err"></div>
     <div class="fg">
       <label>Admin Password</label>
-      <input type="password" class="fi" id="lg-pw" placeholder="Enter password" onkeydown="if(event.key==='Enter')doLogin()">
+      <input type="password" class="fi" id="lg-pw" placeholder="Enter admin password" onkeydown="if(event.key==='Enter')doLogin()">
+      <div class="hint">Password is verified server-side via Netlify function</div>
     </div>
-    <button class="btn btn-p" style="width:100%;justify-content:center;padding:10px" onclick="doLogin()">🔐 Sign In</button>
+    <button class="btn btn-p" style="width:100%;justify-content:center;padding:10px" onclick="doLogin()" id="login-btn">🔐 Sign In</button>
   </div>
 </div>
 
 <!-- APP -->
 <div id="app">
 <div class="layout">
-
-<!-- SIDEBAR -->
 <aside class="sidebar">
   <div class="sb-logo"><div class="sb-logo-name">🌿 Pahadi Roots</div><div class="sb-logo-sub">Admin Panel</div></div>
   <div class="sb-sec">Overview</div>
@@ -207,7 +176,6 @@ textarea.fi{resize:vertical;min-height:80px}
   </div>
 </aside>
 
-<!-- MAIN -->
 <div class="main">
 <div class="topbar">
   <div style="font-size:14px;font-weight:700" id="page-title">Dashboard</div>
@@ -218,9 +186,9 @@ textarea.fi{resize:vertical;min-height:80px}
 </div>
 <div class="content">
 
-<!-- ── DASHBOARD ── -->
+<!-- DASHBOARD -->
 <div class="pg active" id="pg-dashboard">
-  <div class="ph"><div><h1>Dashboard</h1><p id="dash-sub">Loading live data…</p></div>
+  <div class="ph"><div><h1>Dashboard</h1><p id="dash-sub">Loading…</p></div>
     <div class="ph-r"><button class="btn btn-s btn-sm" onclick="loadDash()">↻ Refresh</button></div></div>
   <div class="stats">
     <div class="stat"><div class="stat-lbl">Total Revenue</div><div class="stat-val" id="d-rev">—</div><div class="stat-sub">excl. cancelled</div></div>
@@ -236,7 +204,7 @@ textarea.fi{resize:vertical;min-height:80px}
         <tbody id="dash-orders"><tr><td colspan="4" class="loading">Loading…</td></tr></tbody></table>
       </div>
       <div class="tbl-wrap">
-        <div class="tbl-head"><span style="font-weight:700;font-size:13px">⚠️ Low Stock Products</span></div>
+        <div class="tbl-head"><span style="font-weight:700;font-size:13px">⚠️ Low Stock</span></div>
         <table><thead><tr><th>Product</th><th>Stock</th><th></th></tr></thead>
         <tbody id="dash-low"><tr><td colspan="3" class="loading">Loading…</td></tr></tbody></table>
       </div>
@@ -255,11 +223,11 @@ textarea.fi{resize:vertical;min-height:80px}
   </div>
 </div>
 
-<!-- ── PRODUCTS ── -->
+<!-- PRODUCTS -->
 <div class="pg" id="pg-products">
   <div class="ph"><div><h1>Products</h1><p>Manage your catalogue</p></div>
     <div class="ph-r">
-      <input class="tbl-search" placeholder="🔍 Search products…" oninput="filterProds()" id="prod-q">
+      <input class="tbl-search" placeholder="🔍 Search…" oninput="filterProds()" id="prod-q">
       <select class="tbl-sel" onchange="filterProds()" id="prod-cat-f"><option value="">All Categories</option></select>
       <select class="tbl-sel" onchange="filterProds()" id="prod-status-f"><option value="">All Status</option><option>active</option><option>inactive</option><option>draft</option></select>
       <button class="btn btn-p" onclick="openProdM()">+ Add Product</button>
@@ -272,7 +240,7 @@ textarea.fi{resize:vertical;min-height:80px}
   </div>
 </div>
 
-<!-- ── CATEGORIES ── -->
+<!-- CATEGORIES -->
 <div class="pg" id="pg-categories">
   <div class="ph"><div><h1>Categories</h1><p>Product categories</p></div>
     <div class="ph-r"><button class="btn btn-p" onclick="openCatM()">+ Add Category</button></div></div>
@@ -282,7 +250,7 @@ textarea.fi{resize:vertical;min-height:80px}
   </div>
 </div>
 
-<!-- ── ORDERS ── -->
+<!-- ORDERS -->
 <div class="pg" id="pg-orders">
   <div class="ph"><div><h1>Orders</h1><p>Customer orders & fulfilment</p></div>
     <div class="ph-r">
@@ -303,22 +271,22 @@ textarea.fi{resize:vertical;min-height:80px}
   </div>
 </div>
 
-<!-- ── CUSTOMERS ── -->
+<!-- CUSTOMERS -->
 <div class="pg" id="pg-customers">
-  <div class="ph"><div><h1>Customers</h1><p>Customer profiles & delivery info</p></div>
+  <div class="ph"><div><h1>Customers</h1><p>Customer profiles</p></div>
     <div class="ph-r">
       <input class="tbl-search" placeholder="🔍 Search…" oninput="filterCustomers()" id="cust-q">
       <button class="btn btn-s btn-sm" onclick="exportCustomers()">⬇ CSV</button>
     </div>
   </div>
   <div class="tbl-wrap">
-    <table><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>City</th><th>State</th><th>Orders</th><th>Total Spent</th><th>Actions</th></tr></thead>
+    <table><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>City</th><th>State</th><th>Orders</th><th>Spent</th><th>Actions</th></tr></thead>
     <tbody id="cust-tbody"><tr><td colspan="8" class="loading">Loading…</td></tr></tbody></table>
     <div class="pag" id="cust-pag"></div>
   </div>
 </div>
 
-<!-- ── COUPONS ── -->
+<!-- COUPONS -->
 <div class="pg" id="pg-coupons">
   <div class="ph"><div><h1>Coupons</h1><p>Discount codes</p></div>
     <div class="ph-r"><button class="btn btn-p" onclick="openCouponM()">+ Add Coupon</button></div></div>
@@ -328,61 +296,61 @@ textarea.fi{resize:vertical;min-height:80px}
   </div>
 </div>
 
-<!-- ── SUBSCRIBERS ── -->
+<!-- SUBSCRIBERS -->
 <div class="pg" id="pg-subscribers">
   <div class="ph"><div><h1>Subscribers</h1><p>Newsletter list</p></div>
     <div class="ph-r"><button class="btn btn-s btn-sm" onclick="exportSubs()">⬇ CSV</button></div></div>
   <div class="tbl-wrap">
     <table><thead><tr><th>Email</th><th>Subscribed On</th><th>Actions</th></tr></thead>
-    <tbody id="sub-tbody"><tr><td colspan="3" class="loading">Loading…</td></tr></tbody></table>
+    <tbody id="sub-tbody"></tbody></table>
     <div class="pag" id="sub-pag"></div>
   </div>
 </div>
 
-<!-- ── REVIEWS ── -->
+<!-- REVIEWS -->
 <div class="pg" id="pg-reviews">
   <div class="ph"><div><h1>Reviews</h1><p>Customer reviews</p></div>
     <div class="ph-r"><button class="btn btn-p" onclick="openReviewM()">+ Add Review</button></div></div>
   <div class="tbl-wrap">
     <table><thead><tr><th>Customer</th><th>Product</th><th>Rating</th><th>Review</th><th>Status</th><th>Actions</th></tr></thead>
-    <tbody id="rev-tbody"><tr><td colspan="6" class="loading">Loading…</td></tr></tbody></table>
+    <tbody id="rev-tbody"></tbody></table>
   </div>
 </div>
 
-<!-- ── INVENTORY LOGS ── -->
+<!-- INVENTORY LOGS -->
 <div class="pg" id="pg-inventory_logs">
   <div class="ph"><div><h1>Inventory Logs</h1><p>Stock change history</p></div>
     <div class="ph-r"><button class="btn btn-s btn-sm" onclick="loadInvLogs()">↻ Refresh</button></div></div>
   <div class="tbl-wrap">
     <table><thead><tr><th>Product</th><th>Change Type</th><th>Qty Change</th><th>Reference</th><th>Time</th></tr></thead>
-    <tbody id="invlog-tbody"><tr><td colspan="5" class="loading">Loading…</td></tr></tbody></table>
+    <tbody id="invlog-tbody"></tbody></table>
     <div class="pag" id="invlog-pag"></div>
   </div>
 </div>
 
-<!-- ── ORDER LOGS ── -->
+<!-- ORDER LOGS -->
 <div class="pg" id="pg-order_logs">
   <div class="ph"><div><h1>Order Status Logs</h1><p>Status change history</p></div>
     <div class="ph-r"><button class="btn btn-s btn-sm" onclick="loadOrdLogs()">↻ Refresh</button></div></div>
   <div class="tbl-wrap">
     <table><thead><tr><th>Order ID</th><th>Old Status</th><th>New Status</th><th>Changed At</th></tr></thead>
-    <tbody id="ordlog-tbody"><tr><td colspan="4" class="loading">Loading…</td></tr></tbody></table>
+    <tbody id="ordlog-tbody"></tbody></table>
     <div class="pag" id="ordlog-pag"></div>
   </div>
 </div>
 
-<!-- ── ADMIN LOGS ── -->
+<!-- ADMIN LOGS -->
 <div class="pg" id="pg-admin_logs">
   <div class="ph"><div><h1>Admin Logs</h1><p>Admin action history</p></div>
     <div class="ph-r"><button class="btn btn-s btn-sm" onclick="loadAdminLogs()">↻ Refresh</button></div></div>
   <div class="tbl-wrap">
     <table><thead><tr><th>Admin</th><th>Action</th><th>Table</th><th>Record ID</th><th>Time</th></tr></thead>
-    <tbody id="adminlog-tbody"><tr><td colspan="5" class="loading">Loading…</td></tr></tbody></table>
+    <tbody id="adminlog-tbody"></tbody></table>
     <div class="pag" id="adminlog-pag"></div>
   </div>
 </div>
 
-<!-- ── ANALYTICS ── -->
+<!-- ANALYTICS -->
 <div class="pg" id="pg-analytics">
   <div class="ph"><div><h1>Analytics</h1><p>Sales & performance</p></div>
     <div class="ph-r">
@@ -404,37 +372,32 @@ textarea.fi{resize:vertical;min-height:80px}
   <div class="sc"><h4>Coupon Usage</h4><div id="an-coupons"><div class="loading">Loading…</div></div></div>
 </div>
 
-<!-- ── SETTINGS ── -->
+<!-- SETTINGS -->
 <div class="pg" id="pg-settings">
-  <div class="ph"><div><h1>Settings</h1><p>Configuration</p></div></div>
+  <div class="ph"><div><h1>Settings</h1></div></div>
   <div class="g2c">
     <div>
+      <div class="sc">
+        <h4>🔌 Connection</h4>
+        <button class="btn btn-s" onclick="testConn()">🔌 Test Netlify Function</button>
+        <div id="conn-res" style="margin-top:10px;font-size:12.5px"></div>
+      </div>
       <div class="sc">
         <h4>⚙️ Thresholds</h4>
         <div class="fg"><label>Low Stock Alert (qty)</label><input type="number" class="fi" id="cfg-low" value="10" min="1"></div>
         <button class="btn btn-p" onclick="saveConfig()">💾 Save</button>
       </div>
-      <div class="sc">
-        <h4>🔌 Connection Test</h4>
-        <button class="btn btn-s" onclick="testConn()">🔌 Test Connection</button>
-        <div id="conn-res" style="margin-top:10px;font-size:12.5px"></div>
-      </div>
     </div>
     <div class="sc">
-      <h4>📊 Table Status</h4>
+      <h4>📊 Table Access Status</h4>
       <div id="tbl-status"><div class="loading">Loading…</div></div>
     </div>
   </div>
 </div>
 
-</div><!-- /content -->
-</div><!-- /main -->
-</div><!-- /layout -->
-</div><!-- /app -->
+</div></div></div></div>
 
-<!-- ══ MODALS ══ -->
-
-<!-- Product Modal -->
+<!-- MODALS -->
 <div class="ov" id="prod-modal">
   <div class="modal modal-lg">
     <div class="m-hdr"><h3 id="p-title">Add Product</h3><button class="m-cls" onclick="closeM('prod-modal')">✕</button></div>
@@ -442,7 +405,7 @@ textarea.fi{resize:vertical;min-height:80px}
       <input type="hidden" id="p-id">
       <div class="gr gr2">
         <div class="fg"><label>Name <span class="req">*</span></label><input class="fi" id="p-name" placeholder="Himalayan Wild Honey"></div>
-        <div class="fg"><label>SKU</label><input class="fi" id="p-sku" placeholder="HWH-001"></div>
+        <div class="fg"><label>SKU</label><input class="fi" id="p-sku"></div>
       </div>
       <div class="gr gr3">
         <div class="fg"><label>Category</label><select class="fi" id="p-cat"></select></div>
@@ -450,24 +413,22 @@ textarea.fi{resize:vertical;min-height:80px}
         <div class="fg"><label>Unit Label</label><input class="fi" id="p-unit" placeholder="250g"></div>
       </div>
       <div class="gr gr3">
-        <div class="fg"><label>Price (₹) <span class="req">*</span></label><input type="number" class="fi" id="p-price" placeholder="599"></div>
-        <div class="fg"><label>MRP (₹)</label><input type="number" class="fi" id="p-mrp" placeholder="799"></div>
-        <div class="fg"><label>Stock Qty</label><input type="number" class="fi" id="p-stock" placeholder="50"></div>
+        <div class="fg"><label>Price (₹) <span class="req">*</span></label><input type="number" class="fi" id="p-price"></div>
+        <div class="fg"><label>MRP (₹)</label><input type="number" class="fi" id="p-mrp"></div>
+        <div class="fg"><label>Stock Qty</label><input type="number" class="fi" id="p-stock"></div>
       </div>
       <div class="fg"><label>Short Description</label><textarea class="fi" id="p-desc" rows="2"></textarea></div>
       <div class="gr gr2">
-        <div class="fg"><label>Image URL</label><input class="fi" id="p-img" placeholder="https://…"></div>
-        <div class="fg"><label>Emoji</label><input class="fi" id="p-emoji" placeholder="🍯" style="font-size:20px;width:80px"></div>
+        <div class="fg"><label>Image URL</label><input class="fi" id="p-img"></div>
+        <div class="fg"><label>Emoji</label><input class="fi" id="p-emoji" style="font-size:20px;width:80px"></div>
       </div>
-      <div class="gr gr2">
-        <div class="fg"><label>Tags (comma separated)</label><input class="fi" id="p-tags" placeholder="organic, honey, himachal"></div>
-        <div class="fg">
-          <label>Badges</label>
-          <div style="display:flex;gap:14px;flex-wrap:wrap;margin-top:6px">
-            <label style="display:flex;gap:6px;align-items:center;font-size:12.5px;font-weight:400"><input type="checkbox" id="p-best"> Bestseller</label>
-            <label style="display:flex;gap:6px;align-items:center;font-size:12.5px;font-weight:400"><input type="checkbox" id="p-org"> Organic</label>
-            <label style="display:flex;gap:6px;align-items:center;font-size:12.5px;font-weight:400"><input type="checkbox" id="p-new"> New Launch</label>
-          </div>
+      <div class="fg"><label>Tags (comma separated)</label><input class="fi" id="p-tags"></div>
+      <div class="fg">
+        <label>Badges</label>
+        <div style="display:flex;gap:14px;flex-wrap:wrap;margin-top:6px">
+          <label style="display:flex;gap:6px;align-items:center;font-size:12.5px;font-weight:400"><input type="checkbox" id="p-best"> Bestseller</label>
+          <label style="display:flex;gap:6px;align-items:center;font-size:12.5px;font-weight:400"><input type="checkbox" id="p-org"> Organic</label>
+          <label style="display:flex;gap:6px;align-items:center;font-size:12.5px;font-weight:400"><input type="checkbox" id="p-new"> New Launch</label>
         </div>
       </div>
     </div>
@@ -478,14 +439,13 @@ textarea.fi{resize:vertical;min-height:80px}
   </div>
 </div>
 
-<!-- Category Modal -->
 <div class="ov" id="cat-modal">
   <div class="modal">
     <div class="m-hdr"><h3 id="c-title">Add Category</h3><button class="m-cls" onclick="closeM('cat-modal')">✕</button></div>
     <div class="m-body">
       <input type="hidden" id="c-id">
-      <div class="fg"><label>Name <span class="req">*</span></label><input class="fi" id="c-name" oninput="autoSlug()" placeholder="Wild Honey"></div>
-      <div class="fg"><label>Slug</label><input class="fi" id="c-slug" placeholder="wild-honey"></div>
+      <div class="fg"><label>Name <span class="req">*</span></label><input class="fi" id="c-name" oninput="autoSlug()"></div>
+      <div class="fg"><label>Slug</label><input class="fi" id="c-slug"></div>
       <div class="fg"><label><input type="checkbox" id="c-active" checked style="margin-right:6px"> Active</label></div>
     </div>
     <div class="m-foot">
@@ -495,11 +455,10 @@ textarea.fi{resize:vertical;min-height:80px}
   </div>
 </div>
 
-<!-- Order Modal -->
 <div class="ov" id="order-modal">
   <div class="modal modal-lg">
-    <div class="m-hdr"><h3 id="ord-m-title">Order Details</h3><button class="m-cls" onclick="closeM('order-modal')">✕</button></div>
-    <div class="m-body" id="ord-m-body">Loading…</div>
+    <div class="m-hdr"><h3 id="ord-m-title">Order</h3><button class="m-cls" onclick="closeM('order-modal')">✕</button></div>
+    <div class="m-body" id="ord-m-body"></div>
     <div class="m-foot">
       <button class="btn btn-s" onclick="closeM('order-modal')">Close</button>
       <button class="btn btn-p" id="ord-save-btn" onclick="saveOrdStatus()">💾 Update Status</button>
@@ -507,29 +466,27 @@ textarea.fi{resize:vertical;min-height:80px}
   </div>
 </div>
 
-<!-- Customer Modal -->
 <div class="ov" id="cust-modal">
   <div class="modal modal-lg">
     <div class="m-hdr"><h3 id="cust-m-title">Customer</h3><button class="m-cls" onclick="closeM('cust-modal')">✕</button></div>
-    <div class="m-body" id="cust-m-body">Loading…</div>
+    <div class="m-body" id="cust-m-body"></div>
     <div class="m-foot"><button class="btn btn-s" onclick="closeM('cust-modal')">Close</button></div>
   </div>
 </div>
 
-<!-- Coupon Modal -->
 <div class="ov" id="coupon-modal">
   <div class="modal">
     <div class="m-hdr"><h3 id="coup-title">Add Coupon</h3><button class="m-cls" onclick="closeM('coupon-modal')">✕</button></div>
     <div class="m-body">
       <input type="hidden" id="coup-id">
-      <div class="fg"><label>Code <span class="req">*</span></label><input class="fi" id="coup-code" placeholder="WELCOME50" oninput="this.value=this.value.toUpperCase()"></div>
+      <div class="fg"><label>Code <span class="req">*</span></label><input class="fi" id="coup-code" oninput="this.value=this.value.toUpperCase()"></div>
       <div class="gr gr2">
         <div class="fg"><label>Type</label><select class="fi" id="coup-type"><option value="flat">Flat ₹ Off</option><option value="percent">% Off</option><option value="free_shipping">Free Shipping</option></select></div>
-        <div class="fg"><label>Value</label><input type="number" class="fi" id="coup-val" placeholder="50"></div>
+        <div class="fg"><label>Value</label><input type="number" class="fi" id="coup-val"></div>
       </div>
       <div class="gr gr2">
-        <div class="fg"><label>Min Order (₹)</label><input type="number" class="fi" id="coup-min" placeholder="0"></div>
-        <div class="fg"><label>Max Uses</label><input type="number" class="fi" id="coup-max" placeholder="Unlimited"></div>
+        <div class="fg"><label>Min Order (₹)</label><input type="number" class="fi" id="coup-min"></div>
+        <div class="fg"><label>Max Uses</label><input type="number" class="fi" id="coup-max"></div>
       </div>
       <div class="fg"><label>Expires On</label><input type="date" class="fi" id="coup-exp"></div>
       <div class="fg"><label><input type="checkbox" id="coup-active" checked style="margin-right:6px"> Active</label></div>
@@ -541,15 +498,14 @@ textarea.fi{resize:vertical;min-height:80px}
   </div>
 </div>
 
-<!-- Review Modal -->
 <div class="ov" id="review-modal">
   <div class="modal">
     <div class="m-hdr"><h3>Review</h3><button class="m-cls" onclick="closeM('review-modal')">✕</button></div>
     <div class="m-body">
       <input type="hidden" id="rv-id">
       <div class="gr gr2">
-        <div class="fg"><label>Customer Name</label><input class="fi" id="rv-name" placeholder="Priya S."></div>
-        <div class="fg"><label>Location</label><input class="fi" id="rv-loc" placeholder="Delhi"></div>
+        <div class="fg"><label>Customer Name</label><input class="fi" id="rv-name"></div>
+        <div class="fg"><label>Location</label><input class="fi" id="rv-loc"></div>
       </div>
       <div class="gr gr2">
         <div class="fg"><label>Rating</label><select class="fi" id="rv-rating"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option></select></div>
@@ -570,82 +526,77 @@ textarea.fi{resize:vertical;min-height:80px}
 <script>
 'use strict';
 
-// ══════════════════════════════════════════
-// CONFIG — hardcoded Supabase credentials
-// ══════════════════════════════════════════
-const SB_URL = 'https://ulyrhnpoiyuvarulqqi.supabase.co';
-const SB_KEY = 'sb_publishable_yr_3pvEKoWk8rYPtKfa07Q_aQycceph'; // replace with service_role key for full access
-const ADMIN_PW = localStorage.getItem('pr_pw') || ''; // set via first login
+// ══════════════════════════════════════
+// NO KEYS HERE — all requests go through
+// /.netlify/functions/admin-api
+// ══════════════════════════════════════
+const API = '/.netlify/functions/admin-api';
 
-// ══ STATE ══
 const S = {
   prods:[], cats:[], orders:[], customers:[], coupons:[], subs:[], reviews:[],
   invLogs:[], ordLogs:[], adminLogs:[],
   currentOrder:null,
-  prodPage:1, ordPage:1, custPage:1, subPage:1, invLogPage:1, ordLogPage:1, adminLogPage:1,
+  prodPage:1, ordPage:1, custPage:1, subPage:1,
+  invLogPage:1, ordLogPage:1, adminLogPage:1,
   PAGE:25, lowStock:parseInt(localStorage.getItem('pr_low_stock')||'10'),
-  _fProds:null, _fOrds:null, _fCusts:null, _custCache:{}, _custOrds:{},
+  _fProds:null, _fOrds:null, _fCusts:null,
+  _custCache:{}, _custOrds:{},
 };
 
-// ══ SUPABASE DIRECT API ══
-function sbHeaders(){
-  return {
-    'apikey': SB_KEY,
-    'Authorization': 'Bearer '+SB_KEY,
-    'Content-Type': 'application/json',
-    'Prefer': 'return=representation'
-  };
+// ── API CALL — password sent in header, never in URL ──
+async function api(method, table, query='', body=null){
+  const pw = sessionStorage.getItem('pr_pw');
+  const r = await fetch(API, {
+    method: 'POST',
+    headers: { 'Content-Type':'application/json', 'x-admin-password': pw },
+    body: JSON.stringify({ method, table, query, body }),
+  });
+  if(r.status === 401){ doLogout(); throw new Error('Session expired — please log in again'); }
+  if(!r.ok){ let t=''; try{ const d=await r.json(); t=d.message||d.error||JSON.stringify(d); }catch(e){ t=await r.text(); } throw new Error('['+r.status+'] '+t); }
+  const txt = await r.text();
+  return txt ? JSON.parse(txt) : null;
 }
-async function sb(method, table, query='', body=null){
-  let url = SB_URL+'/rest/v1/'+table;
-  if(query) url += '?'+query;
-  const r = await fetch(url, {method, headers:sbHeaders(), body:body?JSON.stringify(body):null});
-  if(!r.ok){
-    let msg='';
-    try{ const d=await r.json(); msg=d.message||d.hint||d.error||JSON.stringify(d); }catch(e){ msg=await r.text(); }
-    throw new Error('['+r.status+'] '+msg);
-  }
-  const txt=await r.text();
-  return txt?JSON.parse(txt):null;
-}
-const GET=(t,q)=>sb('GET',t,q);
-const POST=(t,b)=>sb('POST',t,'',b);
-const PATCH=(t,q,b)=>sb('PATCH',t,q,b);
-const DEL=(t,q)=>sb('DELETE',t,q);
+const GET=(t,q)=>api('GET',t,q);
+const POST=(t,b)=>api('POST',t,'',b);
+const PATCH=(t,q,b)=>api('PATCH',t,q,b);
+const DEL=(t,q)=>api('DELETE',t,q);
 
-// ══ AUTH ══
+// ── AUTH ──
 async function doLogin(){
   const pw = document.getElementById('lg-pw').value.trim();
   if(!pw){ showErr('Enter password'); return; }
-  // Test connection first
+  const btn = document.getElementById('login-btn');
+  btn.disabled=true; btn.textContent='Signing in…';
+  sessionStorage.setItem('pr_pw', pw);
   try{
     await GET('categories','limit=1');
-    localStorage.setItem('pr_pw', pw);
     document.getElementById('login-gate').style.display='none';
     document.getElementById('app').style.display='block';
     await init();
   }catch(e){
-    showErr('Connection failed: '+e.message+' — Try using the service_role key in SB_KEY');
+    sessionStorage.removeItem('pr_pw');
+    showErr(e.message.includes('401')||e.message.includes('Unauthorized') ? 'Wrong password' : 'Cannot reach server — is the Netlify function deployed?');
   }
+  btn.disabled=false; btn.textContent='🔐 Sign In';
 }
 function showErr(m){ const el=document.getElementById('lg-err'); el.textContent=m; el.style.display='block'; }
-function doLogout(){ localStorage.removeItem('pr_pw'); location.reload(); }
+function doLogout(){ sessionStorage.removeItem('pr_pw'); document.getElementById('login-gate').style.display='flex'; document.getElementById('app').style.display='none'; }
 
-// ══ INIT ══
+// ── INIT ──
 async function init(){
   const b=document.getElementById('db-badge');
   b.className='db-dot wait'; b.textContent='⬤ Connecting…';
   try{
     document.getElementById('topbar-info').textContent=new Date().toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'});
-    S.cats = await GET('categories','order=name.asc').catch(()=>[]);
-    b.className='db-dot on'; b.textContent='⬤ Supabase Live';
+    S.cats=await GET('categories','order=name.asc').catch(()=>[]);
+    b.className='db-dot on'; b.textContent='⬤ Live';
     await loadDash();
     const pend=await GET('orders','order_status=eq.pending&select=id').catch(()=>[]);
     if(pend?.length){ const bd=document.getElementById('badge-ord'); bd.textContent=pend.length; bd.style.display='inline'; }
-  }catch(e){ b.className='db-dot off'; b.textContent='⬤ DB Error'; toast('DB: '+e.message,'er'); }
+  }catch(e){ b.className='db-dot off'; b.textContent='⬤ Error'; toast('Init: '+e.message,'er'); }
 }
 
-// ══ NAV ══
+// ── NAV ──
 function nav(pg){
   document.querySelectorAll('.pg').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nv').forEach(b=>b.classList.remove('active'));
@@ -655,7 +606,7 @@ function nav(pg){
   ({dashboard:loadDash,products:loadProducts,categories:loadCats,orders:loadOrders,customers:loadCustomers,coupons:loadCoupons,subscribers:loadSubs,reviews:loadReviews,analytics:loadAnalytics,settings:loadSettings,inventory_logs:loadInvLogs,order_logs:loadOrdLogs,admin_logs:loadAdminLogs})[pg]?.();
 }
 
-// ══ DASHBOARD ══
+// ── DASHBOARD ──
 async function loadDash(){
   try{
     const [orders,custs,prods]=await Promise.all([
@@ -663,8 +614,7 @@ async function loadDash(){
       GET('customers','select=id').catch(()=>[]),
       GET('products','select=id,name,stock_quantity').catch(()=>[]),
     ]);
-    const notCanc=(orders||[]).filter(o=>o.order_status!=='cancelled');
-    const rev=notCanc.reduce((s,o)=>s+(parseFloat(o.total_amount)||0),0);
+    const rev=(orders||[]).filter(o=>o.order_status!=='cancelled').reduce((s,o)=>s+(parseFloat(o.total_amount)||0),0);
     const pend=(orders||[]).filter(o=>o.order_status==='pending').length;
     document.getElementById('d-rev').textContent='₹'+Math.round(rev).toLocaleString('en-IN');
     document.getElementById('d-ord').textContent=(orders||[]).length;
@@ -672,35 +622,31 @@ async function loadDash(){
     document.getElementById('d-cust').textContent=(custs||[]).length;
     document.getElementById('dash-sub').textContent='Updated '+new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
 
-    // Recent orders + customer names
     const recent=[...(orders||[])].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at)).slice(0,6);
     const ids=[...new Set(recent.map(o=>o.customer_id).filter(Boolean))];
     let cm={};
     if(ids.length){
-      const cs=await GET('customers',`id=in.(${ids.join(',')})&select=id,first_name,last_name,phone`).catch(()=>[]);
+      const cs=await GET('customers',`id=in.(${ids.join(',')})&select=id,first_name,last_name`).catch(()=>[]);
       (cs||[]).forEach(c=>cm[c.id]=c);
     }
     document.getElementById('dash-orders').innerHTML=recent.length?recent.map(o=>{
       const c=cm[o.customer_id]||{};
-      const name=c.first_name?c.first_name+' '+(c.last_name||''):'Guest';
       return `<tr>
-        <td class="mono">#${o.order_number||String(o.id).slice(-6).toUpperCase()}</td>
-        <td class="td-main">${name.trim()}</td>
+        <td class="mono">${o.order_number||('#'+String(o.id).slice(-6).toUpperCase())}</td>
+        <td class="td-main">${((c.first_name||'')+' '+(c.last_name||'')).trim()||'Guest'}</td>
         <td>₹${(parseFloat(o.total_amount)||0).toLocaleString('en-IN')}</td>
-        <td><span class="badge ${sClass(o.order_status)}">${o.order_status||'pending'}</span></td>
+        <td><span class="badge ${sC(o.order_status)}">${o.order_status||'pending'}</span></td>
       </tr>`;
     }).join(''):'<tr><td colspan="4" class="empty">No orders yet</td></tr>';
 
-    // Low stock
     const low=(prods||[]).filter(p=>(p.stock_quantity||0)<=S.lowStock).sort((a,b)=>a.stock_quantity-b.stock_quantity).slice(0,8);
     document.getElementById('dash-low').innerHTML=low.length?low.map(p=>`
       <tr>
         <td class="td-main">${p.name}</td>
-        <td class="${(p.stock_quantity||0)<=0?'stok-lo':'stok-lo'}">${p.stock_quantity||0}</td>
+        <td class="stok-lo">${p.stock_quantity||0}</td>
         <td><button class="btn btn-s btn-sm" onclick="nav('products')">View</button></td>
       </tr>`).join(''):'<tr><td colspan="3" class="empty">All stocked ✓</td></tr>';
 
-    // Revenue chart
     const now=new Date();
     const cd=Array.from({length:7},(_,i)=>{
       const d=new Date(now); d.setDate(d.getDate()-(6-i));
@@ -718,7 +664,7 @@ async function loadDash(){
   }catch(e){ toast('Dashboard: '+e.message,'er'); }
 }
 
-// ══ PRODUCTS ══
+// ── PRODUCTS ──
 async function loadProducts(){
   try{
     S.prods=await GET('products','order=name.asc&select=*');
@@ -753,11 +699,10 @@ function renderProds(){
         <button class="btn btn-s btn-sm" onclick="editProd('${p.id}')">Edit</button>
         <button class="btn btn-d btn-sm" onclick="delProd('${p.id}','${esc(p.name)}')">Del</button>
       </td>
-    </tr>`).join(''):'<tr><td colspan="6" class="empty">No products found</td></tr>';
+    </tr>`).join(''):'<tr><td colspan="6" class="empty">No products</td></tr>';
   renderPag('prod-pag',S.prodPage,pages,total,n=>{S.prodPage=n;renderProds();});
 }
-function openProdM(p){
-  p=p||{};
+function openProdM(p){ p=p||{};
   document.getElementById('p-title').textContent=p.id?'Edit Product':'Add Product';
   document.getElementById('p-id').value=p.id||'';
   document.getElementById('p-name').value=p.name||'';
@@ -780,17 +725,12 @@ function openProdM(p){
 function editProd(id){ openProdM(S.prods.find(x=>String(x.id)===String(id))); }
 async function saveProd(){
   const id=document.getElementById('p-id').value;
-  const name=document.getElementById('p-name').value.trim();
-  const price=parseFloat(document.getElementById('p-price').value);
+  const name=document.getElementById('p-name').value.trim(), price=parseFloat(v('p-price'));
   if(!name||!price){ toast('Name & price required','er'); return; }
-  const badges=[];
-  if(document.getElementById('p-best').checked) badges.push('bestseller');
-  if(document.getElementById('p-org').checked) badges.push('organic');
-  if(document.getElementById('p-new').checked) badges.push('new');
-  const tags=document.getElementById('p-tags').value.split(',').map(t=>t.trim()).filter(Boolean);
+  const badges=[]; if(document.getElementById('p-best').checked)badges.push('bestseller'); if(document.getElementById('p-org').checked)badges.push('organic'); if(document.getElementById('p-new').checked)badges.push('new');
+  const tags=v('p-tags').split(',').map(t=>t.trim()).filter(Boolean);
   const body={name,price,sku:v('p-sku')||null,mrp:parseFloat(v('p-mrp'))||null,unit_label:v('p-unit')||null,stock_quantity:parseInt(v('p-stock'))||0,short_description:v('p-desc')||null,emoji:v('p-emoji')||null,image_url:v('p-img')||null,tags:tags.length?tags:null,badges:badges.length?badges:null,category_id:v('p-cat')||null,status:v('p-status')};
-  const btn=document.getElementById('p-save-btn');
-  btn.disabled=true; btn.textContent='Saving…';
+  const btn=document.getElementById('p-save-btn'); btn.disabled=true; btn.textContent='Saving…';
   try{
     if(id) await PATCH('products',`id=eq.${id}`,body); else await POST('products',body);
     toast('Product saved ✓','ok'); closeM('prod-modal'); await loadProducts();
@@ -803,7 +743,7 @@ async function delProd(id,name){
   catch(e){ toast('Error: '+e.message,'er'); }
 }
 
-// ══ CATEGORIES ══
+// ── CATEGORIES ──
 async function loadCats(){
   try{
     S.cats=await GET('categories','order=name.asc&select=*');
@@ -847,7 +787,7 @@ async function delCat(id,name){
   catch(e){ toast('Error: '+e.message,'er'); }
 }
 
-// ══ ORDERS ══
+// ── ORDERS ──
 async function loadOrders(){
   try{
     S.orders=await GET('orders','order=created_at.desc&select=*');
@@ -866,10 +806,9 @@ function filterOrders(){
   const py=document.getElementById('ord-pay-f').value;
   S._fOrds=S.orders.filter(o=>{
     const c=S._custCache[o.customer_id]||{};
-    const name=(c.first_name||'')+' '+(c.last_name||'');
     if(st&&o.order_status!==st) return false;
     if(py&&o.payment_status!==py) return false;
-    if(q&&![o.order_number,o.id,name,c.email,c.phone,c.city].join(' ').toLowerCase().includes(q)) return false;
+    if(q&&![o.order_number,String(o.id),(c.first_name||'')+' '+(c.last_name||''),c.email,c.phone,c.city].join(' ').toLowerCase().includes(q)) return false;
     return true;
   });
   S.ordPage=1; renderOrders();
@@ -885,15 +824,14 @@ function renderOrders(){
       <td><div class="td-main">${name}</div><div class="td-sub">${c.email||''}</div></td>
       <td style="font-size:11.5px">${c.phone||'—'}<br><span style="color:var(--tx3)">${c.city||''}</span></td>
       <td>₹${(parseFloat(o.total_amount)||0).toLocaleString('en-IN')}</td>
-      <td><span class="badge ${sClass(o.order_status)}">${o.order_status||'pending'}</span></td>
-      <td><span class="badge ${pyClass(o.payment_status)}">${o.payment_status||'pending'}</span></td>
+      <td><span class="badge ${sC(o.order_status)}">${o.order_status||'pending'}</span></td>
+      <td><span class="badge ${pC(o.payment_status)}">${o.payment_status||'pending'}</span></td>
       <td style="font-size:11px;color:var(--tx3)">${new Date(o.created_at).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'2-digit'})}</td>
       <td><button class="btn btn-s btn-sm" onclick="openOrder('${o.id}')">View</button></td>
     </tr>`;
-  }).join(''):'<tr><td colspan="8" class="empty">No orders found</td></tr>';
+  }).join(''):'<tr><td colspan="8" class="empty">No orders</td></tr>';
   renderPag('ord-pag',S.ordPage,pages,total,n=>{S.ordPage=n;renderOrders();});
 }
-
 async function openOrder(id){
   S.currentOrder=S.orders.find(o=>String(o.id)===String(id)); if(!S.currentOrder) return;
   const o=S.currentOrder, c=S._custCache[o.customer_id]||{};
@@ -901,7 +839,7 @@ async function openOrder(id){
   let items=[];
   try{ items=await GET('order_items',`order_id=eq.${id}&select=*`); }catch(e){}
   const pm={}; S.prods.forEach(p=>pm[p.id]=p.name);
-  document.getElementById('ord-m-title').textContent=(o.order_number||'Order #'+String(id).slice(-8).toUpperCase());
+  document.getElementById('ord-m-title').textContent=o.order_number||'Order #'+String(id).slice(-8).toUpperCase();
   document.getElementById('ord-m-body').innerHTML=`
     <div class="g2c" style="gap:12px;margin-bottom:14px">
       <div class="sc" style="margin:0">
@@ -923,7 +861,7 @@ async function openOrder(id){
         <div class="ri"><span class="l">Tax</span><span class="v">₹${(parseFloat(o.tax)||0).toLocaleString('en-IN')}</span></div>
         <div class="ri"><span class="l">Shipping</span><span class="v">₹${(parseFloat(o.shipping_charge)||0).toLocaleString('en-IN')}</span></div>
         <div class="ri"><span class="l">Total</span><span class="v" style="font-weight:700;color:var(--grn)">₹${(parseFloat(o.total_amount)||0).toLocaleString('en-IN')}</span></div>
-        <div class="ri"><span class="l">Payment</span><span class="v">${o.payment_method||'—'} <span class="badge ${pyClass(o.payment_status)}">${o.payment_status||'—'}</span></span></div>
+        <div class="ri"><span class="l">Payment</span><span class="v">${o.payment_method||'—'} <span class="badge ${pC(o.payment_status)}">${o.payment_status||'—'}</span></span></div>
         <div class="ri"><span class="l">Payment ID</span><span class="v mono" style="font-size:11px">${o.payment_id||'—'}</span></div>
         <div class="sep"></div>
         <div class="fg" style="margin:0"><label style="font-size:11.5px;font-weight:600;color:var(--tx2);display:block;margin-bottom:5px">Update Order Status</label>
@@ -947,11 +885,9 @@ async function openOrder(id){
 async function saveOrdStatus(){
   if(!S.currentOrder) return;
   const status=document.getElementById('ord-status-edit').value;
-  const btn=document.getElementById('ord-save-btn');
-  btn.disabled=true; btn.textContent='Saving…';
+  const btn=document.getElementById('ord-save-btn'); btn.disabled=true; btn.textContent='Saving…';
   try{
     await PATCH('orders',`id=eq.${S.currentOrder.id}`,{order_status:status,updated_at:new Date().toISOString()});
-    try{ await POST('order_logs',{order_id:S.currentOrder.id,old_status:S.currentOrder.order_status,new_status:status}); }catch(e){}
     try{ await POST('order_status_history',{order_id:S.currentOrder.id,old_status:S.currentOrder.order_status,new_status:status}); }catch(e){}
     toast('Order updated ✓','ok'); closeM('order-modal'); await loadOrders();
   }catch(e){ toast('Error: '+e.message,'er'); }
@@ -959,32 +895,27 @@ async function saveOrdStatus(){
 }
 function exportOrders(){
   const list=S._fOrds||S.orders;
-  const rows=[['Order #','Customer','Email','Phone','City','State','Postal Code','Subtotal','Tax','Shipping','Total','Order Status','Payment Status','Payment Method','Payment ID','Date','Delivery Date']];
+  const rows=[['Order #','Customer','Email','Phone','City','State','Postal','Subtotal','Tax','Shipping','Total','Order Status','Payment Status','Payment Method','Payment ID','Date']];
   list.forEach(o=>{
     const c=S._custCache[o.customer_id]||{};
-    rows.push([o.order_number||String(o.id).slice(-8).toUpperCase(),(((c.first_name||'')+' '+(c.last_name||'')).trim()),c.email||'',c.phone||'',c.city||'',c.state||'',c.postal_code||'',o.subtotal||0,o.tax||0,o.shipping_charge||0,o.total_amount||0,o.order_status||'',o.payment_status||'',o.payment_method||'',o.payment_id||'',new Date(o.created_at).toLocaleDateString('en-IN'),o.delivery_date||'']);
+    rows.push([o.order_number||String(o.id).slice(-8).toUpperCase(),((c.first_name||'')+' '+(c.last_name||'')).trim(),c.email||'',c.phone||'',c.city||'',c.state||'',c.postal_code||'',o.subtotal||0,o.tax||0,o.shipping_charge||0,o.total_amount||0,o.order_status||'',o.payment_status||'',o.payment_method||'',o.payment_id||'',new Date(o.created_at).toLocaleDateString('en-IN')]);
   });
   dlCSV(rows,'pahadi-orders-'+Date.now()+'.csv');
 }
 
-// ══ CUSTOMERS ══
+// ── CUSTOMERS ──
 async function loadCustomers(){
   try{
     S.customers=await GET('customers','order=created_at.desc&select=*&is_deleted=eq.false');
     const ords=await GET('orders','select=customer_id,total_amount,order_status').catch(()=>[]);
     S._custOrds={};
-    (ords||[]).forEach(o=>{
-      if(!o.customer_id) return;
-      if(!S._custOrds[o.customer_id]) S._custOrds[o.customer_id]={count:0,total:0};
-      S._custOrds[o.customer_id].count++;
-      if(o.order_status!=='cancelled') S._custOrds[o.customer_id].total+=(parseFloat(o.total_amount)||0);
-    });
+    (ords||[]).forEach(o=>{ if(!o.customer_id) return; if(!S._custOrds[o.customer_id]) S._custOrds[o.customer_id]={count:0,total:0}; S._custOrds[o.customer_id].count++; if(o.order_status!=='cancelled') S._custOrds[o.customer_id].total+=(parseFloat(o.total_amount)||0); });
     S._fCusts=null; S.custPage=1; renderCustomers();
   }catch(e){ toast('Customers: '+e.message,'er'); }
 }
 function filterCustomers(){
   const q=(document.getElementById('cust-q').value||'').toLowerCase();
-  S._fCusts=q?S.customers.filter(c=>[(c.first_name||'')+' '+(c.last_name||''),c.email,c.phone,c.city,c.state,c.postal_code].join(' ').toLowerCase().includes(q)):null;
+  S._fCusts=q?S.customers.filter(c=>[(c.first_name||'')+' '+(c.last_name||''),c.email,c.phone,c.city,c.state].join(' ').toLowerCase().includes(q)):null;
   S.custPage=1; renderCustomers();
 }
 function renderCustomers(){
@@ -992,9 +923,8 @@ function renderCustomers(){
   const slice=list.slice((S.custPage-1)*S.PAGE, S.custPage*S.PAGE);
   document.getElementById('cust-tbody').innerHTML=slice.length?slice.map(c=>{
     const o=S._custOrds[c.id]||{count:0,total:0};
-    const name=((c.first_name||'')+' '+(c.last_name||'')).trim()||'—';
     return `<tr>
-      <td class="td-main">${name}</td>
+      <td class="td-main">${((c.first_name||'')+' '+(c.last_name||'')).trim()||'—'}</td>
       <td style="font-size:12px">${c.email||'—'}</td>
       <td>${c.phone||'—'}</td>
       <td>${c.city||'—'}</td>
@@ -1020,7 +950,6 @@ async function openCust(id){
         <div class="ri"><span class="l">Email</span><span class="v">${c.email||'—'}</span></div>
         <div class="ri"><span class="l">Phone</span><span class="v">${c.phone||'—'}</span></div>
         <div class="sep"></div>
-        <h4 style="margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid var(--bd)">📍 Address</h4>
         <div class="ri"><span class="l">Address</span><span class="v">${[c.address_line1,c.address_line2].filter(Boolean).join(', ')||'—'}</span></div>
         <div class="ri"><span class="l">City</span><span class="v">${c.city||'—'}</span></div>
         <div class="ri"><span class="l">State</span><span class="v">${c.state||'—'}</span></div>
@@ -1031,13 +960,11 @@ async function openCust(id){
         <h4>🛒 Orders (${ords.length})</h4>
         ${ords.length?ords.map(o=>`
           <div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--bd)">
-            <div>
-              <div style="font-size:12px;font-weight:600;font-family:monospace">${o.order_number||'#'+String(o.id).slice(-8).toUpperCase()}</div>
-              <div style="font-size:10.5px;color:var(--tx3)">${new Date(o.created_at).toLocaleDateString('en-IN')}</div>
-            </div>
+            <div><div style="font-size:12px;font-weight:600;font-family:monospace">${o.order_number||'#'+String(o.id).slice(-8)}</div>
+            <div style="font-size:10.5px;color:var(--tx3)">${new Date(o.created_at).toLocaleDateString('en-IN')}</div></div>
             <div style="text-align:right">
               <div style="font-weight:600;color:var(--grn)">₹${(parseFloat(o.total_amount)||0).toLocaleString('en-IN')}</div>
-              <span class="badge ${sClass(o.order_status)}">${o.order_status}</span>
+              <span class="badge ${sC(o.order_status)}">${o.order_status}</span>
             </div>
           </div>`).join(''):'<div class="empty">No orders</div>'}
       </div>
@@ -1047,18 +974,14 @@ async function openCust(id){
 function exportCustomers(){
   const list=S._fCusts||S.customers;
   const rows=[['First Name','Last Name','Email','Phone','Address','City','State','Postal Code','Orders','Total Spent','Joined']];
-  list.forEach(c=>{
-    const o=S._custOrds[c.id]||{count:0,total:0};
-    rows.push([c.first_name||'',c.last_name||'',c.email||'',c.phone||'',[c.address_line1,c.address_line2].filter(Boolean).join(' '),c.city||'',c.state||'',c.postal_code||'',o.count,Math.round(o.total),new Date(c.created_at).toLocaleDateString('en-IN')]);
-  });
+  list.forEach(c=>{ const o=S._custOrds[c.id]||{count:0,total:0}; rows.push([c.first_name||'',c.last_name||'',c.email||'',c.phone||'',[c.address_line1,c.address_line2].filter(Boolean).join(' '),c.city||'',c.state||'',c.postal_code||'',o.count,Math.round(o.total),new Date(c.created_at).toLocaleDateString('en-IN')]); });
   dlCSV(rows,'pahadi-customers-'+Date.now()+'.csv');
 }
 
-// ══ COUPONS ══
+// ── COUPONS ──
 async function loadCoupons(){
   try{
     S.coupons=await GET('coupons','order=created_at.desc&select=*');
-    // Also fetch usage counts
     const usage=await GET('coupon_usage','select=coupon_id').catch(()=>[]);
     const ucm={}; (usage||[]).forEach(u=>ucm[u.coupon_id]=(ucm[u.coupon_id]||0)+1);
     document.getElementById('coup-tbody').innerHTML=S.coupons.length?S.coupons.map(c=>`
@@ -1091,13 +1014,12 @@ function openCouponM(c){ c=c||{};
 }
 function editCoupon(id){ openCouponM(S.coupons.find(x=>String(x.id)===String(id))); }
 async function saveCoupon(){
-  const id=document.getElementById('coup-id').value;
-  const code=document.getElementById('coup-code').value.trim().toUpperCase();
+  const id=document.getElementById('coup-id').value, code=v('coup-code').toUpperCase();
   if(!code){ toast('Code required','er'); return; }
   const body={code,type:v('coup-type'),value:parseFloat(v('coup-val'))||0,min_order:parseFloat(v('coup-min'))||0,max_uses:parseInt(v('coup-max'))||null,expires_at:v('coup-exp')||null,is_active:document.getElementById('coup-active').checked};
   try{
     if(id) await PATCH('coupons',`id=eq.${id}`,body); else await POST('coupons',body);
-    toast('Coupon saved ✓','ok'); closeM('coupon-modal'); await loadCoupons();
+    toast('Saved ✓','ok'); closeM('coupon-modal'); await loadCoupons();
   }catch(e){ toast('Error: '+e.message,'er'); }
 }
 async function delCoupon(id,code){
@@ -1106,10 +1028,10 @@ async function delCoupon(id,code){
   catch(e){ toast('Error: '+e.message,'er'); }
 }
 
-// ══ SUBSCRIBERS ══
+// ── SUBSCRIBERS ──
 async function loadSubs(){
   try{
-    S.subs=await GET('subscribers','order=created_at.desc&select=*').catch(()=>{ throw new Error('subscribers table not found'); });
+    S.subs=await GET('subscribers','order=created_at.desc&select=*');
     const total=S.subs.length, pages=Math.ceil(total/S.PAGE);
     const slice=S.subs.slice((S.subPage-1)*S.PAGE, S.subPage*S.PAGE);
     document.getElementById('sub-tbody').innerHTML=slice.length?slice.map(s=>`
@@ -1119,7 +1041,7 @@ async function loadSubs(){
         <td><button class="btn btn-d btn-sm" onclick="delSub('${s.id}','${s.email}')">Remove</button></td>
       </tr>`).join(''):'<tr><td colspan="3" class="empty">No subscribers</td></tr>';
     renderPag('sub-pag',S.subPage,pages,total,n=>{S.subPage=n;loadSubs();});
-  }catch(e){ document.getElementById('sub-tbody').innerHTML=`<tr><td colspan="3" class="empty">Table not found in schema</td></tr>`; }
+  }catch(e){ document.getElementById('sub-tbody').innerHTML='<tr><td colspan="3" class="empty">Table not accessible</td></tr>'; }
 }
 async function delSub(id,email){
   if(!confirm(`Remove ${email}?`)) return;
@@ -1127,15 +1049,14 @@ async function delSub(id,email){
   catch(e){ toast('Error: '+e.message,'er'); }
 }
 function exportSubs(){
-  const rows=[['Email','Subscribed']];
-  S.subs.forEach(s=>rows.push([s.email,new Date(s.created_at).toLocaleDateString('en-IN')]));
+  const rows=[['Email','Subscribed']]; S.subs.forEach(s=>rows.push([s.email,new Date(s.created_at).toLocaleDateString('en-IN')]));
   dlCSV(rows,'subscribers-'+Date.now()+'.csv');
 }
 
-// ══ REVIEWS ══
+// ── REVIEWS ──
 async function loadReviews(){
   try{
-    S.reviews=await GET('reviews','order=created_at.desc&select=*').catch(()=>{ throw new Error('reviews table not found'); });
+    S.reviews=await GET('reviews','order=created_at.desc&select=*');
     if(!S.prods.length) S.prods=await GET('products','select=id,name').catch(()=>[]);
     const pm={}; S.prods.forEach(p=>pm[p.id]=p.name);
     fillSel('rv-prod',S.prods,'id','name');
@@ -1151,7 +1072,7 @@ async function loadReviews(){
           <button class="btn btn-d btn-sm" onclick="delReview('${r.id}')">Del</button>
         </td>
       </tr>`).join(''):'<tr><td colspan="6" class="empty">No reviews</td></tr>';
-  }catch(e){ document.getElementById('rev-tbody').innerHTML=`<tr><td colspan="6" class="empty">Table not found in schema</td></tr>`; }
+  }catch(e){ document.getElementById('rev-tbody').innerHTML='<tr><td colspan="6" class="empty">Table not accessible</td></tr>'; }
 }
 function openReviewM(r){ r=r||{};
   document.getElementById('rv-id').value=r.id||'';
@@ -1178,7 +1099,7 @@ async function delReview(id){
   catch(e){ toast('Error: '+e.message,'er'); }
 }
 
-// ══ INVENTORY LOGS ══
+// ── INVENTORY LOGS ──
 async function loadInvLogs(){
   try{
     S.invLogs=await GET('inventory_logs','order=created_at.desc&select=*');
@@ -1188,17 +1109,17 @@ async function loadInvLogs(){
     const slice=S.invLogs.slice((S.invLogPage-1)*S.PAGE, S.invLogPage*S.PAGE);
     document.getElementById('invlog-tbody').innerHTML=slice.length?slice.map(l=>`
       <tr>
-        <td class="td-main">${pm[l.product_id]||'Product #'+l.product_id}</td>
-        <td><span class="badge ${l.change_type==='restock'||l.change_type==='add'?'bg':l.change_type==='sale'||l.change_type==='remove'?'br':'by'}">${l.change_type||'—'}</span></td>
+        <td class="td-main">${pm[l.product_id]||'#'+l.product_id}</td>
+        <td><span class="badge ${l.quantity_change>0?'bg':'br'}">${l.change_type||'—'}</span></td>
         <td style="font-weight:700;color:${l.quantity_change>0?'var(--grn)':'var(--red)'}">${l.quantity_change>0?'+':''}${l.quantity_change||0}</td>
         <td class="mono" style="font-size:11px">${l.reference_id||'—'}</td>
         <td style="font-size:11px;color:var(--tx3)">${new Date(l.created_at).toLocaleString('en-IN')}</td>
       </tr>`).join(''):'<tr><td colspan="5" class="empty">No logs</td></tr>';
     renderPag('invlog-pag',S.invLogPage,pages,total,n=>{S.invLogPage=n;loadInvLogs();});
-  }catch(e){ toast('Inventory logs: '+e.message,'er'); }
+  }catch(e){ toast('Inv logs: '+e.message,'er'); }
 }
 
-// ══ ORDER LOGS ══
+// ── ORDER LOGS ──
 async function loadOrdLogs(){
   try{
     S.ordLogs=await GET('order_status_history','order=changed_at.desc&select=*');
@@ -1207,15 +1128,15 @@ async function loadOrdLogs(){
     document.getElementById('ordlog-tbody').innerHTML=slice.length?slice.map(l=>`
       <tr>
         <td class="mono">${l.order_id}</td>
-        <td><span class="badge ${sClass(l.old_status)}">${l.old_status||'—'}</span></td>
-        <td><span class="badge ${sClass(l.new_status)}">${l.new_status||'—'}</span></td>
+        <td><span class="badge ${sC(l.old_status)}">${l.old_status||'—'}</span></td>
+        <td><span class="badge ${sC(l.new_status)}">${l.new_status||'—'}</span></td>
         <td style="font-size:11px;color:var(--tx3)">${new Date(l.changed_at).toLocaleString('en-IN')}</td>
       </tr>`).join(''):'<tr><td colspan="4" class="empty">No logs</td></tr>';
     renderPag('ordlog-pag',S.ordLogPage,pages,total,n=>{S.ordLogPage=n;loadOrdLogs();});
   }catch(e){ toast('Order logs: '+e.message,'er'); }
 }
 
-// ══ ADMIN LOGS ══
+// ── ADMIN LOGS ──
 async function loadAdminLogs(){
   try{
     S.adminLogs=await GET('admin_logs','order=created_at.desc&select=*');
@@ -1233,7 +1154,7 @@ async function loadAdminLogs(){
   }catch(e){ toast('Admin logs: '+e.message,'er'); }
 }
 
-// ══ ANALYTICS ══
+// ── ANALYTICS ──
 async function loadAnalytics(){
   const days=parseInt(document.getElementById('an-range').value)||30;
   const since=new Date(); since.setDate(since.getDate()-days);
@@ -1245,103 +1166,75 @@ async function loadAnalytics(){
     ]);
     const valid=(orders||[]).filter(o=>o.order_status!=='cancelled');
     const rev=valid.reduce((s,o)=>s+(parseFloat(o.total_amount)||0),0);
-    const ord=(orders||[]).length;
-    const del=(orders||[]).filter(o=>o.order_status==='delivered').length;
+    const ord=(orders||[]).length, del=(orders||[]).filter(o=>o.order_status==='delivered').length;
     document.getElementById('an-rev').textContent='₹'+Math.round(rev).toLocaleString('en-IN');
     document.getElementById('an-ord').textContent=ord;
     document.getElementById('an-aov').textContent='₹'+Math.round(ord?rev/ord:0).toLocaleString('en-IN');
     document.getElementById('an-del').textContent=ord?Math.round(del/ord*100)+'%':'—';
-
-    // Top products
     if(!S.prods.length) S.prods=await GET('products','select=id,name').catch(()=>[]);
     const pm={}; S.prods.forEach(p=>pm[p.id]=p.name);
     const pr={};
-    (items||[]).forEach(it=>{
-      if(!it.product_id) return;
-      if(!pr[it.product_id]) pr[it.product_id]={name:pm[it.product_id]||'#'+it.product_id,rev:0,qty:0};
-      pr[it.product_id].rev+=(it.quantity||1)*(parseFloat(it.price_at_time)||0);
-      pr[it.product_id].qty+=(it.quantity||0);
-    });
-    const top=Object.values(pr).sort((a,b)=>b.rev-a.rev).slice(0,8);
-    const maxR=top[0]?.rev||1;
+    (items||[]).forEach(it=>{ if(!it.product_id) return; if(!pr[it.product_id]) pr[it.product_id]={name:pm[it.product_id]||'#'+it.product_id,rev:0}; pr[it.product_id].rev+=(it.quantity||1)*(parseFloat(it.price_at_time)||0); });
+    const top=Object.values(pr).sort((a,b)=>b.rev-a.rev).slice(0,8), maxR=top[0]?.rev||1;
     document.getElementById('an-top').innerHTML=top.length?top.map((p,i)=>`
       <div style="margin-bottom:10px">
         <div style="display:flex;justify-content:space-between;margin-bottom:3px">
           <span style="font-size:12.5px;font-weight:600">${i+1}. ${p.name}</span>
           <span style="font-weight:700;color:var(--grn)">₹${Math.round(p.rev).toLocaleString('en-IN')}</span>
         </div>
-        <div style="height:4px;background:var(--bg4);border-radius:4px">
-          <div style="height:100%;width:${Math.round(p.rev/maxR*100)}%;background:linear-gradient(90deg,var(--g),var(--g2));border-radius:4px"></div>
-        </div>
-      </div>`).join(''):'<div class="empty">No item data</div>';
-
-    // By status
-    const sc={};
-    (orders||[]).forEach(o=>{ const s=o.order_status||'unknown'; sc[s]=(sc[s]||0)+1; });
-    document.getElementById('an-status').innerHTML=Object.entries(sc).length?Object.entries(sc).map(([st,cnt])=>`
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--bd)">
-        <span class="badge ${sClass(st)}">${st}</span><span style="font-weight:700">${cnt}</span>
-      </div>`).join(''):'<div class="empty">No orders</div>';
-
-    // Coupon usage
+        <div style="height:4px;background:var(--bg4);border-radius:4px"><div style="height:100%;width:${Math.round(p.rev/maxR*100)}%;background:linear-gradient(90deg,var(--g),var(--g2));border-radius:4px"></div></div>
+      </div>`).join(''):'<div class="empty">No data</div>';
+    const sc={}; (orders||[]).forEach(o=>{ const s=o.order_status||'unknown'; sc[s]=(sc[s]||0)+1; });
+    document.getElementById('an-status').innerHTML=Object.entries(sc).length?Object.entries(sc).map(([st,cnt])=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--bd)"><span class="badge ${sC(st)}">${st}</span><span style="font-weight:700">${cnt}</span></div>`).join(''):'<div class="empty">No orders</div>';
     const cm={}; S.coupons.forEach(c=>cm[c.id]=c.code);
     const cu={};
-    (couponUsage||[]).forEach(u=>{ const k=cm[u.coupon_id]||'#'+u.coupon_id; if(!cu[k])cu[k]={count:0,saved:0}; cu[k].count++; cu[k].saved+=(parseFloat(u.discount_amount)||0); });
-    document.getElementById('an-coupons').innerHTML=Object.entries(cu).length?`<table style="width:100%"><thead><tr><th>Code</th><th>Uses</th><th>Total Saved</th></tr></thead><tbody>${Object.entries(cu).map(([code,d])=>`<tr><td class="td-main mono">${code}</td><td>${d.count}</td><td style="color:var(--red)">-₹${Math.round(d.saved).toLocaleString('en-IN')}</td></tr>`).join('')}</tbody></table>`:'<div class="empty">No coupon usage in period</div>';
+    (couponUsage||[]).forEach(u=>{ const k=cm[u.coupon_id]||'#'+u.coupon_id; if(!cu[k]) cu[k]={count:0,saved:0}; cu[k].count++; cu[k].saved+=(parseFloat(u.discount_amount)||0); });
+    document.getElementById('an-coupons').innerHTML=Object.entries(cu).length?`<table style="width:100%"><thead><tr><th>Code</th><th>Uses</th><th>Total Saved</th></tr></thead><tbody>${Object.entries(cu).map(([code,d])=>`<tr><td class="td-main mono">${code}</td><td>${d.count}</td><td style="color:var(--red)">-₹${Math.round(d.saved).toLocaleString('en-IN')}</td></tr>`).join('')}</tbody></table>`:'<div class="empty">No coupon usage</div>';
   }catch(e){ toast('Analytics: '+e.message,'er'); }
 }
 
-// ══ SETTINGS ══
+// ── SETTINGS ──
 async function loadSettings(){
   document.getElementById('cfg-low').value=S.lowStock;
-  const tables=['products','categories','orders','order_items','customers','coupons','coupon_usage','subscribers','reviews','inventory_logs','order_logs','order_status_history','admin_logs','order_detailed','order_summary'];
+  const tables=['products','categories','orders','order_items','customers','coupons','coupon_usage','subscribers','reviews','inventory_logs','order_status_history','admin_logs'];
   const res=await Promise.all(tables.map(async t=>({t,ok:await GET(t,'limit=0').then(()=>true).catch(()=>false)})));
   document.getElementById('tbl-status').innerHTML=res.map(r=>`
     <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--bd)">
       <code style="font-size:12px;color:var(--tx2)">${r.t}</code>
-      <span class="badge ${r.ok?'bg':'br'}">${r.ok?'✓ OK':'✗ No access'}</span>
+      <span class="badge ${r.ok?'bg':'br'}">${r.ok?'✓ OK':'✗ Error'}</span>
     </div>`).join('');
 }
-async function saveConfig(){
-  S.lowStock=parseInt(document.getElementById('cfg-low').value)||10;
-  localStorage.setItem('pr_low_stock',S.lowStock);
-  toast('Saved ✓','ok');
-}
+async function saveConfig(){ S.lowStock=parseInt(document.getElementById('cfg-low').value)||10; localStorage.setItem('pr_low_stock',S.lowStock); toast('Saved ✓','ok'); }
 async function testConn(){
-  const res=document.getElementById('conn-res');
-  res.textContent='Testing…';
+  const res=document.getElementById('conn-res'); res.textContent='Testing…';
   try{
-    const t0=Date.now();
-    await GET('categories','limit=1');
-    res.innerHTML=`<span style="color:var(--grn)">✅ Connected in ${Date.now()-t0}ms</span>`;
-    document.getElementById('db-badge').className='db-dot on';
-    document.getElementById('db-badge').textContent='⬤ Supabase Live';
+    const t0=Date.now(); await GET('categories','limit=1');
+    res.innerHTML=`<span style="color:var(--grn)">✅ Netlify function responding in ${Date.now()-t0}ms</span>`;
   }catch(e){ res.innerHTML=`<span style="color:var(--red)">❌ ${e.message}</span>`; }
 }
 
-// ══ UTILS ══
-function sClass(s){ return {pending:'by',confirmed:'bb',packed:'bp',shipped:'bb',delivered:'bg',cancelled:'br'}[s]||'bgr'; }
-function pyClass(s){ return {paid:'bg',pending:'by',failed:'br',refunded:'bgr'}[s]||'bgr'; }
+// ── UTILS ──
+function sC(s){ return {pending:'by',confirmed:'bb',packed:'bp',shipped:'bb',delivered:'bg',cancelled:'br'}[s]||'bgr'; }
+function pC(s){ return {paid:'bg',pending:'by',failed:'br',refunded:'bgr'}[s]||'bgr'; }
 function v(id){ return document.getElementById(id)?.value||''; }
-function esc(s){ return (s||'').replace(/'/g,"\\'"); }
+function esc(s){ return (s||'').replace(/'/g,"\\'").replace(/"/g,'&quot;'); }
 function fillSel(id,items,vk,lk,sel=''){
   const el=document.getElementById(id); if(!el) return;
   el.innerHTML='<option value="">— Select —</option>'+(items||[]).map(i=>`<option value="${i[vk]}" ${String(i[vk])===String(sel)?'selected':''}>${i[lk]}</option>`).join('');
 }
 function renderPag(cid,page,pages,total,cb){
   const el=document.getElementById(cid);
-  if(!el||pages<=1){ if(el)el.innerHTML=''; return; }
+  if(!el||pages<=1){ if(el) el.innerHTML=''; return; }
   const from=((page-1)*S.PAGE)+1, to=Math.min(page*S.PAGE,total);
-  let btns='';
   const start=Math.max(1,page-3), end=Math.min(pages,start+6);
+  let btns='';
   for(let i=start;i<=end;i++) btns+=`<button class="pb ${i===page?'cur':''}" onclick="(${cb})(${i})">${i}</button>`;
   el.innerHTML=`<span class="pag-info">${from}–${to} of ${total}</span><div class="pag-btns"><button class="pb" onclick="(${cb})(${page-1})" ${page<=1?'disabled':''}>←</button>${btns}<button class="pb" onclick="(${cb})(${page+1})" ${page>=pages?'disabled':''}>→</button></div>`;
 }
 function openM(id){ document.getElementById(id).classList.add('open'); }
 function closeM(id){ document.getElementById(id).classList.remove('open'); }
 function toast(msg,type='in'){
-  const el=document.createElement('div');
-  el.className=`ti ${type}`; el.textContent=msg;
+  const el=document.createElement('div'); el.className=`ti ${type}`; el.textContent=msg;
   document.getElementById('toast').appendChild(el);
   requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add('show')));
   setTimeout(()=>{ el.classList.remove('show'); setTimeout(()=>el.remove(),300); },3500);
@@ -1351,15 +1244,6 @@ function dlCSV(rows,fn){
   const a=document.createElement('a'); a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv); a.download=fn; a.click();
 }
 document.querySelectorAll('.ov').forEach(m=>m.addEventListener('click',function(e){ if(e.target===this) this.classList.remove('open'); }));
-
-// ══ BOOT ══
-(function boot(){
-  if(localStorage.getItem('pr_pw')){
-    document.getElementById('login-gate').style.display='none';
-    document.getElementById('app').style.display='block';
-    init();
-  }
-})();
 </script>
 </body>
 </html>
