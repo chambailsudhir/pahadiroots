@@ -835,21 +835,44 @@ const PATCH= (t,b,q) => callProxy('PATCH', t, q,    b);
 const DEL  = (t,q)   => callProxy('DELETE',t, q,    null);
 
 // ── Storage upload — file never leaves your server ────────────────────────
-async function uploadToStorage(file, bucket, fileName){
-  const path = fileName || `${Date.now()}-${file.name.replace(/\s+/g,'-')}`;
-  const base64 = await new Promise((res,rej)=>{
-    const r = new FileReader();
-    r.onload  = e => res(e.target.result.split(',')[1]);
-    r.onerror = rej;
-    r.readAsDataURL(file);
+async // Compress image via canvas before uploading (keeps payload under 1MB)
+function compressImage(file, maxW=1600, quality=0.82){
+  return new Promise((res, rej) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      let w = img.width, h = img.height;
+      if(w > maxW){ h = Math.round(h * maxW / w); w = maxW; }
+      const c = document.createElement('canvas');
+      c.width = w; c.height = h;
+      c.getContext('2d').drawImage(img, 0, 0, w, h);
+      URL.revokeObjectURL(url);
+      res(c.toDataURL('image/jpeg', quality));
+    };
+    img.onerror = rej;
+    img.src = url;
   });
+}
+
+async function uploadToStorage(file, bucket, fileName){
+  const path = fileName || `${Date.now()}-${file.name.replace(/\s+/g,'-').replace(/[^a-z0-9._-]/gi,'')}`;
+
+  // Compress before encoding — prevents Netlify 6MB body limit errors
+  const dataUrl = await compressImage(file);
+  const base64  = dataUrl.split(',')[1];
+  const mimeType = 'image/jpeg';
+
   const r = await fetch(getApiBase()+'/storage-upload', {
     method: 'POST',
     headers: { 'Content-Type':'application/json', 'x-admin-password': getAdminPw() },
-    body: JSON.stringify({ bucket, path, base64, mimeType: file.type }),
+    body: JSON.stringify({ bucket, path, base64, mimeType }),
   });
   if(r.status === 401) throw new Error('Unauthorized — check admin password');
-  if(!r.ok){ const t = await r.text(); throw new Error('Upload failed: '+t); }
+  if(!r.ok){
+    let msg = 'Upload failed';
+    try { const d = await r.json(); msg = d.error || msg; } catch(e){ msg += ': '+r.status; }
+    throw new Error(msg);
+  }
   const data = await r.json();
   return data.url;
 }
@@ -1239,9 +1262,10 @@ async function handleProdImgUpload(input){
   const zone   = document.getElementById('p-img-zone');
 
   // Show preview immediately from local file
-  const reader = new FileReader();
-  reader.onload = e => { prev.src=e.target.result; prev.style.display='block'; };
-  reader.readAsDataURL(file);
+  // Show preview immediately
+  const previewReader = new FileReader();
+  previewReader.onload = e => { prev.src=e.target.result; prev.style.display='block'; };
+  previewReader.readAsDataURL(file);
 
   status.style.display='block'; status.style.color='var(--org)'; status.textContent='⟳ Uploading to Supabase Storage…';
   zone.style.borderColor='var(--org)';
@@ -1280,9 +1304,10 @@ async function handleStateImgUpload(input){
   const zone   = document.getElementById('s-img-zone');
   const stateId= g('s-id');
 
-  const reader = new FileReader();
-  reader.onload = e => { prev.src=e.target.result; prev.style.display='block'; };
-  reader.readAsDataURL(file);
+  // Show preview immediately
+  const previewReader = new FileReader();
+  previewReader.onload = e => { prev.src=e.target.result; prev.style.display='block'; };
+  previewReader.readAsDataURL(file);
 
   status.style.display='block'; status.style.color='var(--org)'; status.textContent='⟳ Uploading to state-photos bucket…';
   zone.style.borderColor='var(--org)';
@@ -1367,18 +1392,20 @@ async function saveFounderPhoto(){
   try {
     const fname = 'founder-' + Date.now() + '.' + file.name.split('.').pop();
     const url = await uploadToStorage(file, 'state-photos', fname);
-    // Upsert to Supabase site_settings — permanent, shows for all visitors
-    // Try PATCH first (update existing), then POST (insert new)
+    // Save URL to Supabase site_settings table
+    // NOTE: Create table first: CREATE TABLE site_settings (key text primary key, value text);
     try {
-      const existing = await callProxy('GET','site_settings','key=eq.founder_image_url');
-      if(existing && existing.length > 0){
+      const rows = await callProxy('GET','site_settings','key=eq.founder_image_url&select=key');
+      if(rows && rows.length > 0){
         await callProxy('PATCH','site_settings','key=eq.founder_image_url',{value:url});
       } else {
         await callProxy('POST','site_settings','',{key:'founder_image_url',value:url});
       }
+      toast('✅ Founder photo live on site for all visitors!','ok');
     } catch(dbErr) {
-      console.warn('site_settings save failed:', dbErr.message);
-      // Still works via localStorage cache
+      // Table may not exist yet — still saved to localStorage as fallback
+      console.warn('site_settings:', dbErr.message);
+      toast('⚠️ Photo uploaded but site_settings table missing — create it in Supabase SQL editor:\nCREATE TABLE site_settings (key text primary key, value text);','er');
     }
     try { localStorage.setItem('pr_founder_image', url); } catch(e){}
     if(btn){ btn.textContent='💾 Save Founder Photo'; btn.disabled=false; }
