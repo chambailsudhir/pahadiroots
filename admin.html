@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-  <meta name="supa-key" content="">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Pahadi Roots — Admin v2</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -175,9 +174,6 @@ textarea.fi{resize:vertical;min-height:80px}
   <button class="nv" onclick="nav('inventory_logs')"><span class="nv-ico">📋</span>Inventory Logs</button>
   <button class="nv" onclick="nav('order_logs')"><span class="nv-ico">🔄</span>Order Logs</button>
   <button class="nv" onclick="nav('admin_logs')"><span class="nv-ico">🔒</span>Admin Logs</button>
-  <div class="sb-sec">Media</div>
-  <button class="nv" onclick="nav('states')"><span class="nv-ico">🗺️</span>States</button>
-  <button class="nv" onclick="nav('media')"><span class="nv-ico">🖼️</span>Media</button>
   <div class="sb-sec">System</div>
   <button class="nv" onclick="nav('db_setup')"><span class="nv-ico">🗄️</span>DB Setup</button>
   <button class="nv" onclick="nav('settings')"><span class="nv-ico">⚙️</span>Settings</button>
@@ -385,33 +381,6 @@ textarea.fi{resize:vertical;min-height:80px}
 </div>
 
 <!-- DB SETUP — all SQL from audit docs -->
-<div class="pg" id="pg-states">
-  <div class="ph"><div><h1>🗺️ States Management</h1></div><button class="btn" onclick="openStateM()">+ Add State</button></div>
-  <div id="states-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;margin-top:16px">
-    <div style="text-align:center;color:var(--tx3);padding:40px">Loading…</div>
-  </div>
-</div>
-
-<div class="pg" id="pg-media">
-  <div class="ph"><div><h1>🖼️ Media & Site Settings</h1></div></div>
-  <div class="sc" style="margin-bottom:16px">
-    <h4 style="margin-bottom:12px">👤 Founder Image</h4>
-    <p style="color:var(--tx3);font-size:13px;margin-bottom:14px">Appears on homepage founder/story section</p>
-    <div style="display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap">
-      <div>
-        <div style="font-size:11px;color:var(--tx3);margin-bottom:4px">Current</div>
-        <img id="founder-preview" src="" style="width:120px;height:140px;object-fit:cover;border-radius:12px;border:2px solid var(--bd);background:var(--bg2)" onerror="this.src=''">
-      </div>
-      <div style="flex:1;min-width:220px">
-        <label class="lbl">Upload New Photo</label>
-        <input type="file" id="founder-file" accept="image/*" class="fi" style="margin-bottom:10px" onchange="previewFounder(this)">
-        <button class="btn btn-g" onclick="uploadFounderImage()" style="margin-bottom:8px">📤 Upload & Save</button>
-        <div id="founder-status" style="font-size:12px;color:var(--tx3)"></div>
-      </div>
-    </div>
-  </div>
-</div>
-
 <div class="pg" id="pg-db_setup">
   <div class="ph"><div><h1>🗄️ DB Setup & Migration</h1><p>Run these SQL scripts in Supabase SQL Editor</p></div></div>
 
@@ -641,7 +610,8 @@ async function api(method, table, query='', body=null){
     headers:{'Content-Type':'application/json','x-admin-password':pw},
     body:JSON.stringify({method,table,query,body}),
   });
-  if(r.status===401){ doLogout(); throw new Error('Session expired'); }
+  if(r.status===401){ toast('Session expired — please login again','er'); setTimeout(doLogout,2000); throw new Error('Unauthorized'); }
+  if(r.status===429){ toast('Too many requests — slowing down','er'); await new Promise(r=>setTimeout(r,1000)); throw new Error('Rate limited'); }
   if(r.status===429){ throw new Error('Rate limited — wait a moment'); }
   if(!r.ok){ let m=''; try{const d=await r.json();m=d.error||JSON.stringify(d);}catch(e){m=await r.text();} throw new Error('['+r.status+'] '+m); }
   const txt=await r.text(); return txt?JSON.parse(txt):null;
@@ -708,7 +678,7 @@ function nav(pg){
   document.getElementById('pg-'+pg)?.classList.add('active');
   document.querySelectorAll('.nv').forEach(b=>{if(b.getAttribute('onclick')?.includes("'"+pg+"'"))b.classList.add('active');});
   document.getElementById('page-title').textContent=pg.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
-  ({dashboard:loadDash,products:()=>loadProducts(1),categories:loadCats,orders:()=>loadOrders(1),customers:()=>loadCustomers(1),coupons:loadCoupons,subscribers:()=>loadSubs(1),reviews:loadReviews,analytics:loadAnalytics,settings:loadSettings,inventory_logs:()=>loadInvLogs(1),order_logs:()=>loadOrdLogs(1),admin_logs:()=>loadAdminLogs(1),db_setup:()=>{},states:loadStates,media:loadMedia})[pg]?.();
+  ({dashboard:loadDash,products:()=>loadProducts(1),categories:loadCats,orders:()=>loadOrders(1),customers:()=>loadCustomers(1),coupons:loadCoupons,subscribers:()=>loadSubs(1),reviews:loadReviews,analytics:loadAnalytics,settings:loadSettings,inventory_logs:()=>loadInvLogs(1),order_logs:()=>loadOrdLogs(1),admin_logs:()=>loadAdminLogs(1),db_setup:()=>{}})[pg]?.();
 }
 
 // ── DASHBOARD — uses revenue_summary view ──
@@ -982,13 +952,9 @@ async function openOrder(o, custId){
         <div class="ri"><span class="l">Payment ID</span><span class="v mono" style="font-size:11px">${o.payment_id||'—'}</span></div>
         <div class="sep"></div>
         <div class="fg" style="margin:0"><label style="font-size:11.5px;font-weight:600;color:var(--tx2);display:block;margin-bottom:5px">Update Order Status</label>
-          <select class="fi" id="ord-status-edit" style="margin-bottom:8px">
+          <select class="fi" id="ord-status-edit">
             ${['pending','confirmed','packed','shipped','delivered','cancelled'].map(s=>`<option value="${s}" ${o.order_status===s?'selected':''}>${s}</option>`).join('')}
           </select>
-          <label style="font-size:11.5px;font-weight:600;color:var(--tx2);display:block;margin-bottom:4px;margin-top:8px">Courier Name</label>
-          <input class="fi" id="ord-courier" placeholder="e.g. Shiprocket, Delhivery" value="${o.courier||''}" style="margin-bottom:8px">
-          <label style="font-size:11.5px;font-weight:600;color:var(--tx2);display:block;margin-bottom:4px">Tracking Number</label>
-          <input class="fi" id="ord-tracking" placeholder="e.g. SR1234567890" value="${o.tracking_number||''}">
         </div>
       </div>
     </div>
@@ -1009,14 +975,7 @@ async function saveOrdStatus(){
   const status=document.getElementById('ord-status-edit').value;
   const btn=document.getElementById('ord-save-btn');btn.disabled=true;btn.textContent='Saving…';
   try{
-    const tracking=document.getElementById('ord-tracking')?.value||null;
-    const courier=document.getElementById('ord-courier')?.value||null;
-    const patchBody={order_status:status,updated_at:new Date().toISOString()};
-    if(tracking) patchBody.tracking_number=tracking;
-    if(courier) patchBody.courier=courier;
-    if(status==='shipped' && !S.currentOrder.shipped_at) patchBody.shipped_at=new Date().toISOString();
-    if(status==='delivered' && !S.currentOrder.delivered_at) patchBody.delivered_at=new Date().toISOString();
-    await PATCH('orders',`id=eq.${S.currentOrder.id}`,patchBody);
+    await PATCH('orders',`id=eq.${S.currentOrder.id}`,{order_status:status,updated_at:new Date().toISOString()});
     try{await POST('order_status_history',{order_id:S.currentOrder.id,old_status:S.currentOrder.order_status,new_status:status});}catch(e){}
     toast('Order updated ✓','ok');closeM('order-modal');await loadOrders(1);
   }catch(e){toast('Error: '+e.message,'er');}
@@ -1342,227 +1301,6 @@ async function testConn(){
     res.style.color='var(--red)';
   }
 }
-
-
-// ══════════════════════════════════════
-// SUPABASE STORAGE UPLOAD
-// ══════════════════════════════════════
-const SUPA_URL = 'https://ulyrhnpoiyuvarulqqi.supabase.co';
-// Service key injected at runtime via Netlify function for uploads
-// For now using anon key - upload policies allow public inserts
-const SUPA_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVseXJobnBvaXlwdXZhdXJscXFpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyOTE5NTYsImV4cCI6MjA4Nzg2Nzk1Nn0.lU_Wi4G84X54BPdjhG_h-N4u2_HSYiAF-12hekDnejk';
-
-async function uploadToStorage(file, folder) {
-  const ext = file.name.split('.').pop().toLowerCase();
-  const filePath = `${folder}-${Date.now()}.${ext}`;
-  const pw = document.getElementById('pw-inp')?.value || '';
-  // Use admin API to get upload URL via service key
-  const res = await fetch(`${SUPA_URL}/storage/v1/object/pahadi-images/${filePath}`, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${SUPA_ANON}`,
-      'Content-Type': file.type,
-      'x-upsert': 'true'
-    },
-    body: file
-  });
-  if (!res.ok) { const t = await res.text(); throw new Error('Upload failed: ' + t); }
-  return `${SUPA_URL}/storage/v1/object/public/pahadi-images/${filePath}`;
-}
-
-// ══════════════════════════════════════
-// STATES MANAGEMENT
-// ══════════════════════════════════════
-async function loadStates() {
-  const grid = document.getElementById('states-grid');
-  if (!grid) return;
-  try {
-    const data = await GET('states', 'order=name.asc');
-    if (!data || !data.length) {
-      grid.innerHTML = '<div style="text-align:center;color:var(--tx3);padding:40px;grid-column:1/-1">No states yet. Click + Add State to begin.</div>';
-      return;
-    }
-    grid.innerHTML = data.map(s => `
-      <div class="sc" style="margin:0;padding:0;overflow:hidden;border-radius:14px">
-        <div style="position:relative;height:140px;background:var(--bg2)">
-          ${s.image_path ? `<img src="${s.image_path}" style="width:100%;height:100%;object-fit:cover">` : '<div style="height:100%;display:flex;align-items:center;justify-content:center;font-size:40px">🏔️</div>'}
-          <span class="badge ${s.is_active?'bg':'br'}" style="position:absolute;top:8px;right:8px">${s.is_active?'Active':'Inactive'}</span>
-        </div>
-        <div style="padding:12px">
-          <div style="font-weight:700;font-size:14px;margin-bottom:4px">${s.name}</div>
-          <div style="font-size:12px;color:var(--tx3);margin-bottom:10px">${s.description||'—'}</div>
-          <div style="display:flex;gap:6px">
-            <button class="btn btn-s btn-sm" onclick='openStateM(${JSON.stringify(s).replace(/'/g,"&#39;")})'>✏️ Edit</button>
-            <button class="btn btn-s btn-sm" style="background:var(--red);color:#fff" onclick="deleteState('${s.id}')">🗑️</button>
-          </div>
-        </div>
-      </div>`).join('');
-  } catch(e) {
-    grid.innerHTML = `<div style="color:var(--red);padding:20px;grid-column:1/-1">Error loading states: ${e.message}</div>`;
-  }
-}
-
-function openStateM(s) {
-  s = s || {};
-  document.getElementById('state-m-title').textContent = s.id ? 'Edit State' : 'Add State';
-  document.getElementById('state-id').value = s.id || '';
-  document.getElementById('state-name').value = s.name || '';
-  document.getElementById('state-desc').value = s.description || '';
-  document.getElementById('state-img-url').value = s.image_path || '';
-  document.getElementById('state-active').checked = s.is_active !== false;
-  document.getElementById('state-file').value = '';
-  const prev = document.getElementById('state-img-preview');
-  if (s.image_path) { prev.src = s.image_path; prev.style.display = 'block'; }
-  else { prev.src = ''; prev.style.display = 'none'; }
-  openM('state-modal');
-}
-
-function previewStateImg(input) {
-  const file = input.files[0]; if (!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    const prev = document.getElementById('state-img-preview');
-    prev.src = e.target.result; prev.style.display = 'block';
-    document.getElementById('state-img-url').value = '';
-  };
-  reader.readAsDataURL(file);
-}
-
-async function saveState() {
-  const id = document.getElementById('state-id').value;
-  const name = document.getElementById('state-name').value.trim();
-  if (!name) { toast('State name required','er'); return; }
-  const btn = document.getElementById('state-save-btn');
-  btn.disabled = true; btn.textContent = 'Saving…';
-  try {
-    let imageUrl = document.getElementById('state-img-url').value.trim();
-    const file = document.getElementById('state-file').files[0];
-    if (file) {
-      toast('Uploading image…','ok');
-      imageUrl = await uploadToStorage(file, `states/${name.toLowerCase().replace(/\s+/g,'-')}`);
-    }
-    const body = {
-      name,
-      description: document.getElementById('state-desc').value.trim() || null,
-      image_path: imageUrl || null,
-      is_active: document.getElementById('state-active').checked,
-      updated_at: new Date().toISOString()
-    };
-    if (id) await PATCH('states', `id=eq.${id}`, body);
-    else await POST('states', body);
-    toast('State saved ✓','ok');
-    closeM('state-modal');
-    await loadStates();
-  } catch(e) { toast('Error: '+e.message,'er'); }
-  btn.disabled = false; btn.textContent = '💾 Save';
-}
-
-async function deleteState(id) {
-  if (!confirm('Delete this state?')) return;
-  try { await DEL('states', `id=eq.${id}`); toast('Deleted','ok'); await loadStates(); }
-  catch(e) { toast('Error: '+e.message,'er'); }
-}
-
-// ══════════════════════════════════════
-// MEDIA / FOUNDER IMAGE  
-// ══════════════════════════════════════
-async function loadMedia() {
-  try {
-    const data = await GET('site_settings', 'key=eq.founder_image_url&select=value');
-    const url = data?.[0]?.value || '';
-    const img = document.getElementById('founder-preview');
-    if (url && img) { img.src = url; }
-  } catch(e) { console.warn('Media load failed:', e); }
-}
-
-function previewFounder(input) {
-  const file = input.files[0]; if (!file) return;
-  const reader = new FileReader();
-  reader.onload = e => { document.getElementById('founder-preview').src = e.target.result; };
-  reader.readAsDataURL(file);
-}
-
-async function uploadFounderImage() {
-  const file = document.getElementById('founder-file').files[0];
-  const status = document.getElementById('founder-status');
-  if (!file) { toast('Please select a file first','er'); return; }
-  status.textContent = 'Uploading…'; status.style.color = 'var(--tx3)';
-  try {
-    const url = await uploadToStorage(file, 'founder/founder');
-    const existing = await GET('site_settings', 'key=eq.founder_image_url').catch(()=>[]);
-    if (existing && existing.length > 0) {
-      await PATCH('site_settings', 'key=eq.founder_image_url', {value: url});
-    } else {
-      await POST('site_settings', {key: 'founder_image_url', value: url});
-    }
-    document.getElementById('founder-preview').src = url;
-    status.textContent = '✓ Saved! Refresh homepage to see changes.';
-    status.style.color = 'var(--grn)';
-    toast('Founder image updated ✓','ok');
-  } catch(e) {
-    status.textContent = 'Error: ' + e.message;
-    status.style.color = 'var(--red)';
-    toast('Upload failed: '+e.message,'er');
-  }
-}
-
 </script>
-
-<!-- States Modal -->
-<div class="modal" id="state-modal">
-  <div class="modal-box" style="max-width:480px">
-    <div class="modal-hd"><span id="state-title">Add State</span><button class="cls-btn" onclick="closeM('state-modal')">✕</button></div>
-    <div style="padding:20px;display:flex;flex-direction:column;gap:12px">
-      <input type="hidden" id="state-id">
-      <div class="fg"><label class="lbl">State Name *</label><input class="fi" id="state-name" placeholder="e.g. Himachal Pradesh"></div>
-      <div class="fg"><label class="lbl">Description</label><textarea class="fi" id="state-desc" rows="2" placeholder="Brief description..."></textarea></div>
-      <div class="fg">
-        <label class="lbl">State Image</label>
-        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-          <img id="state-img-preview" src="" style="width:80px;height:60px;object-fit:cover;border-radius:8px;border:1px solid var(--bd);display:none">
-          <div style="flex:1">
-            <input type="file" id="state-file" accept="image/*" class="fi" style="margin-bottom:6px" onchange="previewStateImg(this)">
-            <div style="font-size:11px;color:var(--tx3)">Or paste URL:</div>
-            <input class="fi" id="state-img-url" placeholder="https://..." style="margin-top:4px">
-          </div>
-        </div>
-      </div>
-      <div class="fg" style="flex-direction:row;align-items:center;gap:8px">
-        <input type="checkbox" id="state-active" checked style="width:16px;height:16px">
-        <label style="font-size:13px;font-weight:600">Active</label>
-      </div>
-    </div>
-    <div class="modal-ft"><button class="btn btn-g" id="state-save-btn" onclick="saveState()">💾 Save State</button><button class="btn" onclick="closeM('state-modal')">Cancel</button></div>
-  </div>
-</div>
-
-
-<!-- State Modal -->
-<div class="modal" id="state-modal">
-  <div class="modal-box" style="max-width:460px">
-    <div class="modal-hd"><span id="state-m-title">Add State</span><button class="cls-btn" onclick="closeM('state-modal')">✕</button></div>
-    <div style="padding:20px;display:flex;flex-direction:column;gap:12px">
-      <input type="hidden" id="state-id">
-      <div class="fg"><label class="lbl">State Name *</label><input class="fi" id="state-name" placeholder="e.g. Himachal Pradesh"></div>
-      <div class="fg"><label class="lbl">Description</label><textarea class="fi" id="state-desc" rows="2" placeholder="Brief description about the region..."></textarea></div>
-      <div class="fg">
-        <label class="lbl">State Image</label>
-        <img id="state-img-preview" src="" style="width:100%;height:140px;object-fit:cover;border-radius:8px;border:1px solid var(--bd);margin-bottom:8px;display:none">
-        <input type="file" id="state-file" accept="image/*" class="fi" style="margin-bottom:6px" onchange="previewStateImg(this)">
-        <label class="lbl" style="margin-top:4px">Or paste image URL</label>
-        <input class="fi" id="state-img-url" placeholder="https://...">
-      </div>
-      <div style="display:flex;align-items:center;gap:8px">
-        <input type="checkbox" id="state-active" checked style="width:16px;height:16px;cursor:pointer">
-        <label style="font-size:13px;font-weight:600;cursor:pointer" for="state-active">Active (visible on site)</label>
-      </div>
-    </div>
-    <div class="modal-ft">
-      <button class="btn btn-g" id="state-save-btn" onclick="saveState()">💾 Save</button>
-      <button class="btn" onclick="closeM('state-modal')">Cancel</button>
-    </div>
-  </div>
-</div>
-
 </body>
 </html>
