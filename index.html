@@ -1536,7 +1536,7 @@ async function checkout() {
   // ── Save order to Supabase so admin can see it ──────────────
   try {
     var SB_URL  = 'https://ulyrhnpoiyuvarulqqi.supabase.co';
-    var SB_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml4Ymxucmd3dml0anRjYWxsZWF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM3NjIzNjYsImV4cCI6MjA1OTMzODM2Nn0.2MWQ0sIzRKCGWT7F-xnMNBnBNWJJpFzC1fFncXbP-jI';
+    var SB_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVseXJobnBvaXlwdXZhdXJscXFpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyOTE5NTYsImV4cCI6MjA4Nzg2Nzk1Nn0.lU_Wi4G84X54BPdjhG_h-N4u2_HSYiAF-12hekDnejk';
     var headers = {'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Prefer':'return=representation'};
 
     // 1. Upsert customer (match by phone)
@@ -2087,8 +2087,8 @@ function loadFI() {
     // 1. Try Supabase site_settings (permanent, works for ALL visitors)
     fetch('https://ulyrhnpoiyuvarulqqi.supabase.co/rest/v1/site_settings?key=eq.founder_image_url&select=value', {
       headers: {
-        'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml4Ymxucmd3dml0anRjYWxsZWF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM3NjIzNjYsImV4cCI6MjA1OTMzODM2Nn0.2MWQ0sIzRKCGWT7F-xnMNBnBNWJJpFzC1fFncXbP-jI',
-        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml4Ymxucmd3dml0anRjYWxsZWF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM3NjIzNjYsImV4cCI6MjA1OTMzODM2Nn0.2MWQ0sIzRKCGWT7F-xnMNBnBNWJJpFzC1fFncXbP-jI'
+        'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVseXJobnBvaXlwdXZhdXJscXFpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyOTE5NTYsImV4cCI6MjA4Nzg2Nzk1Nn0.lU_Wi4G84X54BPdjhG_h-N4u2_HSYiAF-12hekDnejk',
+        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVseXJobnBvaXlwdXZhdXJscXFpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyOTE5NTYsImV4cCI6MjA4Nzg2Nzk1Nn0.lU_Wi4G84X54BPdjhG_h-N4u2_HSYiAF-12hekDnejk'
       }
     }).then(function(r){ return r.json(); })
     .then(function(data){
