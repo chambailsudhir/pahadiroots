@@ -688,6 +688,7 @@ footer{background:#0d1a0f;padding:44px 40px 24px}
 .del-input:focus{border-color:var(--g)}
 .del-input.req-err{border-color:#e05252}
 </style>
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 </head>
 
 <body>
@@ -1052,7 +1053,8 @@ footer{background:#0d1a0f;padding:44px 40px 24px}
             </div>
           </div>
         </div>
-        <button class="chkbtn" onclick="checkout()">Proceed to WhatsApp Checkout →</button>
+        <button class="chkbtn" onclick="checkoutRazorpay()" style="background:linear-gradient(135deg,#2d6a4f,#40916c);margin-bottom:10px">💳 Pay Online (UPI · Cards · Net Banking)</button>
+        <button class="chkbtn" onclick="checkout()" style="background:linear-gradient(135deg,#e76f51,#f4a261)">📱 COD + WhatsApp Confirm →</button>
         <div class="cpays">📱 UPI &nbsp;·&nbsp; 💳 Cards &nbsp;·&nbsp; 🏧 Net Banking &nbsp;·&nbsp; 🚪 COD</div>
         <div class="cpage-secure">🔒 100% Secure & Encrypted Checkout</div>
       </div>
@@ -1492,6 +1494,120 @@ function closeCart() {
   if (cp) { cp.classList.remove('open'); document.body.style.overflow = ''; }
 }
 
+
+// ── RAZORPAY PAYMENT ────────────────────────────────────────────────
+async function checkoutRazorpay() {
+  if (!cart.length) { showToast('🛒 Cart is empty!'); return; }
+
+  var name  = (document.getElementById('del-name') ||{}).value||'';
+  var phone = (document.getElementById('del-phone')||{}).value||'';
+  var addr  = (document.getElementById('del-addr') ||{}).value||'';
+  var city  = (document.getElementById('del-city') ||{}).value||'';
+  var pin   = (document.getElementById('del-pin')  ||{}).value||'';
+  var state = (document.getElementById('del-state')||{}).value||'';
+  var email = (document.getElementById('del-email')||{}).value||'';
+
+  var err = false;
+  ['del-name','del-phone','del-addr','del-city','del-pin'].forEach(function(id){
+    var el = document.getElementById(id);
+    if(el && !el.value.trim()){ el.classList.add('req-err'); err=true; }
+    else if(el) el.classList.remove('req-err');
+  });
+  if(err){ showToast('📍 Please fill in all delivery details'); document.getElementById('del-form').scrollIntoView({behavior:'smooth',block:'center'}); return; }
+  if(phone.replace(/\D/g,'').length < 10){ showToast('📱 Enter valid 10-digit phone'); return; }
+
+  var t = cart.reduce(function(a,i){return a+i.price*i.qty;},0);
+  var discount = calcDiscount(t);
+  var final = Math.max(0, t - discount);
+
+  var options = {
+    key: 'rzp_live_SNFVJBHdd3dYRQ',
+    amount: final * 100, // paise
+    currency: 'INR',
+    name: 'Pahadi Roots',
+    description: 'Himalayan Organic Products',
+    image: 'https://pahadiroots.com/images/logo.png',
+    prefill: {
+      name: name.trim(),
+      contact: phone.trim(),
+      email: email.trim() || 'customer@pahadiroots.com'
+    },
+    notes: {
+      address: addr.trim()+', '+city.trim()+', '+state+' - '+pin.trim()
+    },
+    theme: { color: '#2d6a4f' },
+    handler: async function(response) {
+      showToast('✅ Payment successful! Saving order...');
+      await saveOrderToDB(name, phone, email, addr, city, state, pin, final, discount, 'razorpay_online', response.razorpay_payment_id);
+      // Send WhatsApp confirmation
+      var msg = '*Payment Received — Pahadi Roots* 🌿\n\n'+
+        '✅ *Payment ID:* '+response.razorpay_payment_id+'\n'+
+        '👤 *'+name.trim()+'*\n📱 '+phone.trim()+'\n\n'+
+        '📍 '+addr.trim()+', '+city.trim()+' - '+pin.trim()+'\n\n'+
+        '🛒 *Items*\n'+
+        cart.map(function(i){return '• '+i.name+' ×'+i.qty+' = ₹'+(i.price*i.qty);}).join('\n')+
+        '\n\n*Total Paid: ₹'+final+'*';
+      cart = []; renderCart(); updateCartBadge();
+      try{ localStorage.removeItem('pr_cart'); }catch(e){}
+      showToast('🎉 Order placed! You will receive confirmation shortly.');
+      window.open('https://wa.me/919899984895?text='+encodeURIComponent(msg),'_blank');
+    },
+    modal: {
+      ondismiss: function(){ showToast('Payment cancelled'); }
+    }
+  };
+
+  var rzp = new Razorpay(options);
+  rzp.open();
+}
+
+// ── SAVE ORDER TO DB (shared by both payment methods) ───────────────
+async function saveOrderToDB(name, phone, email, addr, city, state, pin, final, discount, payMethod, paymentId) {
+  try {
+    var SB_URL = 'https://ulyrhnpoiyuvarulqqi.supabase.co';
+    var SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVseXJobnBvaXlwdXZhdXJscXFpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyOTE5NTYsImV4cCI6MjA4Nzg2Nzk1Nn0.lU_Wi4G84X54BPdjhG_h-N4u2_HSYiAF-12hekDnejk';
+    var headers = {'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Prefer':'return=representation'};
+
+    // 1. Upsert customer
+    var custBody = {first_name:name.trim(), phone:phone.trim(), email:email.trim()||null, address_line1:addr.trim(), city:city.trim(), state:state.trim()||null, postal_code:pin.trim()};
+    var cr = await fetch(SB_URL+'/rest/v1/customers?phone=eq.'+encodeURIComponent(phone.trim()), {method:'GET', headers:headers});
+    var existingCusts = await cr.json();
+    var custId = null;
+    if(existingCusts && existingCusts.length > 0){
+      custId = existingCusts[0].id;
+      await fetch(SB_URL+'/rest/v1/customers?id=eq.'+custId, {method:'PATCH', headers:headers, body:JSON.stringify(custBody)});
+    } else {
+      var insr = await fetch(SB_URL+'/rest/v1/customers', {method:'POST', headers:headers, body:JSON.stringify(custBody)});
+      var newCust = await insr.json();
+      if(newCust && newCust[0]) custId = newCust[0].id;
+    }
+
+    // 2. Create order
+    var orderBody = {
+      customer_id: custId,
+      total_amount: final,
+      order_status: payMethod === 'razorpay_online' ? 'confirmed' : 'pending',
+      payment_status: payMethod === 'razorpay_online' ? 'paid' : 'pending',
+      payment_method: payMethod,
+      payment_id: paymentId || null,
+      coupon_discount: discount || null
+    };
+    var or = await fetch(SB_URL+'/rest/v1/orders', {method:'POST', headers:headers, body:JSON.stringify(orderBody)});
+    var newOrder = await or.json();
+    var orderId = newOrder && newOrder[0] ? newOrder[0].id : null;
+
+    // 3. Save order items
+    if(orderId){
+      var items = cart.map(function(i){ return {order_id:orderId, product_id:i.id||null, quantity:i.qty, price_at_time:i.price}; });
+      await fetch(SB_URL+'/rest/v1/order_items', {method:'POST', headers:{'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY}, body:JSON.stringify(items)});
+    }
+    return orderId;
+  } catch(e) {
+    console.warn('Order save failed:', e.message);
+    return null;
+  }
+}
+
 async function checkout() {
   if (!cart.length) { showToast('🛒 Cart is empty!'); return; }
 
@@ -1533,51 +1649,8 @@ async function checkout() {
   // Save customer info locally for repeat use
   try { localStorage.setItem('pr_cust_info', JSON.stringify({name:name.trim(),phone:phone.trim(),addr:addr.trim(),city:city.trim(),state:state.trim(),pin:pin.trim(),email:email.trim()})); } catch(e){}
 
-  // ── Save order to Supabase so admin can see it ──────────────
-  try {
-    var SB_URL  = 'https://ulyrhnpoiyuvarulqqi.supabase.co';
-    var SB_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVseXJobnBvaXlwdXZhdXJscXFpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyOTE5NTYsImV4cCI6MjA4Nzg2Nzk1Nn0.lU_Wi4G84X54BPdjhG_h-N4u2_HSYiAF-12hekDnejk';
-    var headers = {'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Prefer':'return=representation'};
-
-    // 1. Upsert customer (match by phone)
-    var custBody = {name:name.trim(), phone:phone.trim(), email:email.trim()||null, address_line1:addr.trim(), city:city.trim(), state:state.trim()||null, pincode:pin.trim()};
-    var cr = await fetch(SB_URL+'/rest/v1/customers?phone=eq.'+encodeURIComponent(phone.trim()), {method:'GET', headers:headers});
-    var existingCusts = await cr.json();
-    var custId = null;
-    if(existingCusts && existingCusts.length > 0){
-      custId = existingCusts[0].id;
-      // Update address in case it changed
-      await fetch(SB_URL+'/rest/v1/customers?id=eq.'+custId, {method:'PATCH', headers:headers, body:JSON.stringify(custBody)});
-    } else {
-      var insr = await fetch(SB_URL+'/rest/v1/customers', {method:'POST', headers:headers, body:JSON.stringify(custBody)});
-      var newCust = await insr.json();
-      if(newCust && newCust[0]) custId = newCust[0].id;
-    }
-
-    // 2. Create order
-    var orderBody = {
-      customer_id: custId,
-      total_amount: final,
-      total_items: cart.reduce(function(a,i){return a+i.qty;},0),
-      order_status: 'pending',
-      payment_method: 'whatsapp_cod',
-      coupon_code: activeCoupon ? activeCoupon.code : null,
-      discount_amount: discount||null,
-      notes: null
-    };
-    var or = await fetch(SB_URL+'/rest/v1/orders', {method:'POST', headers:headers, body:JSON.stringify(orderBody)});
-    var newOrder = await or.json();
-    var orderId = newOrder && newOrder[0] ? newOrder[0].id : null;
-
-    // 3. Save order items
-    if(orderId){
-      var items = cart.map(function(i){ return {order_id:orderId, product_id:i.id||null, product_name:i.name, quantity:i.qty, unit_price:i.price}; });
-      await fetch(SB_URL+'/rest/v1/order_items', {method:'POST', headers:{'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY}, body:JSON.stringify(items)});
-    }
-  } catch(saveErr) {
-    // Silently fail — WhatsApp order still goes through
-    console.warn('Order save to DB failed:', saveErr.message);
-  }
+  // Save order to DB
+  try { await saveOrderToDB(name, phone, email, addr, city, state, pin, final, discount, 'whatsapp_cod', null); } catch(e) { console.warn('DB save failed:', e); }
 
   window.open('https://wa.me/919899984895?text=' + encodeURIComponent(msg), '_blank');
 }
