@@ -1291,4 +1291,15 @@ async function saveConfig(){
 async function testConn(){
   const res=document.getElementById('conn-res');res.textContent='Testing…';
   try{
-    const t0=Date.
+    const t0=Date.now();
+    await GET('categories','limit=1');
+    res.textContent='✓ Connected in '+(Date.now()-t0)+'ms';
+    res.style.color='var(--grn)';
+  }catch(e){
+    res.textContent='✗ '+e.message;
+    res.style.color='var(--red)';
+  }
+}
+</script>
+</body>
+</html>

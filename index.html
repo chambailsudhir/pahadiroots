@@ -1535,7 +1535,7 @@ async function checkout() {
 
   // ── Save order to Supabase so admin can see it ──────────────
   try {
-    var SB_URL  = 'https://ixblnpgwvitjtcalleaw.supabase.co';
+    var SB_URL  = 'https://ulyrhnpoiyuvarulqqi.supabase.co';
     var SB_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml4Ymxucmd3dml0anRjYWxsZWF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM3NjIzNjYsImV4cCI6MjA1OTMzODM2Nn0.2MWQ0sIzRKCGWT7F-xnMNBnBNWJJpFzC1fFncXbP-jI';
     var headers = {'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Prefer':'return=representation'};
 
@@ -1559,7 +1559,7 @@ async function checkout() {
       customer_id: custId,
       total_amount: final,
       total_items: cart.reduce(function(a,i){return a+i.qty;},0),
-      status: 'pending',
+      order_status: 'pending',
       payment_method: 'whatsapp_cod',
       coupon_code: activeCoupon ? activeCoupon.code : null,
       discount_amount: discount||null,
@@ -2085,7 +2085,7 @@ function loadFI() {
     }
 
     // 1. Try Supabase site_settings (permanent, works for ALL visitors)
-    fetch('https://ixblnpgwvitjtcalleaw.supabase.co/rest/v1/site_settings?key=eq.founder_image_url&select=value', {
+    fetch('https://ulyrhnpoiyuvarulqqi.supabase.co/rest/v1/site_settings?key=eq.founder_image_url&select=value', {
       headers: {
         'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml4Ymxucmd3dml0anRjYWxsZWF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM3NjIzNjYsImV4cCI6MjA1OTMzODM2Nn0.2MWQ0sIzRKCGWT7F-xnMNBnBNWJJpFzC1fFncXbP-jI',
         'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml4Ymxucmd3dml0anRjYWxsZWF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM3NjIzNjYsImV4cCI6MjA1OTMzODM2Nn0.2MWQ0sIzRKCGWT7F-xnMNBnBNWJJpFzC1fFncXbP-jI'
