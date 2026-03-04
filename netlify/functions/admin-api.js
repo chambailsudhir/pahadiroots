@@ -56,11 +56,18 @@ function isRateLimited(ip) {
 async function sbFetch(method, table, query = '', body = null) {
   let url = `${SUPABASE_URL}/rest/v1/${table}`;
   if (query) url += `?${query}`;
+  // Support both legacy eyJ... JWT keys and new sb_secret_... keys
+  const authHeaders = SUPABASE_KEY.startsWith('sb_') ? {
+    'Authorization': `Bearer ${SUPABASE_KEY}`,
+    'apikey': SUPABASE_KEY,
+  } : {
+    'apikey': SUPABASE_KEY,
+    'Authorization': `Bearer ${SUPABASE_KEY}`,
+  };
   const r = await fetch(url, {
     method,
     headers: {
-      'apikey':        SUPABASE_KEY,
-      'Authorization': `Bearer ${SUPABASE_KEY}`,
+      ...authHeaders,
       'Content-Type':  'application/json',
       'Prefer':        'return=representation',
     },
