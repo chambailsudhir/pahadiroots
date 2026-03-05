@@ -1179,7 +1179,7 @@ function getStoreApiBase() {
   if (override) return override.replace(/\/$/, '');
   var host = location.hostname;
   if (host.includes('.vercel.app') || host.includes('.vercel.sh')) return '/api';
-  return '/.netlify/functions';
+  return '/api';
 }
 
 // ── DATA LOADING ───────────────────────────────────────────────────
