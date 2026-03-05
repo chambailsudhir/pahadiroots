@@ -483,7 +483,7 @@ CREATE INDEX IF NOT EXISTS idx_products_is_deleted ON products(is_deleted);</div
     <div>
       <div class="sc">
         <h4>🔌 Connection</h4>
-        <button class="btn btn-s" onclick="testConn()">🔌 Test Netlify Function</button>
+        <button class="btn btn-s" onclick="testConn()">🔌 Test Connection</button>
         <div id="conn-res" style="margin-top:10px;font-size:12.5px"></div>
       </div>
       <div class="sc">
@@ -1443,28 +1443,26 @@ function copySQL(btn){
 // ══════════════════════════════════════════════════════════
 // SUPABASE STORAGE UPLOAD
 // ══════════════════════════════════════════════════════════
-const SUPA_STORAGE = 'https://ulyrhnpoiyuvarulqqi.supabase.co/storage/v1/object';
+// Direct browser → Supabase upload (no Vercel size limit)
 const SUPA_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVseXJobnBvaXlwdXZhdXJscXFpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyOTE5NTYsImV4cCI6MjA4Nzg2Nzk1Nn0.lU_Wi4G84X54BPdjhG_h-N4u2_HSYiAF-12hekDnejk';
 
 async function uploadToStorage(file, folder) {
   const ext = file.name.split('.').pop().toLowerCase();
   const fileName = `${folder}-${Date.now()}.${ext}`;
-  // Convert to base64 and upload via admin API (avoids CORS issues)
-  const base64 = await new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result.split(',')[1]);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-  const pw = sessionStorage.getItem('pr_pw');
-  const res = await fetch('/api/admin-api', {
+  const res = await fetch(`https://ulyrhnpoiypuvaurlqqi.supabase.co/storage/v1/object/pahadi-images/${fileName}`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'x-admin-password': pw },
-    body: JSON.stringify({ action: 'storage_upload', fileName, fileType: file.type, fileBase64: base64 })
+    headers: {
+      'Authorization': `Bearer ${SUPA_ANON}`,
+      'Content-Type': file.type,
+      'x-upsert': 'true'
+    },
+    body: file
   });
-  if (!res.ok) { const d = await res.json(); throw new Error(d.error || 'Upload failed'); }
-  const data = await res.json();
-  return data.url;
+  if (!res.ok) {
+    const e = await res.json().catch(() => ({ message: 'Upload failed' }));
+    throw new Error(JSON.stringify(e));
+  }
+  return `https://ulyrhnpoiypuvaurlqqi.supabase.co/storage/v1/object/public/pahadi-images/${fileName}`;
 }
 
 // ══════════════════════════════════════════════════════════
