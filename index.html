@@ -1564,7 +1564,7 @@ async function checkoutRazorpay() {
 // ── SAVE ORDER TO DB (shared by both payment methods) ───────────────
 async function saveOrderToDB(name, phone, email, addr, city, state, pin, final, discount, payMethod, paymentId) {
   try {
-    var SB_URL = 'https://ulyrhnpoiyuvarulqqi.supabase.co';
+    var SB_URL = 'https://ulyrhnpoiypuvaurlqqi.supabase.co';
     var SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVseXJobnBvaXlwdXZhdXJscXFpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyOTE5NTYsImV4cCI6MjA4Nzg2Nzk1Nn0.lU_Wi4G84X54BPdjhG_h-N4u2_HSYiAF-12hekDnejk';
     var headers = {'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Prefer':'return=representation'};
 
@@ -2158,7 +2158,7 @@ function loadFI() {
     }
 
     // 1. Try Supabase site_settings (permanent, works for ALL visitors)
-    fetch('https://ulyrhnpoiyuvarulqqi.supabase.co/rest/v1/site_settings?key=eq.founder_image_url&select=value', {
+    fetch('https://ulyrhnpoiypuvaurlqqi.supabase.co/rest/v1/site_settings?key=eq.founder_image_url&select=value', {
       headers: {
         'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVseXJobnBvaXlwdXZhdXJscXFpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyOTE5NTYsImV4cCI6MjA4Nzg2Nzk1Nn0.lU_Wi4G84X54BPdjhG_h-N4u2_HSYiAF-12hekDnejk',
         'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVseXJobnBvaXlwdXZhdXJscXFpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyOTE5NTYsImV4cCI6MjA4Nzg2Nzk1Nn0.lU_Wi4G84X54BPdjhG_h-N4u2_HSYiAF-12hekDnejk'
