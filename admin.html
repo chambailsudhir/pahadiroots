@@ -174,6 +174,9 @@ textarea.fi{resize:vertical;min-height:80px}
   <button class="nv" onclick="nav('inventory_logs')"><span class="nv-ico">📋</span>Inventory Logs</button>
   <button class="nv" onclick="nav('order_logs')"><span class="nv-ico">🔄</span>Order Logs</button>
   <button class="nv" onclick="nav('admin_logs')"><span class="nv-ico">🔒</span>Admin Logs</button>
+  <div class="sb-sec">Media</div>
+  <button class="nv" onclick="nav('states')"><span class="nv-ico">🗺️</span>States</button>
+  <button class="nv" onclick="nav('media')"><span class="nv-ico">🖼️</span>Media</button>
   <div class="sb-sec">System</div>
   <button class="nv" onclick="nav('db_setup')"><span class="nv-ico">🗄️</span>DB Setup</button>
   <button class="nv" onclick="nav('settings')"><span class="nv-ico">⚙️</span>Settings</button>
@@ -380,6 +383,39 @@ textarea.fi{resize:vertical;min-height:80px}
   <div class="sc"><h4>Coupon Usage</h4><div id="an-coupons"><div class="loading">Loading…</div></div></div>
 </div>
 
+
+<!-- STATES MANAGEMENT -->
+<div class="pg" id="pg-states">
+  <div class="ph">
+    <div><h1>🗺️ States Management</h1><p>Manage Himalayan state images shown on homepage</p></div>
+    <button class="btn btn-p" onclick="openStateM()">+ Add State</button>
+  </div>
+  <div id="states-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;margin-top:4px">
+    <div style="text-align:center;color:var(--tx3);padding:40px;grid-column:1/-1">Loading…</div>
+  </div>
+</div>
+
+<!-- MEDIA / FOUNDER IMAGE -->
+<div class="pg" id="pg-media">
+  <div class="ph"><div><h1>🖼️ Media & Site Settings</h1></div></div>
+  <div class="sc" style="max-width:600px">
+    <h4 style="margin-bottom:4px">👤 Founder / Story Section Image</h4>
+    <p style="color:var(--tx3);font-size:13px;margin-bottom:16px">This appears as the background of the "Our Story" section on homepage</p>
+    <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start">
+      <div>
+        <div style="font-size:11px;color:var(--tx3);margin-bottom:6px;font-weight:600">CURRENT</div>
+        <img id="founder-preview" src="" style="width:140px;height:160px;object-fit:cover;border-radius:12px;border:2px solid var(--bd);background:var(--bg2);display:block" onerror="this.style.opacity='.3'">
+      </div>
+      <div style="flex:1;min-width:200px">
+        <label class="lbl">Upload New Photo</label>
+        <input type="file" id="founder-file" accept="image/*" class="fi" onchange="previewFounder(this)" style="margin-bottom:10px">
+        <button class="btn btn-g" onclick="uploadFounderImage()" style="width:100%;justify-content:center;margin-bottom:8px">📤 Upload & Save to Site</button>
+        <div id="founder-status" style="font-size:12px;color:var(--tx3)"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- DB SETUP — all SQL from audit docs -->
 <div class="pg" id="pg-db_setup">
   <div class="ph"><div><h1>🗄️ DB Setup & Migration</h1><p>Run these SQL scripts in Supabase SQL Editor</p></div></div>
@@ -487,7 +523,8 @@ CREATE INDEX IF NOT EXISTS idx_products_is_deleted ON products(is_deleted);</div
       </div>
       <div class="fg"><label>Short Description</label><textarea class="fi" id="p-desc" rows="2"></textarea></div>
       <div class="gr gr2">
-        <div class="fg"><label>Image URL</label><input class="fi" id="p-img"></div>
+        <div class="fg"><label>Image URL</label><input class="fi" id="p-img" style="flex:1">
+          <button type="button" class="btn btn-s" onclick="openProdImgUpload()" style="margin-top:6px">📤 Upload Image</button></div>
         <div class="fg"><label>Emoji</label><input class="fi" id="p-emoji" style="font-size:20px;width:80px"></div>
       </div>
       <div class="fg"><label>Tags (comma separated)</label><input class="fi" id="p-tags"></div>
@@ -611,7 +648,7 @@ async function api(method, table, query='', body=null){
     body:JSON.stringify({method,table,query,body}),
   });
   if(r.status===401){ toast('Session expired — please login again','er'); setTimeout(doLogout,2000); throw new Error('Unauthorized'); }
-  if(r.status===429){ toast('Too many requests — please wait','er'); throw new Error('Rate limited'); }
+  if(r.status===429){ throw new Error('Rate limited — wait a moment'); }
   if(!r.ok){ let m=''; try{const d=await r.json();m=d.error||JSON.stringify(d);}catch(e){m=await r.text();} throw new Error('['+r.status+'] '+m); }
   const txt=await r.text(); return txt?JSON.parse(txt):null;
 }
@@ -629,19 +666,6 @@ async function pagedGET(table, baseQuery, page=1){
   // Since we go through proxy, we ask for one extra row to detect hasMore
   const data=await GET(table,q);
   return data||[];
-}
-
-
-// ── Toast notifications ──
-function toast(msg, type='ok'){
-  const t=document.getElementById('toast');
-  if(!t) return;
-  const d=document.createElement('div');
-  d.className='toast-item '+(type==='ok'?'t-ok':type==='er'?'t-er':'t-info');
-  d.style.cssText='background:'+(type==='ok'?'#2d6a4f':type==='er'?'#c0392b':'#1a3a5c')+';color:#fff;padding:10px 18px;border-radius:10px;font-size:13px;font-weight:600;box-shadow:0 4px 16px rgba(0,0,0,.3);animation:fadeIn .2s ease;pointer-events:auto';
-  d.textContent=msg;
-  t.appendChild(d);
-  setTimeout(()=>d.remove(),3500);
 }
 
 // ── AUTH ──
@@ -690,7 +714,7 @@ function nav(pg){
   document.getElementById('pg-'+pg)?.classList.add('active');
   document.querySelectorAll('.nv').forEach(b=>{if(b.getAttribute('onclick')?.includes("'"+pg+"'"))b.classList.add('active');});
   document.getElementById('page-title').textContent=pg.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
-  ({dashboard:loadDash,products:()=>loadProducts(1),categories:loadCats,orders:()=>loadOrders(1),customers:()=>loadCustomers(1),coupons:loadCoupons,subscribers:()=>loadSubs(1),reviews:loadReviews,analytics:loadAnalytics,settings:loadSettings,inventory_logs:()=>loadInvLogs(1),order_logs:()=>loadOrdLogs(1),admin_logs:()=>loadAdminLogs(1),db_setup:()=>{}})[pg]?.();
+  ({dashboard:loadDash,products:()=>loadProducts(1),categories:loadCats,orders:()=>loadOrders(1),customers:()=>loadCustomers(1),coupons:loadCoupons,subscribers:()=>loadSubs(1),reviews:loadReviews,analytics:loadAnalytics,settings:loadSettings,inventory_logs:()=>loadInvLogs(1),order_logs:()=>loadOrdLogs(1),admin_logs:()=>loadAdminLogs(1),db_setup:()=>{},states:loadStates,media:loadMedia})[pg]?.();
 }
 
 // ── DASHBOARD — uses revenue_summary view ──
@@ -893,7 +917,7 @@ async function loadOrders(page=1){
     const st=document.getElementById('ord-status-f')?.value||'';
     const py=document.getElementById('ord-pay-f')?.value||'';
     // 2.2 Only required columns
-    let q='select=id,order_number,total_amount,order_status,payment_status,payment_method,payment_id,customer_id,created_at,subtotal,tax,shipping_charge&order=created_at.desc';
+    let q='select=id,order_number,total_amount,order_status,payment_status,payment_method,payment_id,customer_id,created_at,subtotal,tax,shipping_charge,tracking_number,courier,shipped_at,delivered_at&order=created_at.desc';
     if(st) q+=`&order_status=eq.${st}`;
     if(py) q+=`&payment_status=eq.${py}`;
     const data=await pagedGET('orders',q,page);
@@ -964,9 +988,13 @@ async function openOrder(o, custId){
         <div class="ri"><span class="l">Payment ID</span><span class="v mono" style="font-size:11px">${o.payment_id||'—'}</span></div>
         <div class="sep"></div>
         <div class="fg" style="margin:0"><label style="font-size:11.5px;font-weight:600;color:var(--tx2);display:block;margin-bottom:5px">Update Order Status</label>
-          <select class="fi" id="ord-status-edit">
+          <select class="fi" id="ord-status-edit" style="margin-bottom:8px">
             ${['pending','confirmed','packed','shipped','delivered','cancelled'].map(s=>`<option value="${s}" ${o.order_status===s?'selected':''}>${s}</option>`).join('')}
           </select>
+          <label style="font-size:11px;font-weight:600;color:var(--tx2);display:block;margin:8px 0 4px">Courier</label>
+          <input class="fi" id="ord-courier" placeholder="e.g. Shiprocket, Delhivery" value="${o.courier||''}" style="margin-bottom:8px">
+          <label style="font-size:11px;font-weight:600;color:var(--tx2);display:block;margin-bottom:4px">Tracking Number</label>
+          <input class="fi" id="ord-tracking" placeholder="e.g. SR1234567890" value="${o.tracking_number||''}">
         </div>
       </div>
     </div>
@@ -987,7 +1015,14 @@ async function saveOrdStatus(){
   const status=document.getElementById('ord-status-edit').value;
   const btn=document.getElementById('ord-save-btn');btn.disabled=true;btn.textContent='Saving…';
   try{
-    await PATCH('orders',`id=eq.${S.currentOrder.id}`,{order_status:status,updated_at:new Date().toISOString()});
+    const tracking=document.getElementById('ord-tracking')?.value||null;
+    const courier=document.getElementById('ord-courier')?.value||null;
+    const patchBody={order_status:status,updated_at:new Date().toISOString()};
+    if(tracking) patchBody.tracking_number=tracking;
+    if(courier) patchBody.courier=courier;
+    if(status==='shipped' && !S.currentOrder.shipped_at) patchBody.shipped_at=new Date().toISOString();
+    if(status==='delivered' && !S.currentOrder.delivered_at) patchBody.delivered_at=new Date().toISOString();
+    await PATCH('orders',`id=eq.${S.currentOrder.id}`,patchBody);
     try{await POST('order_status_history',{order_id:S.currentOrder.id,old_status:S.currentOrder.order_status,new_status:status});}catch(e){}
     toast('Order updated ✓','ok');closeM('order-modal');await loadOrders(1);
   }catch(e){toast('Error: '+e.message,'er');}
@@ -1313,6 +1348,365 @@ async function testConn(){
     res.style.color='var(--red)';
   }
 }
+
+// ── UTILITY FUNCTIONS ──────────────────────────────────────────────
+
+function toast(msg, type='ok'){
+  const t=document.getElementById('toast');
+  if(!t) return;
+  const d=document.createElement('div');
+  const bg=type==='ok'?'#2d6a4f':type==='er'?'#c0392b':'#1a3a5c';
+  d.style.cssText=`background:${bg};color:#fff;padding:10px 18px;border-radius:10px;font-size:13px;font-weight:600;box-shadow:0 4px 16px rgba(0,0,0,.3);pointer-events:auto;margin-bottom:4px`;
+  d.textContent=msg;
+  t.appendChild(d);
+  setTimeout(()=>d.remove(),3500);
+}
+
+function sC(status){
+  const m={pending:'by',confirmed:'bg',packed:'bp',shipped:'bb',delivered:'bg',cancelled:'br'};
+  return m[status]||'by';
+}
+
+function pC(status){
+  const m={paid:'bg',pending:'by',failed:'br',refunded:'bb'};
+  return m[status]||'by';
+}
+
+function esc(str){
+  return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function renderPag(id, page, count, cb){
+  const el=document.getElementById(id);
+  if(!el) return;
+  const PAGE=25;
+  const hasMore=count>=PAGE;
+  if(page===1 && !hasMore){ el.innerHTML=''; return; }
+  el.innerHTML=`
+    <div style="display:flex;gap:8px;align-items:center;justify-content:flex-end;padding:12px 0">
+      <button class="btn btn-s btn-sm" onclick="(${cb})(${page-1})" ${page<=1?'disabled':''}>← Prev</button>
+      <span style="font-size:13px;color:var(--tx2)">Page ${page}</span>
+      <button class="btn btn-s btn-sm" onclick="(${cb})(${page+1})" ${!hasMore?'disabled':''}>Next →</button>
+    </div>`;
+}
+
+function openM(id){ document.getElementById(id).style.display='flex'; }
+function closeM(id){ document.getElementById(id).style.display='none'; }
+
+function v(id){ return (document.getElementById(id)||{}).value||''; }
+
+
+
+// ── dlCSV — Download CSV ──
+function dlCSV(rows, filename){
+  const csv = rows.map(r => r.map(c => {
+    const s = String(c==null?'':c).replace(/"/g,'""');
+    return s.includes(',') || s.includes('"') || s.includes('\n') ? `"${s}"` : s;
+  }).join(',')).join('\n');
+  const blob = new Blob([csv], {type:'text/csv'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+// ── fillSel — Populate select dropdown ──
+function fillSel(id, items, valKey, labelKey, selected){
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.innerHTML = '<option value="">— Select —</option>' +
+    (items||[]).map(i => 
+      `<option value="${i[valKey]}" ${String(i[valKey])===String(selected)?'selected':''}>${i[labelKey]||'—'}</option>`
+    ).join('');
+}
+
+// ── copySQL — Copy SQL to clipboard ──
+function copySQL(btn){
+  const block = btn.closest('.sc')?.querySelector('pre');
+  if(!block) return;
+  navigator.clipboard.writeText(block.textContent.trim()).then(()=>{
+    const orig = btn.textContent;
+    btn.textContent = '✓ Copied!';
+    btn.style.background = 'var(--grn)';
+    setTimeout(()=>{ btn.textContent = orig; btn.style.background = ''; }, 2000);
+  }).catch(()=> toast('Copy failed','er'));
+}
+
+
+
+
+// ══════════════════════════════════════════════════════════
+// SUPABASE STORAGE UPLOAD
+// ══════════════════════════════════════════════════════════
+const SUPA_STORAGE = 'https://ulyrhnpoiyuvarulqqi.supabase.co/storage/v1/object';
+const SUPA_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVseXJobnBvaXlwdXZhdXJscXFpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyOTE5NTYsImV4cCI6MjA4Nzg2Nzk1Nn0.lU_Wi4G84X54BPdjhG_h-N4u2_HSYiAF-12hekDnejk';
+
+async function uploadToStorage(file, folder) {
+  const ext = file.name.split('.').pop().toLowerCase();
+  const fileName = `${folder}-${Date.now()}.${ext}`;
+  const res = await fetch(`${SUPA_STORAGE}/pahadi-images/${fileName}`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${SUPA_ANON}`,
+      'Content-Type': file.type,
+      'x-upsert': 'true'
+    },
+    body: file
+  });
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error('Upload failed: ' + err);
+  }
+  return `https://ulyrhnpoiyuvarulqqi.supabase.co/storage/v1/object/public/pahadi-images/${fileName}`;
+}
+
+// ══════════════════════════════════════════════════════════
+// STATES MANAGEMENT
+// ══════════════════════════════════════════════════════════
+async function loadStates() {
+  const grid = document.getElementById('states-grid');
+  if (!grid) return;
+  grid.innerHTML = '<div style="text-align:center;color:var(--tx3);padding:40px;grid-column:1/-1">Loading…</div>';
+  try {
+    const data = await GET('states', 'order=name.asc');
+    if (!data || !data.length) {
+      grid.innerHTML = '<div style="text-align:center;color:var(--tx3);padding:40px;grid-column:1/-1">No states yet. Click "+ Add State" to begin.</div>';
+      return;
+    }
+    grid.innerHTML = data.map(s => `
+      <div class="sc" style="margin:0;padding:0;overflow:hidden;border-radius:14px">
+        <div style="position:relative;height:150px;background:var(--bg2)">
+          ${s.image_path 
+            ? `<img src="${s.image_path}" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'">`
+            : '<div style="height:100%;display:flex;align-items:center;justify-content:center;font-size:48px">🏔️</div>'}
+          <span class="badge ${s.is_active ? 'bg' : 'br'}" style="position:absolute;top:8px;right:8px">${s.is_active ? 'Active' : 'Inactive'}</span>
+        </div>
+        <div style="padding:12px">
+          <div style="font-weight:700;font-size:15px;margin-bottom:4px">${esc(s.name)}</div>
+          <div style="font-size:12px;color:var(--tx3);margin-bottom:12px;min-height:16px">${esc(s.description||'')}</div>
+          <div style="display:flex;gap:6px">
+            <button class="btn btn-s btn-sm" style="flex:1;justify-content:center" onclick='openStateM(${JSON.stringify(s).replace(/'/g,"&#39;")})'>✏️ Edit</button>
+            <button class="btn btn-s btn-sm" style="background:var(--red);color:#fff" onclick="deleteState('${s.id}')">🗑️</button>
+          </div>
+        </div>
+      </div>`).join('');
+  } catch(e) {
+    grid.innerHTML = `<div style="color:var(--red);padding:20px;grid-column:1/-1">Error: ${e.message}</div>`;
+  }
+}
+
+function openStateM(s) {
+  s = s || {};
+  document.getElementById('state-m-title').textContent = s.id ? 'Edit State' : 'Add State';
+  document.getElementById('state-id').value = s.id || '';
+  document.getElementById('state-name').value = s.name || '';
+  document.getElementById('state-desc').value = s.description || '';
+  document.getElementById('state-img-url').value = s.image_path || '';
+  document.getElementById('state-active').checked = s.is_active !== false;
+  document.getElementById('state-file').value = '';
+  document.getElementById('state-upload-status').textContent = '';
+  const prev = document.getElementById('state-img-preview');
+  if (s.image_path) { prev.src = s.image_path; prev.style.display = 'block'; }
+  else { prev.src = ''; prev.style.display = 'none'; }
+  openM('state-modal');
+}
+
+function previewStateImg(input) {
+  const file = input.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const prev = document.getElementById('state-img-preview');
+    prev.src = e.target.result;
+    prev.style.display = 'block';
+    document.getElementById('state-img-url').value = '';
+  };
+  reader.readAsDataURL(file);
+}
+
+async function saveState() {
+  const id = document.getElementById('state-id').value;
+  const name = document.getElementById('state-name').value.trim();
+  if (!name) { toast('State name required', 'er'); return; }
+  const btn = document.getElementById('state-save-btn');
+  const status = document.getElementById('state-upload-status');
+  btn.disabled = true; btn.textContent = 'Saving…';
+  try {
+    let imageUrl = document.getElementById('state-img-url').value.trim();
+    const file = document.getElementById('state-file').files[0];
+    if (file) {
+      status.textContent = '⏳ Uploading image…';
+      imageUrl = await uploadToStorage(file, `states/${name.toLowerCase().replace(/\s+/g, '-')}`);
+      status.textContent = '✅ Image uploaded!';
+    }
+    const body = {
+      name,
+      description: document.getElementById('state-desc').value.trim() || null,
+      image_path: imageUrl || null,
+      is_active: document.getElementById('state-active').checked,
+      updated_at: new Date().toISOString()
+    };
+    if (id) await PATCH('states', `id=eq.${id}`, body);
+    else await POST('states', body);
+    toast('State saved ✓', 'ok');
+    closeM('state-modal');
+    await loadStates();
+  } catch(e) {
+    toast('Error: ' + e.message, 'er');
+    status.textContent = '❌ ' + e.message;
+  }
+  btn.disabled = false; btn.textContent = '💾 Save State';
+}
+
+async function deleteState(id) {
+  if (!confirm('Delete this state?')) return;
+  try { await DEL('states', `id=eq.${id}`); toast('Deleted ✓', 'ok'); await loadStates(); }
+  catch(e) { toast('Error: ' + e.message, 'er'); }
+}
+
+// ══════════════════════════════════════════════════════════
+// MEDIA — FOUNDER IMAGE
+// ══════════════════════════════════════════════════════════
+async function loadMedia() {
+  try {
+    const data = await GET('site_settings', 'key=eq.founder_image_url&select=value');
+    const url = data?.[0]?.value || '';
+    const img = document.getElementById('founder-preview');
+    if (url && img) { img.src = url; img.style.opacity = '1'; }
+  } catch(e) { console.warn('Media load:', e); }
+}
+
+function previewFounder(input) {
+  const file = input.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => { document.getElementById('founder-preview').src = e.target.result; };
+  reader.readAsDataURL(file);
+}
+
+async function uploadFounderImage() {
+  const file = document.getElementById('founder-file').files[0];
+  const status = document.getElementById('founder-status');
+  if (!file) { toast('Please select a file first', 'er'); return; }
+  status.textContent = '⏳ Uploading…';
+  try {
+    const url = await uploadToStorage(file, 'founder/founder-image');
+    const existing = await GET('site_settings', 'key=eq.founder_image_url').catch(() => []);
+    if (existing && existing.length > 0) {
+      await PATCH('site_settings', 'key=eq.founder_image_url', { value: url });
+    } else {
+      await POST('site_settings', { key: 'founder_image_url', value: url });
+    }
+    document.getElementById('founder-preview').src = url;
+    status.textContent = '✅ Saved! Refresh homepage to see changes.';
+    status.style.color = 'var(--grn)';
+    toast('Founder image updated ✓', 'ok');
+  } catch(e) {
+    status.textContent = '❌ ' + e.message;
+    status.style.color = 'var(--red)';
+    toast('Upload failed: ' + e.message, 'er');
+  }
+}
+
+// ══════════════════════════════════════════════════════════
+// PRODUCT IMAGE UPLOAD
+// ══════════════════════════════════════════════════════════
+function openProdImgUpload() {
+  document.getElementById('prod-img-file').value = '';
+  document.getElementById('prod-img-status').textContent = '';
+  const cur = document.getElementById('p-img').value;
+  const prev = document.getElementById('prod-img-preview');
+  if (cur) { prev.src = cur; prev.style.display = 'block'; }
+  else prev.style.display = 'none';
+  openM('img-upload-modal');
+}
+
+function previewProdImg(input) {
+  const file = input.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const prev = document.getElementById('prod-img-preview');
+    prev.src = e.target.result;
+    prev.style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+}
+
+async function uploadProdImage() {
+  const file = document.getElementById('prod-img-file').files[0];
+  const status = document.getElementById('prod-img-status');
+  const btn = document.getElementById('prod-img-upload-btn');
+  if (!file) { toast('Select a file first', 'er'); return; }
+  btn.disabled = true; btn.textContent = 'Uploading…';
+  status.textContent = '⏳ Uploading image…';
+  try {
+    const url = await uploadToStorage(file, `products/product-${Date.now()}`);
+    document.getElementById('p-img').value = url;
+    status.textContent = '✅ Done! URL filled in product form.';
+    status.style.color = 'var(--grn)';
+    toast('Image uploaded ✓', 'ok');
+    setTimeout(() => closeM('img-upload-modal'), 1200);
+  } catch(e) {
+    status.textContent = '❌ ' + e.message;
+    status.style.color = 'var(--red)';
+    toast('Upload failed: ' + e.message, 'er');
+  }
+  btn.disabled = false; btn.textContent = '📤 Upload Image';
+}
+
 </script>
+
+<!-- STATE MODAL -->
+<div class="modal" id="state-modal">
+  <div class="modal-box" style="max-width:480px">
+    <div class="modal-hd">
+      <span id="state-m-title">Add State</span>
+      <button class="cls-btn" onclick="closeM('state-modal')">✕</button>
+    </div>
+    <div style="padding:20px;display:flex;flex-direction:column;gap:12px">
+      <input type="hidden" id="state-id">
+      <div class="fg">
+        <label class="lbl">State Name *</label>
+        <input class="fi" id="state-name" placeholder="e.g. Himachal Pradesh">
+      </div>
+      <div class="fg">
+        <label class="lbl">Description</label>
+        <textarea class="fi" id="state-desc" rows="2" placeholder="Brief description about this region..."></textarea>
+      </div>
+      <div class="fg">
+        <label class="lbl">State Image</label>
+        <img id="state-img-preview" src="" style="width:100%;height:150px;object-fit:cover;border-radius:10px;border:1px solid var(--bd);margin-bottom:8px;display:none">
+        <input type="file" id="state-file" accept="image/*" class="fi" style="margin-bottom:8px" onchange="previewStateImg(this)">
+        <label class="lbl">Or paste image URL</label>
+        <input class="fi" id="state-img-url" placeholder="https://...">
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <input type="checkbox" id="state-active" checked style="width:16px;height:16px;cursor:pointer">
+        <label style="font-size:13px;font-weight:600;cursor:pointer" for="state-active">Active (visible on site)</label>
+      </div>
+      <div id="state-upload-status" style="font-size:12px;color:var(--tx3)"></div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-g" id="state-save-btn" onclick="saveState()">💾 Save State</button>
+      <button class="btn" onclick="closeM('state-modal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- PRODUCT IMAGE UPLOAD MODAL -->
+<div class="modal" id="img-upload-modal">
+  <div class="modal-box" style="max-width:420px">
+    <div class="modal-hd">
+      <span>Upload Product Image</span>
+      <button class="cls-btn" onclick="closeM('img-upload-modal')">✕</button>
+    </div>
+    <div style="padding:20px;display:flex;flex-direction:column;gap:12px">
+      <img id="prod-img-preview" src="" style="width:100%;height:200px;object-fit:contain;border-radius:10px;border:1px solid var(--bd);background:var(--bg2);display:none">
+      <input type="file" id="prod-img-file" accept="image/*" class="fi" onchange="previewProdImg(this)">
+      <button class="btn btn-g" onclick="uploadProdImage()" id="prod-img-upload-btn">📤 Upload Image</button>
+      <div id="prod-img-status" style="font-size:12px;color:var(--tx3)"></div>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
