@@ -84,7 +84,7 @@ tr:hover td{background:rgba(255,255,255,.02)}
 .m-cls:hover{background:var(--bg3)}
 .m-body{padding:20px}
 .m-foot{padding:14px 20px;border-top:1px solid var(--bd);display:flex;justify-content:flex-end;gap:10px}
-.fg{margin-bottom:14px}
+.fg{margin-bottom:14px}.lbl{display:block;font-size:11.5px;font-weight:700;color:var(--tx2);margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px}
 .fg label{display:block;font-size:11.5px;font-weight:600;color:var(--tx2);margin-bottom:5px}
 .fi{width:100%;background:var(--bg3);border:1px solid var(--bd);border-radius:var(--r2);padding:8px 12px;color:var(--tx);font-size:13px}
 .fi:focus{outline:none;border-color:var(--g2)}
@@ -626,7 +626,7 @@ CREATE INDEX IF NOT EXISTS idx_products_is_deleted ON products(is_deleted);</div
 'use strict';
 
 // ══ API — all calls through Netlify function. Zero keys in browser. ══
-const API = '/.netlify/functions/admin-api';
+const API = '/api/admin-api';
 const PAGE = 25; // server-side page size
 
 // Detect if categories column has been renamed (set after first load)
@@ -648,7 +648,7 @@ async function api(method, table, query='', body=null){
     body:JSON.stringify({method,table,query,body}),
   });
   if(r.status===401){ toast('Session expired — please login again','er'); setTimeout(doLogout,2000); throw new Error('Unauthorized'); }
-  if(r.status===429){ throw new Error('Rate limited — wait a moment'); }
+  if(r.status===429 || r.status===503){ toast('Service limit reached — try in a moment','er'); throw new Error('Rate limited'); }
   if(!r.ok){ let m=''; try{const d=await r.json();m=d.error||JSON.stringify(d);}catch(e){m=await r.text();} throw new Error('['+r.status+'] '+m); }
   const txt=await r.text(); return txt?JSON.parse(txt):null;
 }
@@ -1457,7 +1457,7 @@ async function uploadToStorage(file, folder) {
     reader.readAsDataURL(file);
   });
   const pw = sessionStorage.getItem('pr_pw');
-  const res = await fetch('/.netlify/functions/admin-api', {
+  const res = await fetch('/api/admin-api', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'x-admin-password': pw },
     body: JSON.stringify({ action: 'storage_upload', fileName, fileType: file.type, fileBase64: base64 })
@@ -1662,11 +1662,11 @@ async function uploadProdImage() {
 </script>
 
 <!-- STATE MODAL -->
-<div class="modal" id="state-modal" style="z-index:10000">
-  <div class="modal-box" style="max-width:480px">
-    <div class="modal-hd">
-      <span id="state-m-title">Add State</span>
-      <button class="cls-btn" onclick="closeM('state-modal')">✕</button>
+<div class="ov" id="state-modal" style="z-index:10000">
+  <div class="modal" style="max-width:480px">
+    <div class="m-hdr">
+      <h3 id="state-m-title">Add State</h3>
+      <button class="m-cls" onclick="closeM('state-modal')">✕</button>
     </div>
     <div style="padding:20px;display:flex;flex-direction:column;gap:12px">
       <input type="hidden" id="state-id">
@@ -1691,19 +1691,19 @@ async function uploadProdImage() {
       </div>
       <div id="state-upload-status" style="font-size:12px;color:var(--tx3)"></div>
     </div>
-    <div class="modal-ft">
-      <button class="btn btn-g" id="state-save-btn" onclick="saveState()">💾 Save State</button>
-      <button class="btn" onclick="closeM('state-modal')">Cancel</button>
+    <div class="m-foot">
+      <button class="btn btn-p" id="state-save-btn" onclick="saveState()">💾 Save State</button>
+      <button class="btn btn-s" onclick="closeM('state-modal')">Cancel</button>
     </div>
   </div>
 </div>
 
 <!-- PRODUCT IMAGE UPLOAD MODAL -->
-<div class="modal" id="img-upload-modal">
-  <div class="modal-box" style="max-width:420px">
-    <div class="modal-hd">
-      <span>Upload Product Image</span>
-      <button class="cls-btn" onclick="closeM('img-upload-modal')">✕</button>
+<div class="ov" id="img-upload-modal">
+  <div class="modal" style="max-width:420px">
+    <div class="m-hdr">
+      <h3>Upload Product Image</h3>
+      <button class="m-cls" onclick="closeM('img-upload-modal')">✕</button>
     </div>
     <div style="padding:20px;display:flex;flex-direction:column;gap:12px">
       <img id="prod-img-preview" src="" style="width:100%;height:200px;object-fit:contain;border-radius:10px;border:1px solid var(--bd);background:var(--bg2);display:none">
