@@ -1025,7 +1025,11 @@ async function saveOrdStatus(){
     await PATCH('orders',`id=eq.${S.currentOrder.id}`,patchBody);
     try{await POST('order_status_history',{order_id:S.currentOrder.id,old_status:S.currentOrder.order_status,new_status:status});}catch(e){}
     toast('Order updated ✓','ok');closeM('order-modal');await loadOrders(1);
-  }catch(e){toast('Error: '+e.message,'er');}
+  }catch(e){
+    if(e.message.includes('Cannot confirm order without items')){
+      toast('Cannot confirm — order has no items','er');
+    } else { toast('Error: '+e.message,'er'); }
+  }
   btn.disabled=false;btn.textContent='💾 Update Status';
 }
 
@@ -1059,7 +1063,7 @@ async function loadCustomers(page=1){
         <td>${c.phone||'—'}</td>
         <td>${c.city||'—'}</td>
         <td>${c.state||'—'}</td>
-        <td style="font-size:11px;color:var(--tx3)">${new Date(c.created_at).toLocaleDateString('en-IN')}</td>
+        <td style="font-size:11px;color:var(--tx3)">${c.created_at ? new Date(c.created_at).toLocaleDateString('en-IN') : '—'}</td>
         <td><button class="btn btn-s btn-sm" onclick="openCust('${c.id}')">View</button></td>
       </tr>`;
     }).join(''):'<tr><td colspan="7" class="empty">No customers</td></tr>';
@@ -1086,7 +1090,7 @@ async function openCust(id){
         <div class="ri"><span class="l">City</span><span class="v">${c.city||'—'}</span></div>
         <div class="ri"><span class="l">State</span><span class="v">${c.state||'—'}</span></div>
         <div class="ri"><span class="l">Postal Code</span><span class="v">${c.postal_code||'—'}</span></div>
-        <div class="ri"><span class="l">Joined</span><span class="v">${new Date(c.created_at).toLocaleDateString('en-IN')}</span></div>
+        <div class="ri"><span class="l">Joined</span><span class="v">${c.created_at ? new Date(c.created_at).toLocaleDateString('en-IN') : '—'}</span></div>
       </div>
       <div class="sc" style="margin:0">
         <h4>🛒 Orders (${ords.length})</h4>
@@ -1220,7 +1224,7 @@ function openReviewM(r){r=r||{};
 function editReview(id){openReviewM((S.reviews||[]).find(x=>String(x.id)===String(id)));}
 async function saveReview(){
   const id=document.getElementById('rv-id').value;
-  const body={customer_name:v('rv-name')||null,location:v('rv-loc')||null,rating:parseInt(v('rv-rating')),review_text:v('rv-text')||null,status:v('rv-status'),product_id:v('rv-prod')||null};
+  const pid=v('rv-prod'); const body={customer_name:v('rv-name')||null,location:v('rv-loc')||null,rating:parseInt(v('rv-rating')),review_text:v('rv-text')||null,status:v('rv-status'),product_id:(pid&&pid!==''&&pid!=='0')?pid:null};
   try{
     if(id)await PATCH('reviews',`id=eq.${id}`,body);else await POST('reviews',body);
     toast('Saved ✓','ok');closeM('review-modal');await loadReviews();
@@ -1445,20 +1449,22 @@ const SUPA_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIs
 async function uploadToStorage(file, folder) {
   const ext = file.name.split('.').pop().toLowerCase();
   const fileName = `${folder}-${Date.now()}.${ext}`;
-  const res = await fetch(`${SUPA_STORAGE}/pahadi-images/${fileName}`, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${SUPA_ANON}`,
-      'Content-Type': file.type,
-      'x-upsert': 'true'
-    },
-    body: file
+  // Convert to base64 and upload via admin API (avoids CORS issues)
+  const base64 = await new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result.split(',')[1]);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
   });
-  if (!res.ok) {
-    const err = await res.text();
-    throw new Error('Upload failed: ' + err);
-  }
-  return `https://ulyrhnpoiyuvarulqqi.supabase.co/storage/v1/object/public/pahadi-images/${fileName}`;
+  const pw = sessionStorage.getItem('pr_pw');
+  const res = await fetch('/.netlify/functions/admin-api', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-admin-password': pw },
+    body: JSON.stringify({ action: 'storage_upload', fileName, fileType: file.type, fileBase64: base64 })
+  });
+  if (!res.ok) { const d = await res.json(); throw new Error(d.error || 'Upload failed'); }
+  const data = await res.json();
+  return data.url;
 }
 
 // ══════════════════════════════════════════════════════════
@@ -1656,7 +1662,7 @@ async function uploadProdImage() {
 </script>
 
 <!-- STATE MODAL -->
-<div class="modal" id="state-modal">
+<div class="modal" id="state-modal" style="z-index:10000">
   <div class="modal-box" style="max-width:480px">
     <div class="modal-hd">
       <span id="state-m-title">Add State</span>
