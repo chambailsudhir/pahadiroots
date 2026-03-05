@@ -513,6 +513,7 @@ CREATE INDEX IF NOT EXISTS idx_products_is_deleted ON products(is_deleted);</div
       </div>
       <div class="gr gr3">
         <div class="fg"><label>Category</label><select class="fi" id="p-cat"></select></div>
+        <div class="fg"><label>State <span class="req">*</span></label><select class="fi" id="p-state"></select></div>
         <div class="fg"><label>Status</label><select class="fi" id="p-status"><option value="active">Active</option><option value="inactive">Inactive</option><option value="draft">Draft</option></select></div>
         <div class="fg"><label>Unit Label</label><input class="fi" id="p-unit" placeholder="250g"></div>
       </div>
@@ -695,6 +696,7 @@ async function init(){
   b.className='db-dot wait'; b.textContent='⬤ Connecting…';
   try{
     document.getElementById('topbar-info').textContent=new Date().toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'});
+    S.states=await GET('states','select=id,name&is_active=eq.true&order=name.asc').catch(()=>[]);
     S.cats=await GET('categories','select=id,name,slug,is_active&order=name.asc').catch(async()=>{
       // Fallback: column not yet renamed
       CAT_ACTIVE_COL='is active';
@@ -829,6 +831,7 @@ function openProdM(p){p=p||{};
   document.getElementById('p-new').checked=!!(p.badges?.includes('new'));
   document.getElementById('p-status').value=p.status||'active';
   fillSel('p-cat',S.cats,'id','name',p.category_id);
+  fillSel('p-state',S.states||[],'id','name',p.state_id);
   openM('prod-modal');
 }
 function editProd(id){
@@ -844,7 +847,7 @@ async function saveProd(){
   if(document.getElementById('p-org').checked)badges.push('organic');
   if(document.getElementById('p-new').checked)badges.push('new');
   const tags=v('p-tags').split(',').map(t=>t.trim()).filter(Boolean);
-  const body={name,price,sku:v('p-sku')||null,mrp:parseFloat(v('p-mrp'))||null,unit_label:v('p-unit')||null,stock_quantity:parseInt(v('p-stock'))||0,short_description:v('p-desc')||null,emoji:v('p-emoji')||null,image_url:v('p-img')||null,tags:tags.length?tags:null,badges:badges.length?badges:null,category_id:v('p-cat')||null,status:v('p-status')};
+  const body={name,price,sku:v('p-sku')||null,mrp:parseFloat(v('p-mrp'))||null,unit_label:v('p-unit')||null,stock_quantity:parseInt(v('p-stock'))||0,short_description:v('p-desc')||null,emoji:v('p-emoji')||null,image_url:v('p-img')||null,tags:tags.length?tags:null,badges:badges.length?badges:null,category_id:v('p-cat')||null,state_id:v('p-state')||null,status:v('p-status')};
   const btn=document.getElementById('p-save-btn');btn.disabled=true;btn.textContent='Saving…';
   try{
     if(id) await PATCH('products',`id=eq.${id}`,body); else await POST('products',body);
