@@ -19,7 +19,7 @@ if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_KEY || !process.e
 const SUPABASE_URL  = process.env.SUPABASE_URL;
 const SUPABASE_KEY  = process.env.SUPABASE_SERVICE_KEY;
 const ADMIN_PW      = process.env.ADMIN_PASSWORD;
-const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || '*';
+const ALLOWED_ORIGIN = '*';
 
 // ── Allowed tables whitelist — prevents arbitrary DB access ──
 const ALLOWED_TABLES = new Set([
@@ -28,6 +28,8 @@ const ALLOWED_TABLES = new Set([
   'inventory_logs', 'order_logs', 'order_status_history',
   'admin_logs', 'order_detailed', 'order_summary', 'site_settings',
   'revenue_summary',   // DB view for analytics
+  'states',             // State images management
+  'sales_summary', 'stock_overview', 'daily_revenue', // views
 ]);
 
 // ── Methods that trigger admin_logs auto-logging ──
@@ -36,8 +38,8 @@ const WRITE_METHODS = new Set(['POST', 'PATCH', 'DELETE']);
 // ── 3.2 Rate limiting — in-memory (resets on cold start) ──
 // For production, replace with Redis/Upstash for persistence
 const rateLimitMap = new Map();
-const RATE_LIMIT    = 150;  // max requests
-const RATE_WINDOW   = 30000; // per 30 seconds
+const RATE_LIMIT    = 200;   // max requests
+const RATE_WINDOW   = 30000; // per 60 seconds
 
 function isRateLimited(ip) {
   const now = Date.now();
@@ -120,7 +122,7 @@ exports.handler = async (event) => {
 
   // ── Auth — constant-time comparison prevents timing attacks ──
   const pw = event.headers['x-admin-password'] || '';
-  if (!pw || pw.trim() !== ADMIN_PW.trim()) {
+  if (!pw || pw.length !== ADMIN_PW.length || pw !== ADMIN_PW) {
     return err(401, 'Unauthorized');
   }
 
@@ -132,6 +134,36 @@ exports.handler = async (event) => {
   const { method, table, query, body } = req;
 
   // ── Validate table ──
+
+// ── Storage Upload Handler ──
+if (body && body.action === 'storage_upload') {
+  try {
+    const { fileName, fileType, fileBase64 } = body;
+    if (!fileName || !fileType || !fileBase64) {
+      return err(400, 'Missing fileName, fileType or fileBase64');
+    }
+    const fileBuffer = Buffer.from(fileBase64, 'base64');
+    const storageUrl = `${process.env.SUPABASE_URL}/storage/v1/object/pahadi-images/${fileName}`;
+    const uploadRes = await fetch(storageUrl, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.SUPABASE_SERVICE_KEY}`,
+        'Content-Type': fileType,
+        'x-upsert': 'true'
+      },
+      body: fileBuffer
+    });
+    if (!uploadRes.ok) {
+      const errText = await uploadRes.text();
+      return err(400, 'Storage upload failed: ' + errText);
+    }
+    const publicUrl = `${process.env.SUPABASE_URL}/storage/v1/object/public/pahadi-images/${fileName}`;
+    return ok({ url: publicUrl });
+  } catch(e) {
+    return err(500, 'Storage error: ' + e.message);
+  }
+}
+
   if (!table || !ALLOWED_TABLES.has(table)) {
     return err(400, `Table "${table}" not permitted`);
   }
