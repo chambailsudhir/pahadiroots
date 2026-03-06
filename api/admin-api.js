@@ -80,6 +80,10 @@ export default async function handler(req, res) {
     res.setHeader('Content-Type',                 'application/json');
     res.setHeader('X-Content-Type-Options',       'nosniff');
     res.setHeader('X-Frame-Options',              'DENY');
+    // Prevent Vercel edge / CDN / browser from caching API responses
+    res.setHeader('Cache-Control',                'no-store, no-cache, must-revalidate');
+    res.setHeader('Pragma',                       'no-cache');
+    res.setHeader('Surrogate-Control',            'no-store');
   }
 
   const ok  = (data)    => { setCORS(); return res.status(200).json(data); };
