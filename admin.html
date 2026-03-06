@@ -1032,7 +1032,6 @@ async function viewOrderById(id){
     else toast('Order not found','er');
   }catch(e){toast('Could not load order: '+e.message,'er');}
 }
-}
 
 async function saveOrdStatus(){
   if(!S.currentOrder)return;
