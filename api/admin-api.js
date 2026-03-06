@@ -201,21 +201,29 @@ export default async function handler(req, res) {
       // 5. Decrement stock_quantity for each item
       if (items && items.length) {
         for (const item of items) {
-          if (!item.id) continue;
           try {
-            const prod = await sbFetch('GET', 'products', `id=eq.${item.id}&select=id,stock_quantity`);
-            if (prod && prod[0]) {
-              const newStock = Math.max(0, (prod[0].stock_quantity || 0) - (item.qty || 1));
-              await sbFetch('PATCH', 'products', `id=eq.${item.id}`, { stock_quantity: newStock });
-              // Save inventory log
+            let prod = null;
+            // Try by id first (UUID from DB products)
+            if (item.id) {
+              const res = await sbFetch('GET', 'products', `id=eq.${item.id}&select=id,stock_quantity,name`).catch(()=>[]);
+              if (res && res[0]) prod = res[0];
+            }
+            // Fallback: try by name (for fallback/hardcoded products)
+            if (!prod && item.name) {
+              const res = await sbFetch('GET', 'products', `name=ilike.${encodeURIComponent(item.name)}&select=id,stock_quantity,name&limit=1`).catch(()=>[]);
+              if (res && res[0]) prod = res[0];
+            }
+            if (prod) {
+              const newStock = Math.max(0, (prod.stock_quantity || 0) - (item.qty || 1));
+              await sbFetch('PATCH', 'products', `id=eq.${prod.id}`, { stock_quantity: newStock });
               await sbFetch('POST', 'inventory_logs', '', {
-                product_id: item.id,
+                product_id: prod.id,
                 change_type: 'sale',
                 quantity_change: -(item.qty || 1),
                 reference_id: orderNumber || String(orderId)
               }).catch(()=>{});
             }
-          } catch(e) { console.warn('stock decrement failed for product', item.id, e); }
+          } catch(e) { console.warn('stock decrement failed:', item.name, e); }
         }
       }
 
