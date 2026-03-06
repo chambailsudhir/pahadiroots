@@ -967,7 +967,7 @@ footer{background:#0d1a0f;padding:44px 40px 24px}
   <!-- Cart header bar -->
   <div class="cpage-hdr">
     <button class="cpage-back" onclick="closeCart()">← Continue Shopping</button>
-    <div class="cpage-title">🛒 Your Cart</div>
+    <div class="cpage-title" style="display:flex;align-items:center;gap:12px">🛒 Your Cart <button onclick="cart=[];uCart();updateCartBadge();try{localStorage.removeItem('pr_cart')}catch(e){};showToast('Cart cleared!')" style="background:none;border:1px solid rgba(0,0,0,.15);padding:3px 10px;border-radius:6px;font-size:11px;cursor:pointer;color:var(--tx3);font-weight:600">🗑 Clear</button></div>
     <a href="#home" class="cpage-logo" onclick="closeCart()">Pahadi Roots 🌿</a>
   </div>
 
@@ -1189,6 +1189,13 @@ async function loadData() {
   PRODUCTS = FALLBACK_PRODUCTS.map(p => Object.assign({}, p));
   renderProds(); renderStates(); loadFI(); uCart(); observeRv();
 
+  // Load coupons from DB
+  fetch(getStoreApiBase() + '/store-data').then(r=>r.json()).then(data=>{
+    if(data.settings && data.settings.coupons) {
+      try { var dbC = JSON.parse(data.settings.coupons); Object.assign(COUPONS, dbC); } catch(e){}
+    }
+  }).catch(()=>{});
+
   // Step 2: try DB
   try {
     var r = await fetch(getStoreApiBase() + '/store-data');
@@ -1196,6 +1203,22 @@ async function loadData() {
     var data = await r.json();
     var dbStates = data.states;
     var dbProds  = data.products;
+    // Load DB coupons
+    if (Array.isArray(data.coupons) && data.coupons.length) {
+      data.coupons.forEach(function(c) {
+        if (!c.code) return;
+        var expOk = !c.expires_at || new Date(c.expires_at) > new Date();
+        var usesOk = !c.max_uses || (c.uses_count||0) < c.max_uses;
+        if (expOk && usesOk) {
+          COUPONS[c.code.toUpperCase()] = {
+            type: c.discount_type === 'percentage' ? 'pct' : 'flat',
+            val:  parseFloat(c.discount_value) || 0,
+            min:  parseFloat(c.min_order_amount) || 0,
+            label: c.discount_type === 'percentage' ? c.discount_value+'% off' : '₹'+c.discount_value+' off'
+          };
+        }
+      });
+    }
     var updated  = false;
 
     if (Array.isArray(dbStates) && dbStates.length) {
@@ -1549,8 +1572,9 @@ async function checkoutRazorpay() {
         '\n\n*Total Paid: ₹'+final+'*';
       cart = []; renderCart(); updateCartBadge();
       try{ localStorage.removeItem('pr_cart'); }catch(e){}
-      showToast('🎉 Order placed! You will receive confirmation shortly.');
+      showToast('🎉 Payment successful! Redirecting...');
       window.open('https://wa.me/919899984895?text='+encodeURIComponent(msg),'_blank');
+      setTimeout(function(){ window.location.href = '/#order-confirmed'; showToast('✅ Order confirmed & payment received!'); }, 1000);
     },
     modal: {
       ondismiss: function(){ showToast('Payment cancelled'); }
@@ -1632,7 +1656,15 @@ async function checkout() {
   // Save order to DB
   try { await saveOrderToDB(name, phone, email, addr, city, state, pin, final, discount, 'whatsapp_cod', null); } catch(e) { console.warn('DB save failed:', e); }
 
+  // Clear cart
+  cart = []; uCart(); updateCartBadge();
+  try{ localStorage.removeItem('pr_cart'); }catch(e){}
+
   window.open('https://wa.me/919899984895?text=' + encodeURIComponent(msg), '_blank');
+  setTimeout(function(){ 
+    showToast('✅ Order placed! We will confirm via WhatsApp shortly.');
+    document.getElementById('cart-panel')&&document.getElementById('cart-panel').classList.remove('open');
+  }, 500);
 }
 
 // Pre-fill delivery form from saved info

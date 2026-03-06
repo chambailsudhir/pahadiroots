@@ -1508,6 +1508,7 @@ function openStateM(s) {
   document.getElementById('state-m-title').textContent = s.id ? 'Edit State' : 'Add State';
   document.getElementById('state-id').value = s.id || '';
   document.getElementById('state-name').value = s.name || '';
+  const slugEl = document.getElementById('state-slug'); if(slugEl){ slugEl.value = s.id || ''; slugEl.disabled = !!s.id; }
   document.getElementById('state-desc').value = s.description || '';
   document.getElementById('state-img-url').value = s.image_path || '';
   document.getElementById('state-active').checked = s.is_active !== false;
@@ -1554,7 +1555,11 @@ async function saveState() {
       updated_at: new Date().toISOString()
     };
     if (id) await PATCH('states', `id=eq.${id}`, body);
-    else await POST('states', body);
+    else {
+      const manualSlug = (document.getElementById('state-slug')?.value||'').trim().toLowerCase().replace(/[^a-z0-9]/g,'');
+      const autoSlug = name.toLowerCase().replace(/[^a-z]/g,'').slice(0,4) + '-' + Date.now().toString().slice(-4);
+      await POST('states', { ...body, id: manualSlug || autoSlug });
+    }
     toast('State saved ✓', 'ok');
     closeM('state-modal');
     await loadStates();
@@ -1671,9 +1676,16 @@ async function uploadProdImage() {
     </div>
     <div style="padding:20px;display:flex;flex-direction:column;gap:12px">
       <input type="hidden" id="state-id">
-      <div class="fg">
-        <label class="lbl">State Name *</label>
-        <input class="fi" id="state-name" placeholder="e.g. Himachal Pradesh">
+      <div class="gr gr2">
+        <div class="fg">
+          <label class="lbl">State Name *</label>
+          <input class="fi" id="state-name" placeholder="e.g. Manipur">
+        </div>
+        <div class="fg">
+          <label class="lbl">State ID <span style="font-size:11px;color:var(--tx3)">(e.g. mn, hp, jk)</span></label>
+          <input class="fi" id="state-slug" placeholder="e.g. mn" maxlength="10">
+          <div style="font-size:11px;color:var(--tx3);margin-top:3px">Leave blank to auto-generate. Cannot change after save.</div>
+        </div>
       </div>
       <div class="fg">
         <label class="lbl">Description</label>
