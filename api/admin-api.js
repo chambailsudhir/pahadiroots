@@ -96,12 +96,6 @@ export default async function handler(req, res) {
   const ip = (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.socket?.remoteAddress || 'unknown';
   if (isRateLimited(ip)) return err(429, 'Too many requests — slow down');
 
-  const pw = req.headers['x-admin-password'] || '';
-  const isPublicAction = reqBody.action === 'save_order' || reqBody.action === 'storage_upload';
-  if (!isPublicAction && (!pw || pw.length !== ADMIN_PW.length || pw !== ADMIN_PW)) {
-    return err(401, 'Unauthorized');
-  }
-
   // ── Parse request body ──
   let reqBody = {};
   try {
@@ -109,6 +103,12 @@ export default async function handler(req, res) {
     if (typeof reqBody === 'string') reqBody = JSON.parse(reqBody);
   } catch (e) {
     return err(400, 'Invalid JSON body');
+  }
+
+  const pw = req.headers['x-admin-password'] || '';
+  const isPublicAction = reqBody.action === 'save_order' || reqBody.action === 'storage_upload';
+  if (!isPublicAction && (!pw || pw.length !== ADMIN_PW.length || pw !== ADMIN_PW)) {
+    return err(401, 'Unauthorized');
   }
 
   const { method, table, query, body } = reqBody;
