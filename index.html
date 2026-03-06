@@ -1211,10 +1211,12 @@ async function loadData() {
         var usesOk = !c.max_uses || (c.uses_count||0) < c.max_uses;
         if (expOk && usesOk) {
           COUPONS[c.code.toUpperCase()] = {
-            type: c.discount_type === 'percentage' ? 'pct' : 'flat',
-            val:  parseFloat(c.discount_value) || 0,
-            min:  parseFloat(c.min_order_amount) || 0,
-            label: c.discount_type === 'percentage' ? c.discount_value+'% off' : '₹'+c.discount_value+' off'
+            type: c.type === 'percent' ? 'pct' : 'flat',
+            val:  parseFloat(c.value) || 0,
+            min:  parseFloat(c.min_order) || 0,
+            maxDiscount: parseFloat(c.max_discount) || null,
+            firstOrderOnly: c.first_order_only || false,
+            label: c.type === 'percent' ? c.value+'% off' : '₹'+c.value+' off'
           };
         }
       });
@@ -1448,7 +1450,12 @@ function chQty(id, d) {
 
 function calcDiscount(subtotal) {
   if (!activeCoupon) return 0;
-  if (activeCoupon.type === 'pct')  return Math.round(subtotal * activeCoupon.val / 100);
+  if (activeCoupon.min && subtotal < activeCoupon.min) return 0;
+  if (activeCoupon.type === 'pct') {
+    var disc = Math.round(subtotal * activeCoupon.val / 100);
+    if (activeCoupon.maxDiscount) disc = Math.min(disc, activeCoupon.maxDiscount);
+    return disc;
+  }
   if (activeCoupon.type === 'flat') return Math.min(activeCoupon.val, subtotal);
   return 0;
 }
@@ -1572,9 +1579,16 @@ async function checkoutRazorpay() {
         '\n\n*Total Paid: ₹'+final+'*';
       cart = []; renderCart(); updateCartBadge();
       try{ localStorage.removeItem('pr_cart'); }catch(e){}
-      showToast('🎉 Payment successful! Redirecting...');
+      try{ localStorage.removeItem('pr_cust_info'); }catch(e){}
+      ['del-name','del-phone','del-addr','del-city','del-state','del-pin','del-email'].forEach(function(id){
+        var el = document.getElementById(id); if(el) el.value='';
+      });
+      activeCoupon = null;
+      var cf = document.getElementById('coupForm'); if(cf) cf.style.display='block';
+      var ca = document.getElementById('coupApplied'); if(ca) ca.style.display='none';
+      showToast('🎉 Payment successful! Order confirmed.');
       window.open('https://wa.me/919899984895?text='+encodeURIComponent(msg),'_blank');
-      setTimeout(function(){ window.location.href = '/#order-confirmed'; showToast('✅ Order confirmed & payment received!'); }, 1000);
+      setTimeout(function(){ window.location.href = '/#order-confirmed'; }, 1000);
     },
     modal: {
       ondismiss: function(){ showToast('Payment cancelled'); }
@@ -1656,9 +1670,17 @@ async function checkout() {
   // Save order to DB
   try { await saveOrderToDB(name, phone, email, addr, city, state, pin, final, discount, 'whatsapp_cod', null); } catch(e) { console.warn('DB save failed:', e); }
 
-  // Clear cart
+  // Clear cart + delivery form
   cart = []; uCart(); updateCartBadge();
   try{ localStorage.removeItem('pr_cart'); }catch(e){}
+  try{ localStorage.removeItem('pr_cust_info'); }catch(e){}
+  ['del-name','del-phone','del-addr','del-city','del-state','del-pin','del-email'].forEach(function(id){
+    var el = document.getElementById(id); if(el) el.value = '';
+  });
+  activeCoupon = null;
+  var cf = document.getElementById('coupForm'); if(cf) cf.style.display='block';
+  var ca = document.getElementById('coupApplied'); if(ca) ca.style.display='none';
+  var ci = document.getElementById('coupInp'); if(ci) ci.value='';
 
   window.open('https://wa.me/919899984895?text=' + encodeURIComponent(msg), '_blank');
   setTimeout(function(){ 
@@ -1688,6 +1710,8 @@ function applyCoupon() {
   if (!code) { if(msg){msg.className='coup-msg coup-bad';msg.textContent='Enter a coupon code';} return; }
   var c = COUPONS[code];
   if (!c) { if(msg){msg.className='coup-msg coup-bad';msg.textContent='❌ Invalid coupon code';} return; }
+  var subtotal = cart.reduce(function(a,i){return a+i.price*i.qty;},0);
+  if (c.min && subtotal < c.min) { if(msg){msg.className='coup-msg coup-bad';msg.textContent='❌ Min order ₹'+c.min+' required';} return; }
   activeCoupon = Object.assign({code:code}, c);
   var cf = document.getElementById('coupForm');
   var ca = document.getElementById('coupApplied');
