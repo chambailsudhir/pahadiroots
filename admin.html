@@ -201,10 +201,10 @@ textarea.fi{resize:vertical;min-height:80px}
   <div class="ph"><div><h1>Dashboard</h1><p id="dash-sub">Loading…</p></div>
     <div class="ph-r"><button class="btn btn-s btn-sm" onclick="loadDash()">↻ Refresh</button></div></div>
   <div class="stats">
-    <div class="stat"><div class="stat-lbl">Total Revenue</div><div class="stat-val" id="d-rev">—</div><div class="stat-sub">from revenue_summary view</div></div>
-    <div class="stat"><div class="stat-lbl">Total Orders</div><div class="stat-val" id="d-ord">—</div><div class="stat-sub">all time</div></div>
-    <div class="stat"><div class="stat-lbl">Pending Orders</div><div class="stat-val" id="d-pend">—</div><div class="stat-sub up">needs action</div></div>
-    <div class="stat"><div class="stat-lbl">Customers</div><div class="stat-val" id="d-cust">—</div><div class="stat-sub">active</div></div>
+    <div class="stat" onclick="nav('analytics')" style="cursor:pointer" title="View Analytics"><div class="stat-lbl">Total Revenue</div><div class="stat-val" id="d-rev">—</div><div class="stat-sub">click for analytics</div></div>
+    <div class="stat" onclick="nav('orders')" style="cursor:pointer" title="View All Orders"><div class="stat-lbl">Total Orders</div><div class="stat-val" id="d-ord">—</div><div class="stat-sub">click to view all</div></div>
+    <div class="stat" onclick="nav('orders');setTimeout(()=>{document.getElementById('ord-status-f').value='pending';loadOrders(1);},300)" style="cursor:pointer" title="View Pending Orders"><div class="stat-lbl">Pending Orders</div><div class="stat-val" id="d-pend">—</div><div class="stat-sub up">needs action ↗</div></div>
+    <div class="stat" onclick="nav('customers')" style="cursor:pointer" title="View Customers"><div class="stat-lbl">Customers</div><div class="stat-val" id="d-cust">—</div><div class="stat-sub">click to view</div></div>
   </div>
   <div class="g2c">
     <div>
@@ -726,7 +726,7 @@ async function loadDash(){
     const [summary, pendOrds, custs, prods, recentOrds] = await Promise.all([
       GET('revenue_summary','select=revenue,total_orders').catch(()=>[{}]),
       GET('orders','order_status=eq.pending&select=id&limit=99').catch(()=>[]),
-      GET('customers','select=id&is_deleted=eq.false&limit=1').catch(()=>[]),
+      GET('customers','select=id&is_deleted=eq.false').catch(()=>[]),
       GET('products','select=id,name,stock_quantity&is_deleted=eq.false').catch(()=>[]),
       GET('orders','select=id,total_amount,order_status,customer_id,created_at,order_number&order=created_at.desc&limit=6').catch(()=>[]),
     ]);
@@ -746,8 +746,8 @@ async function loadDash(){
     }
     document.getElementById('dash-orders').innerHTML=(recentOrds||[]).length?(recentOrds||[]).map(o=>{
       const c=cm[o.customer_id]||{};
-      return `<tr>
-        <td class="mono">${o.order_number||('#'+String(o.id).slice(-6).toUpperCase())}</td>
+      return `<tr style="cursor:pointer" onclick="nav('orders');setTimeout(()=>viewOrderById('${o.id}'),400)" title="Click to view order">
+        <td class="mono" style="color:var(--a)">${o.order_number||('#'+String(o.id).slice(-6).toUpperCase())}</td>
         <td class="td-main">${((c.first_name||'')+' '+(c.last_name||'')).trim()||'Guest'}</td>
         <td>₹${(parseFloat(o.total_amount)||0).toLocaleString('en-IN')}</td>
         <td><span class="badge ${sC(o.order_status)}">${o.order_status||'pending'}</span></td>
@@ -758,7 +758,7 @@ async function loadDash(){
     const low=(prods||[]).filter(p=>(p.stock_quantity||0)<=parseInt(localStorage.getItem('pr_low_stock')||'10')).sort((a,b)=>a.stock_quantity-b.stock_quantity).slice(0,8);
     document.getElementById('dash-low').innerHTML=low.length?low.map(p=>`
       <tr><td class="td-main">${p.name}</td><td class="stok-lo">${p.stock_quantity||0}</td>
-      <td><button class="btn btn-s btn-sm" onclick="nav('products')">View</button></td></tr>`).join(''):'<tr><td colspan="3" class="empty">All stocked ✓</td></tr>';
+      <td><button class="btn btn-s btn-sm" onclick="nav('products');setTimeout(()=>{document.getElementById('prod-q').value=p.name;searchProds();},300)">View</button></td></tr>`).join(''):'<tr><td colspan="3" class="empty">All stocked ✓</td></tr>';
 
     // Revenue chart — last 7 days
     const chart7=await GET('orders','select=created_at,total_amount,order_status&created_at=gte.'+(()=>{const d=new Date();d.setDate(d.getDate()-7);return d.toISOString();})()).catch(()=>[]);
@@ -990,10 +990,21 @@ async function openOrder(o, custId){
         <div class="ri"><span class="l">Payment</span><span class="v">${o.payment_method||'—'} <span class="badge ${pC(o.payment_status)}">${o.payment_status||'—'}</span></span></div>
         <div class="ri"><span class="l">Payment ID</span><span class="v mono" style="font-size:11px">${o.payment_id||'—'}</span></div>
         <div class="sep"></div>
-        <div class="fg" style="margin:0"><label style="font-size:11.5px;font-weight:600;color:var(--tx2);display:block;margin-bottom:5px">Update Order Status</label>
-          <select class="fi" id="ord-status-edit" style="margin-bottom:8px">
-            ${['pending','confirmed','packed','shipped','delivered','cancelled'].map(s=>`<option value="${s}" ${o.order_status===s?'selected':''}>${s}</option>`).join('')}
-          </select>
+        <div class="fg" style="margin:0">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px">
+            <div>
+              <label style="font-size:11.5px;font-weight:600;color:var(--tx2);display:block;margin-bottom:5px">Order Status</label>
+              <select class="fi" id="ord-status-edit">
+                ${['pending','confirmed','packed','shipped','delivered','cancelled'].map(s=>`<option value="${s}" ${o.order_status===s?'selected':''}>${s}</option>`).join('')}
+              </select>
+            </div>
+            <div>
+              <label style="font-size:11.5px;font-weight:600;color:var(--tx2);display:block;margin-bottom:5px">Payment Status</label>
+              <select class="fi" id="ord-pay-edit">
+                ${['pending','paid','failed','refunded'].map(s=>`<option value="${s}" ${o.payment_status===s?'selected':''}>${s}</option>`).join('')}
+              </select>
+            </div>
+          </div>
           <label style="font-size:11px;font-weight:600;color:var(--tx2);display:block;margin:8px 0 4px">Courier</label>
           <input class="fi" id="ord-courier" placeholder="e.g. Shiprocket, Delhivery" value="${o.courier||''}" style="margin-bottom:8px">
           <label style="font-size:11px;font-weight:600;color:var(--tx2);display:block;margin-bottom:4px">Tracking Number</label>
@@ -1013,6 +1024,14 @@ async function openOrder(o, custId){
   openM('order-modal');
 }
 
+async function viewOrderById(id){
+  try{
+    const ords=await GET('orders',`id=eq.${id}&select=*&limit=1`);
+    if(ords&&ords[0]) viewOrder(ords[0]);
+    else toast('Order not found','er');
+  }catch(e){toast('Could not load order: '+e.message,'er');}
+}
+
 async function saveOrdStatus(){
   if(!S.currentOrder)return;
   const status=document.getElementById('ord-status-edit').value;
@@ -1020,7 +1039,9 @@ async function saveOrdStatus(){
   try{
     const tracking=document.getElementById('ord-tracking')?.value||null;
     const courier=document.getElementById('ord-courier')?.value||null;
+    const payStatus=document.getElementById('ord-pay-edit')?.value||null;
     const patchBody={order_status:status,updated_at:new Date().toISOString()};
+    if(payStatus) patchBody.payment_status=payStatus;
     if(tracking) patchBody.tracking_number=tracking;
     if(courier) patchBody.courier=courier;
     if(status==='shipped' && !S.currentOrder.shipped_at) patchBody.shipped_at=new Date().toISOString();
