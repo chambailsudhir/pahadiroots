@@ -921,6 +921,7 @@ async function delCat(id,name){
 
 // ── ORDERS — server-side pagination ──
 async function loadOrders(page=1){
+  S._custCache = {}; // clear cache so customer names always fresh
   try{
     const st=document.getElementById('ord-status-f')?.value||'';
     const py=document.getElementById('ord-pay-f')?.value||'';

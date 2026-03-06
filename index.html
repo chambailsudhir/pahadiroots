@@ -1629,8 +1629,9 @@ async function checkoutRazorpay() {
 }
 
 // ── SAVE ORDER TO DB (shared by both payment methods) ───────────────
-async function saveOrderToDB(name, phone, email, addr, city, state, pin, final, discount, payMethod, paymentId) {
+async function saveOrderToDB(name, phone, email, addr, city, state, pin, final, discount, payMethod, paymentId, cartSnapshot) {
   try {
+    var itemsToSave = (cartSnapshot || cart);  // use snapshot if provided, else live cart
     var endpoint = '/api/admin-api';
     var res = await fetch(endpoint, {
       method: 'POST',
@@ -1640,7 +1641,7 @@ async function saveOrderToDB(name, phone, email, addr, city, state, pin, final, 
         name, phone, email, addr, city, state, pin,
         final, discount, payMethod, paymentId,
         couponCode: activeCoupon ? activeCoupon.code : null,
-        items: cart.map(function(i){ return {id:i.id||null, qty:i.qty, price:i.price, name:i.name||''}; })
+        items: itemsToSave.map(function(i){ return {id:i.id||null, qty:i.qty, price:i.price, name:i.name||''}; })
       })
     });
     var data = await res.json();
@@ -1696,6 +1697,9 @@ async function checkout() {
   try { localStorage.setItem('pr_cust_info', JSON.stringify({name:name.trim(),phone:phone.trim(),addr:addr.trim(),city:city.trim(),state:state.trim(),pin:pin.trim(),email:email.trim()})); } catch(e){}
 
 
+  // Snapshot cart BEFORE clearing (non-blocking save needs items)
+  var cartSnapshot = cart.slice();
+
   // Open WhatsApp IMMEDIATELY — no waiting for DB
   var payMsg = msg + '\n\n💵 *Payment: Cash on Delivery*';
   window.open('https://wa.me/919899984895?text=' + encodeURIComponent(payMsg), '_blank');
@@ -1715,8 +1719,8 @@ async function checkout() {
   showToast('✅ Order placed! We will confirm via WhatsApp shortly.');
   closeCart();
 
-  // Save to DB in background (non-blocking)
-  saveOrderToDB(name, phone, email, addr, city, state, pin, final, discount, 'whatsapp_cod', null)
+  // Save to DB in background (non-blocking) — use cartSnapshot, not cleared cart
+  saveOrderToDB(name, phone, email, addr, city, state, pin, final, discount, 'whatsapp_cod', null, cartSnapshot)
     .catch(function(e){ console.warn('DB save failed:', e); });
 }
 // Pre-fill delivery form from saved info
