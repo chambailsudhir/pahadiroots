@@ -45,7 +45,7 @@ export default async function handler(req, res) {
       sbGet('states', 'is_active=eq.true&order=name.asc').catch(() => []),
       sbGet('products', 'status=eq.active&is_deleted=eq.false&order=name.asc').catch(() => []),
       sbGet('site_settings', 'select=key,value').catch(() => []),
-      sbGet('coupons', 'is_active=eq.true&select=code,discount_type,discount_value,min_order_amount,max_uses,expires_at').catch(() => []),
+      sbGet('coupons', 'is_active=eq.true&select=code,type,value,min_order,max_uses,uses_count,expires_at,first_order_only,max_discount').catch(() => []),
     ]);
 
     // Convert site_settings array to object
