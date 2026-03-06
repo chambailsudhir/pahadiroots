@@ -990,7 +990,10 @@ footer{background:#0d1a0f;padding:44px 40px 24px}
     <!-- Right column: order summary -->
     <div class="cpage-right">
       <div class="cpage-summary">
-        <div class="csum-title">Order Summary</div>
+        <div class="csum-title" style="display:flex;align-items:center;justify-content:space-between">
+          <span>Order Summary</span>
+          <button onclick="resetOrderSummary()" style="background:none;border:1px solid rgba(0,0,0,.15);padding:3px 10px;border-radius:6px;font-size:11px;cursor:pointer;color:var(--tx3);font-weight:600">↺ Reset</button>
+        </div>
         <!-- Coupon -->
         <div class="coup-row">
           <div id="coupApplied" style="display:none">
@@ -998,7 +1001,7 @@ footer{background:#0d1a0f;padding:44px 40px 24px}
           </div>
           <div id="coupForm">
             <div class="coup-inp-row">
-              <input class="coup-inp" id="coupInp" placeholder="COUPON CODE" maxlength="20">
+              <input class="coup-inp" id="coupInp" placeholder="COUPON CODE" maxlength="20" oninput="this.value=this.value.toUpperCase()" style="text-transform:uppercase">
               <button class="coup-btn" onclick="applyCoupon()">Apply</button>
             </div>
             <div class="coup-msg" id="coupMsg"></div>
@@ -1053,7 +1056,7 @@ footer{background:#0d1a0f;padding:44px 40px 24px}
             </div>
           </div>
         </div>
-        <button class="chkbtn" onclick="checkoutRazorpay()" style="background:linear-gradient(135deg,#2d6a4f,#40916c);margin-bottom:10px;display:none">💳 Pay Online (UPI · Cards · Net Banking)</button>
+        <button class="chkbtn" onclick="checkoutRazorpay()" style="background:linear-gradient(135deg,#2d6a4f,#40916c);margin-bottom:10px;">💳 Pay Online (UPI · Cards · Net Banking)</button>
         <button class="chkbtn" onclick="checkout()" style="background:linear-gradient(135deg,#e76f51,#f4a261)">📱 COD + WhatsApp Confirm →</button>
         <div class="cpays">📱 UPI &nbsp;·&nbsp; 💳 Cards &nbsp;·&nbsp; 🏧 Net Banking &nbsp;·&nbsp; 🚪 COD</div>
         <div class="cpage-secure">🔒 100% Secure & Encrypted Checkout</div>
@@ -1443,6 +1446,11 @@ function addToCart(id) {
   var p = PRODUCTS.find(function(x) { return x.id === id; });
   if (!p) return;
   var ex = cart.find(function(x) { return x.id === id; });
+  var currentQty = ex ? ex.qty : 0;
+  // Stock check
+  if (p.stock !== undefined && p.stock !== null && currentQty >= p.stock) {
+    showToast('⚠️ Only ' + p.stock + ' in stock!'); return;
+  }
   if (ex) ex.qty++;
   else cart.push({id:p.id, name:p.name, emoji:p.emoji, image:p.image_url||'', price:p.price, qty:1});
   sv(); uCart(); openCart();
@@ -1728,6 +1736,21 @@ function applyCoupon() {
   uCart();
   showToast('🎟️ Coupon ' + code + ' applied!');
 }
+function resetOrderSummary() {
+  // Reset coupon
+  activeCoupon = null;
+  var cf = document.getElementById('coupForm'); if(cf) cf.style.display='block';
+  var ca = document.getElementById('coupApplied'); if(ca) ca.style.display='none';
+  var ci = document.getElementById('coupInp'); if(ci) ci.value='';
+  var cm = document.getElementById('coupMsg'); if(cm) cm.textContent='';
+  // Reset delivery form
+  ['del-name','del-phone','del-addr','del-city','del-state','del-pin','del-email'].forEach(function(id){
+    var el = document.getElementById(id); if(el) el.value='';
+  });
+  uCart();
+  showToast('Order summary reset!');
+}
+
 function removeCoupon() {
   activeCoupon = null;
   var cf = document.getElementById('coupForm');
@@ -1766,10 +1789,11 @@ function renderUpsell() {
   if (!suggestions.length) { section.style.display = 'none'; return; }
   section.style.display = 'block';
   strip.innerHTML = suggestions.map(function(p) {
-    return '<div class="cu-item" onclick="addToCart(' + p.id + ')">' +
-      '<div class="cu-img">' + (p.image_url ? '<img src="' + p.image_url + '" alt="' + p.name + '">' : (p.emoji||'🌿')) + '</div>' +
+    return '<div class="cu-item">' +
+      '<div class="cu-img">' + (p.image_url ? '<img src="' + p.image_url + '" alt="' + p.name + '" onerror="this.style.display='none'">' : '<span style="font-size:28px">' + (p.emoji||'🌿') + '</span>') + '</div>' +
       '<div class="cu-name">' + p.name + '</div>' +
       '<div class="cu-price">₹' + p.price + '</div>' +
+      '<button onclick="addToCart(' + JSON.stringify(p.id) + ')" style="margin-top:6px;background:var(--g);color:#fff;border:none;border-radius:6px;padding:4px 10px;font-size:11px;font-weight:600;cursor:pointer;width:100%">+ Add</button>' +
     '</div>';
   }).join('');
 }
