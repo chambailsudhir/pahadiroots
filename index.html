@@ -1254,29 +1254,36 @@ async function loadData() {
       PRODUCTS = dbProds.map(function(db) {
         var loc = localById[db.id] || {};
         var bt  = loc.badge_type || 'bs';
+        // Parse badges array from DB
+        var dbBadges = Array.isArray(db.badges) ? db.badges : (typeof db.badges === 'string' ? [db.badges] : []);
+        if (dbBadges.includes('bestseller')) bt = 'bs';
+        else if (dbBadges.includes('organic')) bt = 'og';
+        else if (dbBadges.includes('new')) bt = 'nw';
         return {
           id:             db.id,
           name:           db.name,
-          description:    db.description    || loc.description    || '',
+          description:    db.short_description || loc.description || '',
           price:          db.price,
-          original_price: db.original_price || loc.original_price || null,
-          unit:           db.unit           || loc.unit           || '/unit',
+          original_price: db.mrp             || loc.original_price || null,
+          unit:           db.unit_label      || loc.unit           || '/unit',
           state_id:       db.state_id,
-          region:         db['Product Origin State'] || loc.region || '',
-          image_url:      db.image_url      || loc.image_url      || '',
-          stock:          db.stock          || loc.stock          || 99,
-          emoji:          loc.emoji         || '🌿',
+          region:         loc.region         || '',
+          image_url:      db.image_url       || loc.image_url      || '',
+          stock:          db.stock_quantity  !== undefined ? db.stock_quantity : (loc.stock || 99),
+          emoji:          db.emoji           || loc.emoji          || '🌿',
           badge_type:     bt,
-          badge_label:    loc.badge_label   || badgeMap[bt] || 'Bestseller',
-          card_bg:        loc.card_bg       || '#f9f4ec',
-          active:         db.is_active,
+          badge_label:    loc.badge_label    || badgeMap[bt]       || 'Bestseller',
+          card_bg:        loc.card_bg        || '#f9f4ec',
+          active:         db.status === 'active',
           category_id:    db.category_id,
+          sku:            db.sku,
+          tags:           db.tags,
         };
       });
       updated = true;
     }
 
-    if (updated) { renderProds(); renderStates(); observeRv(); injectProductSchema(); }
+    if (updated) { renderProds(); renderStates(); observeRv(); injectProductSchema(); renderUpsell(); }
   } catch(e) {
     console.info('Using local fallback data:', e.message);
   }
