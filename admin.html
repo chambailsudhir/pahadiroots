@@ -483,14 +483,26 @@ CREATE INDEX IF NOT EXISTS idx_products_is_deleted ON products(is_deleted);</div
   <div class="g2c">
     <div>
       <div class="sc">
+        <h4>📱 WhatsApp & Contact</h4>
+        <div class="fg"><label>WhatsApp Number <small style="color:var(--tx3);font-weight:400">(with country code, no +)</small></label><input type="text" class="fi" id="cfg-wa" placeholder="919899984895"></div>
+        <button class="btn btn-p" onclick="saveSiteSettings()">💾 Save Settings</button>
+        <div id="settings-msg" style="font-size:12px;margin-top:8px;color:var(--g);display:none">✓ Settings saved!</div>
+      </div>
+      <div class="sc">
+        <h4>🚚 Shipping Configuration</h4>
+        <div class="fg"><label>Free Shipping Above (₹)</label><input type="number" class="fi" id="cfg-free-ship" placeholder="799" min="0"></div>
+        <div class="fg"><label>Flat Shipping Charge (₹) <small style="color:var(--tx3);font-weight:400">— charged below free threshold</small></label><input type="number" class="fi" id="cfg-flat-ship" placeholder="99" min="0"></div>
+        <button class="btn btn-p" onclick="saveSiteSettings()">💾 Save Shipping</button>
+      </div>
+      <div class="sc">
+        <h4>⚙️ Admin Thresholds</h4>
+        <div class="fg"><label>Low Stock Alert (qty)</label><input type="number" class="fi" id="cfg-low" value="10" min="1"></div>
+        <button class="btn btn-p" onclick="saveConfig()">💾 Save</button>
+      </div>
+      <div class="sc">
         <h4>🔌 Connection</h4>
         <button class="btn btn-s" onclick="testConn()">🔌 Test Connection</button>
         <div id="conn-res" style="margin-top:10px;font-size:12.5px"></div>
-      </div>
-      <div class="sc">
-        <h4>⚙️ Thresholds</h4>
-        <div class="fg"><label>Low Stock Alert (qty)</label><input type="number" class="fi" id="cfg-low" value="10" min="1"></div>
-        <button class="btn btn-p" onclick="saveConfig()">💾 Save</button>
       </div>
     </div>
     <div class="sc">
@@ -1358,13 +1370,49 @@ async function loadAnalytics(){
 // ── SETTINGS ──
 async function loadSettings(){
   document.getElementById('cfg-low').value=localStorage.getItem('pr_low_stock')||10;
-  const tables=['products','categories','orders','order_items','customers','coupons','coupon_usage','subscribers','reviews','inventory_logs','order_status_history','admin_logs','revenue_summary'];
+  // Load site_settings from DB
+  try {
+    const rows = await GET('site_settings','select=key,value');
+    const s = {};
+    (rows||[]).forEach(r=>{ s[r.key]=r.value; });
+    if(s.whatsapp_number)      document.getElementById('cfg-wa').value         = s.whatsapp_number;
+    if(s.free_shipping_min)    document.getElementById('cfg-free-ship').value  = s.free_shipping_min;
+    if(s.flat_shipping_charge) document.getElementById('cfg-flat-ship').value  = s.flat_shipping_charge;
+  } catch(e) {}
+  // Table status
+  const tables=['products','categories','orders','order_items','customers','coupons','coupon_usage','subscribers','reviews','inventory_logs','order_status_history','admin_logs','revenue_summary','site_settings'];
   const res=await Promise.all(tables.map(async t=>({t,ok:await GET(t,'limit=0').then(()=>true).catch(()=>false)})));
   document.getElementById('tbl-status').innerHTML=res.map(r=>`
     <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--bd)">
       <code style="font-size:12px;color:var(--tx2)">${r.t}</code>
       <span class="badge ${r.ok?'bg':'br'}">${r.ok?'✓ OK':'✗ Error'}</span>
     </div>`).join('');
+}
+
+async function saveSiteSettings(){
+  const wa       = (document.getElementById('cfg-wa')?.value||'').trim();
+  const freeShip = (document.getElementById('cfg-free-ship')?.value||'').trim();
+  const flatShip = (document.getElementById('cfg-flat-ship')?.value||'').trim();
+  const updates  = [];
+  if(wa)       updates.push({key:'whatsapp_number',      value:wa});
+  if(freeShip) updates.push({key:'free_shipping_min',    value:freeShip});
+  if(flatShip) updates.push({key:'flat_shipping_charge', value:flatShip});
+  if(!updates.length){ toast('Nothing to save','warn'); return; }
+  try {
+    // Upsert each key — Supabase upsert with onConflict
+    for(const u of updates){
+      // Try PATCH first, then POST
+      const existing = await GET('site_settings',`key=eq.${encodeURIComponent(u.key)}&limit=1`).catch(()=>[]);
+      if(existing && existing.length>0){
+        await PATCH('site_settings',`key=eq.${encodeURIComponent(u.key)}`,{value:u.value});
+      } else {
+        await POST('site_settings',{key:u.key,value:u.value});
+      }
+    }
+    toast('Settings saved ✓','ok');
+    const msg=document.getElementById('settings-msg');
+    if(msg){ msg.style.display='block'; setTimeout(()=>msg.style.display='none',2500); }
+  } catch(e){ toast('Save failed: '+e.message,'err'); }
 }
 async function saveConfig(){
   const val=parseInt(document.getElementById('cfg-low').value)||10;
