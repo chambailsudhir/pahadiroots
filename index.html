@@ -285,9 +285,9 @@ section.sec{padding:52px 40px}
 .state-sec>.ct,.state-sec>#regions{text-align:left;margin-bottom:0}
 .state-sec .sh2{color:var(--g);font-size:clamp(28px,4vw,52px)}
 .state-sec .ssub{color:var(--tx2);margin-bottom:24px}
-.stabs{display:flex;overflow-x:auto;scrollbar-width:none;background:#f0e8d4;border:none;padding:8px 8px 0;gap:6px}
+.stabs{display:flex;flex-wrap:wrap;overflow-x:visible;scrollbar-width:none;background:#f0e8d4;border:none;padding:8px 8px 0;gap:6px}
 .stabs::-webkit-scrollbar{display:none}
-.stab{flex:0 0 140px;padding:0;border:none;border-radius:8px 8px 0 0;background:#fff;cursor:pointer;display:flex;flex-direction:column;align-items:stretch;transition:all .22s;position:relative;font-family:'Lato',sans-serif;box-shadow:0 1px 4px rgba(0,0,0,.08);overflow:hidden}
+.stab{flex:0 0 auto;width:140px;padding:0;border:none;border-radius:8px 8px 0 0;background:#fff;cursor:pointer;display:flex;flex-direction:column;align-items:stretch;transition:all .22s;position:relative;font-family:'Lato',sans-serif;box-shadow:0 1px 4px rgba(0,0,0,.08);overflow:hidden}
 .stab:hover{transform:translateY(-2px);box-shadow:0 4px 14px rgba(0,0,0,.14)}
 .stab.active{background:var(--g);box-shadow:0 4px 18px rgba(26,58,30,.3);transform:translateY(-2px)}
 .stab-thumb{width:100%;height:90px;overflow:hidden;display:block;background:#d8cfbb;flex-shrink:0}
@@ -631,7 +631,7 @@ footer{background:#0d1a0f;padding:44px 40px 24px}
   .shdr-img-col{height:200px}
   .shdr-info-col{padding:24px 18px}
   .spgrid{grid-template-columns:1fr 1fr;padding:16px 20px}
-  .stab{flex:0 0 110px}
+  .stab{flex:0 0 auto;width:110px}
   .stab-thumb{height:70px}
   .founder-content{flex-direction:column;padding:0 20px 32px;align-items:flex-start}
   .founder-left{max-width:100%}
@@ -646,7 +646,7 @@ footer{background:#0d1a0f;padding:44px 40px 24px}
   .pgr,.rgrid{grid-template-columns:1fr 1fr}
   .pay-opts-wrap{grid-template-columns:1fr 1fr}
   .spgrid{grid-template-columns:1fr}
-  .stab{flex:0 0 86px}
+  .stab{flex:0 0 auto;width:86px}
   .stab-thumb{height:56px}
   .trust{grid-template-columns:1fr 1fr}
   .nlf{flex-direction:column}
@@ -727,6 +727,8 @@ footer{background:#0d1a0f;padding:44px 40px 24px}
 </nav>
 <!-- Mobile nav -->
 <div class="mob-nav" id="mobNav">
+  <div class="mob-nav-bg" onclick="closeMobNav()"></div>
+  <div class="mob-nav-panel">
   <button class="mob-close" onclick="closeMobNav()">✕</button>
   <a href="#home" onclick="closeMobNav()">Home</a>
   <a href="#shop" onclick="closeMobNav()">Shop</a>
@@ -734,6 +736,7 @@ footer{background:#0d1a0f;padding:44px 40px 24px}
   <a href="#story" onclick="closeMobNav()">Our Story</a>
   <a href="#pay-sec" onclick="closeMobNav()">Payment</a>
   <a href="#contact" onclick="closeMobNav()">Contact</a>
+  </div>
 </div>
 <section class="hero" id="home">
   <div class="hmtn"><svg viewBox="0 0 1440 500" preserveAspectRatio="none"><path d="M0 500L90 380L170 420L280 290L380 360L480 230L560 310L660 180L740 260L840 140L940 210L1020 160L1110 240L1200 190L1310 260L1440 210L1440 500Z" fill="#071a09" opacity=".7"/><path d="M0 500L120 400L220 440L320 320L430 390L530 270L620 340L720 200L820 280L920 170L1020 240L1100 190L1200 270L1300 220L1400 280L1440 250L1440 500Z" fill="#050f06" opacity=".85"/></svg></div>
@@ -846,14 +849,16 @@ footer{background:#0d1a0f;padding:44px 40px 24px}
 </section>
 <!-- Order Tracking -->
 <section class="track-sec">
+  <div class="track-inner">
   <div class="chip" style="color:var(--gd)">Track Your Order</div>
   <h2 class="sh2" style="color:var(--gd2)">Where Is My Package?</h2>
   <div class="track-box">
     <div class="track-row">
-      <input class="track-inp" id="trackInp" placeholder="Enter Order ID  e.g. PR-10042" maxlength="12">
+      <input class="track-inp" id="trackInp" placeholder="Enter Order ID  e.g. ORD-2026-00001" maxlength="20">
       <button class="track-btn" onclick="trackOrder()">Track →</button>
     </div>
     <div class="track-result" id="trackResult"></div>
+  </div>
   </div>
 </section>
 <section class="nl-sec">
@@ -1022,27 +1027,27 @@ footer{background:#0d1a0f;padding:44px 40px 24px}
           <div class="del-row">
             <div class="del-field">
               <label>Full Name *</label>
-              <input class="del-input" id="del-name" autocomplete="off" placeholder="Your name" autocomplete="name">
+              <input class="del-input" id="del-name" placeholder="Your name" autocomplete="name">
             </div>
             <div class="del-field">
               <label>Phone *</label>
-              <input class="del-input" id="del-phone" autocomplete="off" placeholder="10-digit mobile" type="tel" maxlength="10" autocomplete="tel">
+              <input class="del-input" id="del-phone" placeholder="10-digit mobile" type="tel" maxlength="10" autocomplete="tel">
             </div>
           </div>
           <div class="del-row full">
             <div class="del-field">
               <label>Address *</label>
-              <input class="del-input" id="del-addr" autocomplete="off" placeholder="House / Flat, Street, Area" autocomplete="address-line1">
+              <input class="del-input" id="del-addr" placeholder="House / Flat, Street, Area" autocomplete="address-line1">
             </div>
           </div>
           <div class="del-row">
             <div class="del-field">
               <label>City *</label>
-              <input class="del-input" id="del-city" autocomplete="off" placeholder="City" autocomplete="address-level2">
+              <input class="del-input" id="del-city" placeholder="City" autocomplete="address-level2">
             </div>
             <div class="del-field">
               <label>State</label>
-              <input class="del-input" id="del-state" autocomplete="off" placeholder="State / UT" autocomplete="address-level1">
+              <input class="del-input" id="del-state" placeholder="State / UT" autocomplete="address-level1">
             </div>
           </div>
           <div class="del-row">
@@ -1052,7 +1057,7 @@ footer{background:#0d1a0f;padding:44px 40px 24px}
             </div>
             <div class="del-field">
               <label>Email</label>
-              <input class="del-input" id="del-email" autocomplete="off" placeholder="Optional" type="email" autocomplete="email">
+              <input class="del-input" id="del-email" placeholder="Optional" type="email" autocomplete="email">
             </div>
           </div>
         </div>
@@ -1114,6 +1119,11 @@ const FALLBACK_STATES = [
    description:"Home to 16 fierce and proud tribes, where warriors wear hornbill feather headdresses. Nagaland produces the legendary Bhut Jolokia (Ghost Pepper), rich wild hill honey, and Axone fermented soybean.",
    pills:["🌶️ Bhut Jolokia","🍯 Wild Hill Honey","🫙 Axone (Fermented)","🌿 Wild Herbs","🧂 Tribal Salt"],
    cover_photo_url:"images/states/nl.webp", tab_photo_url:"images/states/nl.webp"},
+  {id:"mn", name:"Manipur", emoji:"💃", tagline:"Land of Dance & Heritage",
+   panel_bg:"linear-gradient(135deg,#1a1e3a,#2d3353)",
+   description:"The jewel of Northeast India — home to the classical Manipuri dance form, pristine Loktak Lake, and a rich weaving tradition. Manipur's fertile valleys and hills produce rare black rice, indigenous herbs, and unique bamboo shoot delicacies.",
+   pills:["🌾 Black Rice","🎋 Bamboo Shoots","🌿 Wild Herbs","🍯 Wild Honey","🧵 Handloom"],
+   cover_photo_url:"", tab_photo_url:""},
 ];
 
 const FALLBACK_PRODUCTS = [
@@ -1146,13 +1156,8 @@ const svWL = () => localStorage.setItem('pr_wishlist', JSON.stringify(wishlist))
 let recentIds = [];
 try { recentIds = JSON.parse(localStorage.getItem('pr_recent')||'[]'); } catch(e){ recentIds=[]; }
 
-// ── COUPON STATE ───────────────────────────────────────────────────
-const COUPONS = {
-  'PAHADI10':   { type:'pct',  val:10,  label:'10% off' },
-  'WELCOME50':  { type:'flat', val:50,  label:'₹50 off' },
-  'MOUNTAIN':   { type:'pct',  val:15,  label:'15% off' },
-  'FIRSTORDER': { type:'flat', val:100, label:'₹100 off' },
-};
+// ── COUPON STATE — loaded from DB via store-data ───────────────────
+const COUPONS = {};  // populated from DB in loadData()
 let activeCoupon = null;
 
 // ── FILTER/SORT STATE ──────────────────────────────────────────────
@@ -1326,7 +1331,7 @@ function mkProd(p) {
     '<div class="pbody">' +
       '<div class="pregion">📍 ' + (p.region||'') + '</div>' +
       '<div class="pname">' + p.name + '</div>' +
-      '<div class="prating"><span class="pstars">★★★★★</span><span class="prc">(' + (12 + p.id * 7) + ')</span></div>' +
+      '<div class="prating"><span class="pstars">★★★★★</span><span class="prc">(' + (typeof p.id === 'number' ? (12 + p.id * 7) : Math.floor(Math.random()*80+20)) + ')</span></div>' +
       '<div class="pdesc">' + (p.description||'') + '</div>' +
       '<div class="stock-bar"><div class="stock-fill ' + sClass + '" style="width:' + sPct + '%"></div></div>' +
       '<div class="stock-label ' + sClass + '">' + sLbl + '</div>' +
@@ -1533,6 +1538,7 @@ function uCart() {
 function openCart() {
   var cp = document.getElementById('cartPage');
   if (cp) { cp.classList.add('open'); document.body.style.overflow = 'hidden'; }
+  prefillDelivery();
 }
 function closeCart() {
   var cp = document.getElementById('cartPage');
@@ -2072,30 +2078,54 @@ function trackOrder() {
   var res = document.getElementById('trackResult');
   if (!res) return;
   if (!id) { showToast('Enter your Order ID'); return; }
-  if (!id.startsWith('PR-')) {
+  if (!id.startsWith('ORD-')) {
     res.style.display = 'block';
-    res.innerHTML = '<p style="color:rgba(255,255,255,.6);font-size:13px;margin-top:12px">❌ Order ID not found. Format: PR-XXXXX</p>';
+    res.innerHTML = '<p style="color:rgba(255,255,255,.6);font-size:13px;margin-top:12px">❌ Order not found. Format: ORD-2026-XXXXX</p>';
     return;
   }
-  var num   = parseInt(id.replace('PR-','')) || 1;
-  var stage = Math.min(4, num % 5);
-  var msgs = [
-    '📋 Order placed successfully. Confirmation sent to your email.',
-    '✅ Order confirmed! Being prepared by our team.',
-    '📦 Your order has been packed and will be shipped tomorrow.',
-    '🚚 Your order is on the way! Expected delivery: 1–2 business days.',
-    '✅ Your order has been delivered! Enjoy your Himalayan products 🌿',
-  ];
   res.style.display = 'block';
-  res.innerHTML = '<div class="track-steps">' +
-    TRACK_STAGES.map(function(s, i) {
-      return '<div class="track-step">' +
-        '<div class="ts-dot ' + (i < stage ? 'done' : i === stage ? 'active' : '') + '">' + s.emoji + '</div>' +
-        '<div class="ts-lbl ' + (i === stage ? 'active' : i < stage ? 'done' : '') + '">' + s.label + '</div>' +
-      '</div>';
-    }).join('') +
-  '</div>' +
-  '<p class="track-msg">' + msgs[stage] + '</p>';
+  res.innerHTML = '<p style="color:rgba(255,255,255,.6);font-size:13px;margin-top:12px">🔍 Looking up your order…</p>';
+  // Fetch real order from DB via store-data or admin-api (public, no password needed)
+  fetch('/api/admin-api', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json', 'x-admin-password': ''},
+    body: JSON.stringify({method:'GET', table:'orders', query:'order_number=eq.'+id+'&select=order_number,order_status,payment_status,created_at,tracking_number,courier,shipped_at,delivered_at'})
+  }).then(function(r){ return r.json(); }).then(function(data) {
+    var order = Array.isArray(data) ? data[0] : null;
+    if (!order) {
+      res.innerHTML = '<p style="color:rgba(255,255,255,.6);font-size:13px;margin-top:12px">❌ Order <strong>' + id + '</strong> not found. Please check your order ID.</p>';
+      return;
+    }
+    var statusMap = {pending:1, confirmed:2, packed:3, shipped:4, delivered:5, cancelled:0};
+    var stage = statusMap[order.order_status] || 1;
+    var isCancelled = order.order_status === 'cancelled';
+    var msgs = {
+      pending:   '📋 Order received! Our team will confirm it shortly via WhatsApp.',
+      confirmed: '✅ Order confirmed! Being carefully packed for you.',
+      packed:    '📦 Packed and ready to ship! Courier pickup expected soon.',
+      shipped:   '🚚 Your order is on the way!' + (order.courier ? ' via ' + order.courier : '') + (order.tracking_number ? ' · Tracking: ' + order.tracking_number : '') + ' · Expected in 2–4 business days.',
+      delivered: '🎉 Delivered! Thank you for choosing Pahadi Roots. Enjoy your mountain goodies 🌿',
+      cancelled: '❌ This order was cancelled. For queries, WhatsApp us at +91 98999 84895.',
+    };
+    if (isCancelled) {
+      res.innerHTML = '<p class="track-msg" style="color:rgba(255,100,100,.85)">' + msgs.cancelled + '</p>';
+      return;
+    }
+    res.innerHTML = '<div class="track-steps">' +
+      TRACK_STAGES.map(function(s, i) {
+        var done = (i+1) < stage;
+        var active = (i+1) === stage;
+        return '<div class="track-step">' +
+          '<div class="ts-dot ' + (done ? 'done' : active ? 'active' : '') + '">' + s.emoji + '</div>' +
+          '<div class="ts-lbl ' + (active ? 'active' : done ? 'done' : '') + '">' + s.label + '</div>' +
+        '</div>';
+      }).join('') +
+    '</div>' +
+    '<p class="track-msg">' + (msgs[order.order_status] || msgs.pending) + '</p>' +
+    '<p style="font-size:11px;color:rgba(255,255,255,.35);margin-top:8px">Order: ' + order.order_number + ' · Placed: ' + new Date(order.created_at).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) + '</p>';
+  }).catch(function() {
+    res.innerHTML = '<p style="color:rgba(255,255,255,.6);font-size:13px;margin-top:12px">⚠️ Could not reach server. Please try again or WhatsApp us.</p>';
+  });
 }
 
 // ── STICKY ADD-TO-CART ─────────────────────────────────────────────
@@ -2210,35 +2240,20 @@ function loadFI() {
   try {
     var bg = document.getElementById('founderBg');
     if (!bg) return;
-
     function applyFounderImg(url) {
       if (!url) return;
       bg.style.cssText = 'position:relative;width:100%;line-height:0;display:block';
-      // width:100%, height:auto = natural aspect ratio, zero stretch
-      bg.innerHTML = '<img src="' + url + '" alt="Sudhir Chambail" '
-        + 'style="width:100%;height:auto;max-height:760px;display:block;'
-        + 'object-fit:cover;object-position:40% center">';
+      bg.innerHTML = '<img src="' + url + '" alt="Sudhir Chambail" style="width:100%;height:auto;max-height:760px;display:block;object-fit:cover;object-position:40% center">';
     }
-
-    // 1. Try Supabase site_settings (permanent, works for ALL visitors)
-    fetch('https://ulyrhnpoiypuvaurlqqi.supabase.co/rest/v1/site_settings?key=eq.founder_image_url&select=value', {
-      headers: {
-        'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVseXJobnBvaXlwdXZhdXJscXFpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyOTE5NTYsImV4cCI6MjA4Nzg2Nzk1Nn0.lU_Wi4G84X54BPdjhG_h-N4u2_HSYiAF-12hekDnejk',
-        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVseXJobnBvaXlwdXZhdXJscXFpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyOTE5NTYsImV4cCI6MjA4Nzg2Nzk1Nn0.lU_Wi4G84X54BPdjhG_h-N4u2_HSYiAF-12hekDnejk'
-      }
-    }).then(function(r){ return r.json(); })
+    // Show cached immediately
+    var cached = ''; try { cached = localStorage.getItem('pr_founder_image')||''; } catch(e){}
+    if (cached) applyFounderImg(cached);
+    // Refresh via store-data (no anon key exposed in frontend)
+    fetch(getStoreApiBase() + '/store-data').then(function(r){ return r.json(); })
     .then(function(data){
-      if (data && data[0] && data[0].value) {
-        applyFounderImg(data[0].value);
-        try { localStorage.setItem('pr_founder_image', data[0].value); } catch(e){}
-      } else {
-        var cached = ''; try { cached = localStorage.getItem('pr_founder_image')||''; } catch(e){}
-        applyFounderImg(cached);
-      }
-    }).catch(function(){
-      var cached = ''; try { cached = localStorage.getItem('pr_founder_image')||''; } catch(e){}
-      applyFounderImg(cached);
-    });
+      var url = (data && data.settings && data.settings.founder_image_url) ? data.settings.founder_image_url : '';
+      if (url) { applyFounderImg(url); try { localStorage.setItem('pr_founder_image', url); } catch(e){} }
+    }).catch(function(){});
   } catch(e) {}
 }
 
