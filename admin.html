@@ -628,7 +628,7 @@ CREATE INDEX IF NOT EXISTS idx_products_is_deleted ON products(is_deleted);</div
 <script>
 'use strict';
 
-// ══ API — all calls through Netlify function. Zero keys in browser. ══
+// ══ API — all calls through Vercel function. Zero keys in browser. ══
 const API = '/api/admin-api';
 const PAGE = 25; // server-side page size
 
@@ -645,12 +645,10 @@ const S = {
 // ── Core API call — password in header, never in URL ──
 async function api(method, table, query='', body=null){
   const pw = sessionStorage.getItem('pr_pw');
-  // Add cache-buster to GET requests so stock/data is always fresh
-  const cacheBust = method === 'GET' ? `&_t=${Date.now()}` : '';
   const r = await fetch(API, {
     method:'POST',
-    headers:{'Content-Type':'application/json','x-admin-password':pw,'Cache-Control':'no-cache'},
-    body:JSON.stringify({method,table,query:query+cacheBust,body}),
+    headers:{'Content-Type':'application/json','x-admin-password':pw,'Cache-Control':'no-store, no-cache'},
+    body:JSON.stringify({method,table,query,body,_ts:Date.now()}),
   });
   if(r.status===401){ toast('Session expired — please login again','er'); setTimeout(doLogout,2000); throw new Error('Unauthorized'); }
   if(r.status===429 || r.status===503){ toast('Service limit reached — try in a moment','er'); throw new Error('Rate limited'); }
@@ -687,7 +685,7 @@ async function doLogin(){
     await init();
   }catch(e){
     sessionStorage.removeItem('pr_pw');
-    showErr(e.message.includes('401')?'Wrong password':'Cannot reach server — is Netlify function deployed?');
+    showErr(e.message.includes('401')?'Wrong password':'Cannot reach server — check Vercel deployment');
   }
   btn.disabled=false; btn.textContent='🔐 Sign In';
 }

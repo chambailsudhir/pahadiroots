@@ -1612,7 +1612,10 @@ async function checkoutRazorpay() {
       _orderProcessing = false;
       showToast('🎉 Payment successful! Order confirmed.');
       window.open('https://wa.me/919899984895?text='+encodeURIComponent(msg),'_blank');
-      setTimeout(function(){ window.location.href = '/#order-confirmed'; }, 1000);
+      setTimeout(function(){ 
+        closeCart();
+        window.scrollTo({top:0, behavior:'smooth'});
+      }, 800);
     },
     modal: {
       ondismiss: function(){ _orderProcessing = false; showToast('Payment cancelled'); }
@@ -1692,10 +1695,12 @@ async function checkout() {
   // Save customer info locally for repeat use
   try { localStorage.setItem('pr_cust_info', JSON.stringify({name:name.trim(),phone:phone.trim(),addr:addr.trim(),city:city.trim(),state:state.trim(),pin:pin.trim(),email:email.trim()})); } catch(e){}
 
-  // Save order to DB
-  try { await saveOrderToDB(name, phone, email, addr, city, state, pin, final, discount, 'whatsapp_cod', null); } catch(e) { console.warn('DB save failed:', e); }
 
-  // Clear cart + delivery form
+  // Open WhatsApp IMMEDIATELY — no waiting for DB
+  var payMsg = msg + '\n\n💵 *Payment: Cash on Delivery*';
+  window.open('https://wa.me/919899984895?text=' + encodeURIComponent(payMsg), '_blank');
+
+  // Clear cart right away
   cart = []; uCart();
   try{ localStorage.removeItem('pr_cart'); }catch(e){}
   try{ localStorage.removeItem('pr_cust_info'); }catch(e){}
@@ -1706,17 +1711,14 @@ async function checkout() {
   var cf = document.getElementById('coupForm'); if(cf) cf.style.display='block';
   var ca = document.getElementById('coupApplied'); if(ca) ca.style.display='none';
   var ci = document.getElementById('coupInp'); if(ci) ci.value='';
+  _orderProcessing = false;
+  showToast('✅ Order placed! We will confirm via WhatsApp shortly.');
+  closeCart();
 
-  // Append payment method to msg
-  var payMsg = msg + '\n\n💵 *Payment: Cash on Delivery*';
-  window.open('https://wa.me/919899984895?text=' + encodeURIComponent(payMsg), '_blank');
-  setTimeout(function(){ 
-    _orderProcessing = false;
-    showToast('✅ Order placed! We will confirm via WhatsApp shortly.');
-    closeCart();
-  }, 500);
+  // Save to DB in background (non-blocking)
+  saveOrderToDB(name, phone, email, addr, city, state, pin, final, discount, 'whatsapp_cod', null)
+    .catch(function(e){ console.warn('DB save failed:', e); });
 }
-
 // Pre-fill delivery form from saved info
 function prefillDelivery() {
   try {
