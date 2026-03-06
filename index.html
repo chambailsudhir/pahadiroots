@@ -1159,6 +1159,7 @@ try { recentIds = JSON.parse(localStorage.getItem('pr_recent')||'[]'); } catch(e
 // ── COUPON STATE — loaded from DB via store-data ───────────────────
 const COUPONS = {};  // populated from DB in loadData()
 let activeCoupon = null;
+let _orderProcessing = false;  // prevents double order submission
 
 // ── FILTER/SORT STATE ──────────────────────────────────────────────
 let activeFilter = 'all';
@@ -1311,9 +1312,9 @@ function mkProd(p) {
   var pct    = p.original_price ? Math.round((1 - p.price / p.original_price) * 100) : 0;
   var bc     = p.badge_type || 'bs';
   var stock  = p.stock || 99;
-  var sClass = stock > 20 ? 'high' : stock > 5 ? 'mid' : 'low';
+  var sClass = stock > 20 ? 'high' : stock > 5 ? 'mid' : stock > 0 ? 'low' : 'low';
   var sPct   = Math.min(100, Math.round(stock / 50 * 100));
-  var sLbl   = stock > 20 ? 'In Stock' : stock > 5 ? ('Only ' + stock + ' left') : 'Out of Stock';
+  var sLbl   = stock <= 0 ? 'Out of Stock' : stock > 20 ? 'In Stock' : ('Only ' + stock + ' left');
   var inWL   = wishlist.includes(p.id);
   var imgHtml = p.image_url
     ? '<img src="' + p.image_url + '" alt="' + p.name + '" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1" onerror="this.style.display=\'none\'">'
@@ -1323,7 +1324,7 @@ function mkProd(p) {
     '<span class="pemo" style="position:relative;z-index:0">' + (p.emoji||'🌿') + '</span>' +
     '</div>';
   var discBadge = pct ? '<span style="position:absolute;top:8px;right:36px;background:#e53;color:#fff;font-size:9px;font-weight:800;padding:2px 7px;border-radius:10px;z-index:2">-' + pct + '%</span>' : '';
-  var notifyBtn = stock <= 5 ? '<button class="notify-btn" onclick="event.stopPropagation();openNotify(' + p.id + ')">🔔 Notify Me</button>' : '';
+  var notifyBtn = stock <= 0 ? '<button class="notify-btn" onclick="event.stopPropagation();openNotify(' + p.id + ')">🔔 Notify Me</button>' : '';
   return '<div class="pcard" style="position:relative">' +
     '<span class="pbadge b' + bc + '">' + (p.badge_label||'') + '</span>' +
     '<button class="wl-btn' + (inWL?' active':'') + '" data-id="' + p.id + '" onclick="event.stopPropagation();toggleWishlist(' + p.id + ')" title="Wishlist">' + (inWL?'❤️':'🤍') + '</button>' +
@@ -1549,6 +1550,7 @@ function closeCart() {
 // ── RAZORPAY PAYMENT ────────────────────────────────────────────────
 async function checkoutRazorpay() {
   if (!cart.length) { showToast('🛒 Cart is empty!'); return; }
+  if (_orderProcessing) { showToast('⏳ Processing, please wait…'); return; }
 
   var name  = (document.getElementById('del-name') ||{}).value||'';
   var phone = (document.getElementById('del-phone')||{}).value||'';
@@ -1607,16 +1609,19 @@ async function checkoutRazorpay() {
       activeCoupon = null;
       var cf = document.getElementById('coupForm'); if(cf) cf.style.display='block';
       var ca = document.getElementById('coupApplied'); if(ca) ca.style.display='none';
+      _orderProcessing = false;
       showToast('🎉 Payment successful! Order confirmed.');
       window.open('https://wa.me/919899984895?text='+encodeURIComponent(msg),'_blank');
       setTimeout(function(){ window.location.href = '/#order-confirmed'; }, 1000);
     },
     modal: {
-      ondismiss: function(){ showToast('Payment cancelled'); }
+      ondismiss: function(){ _orderProcessing = false; showToast('Payment cancelled'); }
     }
   };
 
   var rzp = new Razorpay(options);
+  _orderProcessing = true;
+  rzp.on('payment.failed', function(){ _orderProcessing = false; });
   rzp.open();
 }
 
@@ -1646,6 +1651,8 @@ async function saveOrderToDB(name, phone, email, addr, city, state, pin, final, 
 
 async function checkout() {
   if (!cart.length) { showToast('🛒 Cart is empty!'); return; }
+  if (_orderProcessing) { showToast('⏳ Processing, please wait…'); return; }
+  _orderProcessing = true;
 
   // Validate delivery fields
   var name  = (document.getElementById('del-name') ||{}).value||'';
@@ -1662,8 +1669,8 @@ async function checkout() {
     if(el && !el.value.trim()){ el.classList.add('req-err'); err=true; }
     else if(el) el.classList.remove('req-err');
   });
-  if(err){ showToast('📍 Please fill in all delivery details'); document.getElementById('del-form').scrollIntoView({behavior:'smooth',block:'center'}); return; }
-  if(phone.replace(/\D/g,'').length < 10){ showToast('📱 Enter a valid 10-digit phone number'); document.getElementById('del-phone').classList.add('req-err'); return; }
+  if(err){ _orderProcessing = false; showToast('📍 Please fill in all delivery details'); document.getElementById('del-form').scrollIntoView({behavior:'smooth',block:'center'}); return; }
+  if(phone.replace(/\D/g,'').length < 10){ _orderProcessing = false; showToast('📱 Enter a valid 10-digit phone number'); document.getElementById('del-phone').classList.add('req-err'); return; }
 
   var t = cart.reduce(function(a, i) { return a + i.price * i.qty; }, 0);
   var discount = calcDiscount(t);
@@ -1704,6 +1711,7 @@ async function checkout() {
   var payMsg = msg + '\n\n💵 *Payment: Cash on Delivery*';
   window.open('https://wa.me/919899984895?text=' + encodeURIComponent(payMsg), '_blank');
   setTimeout(function(){ 
+    _orderProcessing = false;
     showToast('✅ Order placed! We will confirm via WhatsApp shortly.');
     closeCart();
   }, 500);
@@ -1891,8 +1899,8 @@ function openQV(id) {
   var pct = p.original_price ? Math.round((1 - p.price / p.original_price) * 100) : 0;
   var inWL = wishlist.includes(p.id);
   var stock = p.stock || 99;
-  var stockClass = stock > 20 ? 'in' : stock > 5 ? 'low' : 'out';
-  var stockTxt   = stock > 20 ? '✅ In Stock' : stock > 5 ? ('⚠️ Only ' + stock + ' left') : '❌ Out of Stock';
+  var stockClass = stock <= 0 ? 'out' : stock > 20 ? 'in' : 'low';
+  var stockTxt   = stock <= 0 ? '❌ Out of Stock' : stock > 20 ? '✅ In Stock' : ('⚠️ Only ' + stock + ' left');
   var box = document.getElementById('qvBox');
   if (!box) return;
   box.innerHTML = '<div style="position:relative">' +
