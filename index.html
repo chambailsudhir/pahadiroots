@@ -1564,44 +1564,24 @@ async function checkoutRazorpay() {
 // ── SAVE ORDER TO DB (shared by both payment methods) ───────────────
 async function saveOrderToDB(name, phone, email, addr, city, state, pin, final, discount, payMethod, paymentId) {
   try {
-    var SB_URL = 'https://ulyrhnpoiypuvaurlqqi.supabase.co';
-    var SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVseXJobnBvaXlwdXZhdXJscXFpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyOTE5NTYsImV4cCI6MjA4Nzg2Nzk1Nn0.lU_Wi4G84X54BPdjhG_h-N4u2_HSYiAF-12hekDnejk';
-    var headers = {'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Prefer':'return=representation'};
-
-    // 1. Upsert customer
-    var custBody = {first_name:name.trim(), phone:phone.trim(), email:email.trim()||null, address_line1:addr.trim(), city:city.trim(), state:state.trim()||null, postal_code:pin.trim()};
-    var cr = await fetch(SB_URL+'/rest/v1/customers?phone=eq.'+encodeURIComponent(phone.trim()), {method:'GET', headers:headers});
-    var existingCusts = await cr.json();
-    var custId = null;
-    if(existingCusts && existingCusts.length > 0){
-      custId = existingCusts[0].id;
-      await fetch(SB_URL+'/rest/v1/customers?id=eq.'+custId, {method:'PATCH', headers:headers, body:JSON.stringify(custBody)});
-    } else {
-      var insr = await fetch(SB_URL+'/rest/v1/customers', {method:'POST', headers:headers, body:JSON.stringify(custBody)});
-      var newCust = await insr.json();
-      if(newCust && newCust[0]) custId = newCust[0].id;
-    }
-
-    // 2. Create order
-    var orderBody = {
-      customer_id: custId,
-      total_amount: final,
-      order_status: payMethod === 'razorpay_online' ? 'confirmed' : 'pending',
-      payment_status: payMethod === 'razorpay_online' ? 'paid' : 'pending',
-      payment_method: payMethod,
-      payment_id: paymentId || null,
-      coupon_discount: discount || null
-    };
-    var or = await fetch(SB_URL+'/rest/v1/orders', {method:'POST', headers:headers, body:JSON.stringify(orderBody)});
-    var newOrder = await or.json();
-    var orderId = newOrder && newOrder[0] ? newOrder[0].id : null;
-
-    // 3. Save order items
-    if(orderId){
-      var items = cart.map(function(i){ return {order_id:orderId, product_id:i.id||null, quantity:i.qty, price_at_time:i.price}; });
-      await fetch(SB_URL+'/rest/v1/order_items', {method:'POST', headers:{'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY}, body:JSON.stringify(items)});
-    }
-    return orderId;
+    var apiBase = getStoreApiBase().replace('/store-data','').replace('store-data','');
+    // Use /api for Vercel, /.netlify/functions for Netlify
+    var endpoint = (location.hostname.includes('pahadiroots') || location.hostname.includes('vercel')) 
+      ? '/api/admin-api' 
+      : '/.netlify/functions/admin-api';
+    var res = await fetch(endpoint, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        action: 'save_order',
+        name, phone, email, addr, city, state, pin,
+        final, discount, payMethod, paymentId,
+        items: cart.map(function(i){ return {id:i.id||null, qty:i.qty, price:i.price, name:i.name||''}; })
+      })
+    });
+    var data = await res.json();
+    if(!res.ok) { console.warn('Order save failed:', data.error); return null; }
+    return data.orderId || null;
   } catch(e) {
     console.warn('Order save failed:', e.message);
     return null;
