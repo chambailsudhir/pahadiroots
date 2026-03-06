@@ -41,10 +41,11 @@ export default async function handler(req, res) {
 
   try {
     // Fetch states, products, and site_settings in parallel
-    const [states, products, siteSettings] = await Promise.all([
+    const [states, products, siteSettings, coupons] = await Promise.all([
       sbGet('states', 'is_active=eq.true&order=name.asc').catch(() => []),
       sbGet('products', 'status=eq.active&is_deleted=eq.false&order=name.asc').catch(() => []),
       sbGet('site_settings', 'select=key,value').catch(() => []),
+      sbGet('coupons', 'is_active=eq.true&select=code,discount_type,discount_value,min_order_amount,max_uses,expires_at').catch(() => []),
     ]);
 
     // Convert site_settings array to object
@@ -55,6 +56,7 @@ export default async function handler(req, res) {
       states:   states   || [],
       products: products || [],
       settings,
+      coupons:  coupons  || [],
     });
 
   } catch (e) {
