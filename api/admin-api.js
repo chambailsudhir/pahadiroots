@@ -97,7 +97,8 @@ export default async function handler(req, res) {
   if (isRateLimited(ip)) return err(429, 'Too many requests — slow down');
 
   const pw = req.headers['x-admin-password'] || '';
-  if (!pw || pw.length !== ADMIN_PW.length || pw !== ADMIN_PW) {
+  const isPublicAction = reqBody.action === 'save_order' || reqBody.action === 'storage_upload';
+  if (!isPublicAction && (!pw || pw.length !== ADMIN_PW.length || pw !== ADMIN_PW)) {
     return err(401, 'Unauthorized');
   }
 
@@ -129,6 +130,54 @@ export default async function handler(req, res) {
       return ok({ url: publicUrl });
     } catch (e) {
       return err(500, 'Storage error: ' + e.message);
+    }
+  }
+
+  // ── Public Order Save (no password required) ──
+  if (reqBody.action === 'save_order') {
+    try {
+      const { name, phone, email, addr, city, state, pin, final, discount, payMethod, paymentId, items } = reqBody;
+      if (!name || !phone || !final) return err(400, 'Missing required order fields');
+
+      // 1. Upsert customer
+      const custBody = { first_name: name.trim(), phone: phone.trim(), email: email||null, address_line1: addr||null, city: city||null, state: state||null, postal_code: pin||null };
+      const existing = await sbFetch('GET', 'customers', `phone=eq.${encodeURIComponent(phone.trim())}&select=id`);
+      let custId = null;
+      if (existing && existing.length > 0) {
+        custId = existing[0].id;
+        await sbFetch('PATCH', 'customers', `id=eq.${custId}`, custBody);
+      } else {
+        const nc = await sbFetch('POST', 'customers', '', custBody);
+        custId = nc && nc[0] ? nc[0].id : null;
+      }
+      if (!custId) return err(500, 'Could not create customer');
+
+      // 2. Create order
+      const orderBody = {
+        customer_id: custId,
+        total_amount: final,
+        subtotal: final + (discount||0),
+        coupon_discount: discount||0,
+        order_status: payMethod === 'razorpay_online' ? 'confirmed' : 'pending',
+        payment_status: payMethod === 'razorpay_online' ? 'paid' : 'pending',
+        payment_method: payMethod,
+        payment_id: paymentId || null,
+      };
+      const newOrder = await sbFetch('POST', 'orders', '', orderBody);
+      const orderId = newOrder && newOrder[0] ? newOrder[0].id : null;
+      const orderNumber = newOrder && newOrder[0] ? newOrder[0].order_number : null;
+      if (!orderId) return err(500, 'Could not create order');
+
+      // 3. Save order items
+      if (items && items.length) {
+        const orderItems = items.map(i => ({ order_id: orderId, product_id: i.id||null, quantity: i.qty, price_at_time: i.price, product_name: i.name||null }));
+        await sbFetch('POST', 'order_items', '', orderItems).catch(e => console.warn('order_items failed:', e));
+      }
+
+      return ok({ success: true, orderId, orderNumber });
+    } catch(e) {
+      console.error('save_order error:', e);
+      return err(500, 'Order save failed: ' + (e.message || JSON.stringify(e)));
     }
   }
 
