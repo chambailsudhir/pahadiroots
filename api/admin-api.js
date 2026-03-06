@@ -140,7 +140,10 @@ export default async function handler(req, res) {
       if (!name || !phone || !final) return err(400, 'Missing required order fields');
 
       // 1. Upsert customer
-      const custBody = { first_name: name.trim(), phone: phone.trim(), email: email||null, address_line1: addr||null, city: city||null, state: state||null, postal_code: pin||null };
+      const nameParts = name.trim().split(' ');
+      const firstName = nameParts[0] || name.trim();
+      const lastName = nameParts.slice(1).join(' ') || null;
+      const custBody = { first_name: firstName, last_name: lastName, phone: phone.trim(), email: email||null, address_line1: addr||null, city: city||null, state: state||null, postal_code: pin||null };
       const existing = await sbFetch('GET', 'customers', `phone=eq.${encodeURIComponent(phone.trim())}&select=id`);
       let custId = null;
       if (existing && existing.length > 0) {
@@ -158,6 +161,8 @@ export default async function handler(req, res) {
         total_amount: final,
         subtotal: final + (discount||0),
         coupon_discount: discount||0,
+        tax: 0,
+        shipping_charge: 0,
         order_status: payMethod === 'razorpay_online' ? 'confirmed' : 'pending',
         payment_status: payMethod === 'razorpay_online' ? 'paid' : 'pending',
         payment_method: payMethod,
@@ -170,9 +175,57 @@ export default async function handler(req, res) {
 
       // 3. Save order items
       if (items && items.length) {
-        const orderItems = items.map(i => ({ order_id: orderId, product_id: i.id||null, quantity: i.qty, price_at_time: i.price, product_name: i.name||null }));
+        const orderItems = items.map(i => ({ order_id: orderId, product_id: i.id||null, quantity: i.qty, price_at_time: i.price }));
         await sbFetch('POST', 'order_items', '', orderItems).catch(e => console.warn('order_items failed:', e));
       }
+
+      // 4. Increment coupon uses_count + save coupon_usage
+      if (reqBody.couponCode && discount > 0) {
+        const coup = await sbFetch('GET', 'coupons', `code=eq.${reqBody.couponCode}&select=id`).catch(()=>[]);
+        const couponId = coup && coup[0] ? coup[0].id : null;
+        if (couponId) {
+          // Save coupon_usage record
+          await sbFetch('POST', 'coupon_usage', '', {
+            coupon_id: couponId,
+            order_id: orderId,
+            customer_id: custId,
+            discount_amount: discount
+          }).catch(e => console.warn('coupon_usage save failed:', e));
+          // Increment uses_count
+          const curr = await sbFetch('GET', 'coupons', `id=eq.${couponId}&select=uses_count`).catch(()=>[]);
+          const currCount = curr && curr[0] ? (curr[0].uses_count || 0) : 0;
+          await sbFetch('PATCH', 'coupons', `id=eq.${couponId}`, { uses_count: currCount + 1 }).catch(()=>{});
+        }
+      }
+
+      // 5. Decrement stock_quantity for each item
+      if (items && items.length) {
+        for (const item of items) {
+          if (!item.id) continue;
+          try {
+            const prod = await sbFetch('GET', 'products', `id=eq.${item.id}&select=id,stock_quantity`);
+            if (prod && prod[0]) {
+              const newStock = Math.max(0, (prod[0].stock_quantity || 0) - (item.qty || 1));
+              await sbFetch('PATCH', 'products', `id=eq.${item.id}`, { stock_quantity: newStock });
+              // Save inventory log
+              await sbFetch('POST', 'inventory_logs', '', {
+                product_id: item.id,
+                change_type: 'sale',
+                quantity_change: -(item.qty || 1),
+                reference_id: orderNumber || String(orderId)
+              }).catch(()=>{});
+            }
+          } catch(e) { console.warn('stock decrement failed for product', item.id, e); }
+        }
+      }
+
+      // 6. Save order_status_history
+      await sbFetch('POST', 'order_status_history', '', {
+        order_id: orderId,
+        old_status: 'new',
+        new_status: payMethod === 'razorpay_online' ? 'confirmed' : 'pending',
+        changed_at: new Date().toISOString()
+      }).catch(()=>{});
 
       return ok({ success: true, orderId, orderNumber });
     } catch(e) {
