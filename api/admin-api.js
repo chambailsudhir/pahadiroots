@@ -210,7 +210,8 @@ export default async function handler(req, res) {
             }
             // Fallback: try by name (for fallback/hardcoded products)
             if (!prod && item.name) {
-              const res = await sbFetch('GET', 'products', `name=ilike.${encodeURIComponent(item.name)}&select=id,stock_quantity,name&limit=1`).catch(()=>[]);
+              const nameQ = encodeURIComponent('*' + item.name + '*');
+              const res = await sbFetch('GET', 'products', `name=ilike.${nameQ}&select=id,stock_quantity,name&limit=1`).catch(()=>[]);
               if (res && res[0]) prod = res[0];
             }
             if (prod) {
