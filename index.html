@@ -967,7 +967,7 @@ footer{background:#0d1a0f;padding:44px 40px 24px}
   <!-- Cart header bar -->
   <div class="cpage-hdr">
     <button class="cpage-back" onclick="closeCart()">← Continue Shopping</button>
-    <div class="cpage-title" style="display:flex;align-items:center;gap:12px">🛒 Your Cart <button onclick="cart=[];uCart();updateCartBadge();try{localStorage.removeItem('pr_cart')}catch(e){};showToast('Cart cleared!')" style="background:none;border:1px solid rgba(0,0,0,.15);padding:3px 10px;border-radius:6px;font-size:11px;cursor:pointer;color:var(--tx3);font-weight:600">🗑 Clear</button></div>
+    <div class="cpage-title" style="display:flex;align-items:center;gap:12px">🛒 Your Cart <button onclick="cart=[];uCart();try{localStorage.removeItem('pr_cart')}catch(e){};showToast('Cart cleared!')" style="background:none;border:1px solid rgba(0,0,0,.15);padding:3px 10px;border-radius:6px;font-size:11px;cursor:pointer;color:var(--tx3);font-weight:600">🗑 Clear</button></div>
     <a href="#home" class="cpage-logo" onclick="closeCart()">Pahadi Roots 🌿</a>
   </div>
 
@@ -1014,46 +1014,46 @@ footer{background:#0d1a0f;padding:44px 40px 24px}
           <div class="csum-row csum-total"><span>Total</span><span id="ctvalTotal">₹0</span></div>
         </div>
         <!-- DELIVERY INFO FORM -->
-        <div class="del-form" id="del-form">
+        <div class="del-form" id="del-form" autocomplete="off">
           <div class="del-form-title">📍 Delivery Details</div>
           <div class="del-row">
             <div class="del-field">
               <label>Full Name *</label>
-              <input class="del-input" id="del-name" placeholder="Your name" autocomplete="name">
+              <input class="del-input" id="del-name" autocomplete="off" placeholder="Your name" autocomplete="name">
             </div>
             <div class="del-field">
               <label>Phone *</label>
-              <input class="del-input" id="del-phone" placeholder="10-digit mobile" type="tel" maxlength="10" autocomplete="tel">
+              <input class="del-input" id="del-phone" autocomplete="off" placeholder="10-digit mobile" type="tel" maxlength="10" autocomplete="tel">
             </div>
           </div>
           <div class="del-row full">
             <div class="del-field">
               <label>Address *</label>
-              <input class="del-input" id="del-addr" placeholder="House / Flat, Street, Area" autocomplete="address-line1">
+              <input class="del-input" id="del-addr" autocomplete="off" placeholder="House / Flat, Street, Area" autocomplete="address-line1">
             </div>
           </div>
           <div class="del-row">
             <div class="del-field">
               <label>City *</label>
-              <input class="del-input" id="del-city" placeholder="City" autocomplete="address-level2">
+              <input class="del-input" id="del-city" autocomplete="off" placeholder="City" autocomplete="address-level2">
             </div>
             <div class="del-field">
               <label>State</label>
-              <input class="del-input" id="del-state" placeholder="State / UT" autocomplete="address-level1">
+              <input class="del-input" id="del-state" autocomplete="off" placeholder="State / UT" autocomplete="address-level1">
             </div>
           </div>
           <div class="del-row">
             <div class="del-field">
               <label>Pincode *</label>
-              <input class="del-input" id="del-pin" placeholder="6-digit pincode" maxlength="6" type="tel">
+              <input class="del-input" id="del-pin" autocomplete="off" placeholder="6-digit pincode" maxlength="6" type="tel">
             </div>
             <div class="del-field">
               <label>Email</label>
-              <input class="del-input" id="del-email" placeholder="Optional" type="email" autocomplete="email">
+              <input class="del-input" id="del-email" autocomplete="off" placeholder="Optional" type="email" autocomplete="email">
             </div>
           </div>
         </div>
-        <button class="chkbtn" onclick="checkoutRazorpay()" style="background:linear-gradient(135deg,#2d6a4f,#40916c);margin-bottom:10px">💳 Pay Online (UPI · Cards · Net Banking)</button>
+        <button class="chkbtn" onclick="checkoutRazorpay()" style="background:linear-gradient(135deg,#2d6a4f,#40916c);margin-bottom:10px;display:none">💳 Pay Online (UPI · Cards · Net Banking)</button>
         <button class="chkbtn" onclick="checkout()" style="background:linear-gradient(135deg,#e76f51,#f4a261)">📱 COD + WhatsApp Confirm →</button>
         <div class="cpays">📱 UPI &nbsp;·&nbsp; 💳 Cards &nbsp;·&nbsp; 🏧 Net Banking &nbsp;·&nbsp; 🚪 COD</div>
         <div class="cpage-secure">🔒 100% Secure & Encrypted Checkout</div>
@@ -1570,14 +1570,14 @@ async function checkoutRazorpay() {
       showToast('✅ Payment successful! Saving order...');
       await saveOrderToDB(name, phone, email, addr, city, state, pin, final, discount, 'razorpay_online', response.razorpay_payment_id);
       // Send WhatsApp confirmation
-      var msg = '*Payment Received — Pahadi Roots* 🌿\n\n'+
+      var msg = '✅ *Payment Confirmed — Pahadi Roots* 🌿\n\n'+
         '✅ *Payment ID:* '+response.razorpay_payment_id+'\n'+
         '👤 *'+name.trim()+'*\n📱 '+phone.trim()+'\n\n'+
         '📍 '+addr.trim()+', '+city.trim()+' - '+pin.trim()+'\n\n'+
         '🛒 *Items*\n'+
         cart.map(function(i){return '• '+i.name+' ×'+i.qty+' = ₹'+(i.price*i.qty);}).join('\n')+
         '\n\n*Total Paid: ₹'+final+'*';
-      cart = []; renderCart(); updateCartBadge();
+      cart = []; uCart();
       try{ localStorage.removeItem('pr_cart'); }catch(e){}
       try{ localStorage.removeItem('pr_cust_info'); }catch(e){}
       ['del-name','del-phone','del-addr','del-city','del-state','del-pin','del-email'].forEach(function(id){
@@ -1602,11 +1602,7 @@ async function checkoutRazorpay() {
 // ── SAVE ORDER TO DB (shared by both payment methods) ───────────────
 async function saveOrderToDB(name, phone, email, addr, city, state, pin, final, discount, payMethod, paymentId) {
   try {
-    var apiBase = getStoreApiBase().replace('/store-data','').replace('store-data','');
-    // Use /api for Vercel, /.netlify/functions for Netlify
-    var endpoint = (location.hostname.includes('pahadiroots') || location.hostname.includes('vercel')) 
-      ? '/api/admin-api' 
-      : '/.netlify/functions/admin-api';
+    var endpoint = '/api/admin-api';
     var res = await fetch(endpoint, {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
@@ -1614,6 +1610,7 @@ async function saveOrderToDB(name, phone, email, addr, city, state, pin, final, 
         action: 'save_order',
         name, phone, email, addr, city, state, pin,
         final, discount, payMethod, paymentId,
+        couponCode: activeCoupon ? activeCoupon.code : null,
         items: cart.map(function(i){ return {id:i.id||null, qty:i.qty, price:i.price, name:i.name||''}; })
       })
     });
@@ -1671,7 +1668,7 @@ async function checkout() {
   try { await saveOrderToDB(name, phone, email, addr, city, state, pin, final, discount, 'whatsapp_cod', null); } catch(e) { console.warn('DB save failed:', e); }
 
   // Clear cart + delivery form
-  cart = []; uCart(); updateCartBadge();
+  cart = []; uCart();
   try{ localStorage.removeItem('pr_cart'); }catch(e){}
   try{ localStorage.removeItem('pr_cust_info'); }catch(e){}
   ['del-name','del-phone','del-addr','del-city','del-state','del-pin','del-email'].forEach(function(id){
@@ -1682,7 +1679,9 @@ async function checkout() {
   var ca = document.getElementById('coupApplied'); if(ca) ca.style.display='none';
   var ci = document.getElementById('coupInp'); if(ci) ci.value='';
 
-  window.open('https://wa.me/919899984895?text=' + encodeURIComponent(msg), '_blank');
+  // Append payment method to msg
+  var payMsg = msg + '\n\n💵 *Payment: Cash on Delivery*';
+  window.open('https://wa.me/919899984895?text=' + encodeURIComponent(payMsg), '_blank');
   setTimeout(function(){ 
     showToast('✅ Order placed! We will confirm via WhatsApp shortly.');
     document.getElementById('cart-panel')&&document.getElementById('cart-panel').classList.remove('open');

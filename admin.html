@@ -1026,7 +1026,7 @@ async function saveOrdStatus(){
     if(status==='shipped' && !S.currentOrder.shipped_at) patchBody.shipped_at=new Date().toISOString();
     if(status==='delivered' && !S.currentOrder.delivered_at) patchBody.delivered_at=new Date().toISOString();
     await PATCH('orders',`id=eq.${S.currentOrder.id}`,patchBody);
-    try{await POST('order_status_history',{order_id:S.currentOrder.id,old_status:S.currentOrder.order_status,new_status:status});}catch(e){}
+    try{await POST('order_status_history',{order_id:S.currentOrder.id,old_status:S.currentOrder.order_status,new_status:status,changed_at:new Date().toISOString()});}catch(e){}
     toast('Order updated ✓','ok');closeM('order-modal');await loadOrders(1);
   }catch(e){
     if(e.message.includes('Cannot confirm order without items')){
