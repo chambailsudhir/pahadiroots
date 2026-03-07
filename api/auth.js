@@ -331,13 +331,49 @@ export default async function handler(req, res) {
     }
   }
 
-  // ── 10. Logout (client-side only, but invalidate session) ──
+  // ── 10. Logout ─────────────────────────────────────────────
   if (action === 'logout') {
     const token = (req.headers['authorization'] || '').replace('Bearer ', '');
     if (token) {
       try { await sbAuth('/logout', {}, token); } catch(e) {}
     }
     return ok({ success: true });
+  }
+
+  // ── 11. Forgot Password — send reset email ──────────────────
+  if (action === 'forgot_password') {
+    const { email } = body;
+    if (!email) return err(400, 'Email required');
+    try {
+      await sbAuth('/recover', { email });
+      return ok({ success: true, message: 'Reset email sent' });
+    } catch(e) {
+      // Always return success to prevent email enumeration
+      return ok({ success: true, message: 'Reset email sent if account exists' });
+    }
+  }
+
+  // ── 12. Reset Password — set new password with token ────────
+  if (action === 'reset_password') {
+    const token = (req.headers['authorization'] || '').replace('Bearer ', '');
+    const { password } = body;
+    if (!token)   return err(401, 'Invalid or expired reset link');
+    if (!password || password.length < 6) return err(400, 'Password must be at least 6 characters');
+    try {
+      // Update password using the reset token as bearer
+      await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type':  'application/json',
+          'apikey':        SUPABASE_ANON,
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ password }),
+      });
+      return ok({ success: true, message: 'Password updated successfully' });
+    } catch(e) {
+      return err(e.status || 400, e.message || 'Reset failed');
+    }
   }
 
   return err(400, `Unknown action: ${action}`);
