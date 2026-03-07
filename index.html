@@ -183,7 +183,7 @@ nav#mNav.shadow{box-shadow:0 2px 16px rgba(0,0,0,.08)}
 .mob-nav a:hover{background:rgba(26,58,30,.07);color:var(--g)}
 
 /* HERO */
-.hero{min-height:92vh;position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(170deg,#071a09 0%,#0e2812 25%,#1a3a1e 55%,#2d5233 80%,#3a6140 100%)}
+.hero{min-height:80vh;position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(170deg,#071a09 0%,#0e2812 25%,#1a3a1e 55%,#2d5233 80%,#3a6140 100%)}
 .hmtn{position:absolute;bottom:0;left:0;right:0;height:40%;pointer-events:none}
 .hmtn svg{width:100%;height:100%}
 .hov{position:absolute;inset:0;background:linear-gradient(180deg,rgba(7,26,9,.2) 0%,transparent 50%,rgba(7,26,9,.3) 100%);pointer-events:none}
@@ -3013,7 +3013,14 @@ function renderAddress(p) {
     '<div id="addr-msg" style="font-size:12px;margin-top:8px;color:#2d6a4f;display:none">✓ Address saved!</div>' +
     savedList +
     '<div class="acct-section-title" style="margin-top:16px">➕ Add Another Address</div>' +
-    '<div class="profile-field"><label>Label (Home / Office / Parents etc.)</label><input class="profile-input" id="new-addr-label" placeholder="e.g. Parents Home, Himachal"></div>' +
+    '<div class="profile-field"><label>Label</label>' +
+    '<select class="profile-input" id="new-addr-label" style="background:#fff;cursor:pointer;height:44px">' +
+    '<option value="">— Select Label —</option>' +
+    '<option value="Home">🏠 Home</option>' +
+    '<option value="Office">🏢 Office</option>' +
+    '<option value="Parents">👨‍👩‍👧 Parents</option>' +
+    '<option value="Others">📍 Others</option>' +
+    '</select>' +
     '<div class="profile-field"><label>Full Name</label><input class="profile-input" id="new-addr-name" placeholder="Recipient name"></div>' +
     '<div class="profile-field"><label>Phone</label><input class="profile-input" id="new-addr-phone" placeholder="10-digit mobile" type="tel"></div>' +
     '<div class="profile-field"><label>Address Line</label><input class="profile-input" id="new-addr-addr" placeholder="House/Street/Area"></div>' +
