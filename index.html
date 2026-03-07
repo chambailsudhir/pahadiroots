@@ -2554,6 +2554,10 @@ window.addEventListener('DOMContentLoaded', function() {
 
     <!-- Phone OTP Panel -->
     <div class="auth-panel active" id="auth-phone">
+      <div style="background:#fff8e1;border:1px solid #ffe082;border-radius:10px;padding:10px 14px;font-size:12.5px;color:#795548;margin-bottom:14px">
+        ⚠️ <strong>Phone OTP</strong> ke liye SMS provider setup karna padega.<br>
+        Abhi <strong>Email tab</strong> se login karo — turant kaam karega!
+      </div>
       <div class="auth-fg">
         <label class="auth-label">Mobile Number</label>
         <div class="auth-otp-row">
@@ -2568,6 +2572,9 @@ window.addEventListener('DOMContentLoaded', function() {
       </div>
       <div class="auth-err" id="auth-phone-err"></div>
       <button class="auth-submit" id="verifyOtpBtn" style="display:none" onclick="verifyOtp()">Verify & Login</button>
+      <div style="text-align:center;margin-top:12px">
+        <a onclick="switchAuthTab('email')" style="color:#2d6a4f;font-weight:700;cursor:pointer;font-size:13px">→ Email se login karo (recommended)</a>
+      </div>
     </div>
 
     <!-- Email Panel -->
@@ -2690,7 +2697,14 @@ async function sendOtp() {
     startOtpTimer();
     setTimeout(function(){ document.getElementById('auth-otp').focus(); }, 100);
   } catch(e) {
-    errEl.textContent = e.message || 'Failed to send OTP. Try again.';
+    var msg = e.message || '';
+    if (msg === 'SMS_NOT_CONFIGURED') {
+      errEl.textContent = '📧 SMS abhi setup nahi hai — Email tab se login karo';
+      // Auto switch to email tab
+      setTimeout(function(){ switchAuthTab('email'); }, 1800);
+    } else {
+      errEl.textContent = msg || 'Failed to send OTP. Try again.';
+    }
     errEl.classList.add('show');
     btn.disabled = false; btn.textContent = 'Send OTP';
   }
