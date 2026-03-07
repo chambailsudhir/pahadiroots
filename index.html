@@ -2606,8 +2606,13 @@ window.addEventListener('DOMContentLoaded', function() {
           <input class="auth-input" id="auth-forgot-email" type="email" placeholder="you@example.com">
         </div>
         <div class="auth-err" id="auth-forgot-err"></div>
-        <div id="auth-forgot-success" style="display:none;background:#e8f5e9;border-radius:10px;padding:12px;font-size:13px;color:#1a5c2a;text-align:center;margin-bottom:12px">
-          ✅ Reset link bhej diya! Gmail check karo (spam bhi dekho)
+        <div id="auth-forgot-success" style="display:none;background:#e8f5e9;border-radius:10px;padding:14px;font-size:13px;color:#1a5c2a;text-align:center;margin-bottom:12px">
+          ✅ Reset link bhej diya!<br>
+          <span style="color:#555;font-size:12px">Gmail check karo (Spam folder bhi dekho)</span><br>
+          <div id="resend-countdown" style="font-size:12px;color:#888;margin-top:8px;margin-bottom:4px"></div>
+          <button id="resendBtn" onclick="resendResetLink()" style="display:none;margin-top:4px;background:#1a5c2a;border:none;color:#fff;padding:9px 18px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;width:100%">
+            🔄 Resend Reset Link
+          </button>
         </div>
         <button class="auth-submit" id="forgotBtn" onclick="forgotPassword()">Send Reset Link</button>
         <div class="auth-switch"><a onclick="showEmailLogin()">← Back to Login</a></div>
@@ -2995,6 +3000,31 @@ async function logoutAccount() {
 }
 
 // ── Forgot / Reset Password ─────────────────────────────────────
+var _forgotEmail = '';
+var _resendTimer = null;
+
+function startResendCountdown() {
+  var secs = 30;
+  var cd  = document.getElementById('resend-countdown');
+  var btn = document.getElementById('resendBtn');
+  if (!cd || !btn) return;
+  btn.style.display = 'none';
+  btn.disabled = false;
+  clearInterval(_resendTimer);
+  cd.textContent = 'Resend available in ' + secs + 's';
+  _resendTimer = setInterval(function() {
+    secs--;
+    cd.textContent = 'Resend available in ' + secs + 's';
+    if (secs <= 0) {
+      clearInterval(_resendTimer);
+      cd.textContent = '';
+      btn.style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = '🔄 Resend Reset Link';
+    }
+  }, 1000);
+}
+
 async function forgotPassword() {
   var email = (document.getElementById('auth-forgot-email').value || '').trim();
   var errEl = document.getElementById('auth-forgot-err');
@@ -3003,12 +3033,25 @@ async function forgotPassword() {
   if (!email) { errEl.textContent = 'Email address daalo'; errEl.classList.add('show'); return; }
   var btn = document.getElementById('forgotBtn');
   btn.disabled = true; btn.textContent = 'Sending…';
-  try {
-    await callAuth('forgot_password', { email });
-  } catch(e) {}
-  // Always show success (security — don't reveal if email exists)
+  _forgotEmail = email;
+  try { await callAuth('forgot_password', { email }); } catch(e) {}
   sucEl.style.display = 'block';
   btn.style.display = 'none';
+  startResendCountdown();
+}
+
+async function resendResetLink() {
+  if (!_forgotEmail) return;
+  var btn = document.getElementById('resendBtn');
+  var cd  = document.getElementById('resend-countdown');
+  btn.disabled = true; btn.textContent = 'Sending…';
+  try { await callAuth('forgot_password', { email: _forgotEmail }); } catch(e) {}
+  btn.textContent = '✅ Sent!';
+  setTimeout(function() {
+    btn.disabled = false;
+    btn.textContent = '🔄 Resend Reset Link';
+    startResendCountdown();
+  }, 1500);
 }
 
 // ── Handle reset link from email (runs on page load) ───────────
@@ -3053,18 +3096,23 @@ async function submitResetPassword(token) {
   var btn = document.getElementById('resetBtn');
   btn.disabled = true; btn.textContent = 'Updating…';
   try {
+    var controller = new AbortController();
+    var timeoutId  = setTimeout(function(){ controller.abort(); }, 8000);
     var res = await fetch(getStoreApiBase() + '/auth', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
       body: JSON.stringify({ action: 'reset_password', password: pass }),
+      signal: controller.signal,
     });
+    clearTimeout(timeoutId);
     var data = await res.json();
     if (!res.ok) throw new Error(data.error || 'Reset failed');
     closeAuth();
     showToast('✅ Password update ho gaya! Ab login karo.');
     setTimeout(openAuth, 1200);
   } catch(e) {
-    errEl.textContent = e.message || 'Reset failed — link expire ho gaya, dobara try karo';
+    var msg = e.name === 'AbortError' ? 'Timeout — please try again' : (e.message || 'Reset failed — link expire ho gaya, dobara try karo');
+    errEl.textContent = msg;
     errEl.classList.add('show');
     btn.disabled = false; btn.textContent = 'Update Password';
   }
