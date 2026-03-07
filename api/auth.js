@@ -312,18 +312,19 @@ export default async function handler(req, res) {
   if (action === 'update_profile') {
     const token = (req.headers['authorization'] || '').replace('Bearer ', '');
     if (!token) return err(401, 'Not logged in');
-    const { first_name, last_name, address_line1, city, state, postal_code } = body;
+    const { first_name, last_name, address_line1, city, state, postal_code, saved_addresses } = body;
     try {
       const user    = await sbAuth('/user', null, token);
       const profile = await syncCustomerProfile(user);
       if (!profile) return err(404, 'Profile not found');
       const updates = {};
-      if (first_name    !== undefined) updates.first_name    = first_name;
-      if (last_name     !== undefined) updates.last_name     = last_name;
-      if (address_line1 !== undefined) updates.address_line1 = address_line1;
-      if (city          !== undefined) updates.city          = city;
-      if (state         !== undefined) updates.state         = state;
-      if (postal_code   !== undefined) updates.postal_code   = postal_code;
+      if (first_name       !== undefined) updates.first_name       = first_name;
+      if (last_name        !== undefined) updates.last_name        = last_name;
+      if (address_line1    !== undefined) updates.address_line1    = address_line1;
+      if (city             !== undefined) updates.city             = city;
+      if (state            !== undefined) updates.state            = state;
+      if (postal_code      !== undefined) updates.postal_code      = postal_code;
+      if (saved_addresses  !== undefined) updates.saved_addresses  = saved_addresses;
       await sbAdmin('PATCH', `/rest/v1/customers?id=eq.${profile.id}`, updates);
       return ok({ success: true, profile: { ...profile, ...updates } });
     } catch(e) {
