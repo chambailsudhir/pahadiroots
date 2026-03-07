@@ -146,12 +146,16 @@ export default async function handler(req, res) {
   if (action === 'send_otp') {
     const { phone } = body;
     if (!phone) return err(400, 'Phone required');
-    // Normalize phone: ensure +91 prefix
     const normalised = phone.startsWith('+') ? phone : '+91' + phone.replace(/\D/g, '').slice(-10);
     try {
       await sbAuth('/otp', { phone: normalised, channel: 'sms' });
       return ok({ success: true, message: 'OTP sent' });
     } catch(e) {
+      // Friendly error if SMS provider not configured
+      const msg = e.message || '';
+      if (msg.toLowerCase().includes('unsupported') || msg.toLowerCase().includes('provider') || e.status === 422) {
+        return err(422, 'SMS_NOT_CONFIGURED');
+      }
       return err(e.status || 500, e.message || 'Failed to send OTP');
     }
   }
@@ -163,15 +167,17 @@ export default async function handler(req, res) {
     const normalised = phone.startsWith('+') ? phone : '+91' + phone.replace(/\D/g, '').slice(-10);
     try {
       const data = await sbAuth('/verify', { phone: normalised, token, type: 'sms' });
-      const profile = await syncCustomerProfile(data.user);
+      const user = data.user || data;
+      if (!user || !user.id) return err(400, 'Verification failed');
+      const profile = await syncCustomerProfile(user);
       return ok({
         success:      true,
         access_token: data.access_token,
         refresh_token:data.refresh_token,
         user: {
-          id:    data.user.id,
-          phone: data.user.phone,
-          email: data.user.email,
+          id:    user.id,
+          phone: user.phone || normalised,
+          email: user.email || null,
         },
         profile,
       });
@@ -190,15 +196,18 @@ export default async function handler(req, res) {
         email, password,
         data: { full_name: full_name || '' }
       });
-      const profile = await syncCustomerProfile(data.user);
+      // Supabase may return user in data.user or data directly
+      const user = data.user || data;
+      if (!user || !user.id) return err(400, 'Signup failed — could not create user');
+      const profile = await syncCustomerProfile(user);
       return ok({
         success:      true,
-        access_token: data.access_token,
-        refresh_token:data.refresh_token,
+        access_token: data.access_token || null,
+        refresh_token:data.refresh_token || null,
         user: {
-          id:    data.user.id,
-          email: data.user.email,
-          phone: data.user.phone,
+          id:    user.id,
+          email: user.email || email,
+          phone: user.phone || null,
         },
         profile,
       });
@@ -213,15 +222,17 @@ export default async function handler(req, res) {
     if (!email || !password) return err(400, 'Email and password required');
     try {
       const data = await sbAuth('/token?grant_type=password', { email, password });
-      const profile = await syncCustomerProfile(data.user);
+      const user = data.user || data;
+      if (!user || !user.id) return err(401, 'Invalid email or password');
+      const profile = await syncCustomerProfile(user);
       return ok({
         success:      true,
         access_token: data.access_token,
         refresh_token:data.refresh_token,
         user: {
-          id:    data.user.id,
-          email: data.user.email,
-          phone: data.user.phone,
+          id:    user.id,
+          email: user.email || email,
+          phone: user.phone || null,
         },
         profile,
       });
