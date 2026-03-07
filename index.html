@@ -1025,11 +1025,12 @@ footer{background:#0d1a0f;padding:44px 40px 24px}
         <!-- DELIVERY INFO FORM -->
         <div class="del-form" id="del-form" autocomplete="off">
           <div class="del-form-title">📍 Delivery Details</div>
-          <!-- Saved addresses selector (shown only when logged in) -->
+          <!-- Saved addresses dropdown (shown only when logged in) -->
           <div id="saved-addr-bar" style="display:none;margin-bottom:14px">
-            <label style="font-size:11px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.5px">Saved Addresses</label>
-            <div id="saved-addr-list" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px"></div>
-            <button onclick="showNewAddressForm()" style="margin-top:8px;background:none;border:1.5px dashed #2d6a4f;color:#2d6a4f;padding:6px 14px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer">+ Add New Address</button>
+            <label style="font-size:11px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.5px">📋 Select Saved Address</label>
+            <select id="saved-addr-select" onchange="fillSavedAddress(this.value)" style="width:100%;margin-top:6px;padding:10px 12px;border:1.5px solid #ddd;border-radius:10px;font-size:13px;color:#333;background:#fff;cursor:pointer">
+              <option value="">— Choose a saved address —</option>
+            </select>
           </div>
           <div class="del-row">
             <div class="del-field">
@@ -1632,44 +1633,44 @@ function openCart() {
 }
 
 function renderSavedAddresses() {
-  var bar  = document.getElementById('saved-addr-bar');
-  var list = document.getElementById('saved-addr-list');
-  if (!bar || !list) return;
+  var bar    = document.getElementById('saved-addr-bar');
+  var select = document.getElementById('saved-addr-select');
+  if (!bar || !select) return;
   if (!_authProfile) { bar.style.display = 'none'; return; }
   var addrs = [];
   try { addrs = JSON.parse(_authProfile.saved_addresses || '[]'); } catch(e) {}
   // Add default address from profile if exists
   if (_authProfile.address_line1) {
+    var defPhone = (_authProfile.phone || '').replace(/^\+91/, '').replace(/\D/g,'').slice(-10);
     var def = {
       label: 'Default',
       name:  [_authProfile.first_name, _authProfile.last_name].filter(Boolean).join(' '),
-      phone: _authProfile.phone || '',
+      phone: defPhone,
       addr:  _authProfile.address_line1 || '',
       city:  _authProfile.city || '',
       state: _authProfile.state || '',
       pin:   _authProfile.postal_code || '',
-      email: _authProfile.email || '',
+      email: _authProfile.email || (_authUser && _authUser.email) || '',
     };
-    // Only add if not already in saved list
     var exists = addrs.some(function(a){ return a.addr === def.addr && a.pin === def.pin; });
     if (!exists) addrs.unshift(def);
   }
   if (!addrs.length) { bar.style.display = 'none'; return; }
   bar.style.display = 'block';
-  list.innerHTML = addrs.map(function(a, idx) {
-    return '<button onclick="fillSavedAddress(' + idx + ')" style="background:#f0f7f2;border:1.5px solid #cde8d4;color:#1a5c2a;padding:6px 12px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;text-align:left">' +
-      '📍 ' + (a.label || 'Address ' + (idx+1)) + '<br>' +
-      '<span style="font-weight:400;color:#555;font-size:11px">' + a.addr + ', ' + a.city + '</span>' +
-      '</button>';
-  }).join('');
-  // Store for use
+  select.innerHTML = '<option value="">— Choose a saved address —</option>' +
+    addrs.map(function(a, idx) {
+      return '<option value="' + idx + '">📍 ' + (a.label || 'Address '+(idx+1)) + ' — ' + a.addr + ', ' + a.city + '</option>';
+    }).join('');
   window._savedAddresses = addrs;
 }
 
 function fillSavedAddress(idx) {
-  var a = (window._savedAddresses || [])[idx];
+  if (idx === '' || idx === null || idx === undefined) return;
+  var a = (window._savedAddresses || [])[parseInt(idx)];
   if (!a) return;
-  var map = { 'del-name': a.name, 'del-phone': a.phone, 'del-addr': a.addr, 'del-city': a.city, 'del-state': a.state, 'del-pin': a.pin, 'del-email': a.email };
+  // Clean phone — strip +91, keep 10 digits
+  var phone = (a.phone || '').replace(/^\+91/, '').replace(/\D/g,'').slice(-10);
+  var map = { 'del-name': a.name, 'del-phone': phone, 'del-addr': a.addr, 'del-city': a.city, 'del-state': a.state, 'del-pin': a.pin, 'del-email': a.email };
   Object.entries(map).forEach(function(kv){ var el = document.getElementById(kv[0]); if(el) el.value = kv[1] || ''; });
   showToast('📍 Address filled!');
 }
@@ -1776,7 +1777,7 @@ async function checkoutRazorpay() {
 // ── SAVE ORDER TO DB (shared by both payment methods) ───────────────
 async function saveOrderToDB(name, phone, email, addr, city, state, pin, final, discount, shipCharge, payMethod, paymentId, cartSnapshot) {
   try {
-    var itemsToSave = (cartSnapshot || cart);  // use snapshot if provided, else live cart
+    var itemsToSave = (cartSnapshot || cart);
     var endpoint = '/api/admin-api';
     var res = await fetch(endpoint, {
       method: 'POST',
@@ -1786,6 +1787,7 @@ async function saveOrderToDB(name, phone, email, addr, city, state, pin, final, 
         name, phone, email, addr, city, state, pin,
         final, discount, shipCharge: shipCharge || 0, payMethod, paymentId,
         couponCode: activeCoupon ? activeCoupon.code : null,
+        auth_user_id: (_authUser && _authUser.id) ? _authUser.id : null,
         items: itemsToSave.map(function(i){ return {id:i.id||null, qty:i.qty, price:i.price, name:i.name||''}; })
       })
     });
@@ -3257,7 +3259,7 @@ function prefillDelivery() {
     var p = _authProfile;
     var map = {
       'del-name':  [p.first_name, p.last_name].filter(Boolean).join(' '),
-      'del-phone': p.phone || '',
+      'del-phone': (p.phone || '').replace(/^\+91/, '').replace(/\D/g,'').slice(-10),
       'del-addr':  p.address_line1 || '',
       'del-city':  p.city || '',
       'del-state': p.state || '',
