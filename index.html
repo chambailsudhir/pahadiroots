@@ -2608,7 +2608,7 @@ window.addEventListener('DOMContentLoaded', function() {
         <div class="auth-err" id="auth-forgot-err"></div>
         <div id="auth-forgot-success" style="display:none;background:#e8f5e9;border-radius:10px;padding:14px;font-size:13px;color:#1a5c2a;text-align:center;margin-bottom:12px">
           ✅ Reset link bhej diya!<br>
-          <span style="color:#555;font-size:12px">Gmail check karo (Spam folder bhi dekho)</span><br>
+          <span style="color:#555;font-size:12px">Email check karo (Spam folder bhi dekho)</span><br>
           <div id="resend-countdown" style="font-size:12px;color:#888;margin-top:8px;margin-bottom:4px"></div>
           <button id="resendBtn" onclick="resendResetLink()" style="display:none;margin-top:4px;background:#1a5c2a;border:none;color:#fff;padding:9px 18px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;width:100%">
             🔄 Resend Reset Link
@@ -2652,8 +2652,7 @@ window.addEventListener('DOMContentLoaded', function() {
   </div>
   <div class="acct-tabs">
     <button class="acct-tab active" onclick="switchAcctTab('orders')">📦 Orders</button>
-    <button class="acct-tab" onclick="switchAcctTab('address')">📍 Address</button>
-    <button class="acct-tab" onclick="switchAcctTab('profile')">👤 Profile</button>
+    <button class="acct-tab" onclick="switchAcctTab('profile')">👤 Profile & Address</button>
   </div>
   <div class="acct-body" id="acctBody">
     <div class="acct-loading">Loading your account…</div>
@@ -2841,7 +2840,7 @@ function closeAccount() {
 function switchAcctTab(tab) {
   _acctTab = tab;
   document.querySelectorAll('.acct-tab').forEach(function(t,i){
-    t.classList.toggle('active', ['orders','address','profile'][i] === tab);
+    t.classList.toggle('active', ['orders','profile'][i] === tab);
   });
   renderAcctTab();
 }
@@ -2873,8 +2872,7 @@ function renderAcctTab() {
   if (!_acctData) return;
   var body = document.getElementById('acctBody');
   if (_acctTab === 'orders') body.innerHTML = renderOrders(_acctData.orders || []);
-  else if (_acctTab === 'address') body.innerHTML = renderAddress(_acctData.profile || {});
-  else if (_acctTab === 'profile') body.innerHTML = renderProfile(_acctData.profile || {}, _acctData.user || {});
+  else if (_acctTab === 'profile') body.innerHTML = renderProfile(_acctData.profile || {}, _acctData.user || {}) + renderAddress(_acctData.profile || {});
 }
 
 function renderOrders(orders) {
@@ -2976,7 +2974,15 @@ async function linkPhone() {
     await callAuth('link_phone', { phone }, true);
     showToast('✅ Phone linked!');
     loadAccountData();
-  } catch(e) { msgEl.textContent = e.message || 'Failed to link phone'; msgEl.style.color = '#c0392b'; }
+  } catch(e) {
+    var msg = e.message || '';
+    if (msg.includes('23505') || msg.includes('already exists') || msg.includes('duplicate')) {
+      msgEl.textContent = '⚠️ Yeh number pehle se kisi account se linked hai';
+    } else {
+      msgEl.textContent = msg || 'Phone link nahi ho saka';
+    }
+    msgEl.style.color = '#c0392b';
+  }
 }
 
 async function linkEmail() {
