@@ -140,7 +140,7 @@ export default async function handler(req, res) {
   // ── Public Order Save (no password required) ──
   if (reqBody.action === 'save_order') {
     try {
-      const { name, phone, email, addr, city, state, pin, final, discount, shipCharge, payMethod, paymentId, items } = reqBody;
+      const { name, phone, email, addr, city, state, pin, final, discount, shipCharge, payMethod, paymentId, items, auth_user_id, couponCode } = reqBody;
       if (!name || !phone || !final) return err(400, 'Missing required order fields');
 
       // 1. Upsert customer
@@ -148,14 +148,27 @@ export default async function handler(req, res) {
       const firstName = nameParts[0] || name.trim();
       const lastName = nameParts.slice(1).join(' ') || null;
       const custBody = { first_name: firstName, last_name: lastName, phone: phone.trim(), email: email||null, address_line1: addr||null, city: city||null, state: state||null, postal_code: pin||null };
-      const existing = await sbFetch('GET', 'customers', `phone=eq.${encodeURIComponent(phone.trim())}&select=id`);
+      if (auth_user_id) custBody.auth_user_id = auth_user_id;
+
       let custId = null;
-      if (existing && existing.length > 0) {
-        custId = existing[0].id;
-        await sbFetch('PATCH', 'customers', `id=eq.${custId}`, custBody);
-      } else {
-        const nc = await sbFetch('POST', 'customers', '', custBody);
-        custId = nc && nc[0] ? nc[0].id : null;
+      // First try by auth_user_id (most reliable for logged-in users)
+      if (auth_user_id) {
+        const byAuth = await sbFetch('GET', 'customers', `auth_user_id=eq.${auth_user_id}&select=id`).catch(()=>[]);
+        if (byAuth && byAuth.length > 0) {
+          custId = byAuth[0].id;
+          await sbFetch('PATCH', 'customers', `id=eq.${custId}`, custBody);
+        }
+      }
+      // Fallback: lookup by phone
+      if (!custId) {
+        const existing = await sbFetch('GET', 'customers', `phone=eq.${encodeURIComponent(phone.trim())}&select=id`).catch(()=>[]);
+        if (existing && existing.length > 0) {
+          custId = existing[0].id;
+          await sbFetch('PATCH', 'customers', `id=eq.${custId}`, custBody);
+        } else {
+          const nc = await sbFetch('POST', 'customers', '', custBody);
+          custId = nc && nc[0] ? nc[0].id : null;
+        }
       }
       if (!custId) return err(500, 'Could not create customer');
 
