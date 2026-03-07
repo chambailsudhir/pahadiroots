@@ -1633,14 +1633,16 @@ function openCart() {
 }
 
 function getSavedAddresses() {
-  // Get from localStorage (keyed by user id)
-  var key = 'pr_addrs_' + ((_authUser && _authUser.id) || 'guest');
-  try { return JSON.parse(localStorage.getItem(key) || '[]'); } catch(e) { return []; }
+  // Get from profile (DB) - saved_addresses column in customers table
+  try { return JSON.parse((_authProfile && _authProfile.saved_addresses) || '[]'); } catch(e) { return []; }
 }
 
-function setSavedAddresses(addrs) {
-  var key = 'pr_addrs_' + ((_authUser && _authUser.id) || 'guest');
-  try { localStorage.setItem(key, JSON.stringify(addrs)); } catch(e) {}
+async function setSavedAddresses(addrs) {
+  // Save to DB via update_profile
+  var json = JSON.stringify(addrs);
+  if (_authProfile) _authProfile.saved_addresses = json;
+  if (_acctData && _acctData.profile) _acctData.profile.saved_addresses = json;
+  try { await callAuth('update_profile', { saved_addresses: json }, true); } catch(e) { console.warn('Address save failed:', e); }
 }
 
 function renderSavedAddresses() {
@@ -1649,12 +1651,13 @@ function renderSavedAddresses() {
   if (!bar || !select) return;
   if (!_authProfile) { bar.style.display = 'none'; return; }
 
-  var addrs = getSavedAddresses();
+  // Build address list: Default from profile + extras from DB saved_addresses
+  var allAddrs = [];
 
-  // Always include Default from profile at index 0
-  if (_authProfile.address_line1) {
-    var defPhone = (_authProfile.phone || '').replace(/^\+91/, '').replace(/\D/g,'').slice(-10);
-    var def = {
+  // 1. Always add Default from profile fields (most up-to-date)
+  var defPhone = (_authProfile.phone || '').replace(/^\+91/, '').replace(/\D/g,'').slice(-10);
+  if (_authProfile.address_line1 || defPhone) {
+    allAddrs.push({
       label: 'Default',
       name:  [_authProfile.first_name, _authProfile.last_name].filter(Boolean).join(' '),
       phone: defPhone,
@@ -1663,23 +1666,22 @@ function renderSavedAddresses() {
       state: _authProfile.state || '',
       pin:   _authProfile.postal_code || '',
       email: _authProfile.email || (_authUser && _authUser.email) || '',
-    };
-    // Replace or prepend default
-    var defIdx = addrs.findIndex(function(a){ return a.label === 'Default'; });
-    if (defIdx >= 0) addrs[defIdx] = def;
-    else addrs.unshift(def);
-    setSavedAddresses(addrs);
+    });
   }
 
-  if (!addrs.length) { bar.style.display = 'none'; return; }
-  bar.style.display = 'block';
-  window._savedAddresses = addrs;
+  // 2. Add extra saved addresses (exclude any stale Default entries)
+  var extras = getSavedAddresses().filter(function(a){ return a.label !== 'Default'; });
+  allAddrs = allAddrs.concat(extras);
 
-  select.innerHTML = addrs.map(function(a, idx) {
-    return '<option value="' + idx + '">📍 ' + (a.label || 'Address '+(idx+1)) + ' — ' + a.addr + ', ' + a.city + '</option>';
+  if (!allAddrs.length) { bar.style.display = 'none'; return; }
+  bar.style.display = 'block';
+  window._savedAddresses = allAddrs;
+
+  select.innerHTML = allAddrs.map(function(a, idx) {
+    return '<option value="' + idx + '">📍 ' + (a.label || 'Address '+(idx+1)) + ' — ' + a.addr + (a.city ? ', ' + a.city : '') + '</option>';
   }).join('');
 
-  // Auto-fill default (index 0) immediately
+  // Auto-select + auto-fill Default (index 0)
   select.value = '0';
   fillSavedAddress('0');
 }
@@ -2940,11 +2942,14 @@ async function loadAccountData() {
   try {
     var data = await callAuth('get_profile', {}, true);
     _acctData = data;
+    // Always keep _authProfile and _authUser in sync
+    if (data.profile) _authProfile = data.profile;
+    if (data.user)    _authUser    = data.user;
     // Update header
     var p = data.profile || {};
     var name = [p.first_name, p.last_name].filter(Boolean).join(' ') || data.user.email || data.user.phone || 'Customer';
-    document.getElementById('acctName').textContent = name;
-    document.getElementById('acctSub').textContent  = data.user.email || data.user.phone || '';
+    document.getElementById('acctName').textContent  = name;
+    document.getElementById('acctSub').textContent   = data.user.email || data.user.phone || '';
     document.getElementById('acctAvatar').textContent = name[0] ? name[0].toUpperCase() : '👤';
     renderAcctTab();
   } catch(e) {
@@ -2985,12 +2990,14 @@ function renderOrders(orders) {
 
 function renderAddress(p) {
   var addrs = getSavedAddresses();
-  var savedList = addrs.length ? 
+  // Show saved addresses (exclude Default — that's shown separately)
+  var extraAddrs = addrs.filter(function(a){ return a.label !== 'Default'; });
+  var savedList = extraAddrs.length ? 
     '<div class="acct-section-title" style="margin-top:16px">📋 Saved Addresses</div>' +
-    addrs.map(function(a, i) {
+    extraAddrs.map(function(a, i) {
       return '<div style="background:#f0f7f2;border-radius:10px;padding:10px 12px;margin-bottom:8px;font-size:13px">' +
         '<div style="font-weight:700;color:#1a5c2a">📍 ' + (a.label||'Address '+(i+1)) + '</div>' +
-        '<div style="color:#555;margin-top:2px">' + a.addr + ', ' + a.city + ' - ' + a.pin + '</div>' +
+        '<div style="color:#555;margin-top:2px">' + a.name + (a.name ? ' · ' : '') + a.addr + ', ' + a.city + ' - ' + a.pin + '</div>' +
         '<button onclick="deleteSavedAddress(' + i + ')" style="margin-top:6px;background:none;border:none;color:#c0392b;font-size:11px;cursor:pointer;padding:0">🗑 Remove</button>' +
         '</div>';
     }).join('') : '';
@@ -3015,13 +3022,13 @@ function renderAddress(p) {
     '<div class="profile-field"><label>State</label><input class="profile-input" id="new-addr-state" placeholder="State"></div>' +
     '</div>' +
     '<div class="profile-field" style="max-width:160px"><label>Pincode</label><input class="profile-input" id="new-addr-pin" placeholder="Pincode" maxlength="6"></div>' +
-    '<button class="acct-btn acct-btn-p" onclick="saveNewAddress()" style="margin-top:8px;background:#1a5c2a">💾 Save Address</button>' +
+    '<button id="new-addr-save-btn" class="acct-btn acct-btn-p" onclick="saveNewAddress()" style="margin-top:8px;background:#1a5c2a">💾 Save Address</button>' +
     '<div id="new-addr-msg" style="font-size:12px;margin-top:8px;color:#2d6a4f;display:none">✓ Address added!</div>' +
     '</div>';
 }
 
 function renderProfile(p, user) {
-  var linkedPhone = user.phone || '';
+  var linkedPhone = (user.phone || '').replace(/^\+91/, '');
   var linkedEmail = user.email || '';
   return '<div class="acct-section"><div class="acct-section-title">Personal Info</div>' +
     '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">' +
@@ -3071,24 +3078,29 @@ async function saveNewAddress() {
   var state = (document.getElementById('new-addr-state').value || '').trim();
   var pin   = (document.getElementById('new-addr-pin').value   || '').trim();
   if (!addr || !city || !pin) { showToast('❌ Address, City aur Pincode zaroori hai'); return; }
+  var btn = document.getElementById('new-addr-save-btn');
+  if (btn) { btn.disabled = true; btn.textContent = '💾 Saving…'; }
   var addrs = getSavedAddresses();
-  addrs.push({ label: label || 'Address ' + (addrs.length + 1), name, phone, addr, city, state, pin });
-  setSavedAddresses(addrs);
+  // Remove existing with same label
+  addrs = addrs.filter(function(a){ return a.label !== 'Default'; });
+  addrs.push({ label: label || 'Address ' + (addrs.length + 1), name: name, phone: phone, addr: addr, city: city, state: state, pin: pin });
+  await setSavedAddresses(addrs);
   ['new-addr-label','new-addr-name','new-addr-phone','new-addr-addr','new-addr-city','new-addr-state','new-addr-pin'].forEach(function(id){
     var el = document.getElementById(id); if(el) el.value = '';
   });
+  if (btn) { btn.disabled = false; btn.textContent = '💾 Save Address'; }
   var msg = document.getElementById('new-addr-msg');
   if (msg) { msg.style.display = 'block'; setTimeout(function(){ msg.style.display='none'; }, 2000); }
-  showToast('✅ Address save ho gaya!');
-  setTimeout(function(){ loadAccountData(); }, 300);
+  showToast('✅ ' + (label || 'Address') + ' save ho gaya!');
+  setTimeout(function(){ loadAccountData(); }, 400);
 }
 
-function deleteSavedAddress(idx) {
-  var addrs = getSavedAddresses();
+async function deleteSavedAddress(idx) {
+  var addrs = getSavedAddresses().filter(function(a){ return a.label !== 'Default'; });
   addrs.splice(idx, 1);
-  setSavedAddresses(addrs);
+  await setSavedAddresses(addrs);
   showToast('🗑 Address remove ho gaya');
-  setTimeout(function(){ loadAccountData(); }, 300);
+  setTimeout(function(){ loadAccountData(); }, 400);
 }
 
 async function saveProfile() {
@@ -3099,10 +3111,20 @@ async function saveProfile() {
     };
     await callAuth('update_profile', updates, true);
     if (_acctData && _acctData.profile) Object.assign(_acctData.profile, updates);
+    if (_authProfile) Object.assign(_authProfile, updates);
     var name = [updates.first_name, updates.last_name].filter(Boolean).join(' ');
-    if (name) { document.getElementById('acctName').textContent = name; document.getElementById('acctAvatar').textContent = name[0].toUpperCase(); }
+    if (name) {
+      var acctName = document.getElementById('acctName');
+      var acctAvtr = document.getElementById('acctAvatar');
+      if (acctName) acctName.textContent = name;
+      if (acctAvtr) acctAvtr.textContent = name[0].toUpperCase();
+      // Also update cart delivery name if it matches old name
+      var delName = document.getElementById('del-name');
+      if (delName) delName.value = name;
+    }
     var msg = document.getElementById('profile-msg');
     if (msg) { msg.style.display = 'block'; setTimeout(function(){ msg.style.display='none'; }, 2500); }
+    showToast('✅ Profile saved!');
   } catch(e) { showToast('❌ ' + (e.message || 'Save failed')); }
 }
 
