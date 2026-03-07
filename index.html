@@ -719,7 +719,7 @@ footer{background:#0d1a0f;padding:44px 40px 24px}
   </ul>
   <div class="nav-right">
     <button class="nib" onclick="openSearch()" title="Search products" aria-label="Search">🔍</button>
-    <button class="nib" onclick="openWishlist()" title="Wishlist" aria-label="Wishlist" style="position:relative">❤️<span class="wl-badge" id="wlBadge"></span></button>
+    <button class="nib" onclick="openWishlist()" title="Wishlist — Apni pasandida products save karo" aria-label="Wishlist" style="position:relative">❤️<span class="wl-badge" id="wlBadge"></span></button>
     <button class="nib" id="accountBtn" onclick="openAccount()" title="My Account" aria-label="My Account" style="position:relative">👤<span id="accountDot" style="display:none;position:absolute;top:4px;right:4px;width:7px;height:7px;background:#2d6a4f;border-radius:50%;border:1.5px solid #fff"></span></button>
     <button class="dark-btn" onclick="toggleDark()" id="darkBtn" title="Toggle dark mode">🌙</button>
     <button class="cart-btn" onclick="openCart()">🛒 Cart <span class="cbadge" id="cartCount">0</span></button>
@@ -1632,14 +1632,26 @@ function openCart() {
   }
 }
 
+function getSavedAddresses() {
+  // Get from localStorage (keyed by user id)
+  var key = 'pr_addrs_' + ((_authUser && _authUser.id) || 'guest');
+  try { return JSON.parse(localStorage.getItem(key) || '[]'); } catch(e) { return []; }
+}
+
+function setSavedAddresses(addrs) {
+  var key = 'pr_addrs_' + ((_authUser && _authUser.id) || 'guest');
+  try { localStorage.setItem(key, JSON.stringify(addrs)); } catch(e) {}
+}
+
 function renderSavedAddresses() {
   var bar    = document.getElementById('saved-addr-bar');
   var select = document.getElementById('saved-addr-select');
   if (!bar || !select) return;
   if (!_authProfile) { bar.style.display = 'none'; return; }
-  var addrs = [];
-  try { addrs = JSON.parse(_authProfile.saved_addresses || '[]'); } catch(e) {}
-  // Add default address from profile if exists
+
+  var addrs = getSavedAddresses();
+
+  // Always include Default from profile at index 0
   if (_authProfile.address_line1) {
     var defPhone = (_authProfile.phone || '').replace(/^\+91/, '').replace(/\D/g,'').slice(-10);
     var def = {
@@ -1652,16 +1664,24 @@ function renderSavedAddresses() {
       pin:   _authProfile.postal_code || '',
       email: _authProfile.email || (_authUser && _authUser.email) || '',
     };
-    var exists = addrs.some(function(a){ return a.addr === def.addr && a.pin === def.pin; });
-    if (!exists) addrs.unshift(def);
+    // Replace or prepend default
+    var defIdx = addrs.findIndex(function(a){ return a.label === 'Default'; });
+    if (defIdx >= 0) addrs[defIdx] = def;
+    else addrs.unshift(def);
+    setSavedAddresses(addrs);
   }
+
   if (!addrs.length) { bar.style.display = 'none'; return; }
   bar.style.display = 'block';
-  select.innerHTML = '<option value="">— Choose a saved address —</option>' +
-    addrs.map(function(a, idx) {
-      return '<option value="' + idx + '">📍 ' + (a.label || 'Address '+(idx+1)) + ' — ' + a.addr + ', ' + a.city + '</option>';
-    }).join('');
   window._savedAddresses = addrs;
+
+  select.innerHTML = addrs.map(function(a, idx) {
+    return '<option value="' + idx + '">📍 ' + (a.label || 'Address '+(idx+1)) + ' — ' + a.addr + ', ' + a.city + '</option>';
+  }).join('');
+
+  // Auto-fill default (index 0) immediately
+  select.value = '0';
+  fillSavedAddress('0');
 }
 
 function fillSavedAddress(idx) {
@@ -2964,8 +2984,7 @@ function renderOrders(orders) {
 }
 
 function renderAddress(p) {
-  var addrs = [];
-  try { addrs = JSON.parse(p.saved_addresses || '[]'); } catch(e) {}
+  var addrs = getSavedAddresses();
   var savedList = addrs.length ? 
     '<div class="acct-section-title" style="margin-top:16px">📋 Saved Addresses</div>' +
     addrs.map(function(a, i) {
@@ -3052,31 +3071,24 @@ async function saveNewAddress() {
   var state = (document.getElementById('new-addr-state').value || '').trim();
   var pin   = (document.getElementById('new-addr-pin').value   || '').trim();
   if (!addr || !city || !pin) { showToast('❌ Address, City aur Pincode zaroori hai'); return; }
-  var addrs = [];
-  try { addrs = JSON.parse((_acctData.profile || {}).saved_addresses || '[]'); } catch(e) {}
-  addrs.push({ label: label || 'Address ' + (addrs.length+1), name, phone, addr, city, state, pin });
-  try {
-    await callAuth('update_profile', { saved_addresses: JSON.stringify(addrs) }, true);
-    if (_acctData && _acctData.profile) _acctData.profile.saved_addresses = JSON.stringify(addrs);
-    if (_authProfile) _authProfile.saved_addresses = JSON.stringify(addrs);
-    var msg = document.getElementById('new-addr-msg');
-    if (msg) { msg.style.display = 'block'; setTimeout(function(){ msg.style.display='none'; }, 2000); }
-    showToast('✅ Address save ho gaya!');
-    setTimeout(function(){ loadAccountData(); }, 500);
-  } catch(e) { showToast('❌ ' + (e.message || 'Save failed')); }
+  var addrs = getSavedAddresses();
+  addrs.push({ label: label || 'Address ' + (addrs.length + 1), name, phone, addr, city, state, pin });
+  setSavedAddresses(addrs);
+  ['new-addr-label','new-addr-name','new-addr-phone','new-addr-addr','new-addr-city','new-addr-state','new-addr-pin'].forEach(function(id){
+    var el = document.getElementById(id); if(el) el.value = '';
+  });
+  var msg = document.getElementById('new-addr-msg');
+  if (msg) { msg.style.display = 'block'; setTimeout(function(){ msg.style.display='none'; }, 2000); }
+  showToast('✅ Address save ho gaya!');
+  setTimeout(function(){ loadAccountData(); }, 300);
 }
 
-async function deleteSavedAddress(idx) {
-  var addrs = [];
-  try { addrs = JSON.parse((_acctData.profile || {}).saved_addresses || '[]'); } catch(e) {}
+function deleteSavedAddress(idx) {
+  var addrs = getSavedAddresses();
   addrs.splice(idx, 1);
-  try {
-    await callAuth('update_profile', { saved_addresses: JSON.stringify(addrs) }, true);
-    if (_acctData && _acctData.profile) _acctData.profile.saved_addresses = JSON.stringify(addrs);
-    if (_authProfile) _authProfile.saved_addresses = JSON.stringify(addrs);
-    showToast('🗑 Address remove ho gaya');
-    setTimeout(function(){ loadAccountData(); }, 300);
-  } catch(e) { showToast('❌ Delete failed'); }
+  setSavedAddresses(addrs);
+  showToast('🗑 Address remove ho gaya');
+  setTimeout(function(){ loadAccountData(); }, 300);
 }
 
 async function saveProfile() {
@@ -3291,6 +3303,13 @@ document.addEventListener('DOMContentLoaded', function() {
   // Update WA float button href dynamically
   var waBtn = document.getElementById('waFloatBtn');
   if (waBtn) waBtn.href = 'https://wa.me/' + WHATSAPP_NUMBER;
+  // One-time wishlist hint
+  if (!localStorage.getItem('pr_wl_hint_shown')) {
+    setTimeout(function() {
+      showToast('❤️ Kisi bhi product pe heart tap karke Wishlist mein save karo!');
+      localStorage.setItem('pr_wl_hint_shown', '1');
+    }, 4000);
+  }
 });
 </script>
 
