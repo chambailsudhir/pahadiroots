@@ -2588,9 +2588,29 @@ window.addEventListener('DOMContentLoaded', function() {
           <label class="auth-label">Password</label>
           <input class="auth-input" id="auth-email-pass" type="password" placeholder="Your password">
         </div>
+        <div style="text-align:right;margin-top:-8px;margin-bottom:12px">
+          <a onclick="showForgotPassword()" style="font-size:12px;color:#2d6a4f;cursor:pointer;font-weight:600">Forgot Password?</a>
+        </div>
         <div class="auth-err" id="auth-email-err"></div>
         <button class="auth-submit" onclick="emailLogin()">Login</button>
         <div class="auth-switch">Don't have an account? <a onclick="showEmailSignup()">Sign Up</a></div>
+      </div>
+
+      <!-- Forgot Password -->
+      <div id="auth-forgot" style="display:none">
+        <div style="text-align:center;margin-bottom:16px;font-size:13px;color:#666">
+          📧 Apna registered email daalo — reset link bhejenge
+        </div>
+        <div class="auth-fg">
+          <label class="auth-label">Email Address</label>
+          <input class="auth-input" id="auth-forgot-email" type="email" placeholder="you@example.com">
+        </div>
+        <div class="auth-err" id="auth-forgot-err"></div>
+        <div id="auth-forgot-success" style="display:none;background:#e8f5e9;border-radius:10px;padding:12px;font-size:13px;color:#1a5c2a;text-align:center;margin-bottom:12px">
+          ✅ Reset link bhej diya! Gmail check karo (spam bhi dekho)
+        </div>
+        <button class="auth-submit" id="forgotBtn" onclick="forgotPassword()">Send Reset Link</button>
+        <div class="auth-switch"><a onclick="showEmailLogin()">← Back to Login</a></div>
       </div>
       <div id="auth-email-signup" style="display:none">
         <div class="auth-fg">
@@ -2656,9 +2676,16 @@ function showEmailSignup() {
   document.getElementById('auth-email-login').style.display = 'none';
   document.getElementById('auth-email-signup').style.display = 'block';
 }
+function showForgotPassword() {
+  document.getElementById('auth-email-login').style.display   = 'none';
+  document.getElementById('auth-email-signup').style.display  = 'none';
+  document.getElementById('auth-forgot').style.display        = 'block';
+  setTimeout(function(){ document.getElementById('auth-forgot-email').focus(); }, 100);
+}
 function showEmailLogin() {
-  document.getElementById('auth-email-login').style.display = 'block';
-  document.getElementById('auth-email-signup').style.display = 'none';
+  document.getElementById('auth-email-login').style.display   = 'block';
+  document.getElementById('auth-email-signup').style.display  = 'none';
+  document.getElementById('auth-forgot').style.display        = 'none';
 }
 
 // ── OTP Flow ────────────────────────────────────────────────────
@@ -2965,6 +2992,82 @@ async function logoutAccount() {
   updateAccountBtn();
   closeAccount();
   showToast('👋 Logged out successfully');
+}
+
+// ── Forgot / Reset Password ─────────────────────────────────────
+async function forgotPassword() {
+  var email = (document.getElementById('auth-forgot-email').value || '').trim();
+  var errEl = document.getElementById('auth-forgot-err');
+  var sucEl = document.getElementById('auth-forgot-success');
+  errEl.classList.remove('show'); sucEl.style.display = 'none';
+  if (!email) { errEl.textContent = 'Email address daalo'; errEl.classList.add('show'); return; }
+  var btn = document.getElementById('forgotBtn');
+  btn.disabled = true; btn.textContent = 'Sending…';
+  try {
+    await callAuth('forgot_password', { email });
+  } catch(e) {}
+  // Always show success (security — don't reveal if email exists)
+  sucEl.style.display = 'block';
+  btn.style.display = 'none';
+}
+
+// ── Handle reset link from email (runs on page load) ───────────
+(function checkResetToken() {
+  var hash = window.location.hash;
+  if (!hash) return;
+  var params = {};
+  hash.slice(1).split('&').forEach(function(p) {
+    var kv = p.split('='); params[kv[0]] = decodeURIComponent(kv[1] || '');
+  });
+  if (params.type === 'recovery' && params.access_token) {
+    window.history.replaceState(null, '', window.location.pathname);
+    setTimeout(function() { showResetPasswordModal(params.access_token); }, 600);
+  }
+})();
+
+function showResetPasswordModal(token) {
+  var box = document.querySelector('.auth-box');
+  if (!box) return;
+  box.innerHTML = '<button class="auth-close" onclick="closeAuth()">✕</button>' +
+    '<div class="auth-logo">🌿</div>' +
+    '<div class="auth-title">Set New Password</div>' +
+    '<div class="auth-sub">Apna naya password daalo</div>' +
+    '<div class="auth-fg" style="margin-top:20px">' +
+    '<label class="auth-label">New Password (min 6 chars)</label>' +
+    '<input class="auth-input" id="reset-pass" type="password" placeholder="New password"></div>' +
+    '<div class="auth-fg"><label class="auth-label">Confirm Password</label>' +
+    '<input class="auth-input" id="reset-pass2" type="password" placeholder="Confirm password"></div>' +
+    '<div class="auth-err" id="reset-err"></div>' +
+    '<button class="auth-submit" id="resetBtn" onclick="submitResetPassword(\'' + token + '\')">Update Password</button>';
+  document.getElementById('authModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+async function submitResetPassword(token) {
+  var pass  = (document.getElementById('reset-pass').value  || '');
+  var pass2 = (document.getElementById('reset-pass2').value || '');
+  var errEl = document.getElementById('reset-err');
+  errEl.classList.remove('show');
+  if (pass.length < 6) { errEl.textContent = 'Kam se kam 6 characters chahiye'; errEl.classList.add('show'); return; }
+  if (pass !== pass2)  { errEl.textContent = 'Dono passwords match nahi kar rahe'; errEl.classList.add('show'); return; }
+  var btn = document.getElementById('resetBtn');
+  btn.disabled = true; btn.textContent = 'Updating…';
+  try {
+    var res = await fetch(getStoreApiBase() + '/auth', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({ action: 'reset_password', password: pass }),
+    });
+    var data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Reset failed');
+    closeAuth();
+    showToast('✅ Password update ho gaya! Ab login karo.');
+    setTimeout(openAuth, 1200);
+  } catch(e) {
+    errEl.textContent = e.message || 'Reset failed — link expire ho gaya, dobara try karo';
+    errEl.classList.add('show');
+    btn.disabled = false; btn.textContent = 'Update Password';
+  }
 }
 
 // ── Auto-fill delivery form from account address ────────────────
