@@ -183,7 +183,7 @@ nav#mNav.shadow{box-shadow:0 2px 16px rgba(0,0,0,.08)}
 .mob-nav a:hover{background:rgba(26,58,30,.07);color:var(--g)}
 
 /* HERO */
-.hero{min-height:80vh;position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(170deg,#071a09 0%,#0e2812 25%,#1a3a1e 55%,#2d5233 80%,#3a6140 100%)}
+.hero{min-height:75vh;position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(170deg,#071a09 0%,#0e2812 25%,#1a3a1e 55%,#2d5233 80%,#3a6140 100%)}
 .hmtn{position:absolute;bottom:0;left:0;right:0;height:40%;pointer-events:none}
 .hmtn svg{width:100%;height:100%}
 .hov{position:absolute;inset:0;background:linear-gradient(180deg,rgba(7,26,9,.2) 0%,transparent 50%,rgba(7,26,9,.3) 100%);pointer-events:none}
@@ -662,9 +662,9 @@ footer{background:#0d1a0f;padding:44px 40px 24px}
 
 /* ── FOUNDER — Full-width cinematic (Image 2 style) ── */
 .founder-sec{position:relative;overflow:hidden;display:flex;align-items:stretch;background:#071408}
-.founder-bg{position:relative;width:100%;line-height:0;display:block;background:linear-gradient(135deg,#071408 0%,#0a1e0c 50%,#0e2b12 100%);min-height:450px}
+.founder-bg{position:relative;width:100%;line-height:0;display:block;background:linear-gradient(135deg,#071408 0%,#0a1e0c 50%,#0e2b12 100%);min-height:340px}
 .founder-overlay{position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,rgba(0,0,0,0) 0%,rgba(0,0,0,0) 42%,rgba(0,0,0,.5) 70%,rgba(0,0,0,.85) 100%),linear-gradient(90deg,rgba(0,0,0,.4) 0%,rgba(0,0,0,.15) 40%,rgba(0,0,0,0) 65%)}
-.founder-content{position:absolute;bottom:0;left:0;right:0;z-index:2;display:flex;align-items:flex-end;justify-content:space-between;padding:0 64px 52px;gap:32px}
+.founder-content{position:absolute;bottom:0;left:0;right:0;z-index:2;display:flex;align-items:flex-end;justify-content:space-between;padding:0 64px 36px;gap:32px}
 .founder-left{max-width:520px;flex:1}
 .founder-right{flex-shrink:0;display:flex;align-items:flex-end;padding-bottom:4px}
 .founder-badge{display:flex;align-items:center;gap:8px;background:rgba(13,47,16,.85);border:1px solid rgba(200,146,10,.35);color:var(--gd2);font-size:9.5px;font-weight:800;letter-spacing:2.2px;padding:13px 22px;border-radius:3px;white-space:nowrap;backdrop-filter:blur(6px)}
@@ -1089,7 +1089,7 @@ footer{background:#0d1a0f;padding:44px 40px 24px}
 const FALLBACK_STATES = [
   {id:"hp", name:"Himachal Pradesh", emoji:"🏔️", tagline:"Dev Bhoomi",
    panel_bg:"linear-gradient(135deg,#1a3a1e,#2d5233)",
-   description:"The soul of Pahadi Roots. Ancient temples cling to cliff-faces, apple orchards fill every valley, and pine-forest honey is harvested by hand. Sudhir, our founder, grew up here — every product carries his personal guarantee of authenticity.",
+   description:"Himachal Pradesh — Dev Bhoomi, the Land of Gods. Ancient Shiva temples cling to cliff faces above apple orchards that bloom white every spring. The Kangra valley, cradle of a 5,000-year-old civilisation, produces an orthodox tea so delicate it was once reserved for royalty. From Kinnaur's snowbound heights come the rare Chilgoza pine nuts — hand-gathered from ancient forests above 2,500 metres. And wild Himalayan honey, harvested from cliffside rock hives by fearless Gaddi tribesmen, carries the nectar of a hundred mountain wildflowers.",
    pills:["🍎 Apple & ACV","🍯 Pine Honey","🍵 Kangra Tea","🥛 Bilona Ghee","🌰 Chilgoza Nuts"],
    cover_photo_url:"", tab_photo_url:""},
   {id:"uk", name:"Uttarakhand", emoji:"🏔️", tagline:"Dev Bhoomi",
@@ -1099,39 +1099,44 @@ const FALLBACK_STATES = [
    cover_photo_url:"", tab_photo_url:""},
   {id:"jk", name:"J&K / Kashmir", emoji:"🌷", tagline:"Paradise on Earth",
    panel_bg:"linear-gradient(135deg,#1e3a8a,#2d4fa3)",
-   description:"Where women adorn themselves with cascading silver jewellery and intricately embroidered Kashmiri Pherans — the same craft tradition found beside the shimmering Dal Lake. Kashmir's extraordinary Kesar blooms in Pampore, paper-shelled Kagzi walnuts ripen in ancient orchards, and the legendary Kahwa warms cold mountain mornings.",
+   description:"Kashmir — Jannat, as the Mughals called it — where saffron fields turn the Pampore plains a deep violet every October, harvested flower by flower before sunrise. The same hands that embroider intricate Pheran shawls beside the shimmering Dal Lake also tend the ancient walnut orchards of Wular and the almond groves of Pahalgam. Mongra saffron — Grade A, thread by thread — is the world's most precious spice. Kagzi walnuts, with paper-thin shells and a sweet, oily kernel, are prized by pastry chefs from Paris to Mumbai. And Kahwa, brewed with cardamom, cinnamon, saffron strands, and dried rose petals, is a cup of warmth that has greeted Himalayan guests for a thousand years.",
    pills:["🌸 Kashmiri Kesar","🌰 Kagzi Walnuts","🍵 Kahwa Tea","🌶️ Kashmiri Mirchi","🥜 Almonds"],
    cover_photo_url:"", tab_photo_url:""},
   {id:"la", name:"Ladakh", emoji:"❄️", tagline:"Land of High Passes",
    panel_bg:"linear-gradient(135deg,#4a2c10,#6b3a18)",
-   description:"At 3,500m above sea level, women wear the magnificent Perak headdress adorned with turquoise gems. Ladakh's extreme altitude creates superfoods found nowhere else — the miraculous Seabuckthorn berry, ancient Shilajit resin, and sun-dried apricots from Kargil's orchards.",
+   description:"Ladakh — the roof of the world, where the sky is impossibly blue, the air is thin, and every living thing that survives here does so with extraordinary potency. At 3,500 metres above sea level, Seabuckthorn berries ripen on thorny bushes along the Indus river — bright orange clusters so loaded with Vitamin C, Omega-7, and antioxidants that Tibetan monks have used them medicinally for centuries. Shilajit, the ancient 'destroyer of weakness', oozes from granite rocks during summer thaw — a mineral resin found only in the highest Himalayan ranges. And wild apricots from Kargil and Nubra valley, sun-dried on stone rooftops at altitude, are nature's most concentrated energy food — sweet, tangy, and unlike any apricot grown in the plains.",
    pills:["🫐 Seabuckthorn","🪨 Shilajit","🍑 Wild Apricots","⚡ Black Buckwheat","🧂 Rock Salt"],
    cover_photo_url:"", tab_photo_url:""},
   {id:"sk", name:"Sikkim", emoji:"🌺", tagline:"India's First Organic State",
    panel_bg:"linear-gradient(135deg,#1a3a1e,#2a5230)",
-   description:"India's only fully organic state since 2016. Sikkim's dancers in vibrant striped Bakhu dresses celebrate a culture deeply rooted in nature and Buddhism. These pristine hills produce exceptional large cardamom and award-winning Temi orthodox tea.",
+   description:"Sikkim — India's first and only fully organic state, where chemical fertilisers have been completely banned since 2016. On mist-covered hillsides at 1,500 metres, Lepcha and Bhutia women in vibrant striped Bakhu dresses tend cardamom groves under the shade of forest trees — a centuries-old agroforestry system that produces Large Cardamom of extraordinary quality. Smoky, camphor-sweet, and revered in Ayurveda, Sikkim's cardamom accounts for over 30% of global supply. The Temi Tea Estate — the only government-run tea garden in the Himalayas — yields a delicate, floral orthodox tea from bushes grown at altitude above the clouds. And organic turmeric from Sikkim's mineral-rich volcanic soil carries nearly twice the curcumin of anything grown in the plains.",
    pills:["🫚 Large Cardamom","🌿 Organic Turmeric","🍵 Temi Tea","🌱 Organic Ginger","🥬 Gundruk"],
    cover_photo_url:"", tab_photo_url:""},
   {id:"as", name:"Assam", emoji:"🍵", tagline:"Tea Capital of the World",
    panel_bg:"linear-gradient(135deg,#1a3a1e,#2d5233)",
-   description:"The Bihu festival fills the Brahmaputra valley with the grace of mekhela chadors. These same fertile plains produce the world's most consumed tea, rare aromatic black Joha rice, and probiotic-rich bamboo shoot pickle central to Assamese cuisine.",
+   description:"Assam — where the Brahmaputra runs wide and golden, and every April, the Bihu harvest festival turns the valley into a river of colour, dance, and feast. The same red-clay floodplain soil that grows the world's most recognised black tea — full-bodied, malty, brisk — also nurtures Black Joha rice, an aromatic short-grain heirloom variety with a scent like pandan leaf, cooked only on festival days and now recognised as a GI heritage crop. From the dense forest corridors along the river, Bodo tribespeople harvest wild honey using smoke and bare hands — raw, dark, and powerfully medicinal. And bamboo shoot pickle, fermented in mustard with dried chilli, is the backbone of Assamese home cooking.",
    pills:["🍵 Orthodox Tea","⚡ Black Joha Rice","🫙 Bamboo Pickle","🍯 Forest Honey","🍍 Queen Pineapple"],
    cover_photo_url:"", tab_photo_url:""},
   {id:"ml", name:"Meghalaya", emoji:"🌧️", tagline:"Abode of Clouds",
    panel_bg:"linear-gradient(135deg,#1e3a8a,#2d4fa3)",
-   description:"The wettest place on earth, where Khasi women in vibrant orange Jainsem dresses carry the wisdom of a matrilineal society. Meghalaya's cloud-soaked hills produce the world's highest-curcumin Lakadong turmeric and wild forest honey.",
+   description:"Meghalaya — Abode of Clouds, the wettest land on earth. Khasi women in flowing orange Jainsem dresses own land, run markets, and carry family surnames — one of the last matrilineal societies on the planet, where women have held economic power for a thousand years. The same 12,000mm of annual rainfall that feeds the legendary living root bridges of Nongriat also nurtures Lakadong turmeric — a small, stubby rhizome from the East Jaintia Hills carrying up to 7.5% curcumin, the highest of any turmeric variety on earth. Wild black pepper climbs ancient forest trees untouched by pesticide. Bay leaves gathered from Khasi hilltop groves carry an aroma so intense, one leaf perfumes an entire pot. And wild forest honey, gathered from rock hives by Khasi collectors using only smoke and patience, is dark, resinous, and medicinal.",
    pills:["🌿 Lakadong Turmeric","🌑 Wild Black Pepper","🍯 Wild Honey","🍃 Bay Leaf","🫚 Hill Ginger"],
    cover_photo_url:"", tab_photo_url:""},
   {id:"nl", name:"Nagaland", emoji:"🌶️", tagline:"Land of Festivals & Fire",
    panel_bg:"linear-gradient(135deg,#3a0a0a,#5c1a1a)",
-   description:"Home to 16 fierce and proud tribes, where warriors wear hornbill feather headdresses. Nagaland produces the legendary Bhut Jolokia (Ghost Pepper), rich wild hill honey, and Axone fermented soybean.",
+   description:"Nagaland — Land of the Hornbill, where 16 distinct tribes gather each December in a festival of war dances, tribal cuisine, and living tradition. Naga warriors once wore the feathers of the Great Hornbill into battle; today those feathers crown the Hornbill Festival headgear. The same fierce spirit lives in the food: Bhut Jolokia, the Ghost Pepper — once the world's hottest chilli, still ranked among the top five — grows wild in Naga villages. Axone, fermented soybean wrapped in banana leaf, is a condiment so complex and aromatic that Northeast chefs now serve it in fine dining restaurants. And wild hill honey, gathered from rock hives in Nagaland's cloud forests, is dark, resinous, and deeply medicinal.",
    pills:["🌶️ Bhut Jolokia","🍯 Wild Hill Honey","🫙 Axone (Fermented)","🌿 Wild Herbs","🧂 Tribal Salt"],
    cover_photo_url:"", tab_photo_url:""},
   {id:"mn", name:"Manipur", emoji:"💃", tagline:"Land of Dance & Heritage",
    panel_bg:"linear-gradient(135deg,#1a1e3a,#2d3353)",
-   description:"The jewel of Northeast India — home to the classical Manipuri dance form, pristine Loktak Lake, and a rich weaving tradition. Manipur's fertile valleys and hills produce rare black rice, indigenous herbs, and unique bamboo shoot delicacies.",
+   description:"Manipur — the Jewelled Land, where the Ras Lila dance form is so sacred it is performed only in temples, and the floating islands of Loktak Lake are home to the last Sangai deer on earth. Manipuri women weave Moirang Phee cloth on handlooms passed down through generations — the same patient hands that harvest Chakhao, the black rice of Manipur. This purple-grain heirloom rice, cooked for royal feasts and Buddhist ceremonies for centuries, is now recognised as one of India's most antioxidant-rich foods. Bamboo shoots fermented in mustard leaf, foraged wild herbs from the Senapati hills, and forest honey from Mao Naga villages complete a food culture that is utterly unlike anywhere else in India.",
    pills:["🌾 Black Rice","🎋 Bamboo Shoots","🌿 Wild Herbs","🍯 Wild Honey","🧵 Handloom"],
    cover_photo_url:"", tab_photo_url:""},
+   {id:"tr", name:"Tripura", emoji:"🏛️", tagline:"Land of Fourteen Tribes",
+    panel_bg:"linear-gradient(135deg,#0d3320,#1a5c3a)",
+    description:"Where Culture Meets Nature — the queen pineapple here is so sweet it needs no sugar. Wild forest honey gathered by Chakma & Tripuri tribes using centuries-old bark hives. And Berma — fermented fish paste — the Northeast's best-kept culinary secret.",
+    pills:["🍍 Queen Pineapple","🍯 Wild Forest Honey","🎋 Bamboo Shoots","🌿 Matai Peas","🫙 Berma (Fermented Fish)"],
+    cover_photo_url:"", tab_photo_url:""},
 ];
 
 const FALLBACK_PRODUCTS = [
