@@ -340,16 +340,90 @@ export default async function handler(req, res) {
     return ok({ success: true });
   }
 
-  // ── 11. Forgot Password — send reset email ──────────────────
+  // ── 11. Forgot Password — send reset email via Resend ───────
   if (action === 'forgot_password') {
     const { email } = body;
     if (!email) return err(400, 'Email required');
+
+    const RESEND_KEY = process.env.RESEND_API_KEY;
+    const SITE_URL   = 'https://pahadiroots.com';
+
     try {
-      await sbAuth('/recover', { email });
-      return ok({ success: true, message: 'Reset email sent' });
+      // Step 1: Generate reset token via Supabase Admin
+      const genRes = await fetch(`${SUPABASE_URL}/auth/v1/admin/generate_link`, {
+        method: 'POST',
+        headers: {
+          'Content-Type':  'application/json',
+          'apikey':        SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`,
+        },
+        body: JSON.stringify({
+          type:       'recovery',
+          email,
+          options: { redirect_to: SITE_URL }
+        }),
+      });
+      const genData = await genRes.json();
+      if (!genRes.ok) {
+        // Don't reveal if email exists
+        return ok({ success: true });
+      }
+
+      // Step 2: Build reset URL pointing to pahadiroots.com
+      const actionLink = genData.action_link || '';
+      // Replace Supabase URL with our site URL
+      const resetUrl = actionLink.replace(/^https?:\/\/[^\/]+/, SUPABASE_URL)
+        .replace('redirect_to=', 'redirect_to=' + encodeURIComponent(SITE_URL) + '&_=');
+
+      // Use the hashed token directly
+      const token       = genData.hashed_token || '';
+      const finalResetUrl = `${SITE_URL}#access_token=${token}&type=recovery`;
+
+      // Step 3: Send via Resend
+      if (RESEND_KEY) {
+        await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: {
+            'Content-Type':  'application/json',
+            'Authorization': `Bearer ${RESEND_KEY}`,
+          },
+          body: JSON.stringify({
+            from:    'Pahadi Roots <noreply@pahadiroots.com>',
+            to:      [email],
+            subject: 'Reset Your Password — Pahadi Roots',
+            html: `
+              <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:32px 24px">
+                <div style="text-align:center;margin-bottom:24px">
+                  <span style="font-size:36px">🌿</span>
+                  <h2 style="color:#1a3a1e;margin:8px 0">Pahadi Roots</h2>
+                </div>
+                <h3 style="color:#1a3a1e">Reset Your Password</h3>
+                <p style="color:#555;line-height:1.6">
+                  Aapne password reset request ki hai. Neeche diye button pe click karke naya password set karein.
+                </p>
+                <div style="text-align:center;margin:32px 0">
+                  <a href="${finalResetUrl}" 
+                     style="background:#1a5c2a;color:#fff;padding:14px 32px;border-radius:10px;text-decoration:none;font-weight:700;font-size:15px">
+                    🔑 Reset Password
+                  </a>
+                </div>
+                <p style="color:#888;font-size:12px;text-align:center">
+                  Yeh link 1 ghante mein expire ho jaayega.<br>
+                  Agar aapne request nahi ki, please ignore karein.
+                </p>
+                <hr style="border:none;border-top:1px solid #eee;margin:24px 0">
+                <p style="color:#aaa;font-size:11px;text-align:center">
+                  Pahadi Roots — Pure Himalayan Products<br>
+                  pahadiroots.com
+                </p>
+              </div>
+            `,
+          }),
+        });
+      }
+      return ok({ success: true });
     } catch(e) {
-      // Always return success to prevent email enumeration
-      return ok({ success: true, message: 'Reset email sent if account exists' });
+      return ok({ success: true }); // Always success for security
     }
   }
 
@@ -360,8 +434,7 @@ export default async function handler(req, res) {
     if (!token)   return err(401, 'Invalid or expired reset link');
     if (!password || password.length < 6) return err(400, 'Password must be at least 6 characters');
     try {
-      // Update password using the reset token as bearer
-      await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+      const res = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
         method: 'PUT',
         headers: {
           'Content-Type':  'application/json',
@@ -370,9 +443,11 @@ export default async function handler(req, res) {
         },
         body: JSON.stringify({ password }),
       });
-      return ok({ success: true, message: 'Password updated successfully' });
+      const data = await res.json();
+      if (!res.ok) throw { status: res.status, message: data.msg || data.message || 'Reset failed' };
+      return ok({ success: true });
     } catch(e) {
-      return err(e.status || 400, e.message || 'Reset failed');
+      return err(e.status || 400, e.message || 'Reset failed — link expire ho gaya');
     }
   }
 
