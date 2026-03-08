@@ -2773,43 +2773,89 @@ window.addEventListener('DOMContentLoaded', function() {
 <!-- ── AUTH JAVASCRIPT ──────────────────────────────────────────── -->
 <script>
 // ── Google OAuth ─────────────────────────
-function loginWithGoogle() {
+async function loginWithGoogle() {
+  const SB = 'https://ulyrhnpoiypuvaurlqqi.supabase.co';
+  const ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVseXJobnBvaXlwdXZhdXJscXFpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI5MTcwMDYsImV4cCI6MjA1ODQ5MzAwNn0.eWiNAusHGkMDMwRtFnLJhVWXotFBcBxVEBqJFbYEcck';
+
+  // Generate PKCE code verifier + challenge
+  function generateVerifier() {
+    const arr = new Uint8Array(32);
+    crypto.getRandomValues(arr);
+    return btoa(String.fromCharCode(...arr)).replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');
+  }
+  async function generateChallenge(verifier) {
+    const enc = new TextEncoder().encode(verifier);
+    const hash = await crypto.subtle.digest('SHA-256', enc);
+    return btoa(String.fromCharCode(...new Uint8Array(hash))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');
+  }
+
+  const verifier = generateVerifier();
+  const challenge = await generateChallenge(verifier);
+  sessionStorage.setItem('pkce_verifier', verifier);
+
   const redirectTo = encodeURIComponent(window.location.origin + '/');
-  window.location.href = 'https://ulyrhnpoiypuvaurlqqi.supabase.co/auth/v1/authorize?provider=google&redirect_to=' + redirectTo;
+  window.location.href = SB + '/auth/v1/authorize?provider=google&redirect_to=' + redirectTo +
+    '&code_challenge=' + challenge + '&code_challenge_method=S256';
 }
 
-// Handle Google OAuth callback (Supabase returns #access_token in hash)
+// Handle Google OAuth callback
 (function(){
-  const hash = window.location.hash;
-  const params = new URLSearchParams(hash.replace('#',''));
-  const accessToken = params.get('access_token');
-  const refreshToken = params.get('refresh_token');
+  const ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVseXJobnBvaXlwdXZhdXJscXFpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI5MTcwMDYsImV4cCI6MjA1ODQ5MzAwNn0.eWiNAusHGkMDMwRtFnLJhVWXotFBcBxVEBqJFbYEcck';
+  const SB = 'https://ulyrhnpoiypuvaurlqqi.supabase.co';
+
+  // Check hash for implicit flow (#access_token=...)
+  const hashParams = new URLSearchParams(window.location.hash.replace('#',''));
+  const accessToken = hashParams.get('access_token');
+  const refreshToken = hashParams.get('refresh_token') || '';
+
+  // Check query for PKCE flow (?code=...)
+  const searchParams = new URLSearchParams(window.location.search);
+  const code = searchParams.get('code');
+
+  async function handleToken(token, refresh) {
+    try {
+      const r = await fetch(SB + '/auth/v1/user', {
+        headers: { 'Authorization': 'Bearer ' + token, 'apikey': ANON }
+      });
+      const user = await r.json();
+      if(!user || !user.id) return;
+      const nameParts = (user.user_metadata?.full_name || user.email || '').split(' ');
+      const profile = {
+        first_name: nameParts[0] || '',
+        last_name: nameParts.slice(1).join(' ') || '',
+        email: user.email,
+        auth_user_id: user.id,
+        avatar_url: user.user_metadata?.avatar_url || null
+      };
+      saveAuthSession({ access_token: token, refresh_token: refresh }, profile);
+      window.history.replaceState({}, '', '/');
+      setTimeout(()=>{
+        showToast('✅ Welcome ' + (profile.first_name || 'back') + '! Google se login ho gaye!', 'success');
+        loadCartFromDB();
+        updateAuthUI();
+      }, 400);
+    } catch(e) { console.error('Google auth error:', e); }
+  }
+
+  async function handleCode(c) {
+    try {
+      const verifier = sessionStorage.getItem('pkce_verifier') || '';
+      const r = await fetch(SB + '/auth/v1/token?grant_type=pkce', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'apikey': ANON },
+        body: new URLSearchParams({ auth_code: c, code_verifier: verifier }).toString()
+      });
+      const data = await r.json();
+      console.log('PKCE exchange:', data);
+      if(data.access_token) await handleToken(data.access_token, data.refresh_token || '');
+      else console.error('No access_token in response:', data);
+    } catch(e) { console.error('PKCE exchange error:', e); }
+  }
+
   if(accessToken) {
-    // Get user info using access token
-    fetch('https://ulyrhnpoiypuvaurlqqi.supabase.co/auth/v1/user', {
-      headers: {
-        'Authorization': 'Bearer ' + accessToken,
-        'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVseXJobnBvaXlwdXZhdXJscXFpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI5MTcwMDYsImV4cCI6MjA1ODQ5MzAwNn0.eWiNAusHGkMDMwRtFnLJhVWXotFBcBxVEBqJFbYEcck'
-      }
-    }).then(r=>r.json()).then(user=>{
-      if(user && user.id) {
-        const session = { access_token: accessToken, refresh_token: refreshToken };
-        const nameParts = (user.user_metadata?.full_name || user.email || '').split(' ');
-        const profile = {
-          first_name: nameParts[0] || '',
-          last_name: nameParts.slice(1).join(' ') || '',
-          email: user.email,
-          auth_user_id: user.id,
-          avatar_url: user.user_metadata?.avatar_url || null
-        };
-        saveAuthSession(session, profile);
-        window.history.replaceState({}, '', '/');
-        setTimeout(()=>{
-          showToast('✅ Google se login ho gaye! Welcome ' + (profile.first_name||'') + '!', 'success');
-          loadCartFromDB();
-        }, 300);
-      }
-    }).catch(()=>{});
+    handleToken(accessToken, refreshToken);
+  } else if(code) {
+    handleCode(code);
   }
 })();
 
