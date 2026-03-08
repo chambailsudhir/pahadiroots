@@ -2805,49 +2805,52 @@ async function loginWithGoogle() {
   const ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVseXJobnBvaXlwdXZhdXJscXFpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyOTE5NTYsImV4cCI6MjA4Nzg2Nzk1Nn0.lU_Wi4G84X54BPdjhG_h-N4u2_HSYiAF-12hekDnejk';
 
   const code = new URLSearchParams(window.location.search).get('code');
-  if (!code) return; // not a Google callback
+  if (!code) return;
 
   const verifier = localStorage.getItem('pr_pkce_verifier') || '';
-  localStorage.removeItem('pr_pkce_verifier'); // cleanup
+  localStorage.removeItem('pr_pkce_verifier');
 
-  // Exchange code + verifier for session
   fetch(SB + '/auth/v1/token?grant_type=pkce', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'apikey': ANON },
     body: JSON.stringify({ auth_code: code, code_verifier: verifier })
   })
-  .then(r => r.json())
-  .then(data => {
+  .then(function(r) { return r.json(); })
+  .then(function(data) {
     if (!data.access_token) {
-      console.error('Google PKCE failed:', data);
-      showToast('Google login failed. Try again.', 'error');
+      console.error('PKCE token exchange failed:', data);
       return;
     }
-    // Get user profile
+    // Get user info
     return fetch(SB + '/auth/v1/user', {
       headers: { 'Authorization': 'Bearer ' + data.access_token, 'apikey': ANON }
     })
-    .then(r => r.json())
-    .then(user => {
-      const nameParts = (user.user_metadata?.full_name || user.email || '').split(' ');
-      const profile = {
+    .then(function(r) { return r.json(); })
+    .then(function(user) {
+      var nameParts = ((user.user_metadata && user.user_metadata.full_name) || user.email || '').split(' ');
+      var profile = {
         first_name: nameParts[0] || '',
-        last_name: nameParts.slice(1).join(' ') || '',
-        email: user.email,
-        auth_user_id: user.id,
-        avatar_url: user.user_metadata?.avatar_url || null
+        last_name:  nameParts.slice(1).join(' ') || '',
+        email:      user.email || '',
+        auth_user_id: user.id || '',
+        avatar_url: (user.user_metadata && user.user_metadata.avatar_url) || null
       };
-      const session = { access_token: data.access_token, refresh_token: data.refresh_token || '' };
-      saveAuthSession(session, profile);
+      // saveAuthSession expects {access_token, refresh_token, user, profile}
+      saveAuthSession({
+        access_token:  data.access_token,
+        refresh_token: data.refresh_token || '',
+        user:          user,
+        profile:       profile
+      });
       window.history.replaceState({}, '', '/');
-      setTimeout(() => {
+      setTimeout(function() {
         showToast('✅ Welcome ' + (profile.first_name || '') + '! Google se login ho gaye!', 'success');
-        loadCartFromDB();
-        updateAuthUI();
+        updateAccountBtn();
+        uCart();
       }, 300);
     });
   })
-  .catch(e => console.error('Google login error:', e));
+  .catch(function(e) { console.error('Google login error:', e); });
 })();
 
 // ── Auth Modal ──────────────────────────────────────────────────
