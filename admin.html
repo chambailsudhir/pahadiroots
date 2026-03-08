@@ -1801,7 +1801,11 @@ async function uploadFounderImages() {
     }
     // Delete all existing founder images and re-insert
     status.textContent = '⏳ Saving to DB…';
-    await DEL('founder_images', 'id=neq.00000000-0000-0000-0000-000000000000').catch(() => {});
+    // Fetch all IDs first, then delete each (Supabase rejects fake UUID in neq)
+    const existingRows = await GET('founder_images', 'select=id').catch(() => []);
+    for (const row of (existingRows || [])) {
+      await DEL('founder_images', `id=eq.${row.id}`).catch(() => {});
+    }
     for (let i = 0; i < urls.length; i++) {
       await POST('founder_images', { image_url: urls[i], sort_order: i });
     }
