@@ -718,10 +718,15 @@ footer{background:#0d1a0f;padding:44px 40px 24px}
 /* State image slideshow dots */
 .sshdr-dot{display:inline-block;width:20px;height:3px;background:rgba(255,255,255,.3);border-radius:2px;cursor:pointer;transition:all .3s}
 .sshdr-dot.active{background:var(--gd);width:32px}
-/* Product hover image swap */
+/* Product hover image swap — single hover image */
 .piw .phover-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:2;opacity:0;transition:opacity .45s ease}
 .pcard:hover .piw .phover-img{opacity:1}
 .pcard:hover .pemo{opacity:0;transition:opacity .3s}
+/* Product hover cycle — multiple images cycling on hover */
+@keyframes hoverCycle{0%,45%{opacity:1}50%,95%{opacity:0}100%{opacity:1}}
+.phover-cycle{animation:none}
+.pcard:hover .phover-cycle{animation:hoverCycle var(--hc-dur,4s) ease infinite;opacity:0}
+.pcard:hover .phover-cycle:first-of-type{opacity:1}
 </style>
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 </head>
@@ -1346,17 +1351,6 @@ async function loadData() {
       if (data.settings.free_shipping_min)    FREE_SHIP_THRESHOLD = parseInt(data.settings.free_shipping_min) || 799;
       if (data.settings.flat_shipping_charge) FLAT_SHIP_CHARGE    = parseInt(data.settings.flat_shipping_charge) || 99;
       if (data.settings.whatsapp_number)      WHATSAPP_NUMBER     = data.settings.whatsapp_number;
-      // Inject multi-image URLs into STATES
-      Object.keys(data.settings).forEach(function(key) {
-        if (key.indexOf('state_images_') === 0) {
-          var sid = key.replace('state_images_', '');
-          var imgList = (data.settings[key] || '').split(',').map(function(u){ return u.trim(); }).filter(Boolean);
-          if (imgList.length > 1) {
-            var st = STATES.find(function(s){ return s.id === sid; });
-            if (st) st._uploadedImgs = imgList;
-          }
-        }
-      });
     }
     var updated  = false;
 
@@ -1415,12 +1409,75 @@ async function loadData() {
           category_id:    db.category_id,
           sku:            db.sku,
           tags:           db.tags,
+          extra_image_url: db.extra_image_url || null,
+          _images:        [],  // populated from product_images table after load
         };
       });
       updated = true;
     }
 
     if (updated) { renderProds(); renderStates(); observeRv(); injectProductSchema(); renderUpsell(); initAllStateSlides(); initProductHoverImages(); }
+
+    // ── Load state_images table (multiple images per state) ──
+    try {
+      var siResp = await fetch(getStoreApiBase() + '/store-data?table=state_images');
+      if (siResp.ok) {
+        var siData = await siResp.json();
+        if (Array.isArray(siData) && siData.length) {
+          // Group by state_id, sorted by sort_order
+          var byState = {};
+          siData.forEach(function(row) {
+            if (!byState[row.state_id]) byState[row.state_id] = [];
+            byState[row.state_id].push(row);
+          });
+          Object.keys(byState).forEach(function(sid) {
+            var imgs = byState[sid].sort(function(a,b){ return (a.sort_order||0)-(b.sort_order||0); });
+            var urls = imgs.map(function(r){ return r.image_url; }).filter(Boolean);
+            if (urls.length) {
+              var st = STATES.find(function(s){ return s.id === sid; });
+              if (st) {
+                st._uploadedImgs = urls;
+                if (!st.cover_photo_url) st.cover_photo_url = urls[0];
+                if (!st.tab_photo_url)   st.tab_photo_url   = urls[0];
+              }
+            }
+          });
+          renderStates(); initAllStateSlides();
+        }
+      }
+    } catch(e2) { console.info('state_images fetch skipped:', e2.message); }
+
+    // ── Load product_images table (multiple images per product for hover slideshow) ──
+    try {
+      var piResp = await fetch(getStoreApiBase() + '/store-data?table=product_images');
+      if (piResp.ok) {
+        var piData = await piResp.json();
+        if (Array.isArray(piData) && piData.length) {
+          // Group by product_id, sorted by sort_order
+          var byProd = {};
+          piData.forEach(function(row) {
+            if (!byProd[row.product_id]) byProd[row.product_id] = [];
+            byProd[row.product_id].push(row);
+          });
+          var changed = false;
+          Object.keys(byProd).forEach(function(pid) {
+            var imgs = byProd[pid].sort(function(a,b){ return (a.sort_order||0)-(b.sort_order||0); });
+            var urls = imgs.map(function(r){ return r.image_url; }).filter(Boolean);
+            if (!urls.length) return;
+            // pid may be UUID — match against PRODUCTS by id
+            var pr = PRODUCTS.find(function(p){ return String(p.id) === String(pid); });
+            if (pr) {
+              pr._images = urls;
+              // First image is always the main image
+              if (!pr.image_url && urls[0]) pr.image_url = urls[0];
+              changed = true;
+            }
+          });
+          if (changed) { renderProds(); renderStates(); setTimeout(initProductHoverImages, 80); }
+        }
+      }
+    } catch(e3) { console.info('product_images fetch skipped:', e3.message); }
+
   } catch(e) {
     console.info('Using local fallback data:', e.message);
   }
@@ -1634,20 +1691,37 @@ function initAllStateSlides() {
 // Adds a second hover image to product cards that have extra images stored
 // Called after renderProds/renderStates
 function initProductHoverImages() {
-  // For each product that has extra_image_url, inject a hover img into .piw
+  // For each product that has _images (from product_images table), inject hover slideshow into .piw
   PRODUCTS.forEach(function(p) {
-    if (!p.extra_image_url) return;
+    // Support both _images array (from product_images table) and legacy extra_image_url
+    var hoverImgs = [];
+    if (p._images && p._images.length > 1) {
+      // Skip index 0 (that's the main image already shown), use rest as hover slides
+      hoverImgs = p._images.slice(1);
+    } else if (p.extra_image_url) {
+      hoverImgs = [p.extra_image_url];
+    }
+    if (!hoverImgs.length) return;
+
     document.querySelectorAll('.pcard').forEach(function(card) {
-      // Match by onclick containing the id
       if (card.innerHTML.indexOf('addToCart(' + p.id + ')') === -1) return;
       var piw = card.querySelector('.piw');
       if (!piw || piw.querySelector('.phover-img')) return;
-      var img = document.createElement('img');
-      img.className = 'phover-img';
-      img.src = p.extra_image_url;
-      img.alt = p.name;
-      img.loading = 'lazy';
-      piw.appendChild(img);
+      // Inject all hover images (they cycle on hover)
+      hoverImgs.forEach(function(src, hi) {
+        var img = document.createElement('img');
+        img.className = 'phover-img';
+        img.src = src;
+        img.alt = p.name;
+        img.loading = 'lazy';
+        // If multiple hover images, cycle them
+        if (hoverImgs.length > 1) {
+          img.style.animationDelay = (hi * 2) + 's';
+          img.style.animationDuration = (hoverImgs.length * 2) + 's';
+          img.classList.add('phover-cycle');
+        }
+        piw.appendChild(img);
+      });
     });
   });
 }
@@ -2555,24 +2629,33 @@ var _founderTimer = null;
 
 function loadFI() {
   try {
-    fetch(getStoreApiBase() + '/store-data').then(function(r){ return r.json(); })
-    .then(function(data){
-      // Collect all founder image URLs from settings
+    // First try founder_images table (proper DB table)
+    fetch(getStoreApiBase() + '/store-data?table=founder_images')
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(rows){
       var urls = [];
-      if (data && data.settings) {
-        // Single image key
-        if (data.settings.founder_image_url) urls.push(data.settings.founder_image_url);
-        // Multi-image keys: founder_image_url_2, founder_image_url_3 …
-        for (var i = 2; i <= 10; i++) {
-          var k = 'founder_image_url_' + i;
-          if (data.settings[k]) urls.push(data.settings[k]);
-        }
-        // Also support comma-separated list in founder_images key
-        if (data.settings.founder_images) {
-          data.settings.founder_images.split(',').forEach(function(u){ var t=u.trim(); if(t) urls.push(t); });
-        }
+      if (Array.isArray(rows) && rows.length) {
+        // Sort by sort_order, take image_url
+        rows.sort(function(a,b){ return (a.sort_order||0)-(b.sort_order||0); });
+        urls = rows.map(function(r){ return r.image_url; }).filter(Boolean);
       }
-      if (urls.length) initFounderSlideshow(urls);
+      if (urls.length) {
+        initFounderSlideshow(urls);
+        return;
+      }
+      // Fallback: site_settings keys
+      return fetch(getStoreApiBase() + '/store-data').then(function(r){ return r.json(); })
+      .then(function(data){
+        var fallbackUrls = [];
+        if (data && data.settings) {
+          if (data.settings.founder_image_url) fallbackUrls.push(data.settings.founder_image_url);
+          for (var i = 2; i <= 10; i++) {
+            var k = 'founder_image_url_' + i;
+            if (data.settings[k]) fallbackUrls.push(data.settings[k]);
+          }
+        }
+        if (fallbackUrls.length) initFounderSlideshow(fallbackUrls);
+      });
     }).catch(function(){});
   } catch(e) {}
 }
