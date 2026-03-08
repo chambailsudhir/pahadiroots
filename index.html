@@ -2773,16 +2773,9 @@ window.addEventListener('DOMContentLoaded', function() {
 <!-- ── AUTH JAVASCRIPT ──────────────────────────────────────────── -->
 <script>
 // ── Google OAuth ─────────────────────────
-async function loginWithGoogle() {
-  try {
-    const SUPABASE_URL = 'https://ulyrhnpoiypuvaurlqqi.supabase.co';
-    const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVseXJobnBvaXlwdXZhdXJscXFpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI5MTcwMDYsImV4cCI6MjA1ODQ5MzAwNn0.eWiNAusHGkMDMwRtFnLJhVWXotFBcBxVEBqJFbYEcck';
-    const redirectTo = encodeURIComponent(window.location.origin + '/');
-    const url = `${SUPABASE_URL}/auth/v1/authorize?provider=google&redirect_to=${redirectTo}`;
-    window.location.href = url;
-  } catch(e) {
-    showToast('Google login error. Try again.', 'error');
-  }
+function loginWithGoogle() {
+  const redirectTo = encodeURIComponent(window.location.origin + '/');
+  window.location.href = 'https://ulyrhnpoiypuvaurlqqi.supabase.co/auth/v1/authorize?provider=google&redirect_to=' + redirectTo;
 }
 
 // Handle Google OAuth callback
