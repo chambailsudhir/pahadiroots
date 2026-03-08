@@ -18,7 +18,6 @@ const ALLOWED_TABLES = new Set([
   'inventory_logs', 'order_logs', 'order_status_history',
   'admin_logs', 'order_detailed', 'order_summary', 'site_settings',
   'revenue_summary', 'states', 'sales_summary', 'stock_overview', 'daily_revenue',
-  'state_images', 'product_images', 'founder_images',
 ]);
 
 const WRITE_METHODS = new Set(['POST', 'PATCH', 'DELETE']);
@@ -111,7 +110,7 @@ export default async function handler(req, res) {
   }
 
   const pw = req.headers['x-admin-password'] || '';
-  const isPublicAction = reqBody.action === 'save_order' || reqBody.action === 'storage_upload';
+  const isPublicAction = reqBody.action === 'save_order'; // storage_upload requires admin auth
   if (!isPublicAction && (!pw || pw.length !== ADMIN_PW.length || pw !== ADMIN_PW)) {
     return err(401, 'Unauthorized');
   }
