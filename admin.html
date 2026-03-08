@@ -75,6 +75,7 @@ tr:hover td{background:rgba(255,255,255,.02)}
 .bb{background:rgba(88,166,255,.12);color:var(--blu)}
 .bgr{background:rgba(139,148,158,.12);color:var(--tx3)}
 .bp{background:rgba(167,139,250,.12);color:#a78bfa}
+.btn-g{background:var(--g);color:#fff}.btn-g:hover{background:var(--g2)}
 .ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:1000;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)}
 .ov.open{display:flex}
 .modal{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);width:100%;max-width:560px;max-height:92vh;overflow-y:auto;box-shadow:0 24px 60px rgba(0,0,0,.6)}
@@ -412,7 +413,7 @@ textarea.fi{resize:vertical;min-height:80px}
       <div style="flex:1;min-width:200px">
         <label class="lbl">Upload Photos (select multiple for slideshow)</label>
         <input type="file" id="founder-file" accept="image/*" class="fi" multiple onchange="previewFounders(this)" style="margin-bottom:6px">
-        <div style="font-size:11px;color:var(--tx3);margin-bottom:10px">📸 Select 2–5 images — they'll rotate every 3 seconds in the Editorial strip</div>
+        <div style="font-size:11px;color:var(--tx3);margin-bottom:10px">📸 Select images — <strong>adds to existing</strong>, use × to remove individual images. They rotate every 3s in the story section.</div>
         <button class="btn btn-g" onclick="uploadFounderImages()" style="width:100%;justify-content:center;margin-bottom:8px">📤 Upload All & Save to Site</button>
         <div id="founder-status" style="font-size:12px;color:var(--tx3)"></div>
       </div>
@@ -1509,13 +1510,13 @@ function fillSel(id, items, valKey, labelKey, selected){
 
 // ── copySQL — Copy SQL to clipboard ──
 function copySQL(btn){
-  const block = btn.closest('.sc')?.querySelector('pre');
+  const block = btn.closest('.sc')?.querySelector('.sql-block');
   if(!block) return;
   navigator.clipboard.writeText(block.textContent.trim()).then(()=>{
     const orig = btn.textContent;
     btn.textContent = '✓ Copied!';
-    btn.style.background = 'var(--grn)';
-    setTimeout(()=>{ btn.textContent = orig; btn.style.background = ''; }, 2000);
+    btn.style.background = 'var(--grn)'; btn.style.color = '#fff';
+    setTimeout(()=>{ btn.textContent = orig; btn.style.background = ''; btn.style.color = ''; }, 2000);
   }).catch(()=> toast('Copy failed','er'));
 }
 
@@ -1605,6 +1606,18 @@ async function loadStates() {
   }
 }
 
+async function deleteState(id) {
+  if (!confirm('Delete this state? This will also remove all its images.')) return;
+  try {
+    // Delete state_images first
+    await DEL('state_images', `state_id=eq.${id}`).catch(() => {});
+    await DEL('states', `id=eq.${id}`);
+    toast('State deleted ✓', 'ok');
+    await loadStates();
+  } catch(e) { toast('Delete failed: ' + e.message, 'er'); }
+}
+
+
 function openStateM(s) {
   s = s || {};
   document.getElementById('state-m-title').textContent = s.id ? 'Edit State' : 'Add State';
@@ -1624,9 +1637,10 @@ function openStateM(s) {
       GET('state_images', `state_id=eq.${s.id}&order=sort_order.asc`).then(rows => {
         if (rows && rows.length) {
           prevContainer.innerHTML = rows.map((r, i) =>
-            `<div style="position:relative;display:inline-block">
-              <img src="${r.image_url}" style="width:${i===0?'100%':'80px'};height:${i===0?'150px':'80px'};object-fit:cover;border-radius:8px;border:2px solid var(--bd)" onerror="this.style.display='none'">
+            `<div class="db-img-thumb" style="position:relative;display:inline-block">
+              <img src="${r.image_url}" style="width:${i===0?'100%':'80px'};height:${i===0?'150px':'80px'};object-fit:cover;border-radius:8px;border:2px solid var(--bd)" onerror="this.style.opacity='.3'">
               <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,.6);color:#fff;font-size:9px;font-weight:700;padding:2px 5px;border-radius:4px">${i===0?'Main':`#${i+1}`}</div>
+              <button onclick="deleteStateImg('${r.id}',this.parentNode)" style="position:absolute;top:4px;right:4px;background:rgba(200,40,40,.85);color:#fff;border:none;border-radius:3px;width:18px;height:18px;font-size:11px;cursor:pointer;line-height:1;padding:0">×</button>
             </div>`
           ).join('');
         } else if (s.image_path) {
@@ -1645,20 +1659,25 @@ function openStateM(s) {
 function previewStateImgs(input) {
   const files = Array.from(input.files); if (!files.length) return;
   const container = document.getElementById('state-img-previews');
-  container.innerHTML = '';
   document.getElementById('state-img-url').value = '';
+  // Remove any previous "new file" previews (but keep existing DB image thumbs)
+  container.querySelectorAll('.new-preview').forEach(el => el.remove());
+  // Add a separator if DB images already exist
+  const existingCount = container.querySelectorAll('.db-img-thumb').length;
   files.forEach((file, i) => {
     const reader = new FileReader();
     reader.onload = e => {
       const wrap = document.createElement('div');
+      wrap.className = 'new-preview';
       wrap.style.cssText = 'position:relative;display:inline-block';
       const img = document.createElement('img');
       img.src = e.target.result;
-      img.style.cssText = `width:${i===0?'100%':'80px'};height:${i===0?'150px':'80px'};object-fit:cover;border-radius:8px;border:2px solid var(--gd);display:block`;
-      img.title = `Image ${i+1}`;
+      const totalIdx = existingCount + i;
+      img.style.cssText = `width:${totalIdx===0?'100%':'80px'};height:${totalIdx===0?'150px':'80px'};object-fit:cover;border-radius:8px;border:2px solid var(--org);display:block`;
+      img.title = `New Image ${i+1}`;
       const lbl = document.createElement('div');
-      lbl.style.cssText = 'position:absolute;top:4px;left:4px;background:rgba(0,0,0,.6);color:#fff;font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px';
-      lbl.textContent = i === 0 ? 'Main' : `+${i}`;
+      lbl.style.cssText = 'position:absolute;top:4px;left:4px;background:rgba(180,100,0,.85);color:#fff;font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px';
+      lbl.textContent = `NEW ${i+1}`;
       wrap.appendChild(img); wrap.appendChild(lbl);
       container.appendChild(wrap);
     };
@@ -1666,6 +1685,24 @@ function previewStateImgs(input) {
   });
 }
 function previewStateImg(input) { previewStateImgs(input); }
+
+async function deleteStateImg(rowId, wrap) {
+  try {
+    await DEL('state_images', `id=eq.${rowId}`);
+    wrap.remove();
+    toast('Image removed ✓', 'ok');
+    // Re-sync first remaining image to states.image_path
+    const stateId = document.getElementById('state-id').value;
+    if (stateId) {
+      const rows = await GET('state_images', `state_id=eq.${stateId}&order=sort_order.asc&limit=1`).catch(() => []);
+      const newMain = rows?.[0]?.image_url || '';
+      if (newMain) {
+        document.getElementById('state-img-url').value = newMain;
+        await PATCH('states', `id=eq.${stateId}`, { image_path: newMain }).catch(() => {});
+      }
+    }
+  } catch(e) { toast('Delete failed: ' + e.message, 'er'); }
+}
 
 async function saveState() {
   const id = document.getElementById('state-id').value;
@@ -1706,23 +1743,32 @@ async function saveState() {
       await POST('states', { ...body, id: stateId });
     }
 
-    // Save all uploaded images to state_images table
+    // APPEND new images to state_images table (do NOT delete existing)
     if (uploadedUrls.length > 0) {
       status.textContent = '⏳ Saving images to DB…';
-      // Delete existing images for this state first
-      await DEL('state_images', `state_id=eq.${stateId}`).catch(() => {});
-      // Insert each image with sort_order
+      // Get current max sort_order so we append after existing images
+      const existSI = await GET('state_images', `state_id=eq.${stateId}&order=sort_order.desc&limit=1`).catch(() => []);
+      let nextOrder = existSI?.[0]?.sort_order !== undefined ? existSI[0].sort_order + 1 : 0;
       for (let i = 0; i < uploadedUrls.length; i++) {
-        await POST('state_images', { state_id: stateId, image_url: uploadedUrls[i], sort_order: i });
+        await POST('state_images', { state_id: stateId, image_url: uploadedUrls[i], sort_order: nextOrder + i });
       }
-      status.textContent = `✅ ${uploadedUrls.length} image(s) saved!`;
+      status.textContent = `✅ ${uploadedUrls.length} image(s) added!`;
     } else if (imageUrl) {
-      // URL pasted — save as single image in state_images table
-      await DEL('state_images', `state_id=eq.${stateId}`).catch(() => {});
-      await POST('state_images', { state_id: stateId, image_url: imageUrl, sort_order: 0 });
+      // URL pasted — append as image (don't wipe existing)
+      const existSI2 = await GET('state_images', `state_id=eq.${stateId}&order=sort_order.desc&limit=1`).catch(() => []);
+      const nextOrd2 = existSI2?.[0]?.sort_order !== undefined ? existSI2[0].sort_order + 1 : 0;
+      // Only add if URL not already in table (don't use encodeURIComponent in Supabase filter)
+      await POST('state_images', { state_id: stateId, image_url: imageUrl, sort_order: nextOrd2 });
       status.textContent = '✅ Image URL saved!';
     }
 
+    // Re-sync states.image_path to first image in state_images table
+    try {
+      const firstImg = await GET('state_images', `state_id=eq.${stateId}&order=sort_order.asc&limit=1`).catch(() => []);
+      if (firstImg?.[0]?.image_url) {
+        await PATCH('states', `id=eq.${stateId}`, { image_path: firstImg[0].image_url }).catch(() => {});
+      }
+    } catch(e) {}
     toast('State saved ✓', 'ok');
     closeM('state-modal');
     await loadStates();
@@ -1747,15 +1793,11 @@ async function loadMedia() {
         `<div style="position:relative;display:inline-block">
           <img src="${r.image_url}" style="width:${i===0?'140':'80'}px;height:${i===0?'160':'90'}px;object-fit:cover;border-radius:${i===0?'12':'8'}px;border:2px solid var(--bd)" onerror="this.style.opacity='.3'" title="Image ${i+1}">
           <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,.6);color:#fff;font-size:9px;font-weight:700;padding:2px 5px;border-radius:4px">${i===0?'Main':`#${i+1}`}</div>
+          <button onclick="deleteFounderImg('${r.id}',this.parentNode)" style="position:absolute;top:4px;right:4px;background:rgba(200,40,40,.85);color:#fff;border:none;border-radius:3px;width:18px;height:18px;font-size:11px;cursor:pointer;line-height:1;padding:0">×</button>
         </div>`
       ).join('');
     } else if (container) {
-      // Fallback: check site_settings for old single image
-      const data = await GET('site_settings', 'key=eq.founder_image_url&select=value').catch(() => []);
-      const url = data?.[0]?.value || '';
-      if (url && container) {
-        container.innerHTML = `<img src="${url}" style="width:140px;height:160px;object-fit:cover;border-radius:12px;border:2px solid var(--bd)" onerror="this.style.opacity='.3'">`;
-      }
+      container.innerHTML = '<div style="color:var(--tx3);font-size:12px;padding:20px 0">No founder images yet — upload some below</div>';
     }
   } catch(e) { console.warn('Media load:', e); }
 }
@@ -1801,17 +1843,16 @@ async function uploadFounderImages() {
     }
     // Delete all existing founder images and re-insert
     status.textContent = '⏳ Saving to DB…';
-    // Fetch all IDs first, then delete each (Supabase rejects fake UUID in neq)
-    const existingRows = await GET('founder_images', 'select=id').catch(() => []);
-    for (const row of (existingRows || [])) {
-      await DEL('founder_images', `id=eq.${row.id}`).catch(() => {});
-    }
+    // APPEND new images — do NOT delete existing
+    const existFI = await GET('founder_images', 'order=sort_order.desc&limit=1&select=sort_order').catch(() => []);
+    let nextFIOrder = existFI?.[0]?.sort_order !== undefined ? existFI[0].sort_order + 1 : 0;
     for (let i = 0; i < urls.length; i++) {
-      await POST('founder_images', { image_url: urls[i], sort_order: i });
+      await POST('founder_images', { image_url: urls[i], sort_order: nextFIOrder + i });
     }
     status.textContent = `✅ ${urls.length} image(s) saved! Refresh homepage to see slideshow.`;
     status.style.color = 'var(--grn)';
     toast(`Founder slideshow updated (${urls.length} images) ✓`, 'ok');
+    document.getElementById('founder-file').value = ''; // clear file input
     await loadMedia();
   } catch(e) {
     status.textContent = '❌ ' + e.message;
@@ -1821,6 +1862,14 @@ async function uploadFounderImages() {
   if (btn) { btn.disabled = false; btn.textContent = '📤 Upload All & Save to Site'; }
 }
 async function uploadFounderImage() { return uploadFounderImages(); }
+
+async function deleteFounderImg(rowId, wrap) {
+  try {
+    await DEL('founder_images', `id=eq.${rowId}`);
+    wrap.remove();
+    toast('Founder image removed ✓', 'ok');
+  } catch(e) { toast('Delete failed: ' + e.message, 'er'); }
+}
 
 
 // ══════════════════════════════════════════════════════════
@@ -1924,10 +1973,12 @@ async function uploadProdImage() {
       await POST('product_images', { product_id: _currentProdId, image_url: url, sort_order: nextOrder + i });
     }
 
-    // If these are the first images (or first upload), set product.image_url to first
-    if (isFirst && uploadedUrls.length > 0) {
-      document.getElementById('p-img').value = uploadedUrls[0];
-      await PATCH('products', `id=eq.${_currentProdId}`, { image_url: uploadedUrls[0] }).catch(() => {});
+    // Sync products.image_url to first image in table (always keep it accurate)
+    if (uploadedUrls.length > 0) {
+      const firstInTable = await GET('product_images', `product_id=eq.${_currentProdId}&order=sort_order.asc&limit=1`).catch(() => []);
+      const mainUrl = firstInTable?.[0]?.image_url || uploadedUrls[0];
+      document.getElementById('p-img').value = mainUrl;
+      await PATCH('products', `id=eq.${_currentProdId}`, { image_url: mainUrl }).catch(() => {});
     }
 
     status.textContent = `✅ ${uploadedUrls.length} image(s) uploaded!`;
@@ -1978,7 +2029,7 @@ async function uploadProdImage() {
         <label class="lbl">State Image</label>
         <div id="state-img-previews" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px"></div>
         <input type="file" id="state-file" accept="image/*" class="fi" style="margin-bottom:8px" multiple onchange="previewStateImgs(this)">
-        <div style="font-size:11px;color:var(--tx3);margin-bottom:6px">📸 Select multiple images — they'll auto-slideshow every 2.5s on the site</div>
+        <div style="font-size:11px;color:var(--tx3);margin-bottom:6px">📸 Select multiple images — <strong>adds to existing</strong>, doesn't replace. Auto-slideshow every 2.5s on site.</div>
         <label class="lbl">Or paste image URL (main image)</label>
         <input class="fi" id="state-img-url" placeholder="https://...">
       </div>
@@ -2014,7 +2065,7 @@ async function uploadProdImage() {
         <div style="font-size:11px;font-weight:700;color:var(--tx3);letter-spacing:.5px;margin-bottom:6px">ADD MORE IMAGES</div>
         <div id="prod-img-new-previews" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px"></div>
         <input type="file" id="prod-img-file" accept="image/*" class="fi" multiple onchange="previewProdImg(this)" style="margin-bottom:4px">
-        <div style="font-size:11px;color:var(--tx3);margin-bottom:10px">📸 Select multiple — they'll slideshow on hover on the site</div>
+        <div style="font-size:11px;color:var(--tx3);margin-bottom:10px">📸 Select multiple — <strong>adds to existing</strong>, use × to remove. 1st = main image, rest = hover slideshow.</div>
         <button class="btn btn-g" onclick="uploadProdImage()" id="prod-img-upload-btn" style="width:100%;justify-content:center">📤 Upload Images</button>
         <div id="prod-img-status" style="font-size:12px;color:var(--tx3);margin-top:6px"></div>
       </div>
