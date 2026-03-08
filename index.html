@@ -2775,17 +2775,11 @@ window.addEventListener('DOMContentLoaded', function() {
 // ── Google OAuth ─────────────────────────
 async function loginWithGoogle() {
   try {
-    const res = await fetch('/api/auth', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({action:'google_oauth'})
-    });
-    const data = await res.json();
-    if(data.url) {
-      window.location.href = data.url;
-    } else {
-      showToast('Google login failed. Try again.', 'error');
-    }
+    const SUPABASE_URL = 'https://ulyrhnpoiypuvaurlqqi.supabase.co';
+    const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVseXJobnBvaXlwdXZhdXJscXFpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI5MTcwMDYsImV4cCI6MjA1ODQ5MzAwNn0.eWiNAusHGkMDMwRtFnLJhVWXotFBcBxVEBqJFbYEcck';
+    const redirectTo = encodeURIComponent(window.location.origin + '/');
+    const url = `${SUPABASE_URL}/auth/v1/authorize?provider=google&redirect_to=${redirectTo}`;
+    window.location.href = url;
   } catch(e) {
     showToast('Google login error. Try again.', 'error');
   }
