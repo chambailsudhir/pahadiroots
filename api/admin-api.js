@@ -1,8 +1,16 @@
 // ═══════════════════════════════════════════════════════════════
 // Pahadi Roots — Admin API (Vercel Serverless Function)
-// Version: 2.1 — Fixed setCORS + reqBody bug
+// Version: 2.2 — Secure storage upload + increased body limit
 // File path: api/admin-api.js
 // ═══════════════════════════════════════════════════════════════
+
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: '6mb', // base64 of a 4MB image ≈ 5.3MB
+    },
+  },
+};
 
 if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_KEY || !process.env.ADMIN_PASSWORD) {
   console.error('FATAL: Missing required environment variables');
@@ -110,7 +118,7 @@ export default async function handler(req, res) {
   }
 
   const pw = req.headers['x-admin-password'] || '';
-  const isPublicAction = reqBody.action === 'save_order'; // storage_upload requires admin auth
+  const isPublicAction = reqBody.action === 'save_order';
   if (!isPublicAction && (!pw || pw.length !== ADMIN_PW.length || pw !== ADMIN_PW)) {
     return err(401, 'Unauthorized');
   }
