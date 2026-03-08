@@ -129,6 +129,7 @@ button{cursor:pointer;font-family:inherit}
 body.dark{background:#0d1a0f;color:#f0f0f0}
 body.dark nav#mNav{background:rgba(13,26,15,.97)}
 body.dark .pcard{background:#1a2b1c;border-color:rgba(255,255,255,.06)}
+body.dark .spgrid{background:#0d1a0f}
 body.dark .filter-btn{background:#1a2b1c;border-color:rgba(255,255,255,.1);color:#c0c0c0}
 body.dark .filter-btn.active{background:var(--g);color:#fff}
 body.dark .filter-sort{background:#1a2b1c;color:#c0c0c0;border-color:rgba(255,255,255,.1)}
@@ -292,8 +293,8 @@ section.sec{padding:52px 40px}
 .stab{flex:0 0 auto;width:140px;padding:0;border:none;border-radius:8px 8px 0 0;background:#fff;cursor:pointer;display:flex;flex-direction:column;align-items:stretch;transition:all .22s;position:relative;font-family:'Lato',sans-serif;box-shadow:0 1px 4px rgba(0,0,0,.08);overflow:hidden}
 .stab:hover{transform:translateY(-2px);box-shadow:0 4px 14px rgba(0,0,0,.14)}
 .stab.active{background:var(--g);box-shadow:0 4px 18px rgba(26,58,30,.3);transform:translateY(-2px)}
-.stab-thumb{width:100%;height:90px;overflow:hidden;display:block;background:#d8cfbb;flex-shrink:0}
-.stab-slide{position:relative;width:100%;height:100%}
+.stab-thumb{width:100%;height:90px;overflow:hidden;display:block;background:#d8cfbb;flex-shrink:0;position:relative}
+.stab-slide{position:absolute;inset:0;width:100%;height:100%}
 .stab-slide img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .spnl-slide{position:absolute;inset:0}
 .stab-thumb img{width:100%;height:100%;object-fit:cover;object-position:55% 15%;display:block;transition:transform .4s}
@@ -321,24 +322,8 @@ section.sec{padding:52px 40px}
 .sstate-desc{font-size:13px;color:rgba(255,255,255,.78);line-height:1.75;margin-bottom:16px;display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden}
 .sstate-pills{display:flex;flex-wrap:wrap;gap:6px}
 .sstate-pill{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);color:rgba(255,255,255,.9);font-size:10px;font-weight:700;letter-spacing:.5px;padding:4px 12px;border-radius:20px}
-.spgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;padding:24px 40px;background:#0d1f0e}
-.spgrid .pcard{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09)}
-.spgrid .pcard:hover{background:rgba(255,255,255,.09);border-color:rgba(200,146,10,.45);transform:translateY(-4px);box-shadow:0 14px 36px rgba(0,0,0,.35)}
-.spgrid .pname,.spgrid .pstars{color:#fff}
-.spgrid .pregion{color:var(--gd)}
-.spgrid .pdesc{color:rgba(255,255,255,.52)}
-.spgrid .pnow{color:var(--gd2)}
-.spgrid .pwas{color:rgba(255,255,255,.25)}
-.spgrid .punt{color:rgba(255,255,255,.35)}
-.spgrid .prc{color:rgba(255,255,255,.3)}
-.spgrid .atc{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.18)}
-.spgrid .atc:hover{background:var(--gd);border-color:var(--gd);color:#1a3a1e}
-.spgrid .wl-btn{color:rgba(255,255,255,.6)}
-.spgrid .stock-bar{background:rgba(255,255,255,.1)}
-.spgrid .cmp-btn{border-color:rgba(255,255,255,.18);color:rgba(255,255,255,.45);background:transparent}
-.spgrid .stock-label.high{color:rgba(80,210,80,.8)}
-.spgrid .stock-label.mid{color:rgba(255,180,50,.85)}
-.spgrid .stock-label.low{color:rgba(255,100,100,.85)}
+.spgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:18px;padding:28px 40px 36px;background:#fff;max-width:1280px;margin:0 auto}
+.spgrid .pcard:hover{transform:translateY(-4px);box-shadow:0 12px 32px rgba(0,0,0,.1)}
 
 /* OUR PROMISE */
 .why-bg{background:linear-gradient(180deg,#faf6ee,#f2eadc);padding:20px 40px}
@@ -640,9 +625,9 @@ footer{background:#0d1a0f;padding:44px 40px 24px}
 
 /* RESPONSIVE */
 @media(max-width:960px){
-  .founder-content{flex-direction:column;padding:40px 28px 32px;align-items:flex-start}
-  .founder-left{max-width:100%}
-  .founder-right{display:none}
+
+
+
 
 
   .trust{grid-template-columns:repeat(2,1fr)}
@@ -656,9 +641,9 @@ footer{background:#0d1a0f;padding:44px 40px 24px}
   .spgrid{grid-template-columns:1fr 1fr;padding:16px 20px}
   .stab{flex:0 0 auto;width:110px}
   .stab-thumb{height:70px}
-  .founder-content{flex-direction:column;padding:0 20px 32px;align-items:flex-start}
-  .founder-left{max-width:100%}
-  .founder-right{display:none}
+
+
+
 
   .fname{font-size:clamp(28px,6vw,40px)}
   .cpage-body{grid-template-columns:1fr;overflow:auto}
@@ -684,20 +669,36 @@ footer{background:#0d1a0f;padding:44px 40px 24px}
 .rv-strip{display:flex;gap:12px;overflow-x:auto;padding-bottom:6px}
 
 /* ── FOUNDER — Full-width cinematic (Image 2 style) ── */
-.founder-sec{position:relative;overflow:hidden;display:flex;align-items:stretch;background:#071408}
-.founder-bg{position:relative;width:100%;line-height:0;display:block;background:linear-gradient(135deg,#071408 0%,#0a1e0c 50%,#0e2b12 100%);min-height:200px}
-.founder-overlay{position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,rgba(0,0,0,0) 0%,rgba(0,0,0,0) 42%,rgba(0,0,0,.5) 70%,rgba(0,0,0,.85) 100%),linear-gradient(90deg,rgba(0,0,0,.4) 0%,rgba(0,0,0,.15) 40%,rgba(0,0,0,0) 65%)}
-.founder-content{position:absolute;bottom:0;left:0;right:0;z-index:2;display:flex;align-items:flex-end;justify-content:space-between;padding:0 64px 24px;gap:32px}
-.founder-left{max-width:520px;flex:1}
-.founder-right{flex-shrink:0;display:flex;align-items:flex-end;padding-bottom:4px}
-.founder-badge{display:flex;align-items:center;gap:8px;background:rgba(13,47,16,.85);border:1px solid rgba(200,146,10,.35);color:var(--gd2);font-size:9.5px;font-weight:800;letter-spacing:2.2px;padding:13px 22px;border-radius:3px;white-space:nowrap;backdrop-filter:blur(6px)}
-.ftag{color:var(--gd2);font-size:9.5px;font-weight:800;letter-spacing:4px;margin-bottom:16px;opacity:.8;text-transform:uppercase}
-.fname{font-family:'Playfair Display',serif;font-size:clamp(32px,4.8vw,60px);color:#fff;font-weight:900;margin-bottom:12px;line-height:1.05;text-shadow:0 2px 20px rgba(0,0,0,.4)}
-.fsubtitle-big{font-family:'Playfair Display',serif;font-size:clamp(17px,2.3vw,28px);color:var(--gd2);font-style:italic;margin-bottom:24px;line-height:1.35;font-weight:400}
-.fq{font-size:clamp(12.5px,1.25vw,14.5px);color:rgba(255,255,255,.76);line-height:1.85;font-style:italic;margin-bottom:22px;max-width:460px}
-.faut-row{display:flex;align-items:center;gap:12px}
-.faut-line{width:38px;height:1.5px;background:var(--gd2);opacity:.7;display:block;flex-shrink:0}
-.faut{font-size:10px;font-weight:700;letter-spacing:2.5px;color:rgba(255,255,255,.45);text-transform:uppercase}
+.founder-sec{position:relative;overflow:hidden;background:#050e06}
+.founder-bg{display:none}
+.founder-editorial{display:grid;grid-template-columns:1.1fr 0.9fr;min-height:340px;max-height:360px}
+.founder-text-col{padding:48px 56px;display:flex;flex-direction:column;justify-content:center;position:relative;background:#050e06}
+.founder-text-col::after{content:'';position:absolute;right:0;top:15%;bottom:15%;width:1px;background:linear-gradient(180deg,transparent,rgba(200,146,10,.35),transparent)}
+.founder-photo-col{position:relative;overflow:hidden;min-height:340px}
+.founder-photo-col .founder-slide,
+.founder-photo-col .founder-photo-inner{position:absolute;inset:0}
+.founder-photo-col img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top}
+.founder-photo-col .founder-slide img{transition:opacity 1.2s ease}
+.founder-photo-col-overlay{position:absolute;inset:0;z-index:1;background:linear-gradient(90deg,rgba(5,14,6,.65) 0%,transparent 40%);pointer-events:none}
+.founder-photo-col-clip{position:absolute;inset:0;clip-path:polygon(10% 0%,100% 0%,100% 100%,0% 100%)}
+.founder-year-badge{position:absolute;bottom:24px;right:24px;z-index:2;background:rgba(200,146,10,.12);border:1px solid rgba(200,146,10,.38);color:#c8920a;font-size:8.5px;font-weight:800;letter-spacing:2px;padding:10px 16px;border-radius:3px;text-transform:uppercase;backdrop-filter:blur(4px)}
+.ftag{color:#c8920a;font-size:8.5px;font-weight:800;letter-spacing:3.5px;margin-bottom:14px;opacity:.85;text-transform:uppercase}
+.fname{font-family:'Playfair Display',serif;font-size:clamp(30px,3.5vw,52px);color:#fff;font-weight:900;margin-bottom:4px;line-height:1.0}
+.fname em{color:#c8920a;font-style:normal}
+.fsubtitle-big{font-size:11px;color:rgba(255,255,255,.35);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:24px}
+.fq{font-size:13.5px;color:rgba(255,255,255,.65);line-height:1.85;font-style:italic;border-left:2px solid #c8920a;padding-left:18px;margin-bottom:0;max-width:440px}
+.faut-row{display:none}
+.founder-badge{display:none}
+.founder-overlay{display:none}
+.founder-content{display:none}
+@media(max-width:768px){
+  .founder-editorial{grid-template-columns:1fr;max-height:none}
+  .founder-text-col{padding:36px 28px;order:2}
+  .founder-text-col::after{display:none}
+  .founder-photo-col{min-height:220px;order:1}
+  .founder-photo-col-clip{clip-path:none}
+  .founder-year-badge{bottom:12px;right:12px}
+}
 .fvis{display:none}
 .ftxt{display:none}
 .fport{display:none}
@@ -1022,22 +1023,19 @@ footer{background:#0d1a0f;padding:44px 40px 24px}
   </div>
 </section>
 <section class="founder-sec" id="story">
-  <!-- Full-width background image — set from admin Site Settings -->
-  <div class="founder-bg" id="founderBg"></div>
-  <div class="founder-overlay"></div>
-  <div class="founder-content">
-    <div class="founder-left">
-      <div class="ftag">THE MAN BEHIND PAHADI ROOTS</div>
-      <h2 class="fname">Sudhir Chambail</h2>
-      <p class="fsubtitle-big">Born in Himachal. Living in Delhi.<br>Always on the road.</p>
+  <div class="founder-editorial">
+    <div class="founder-text-col">
+      <div class="ftag">The Man Behind Pahadi Roots</div>
+      <h2 class="fname">Sudhir <em>Chambail</em></h2>
+      <div class="fsubtitle-big">Himachal Pradesh &nbsp;·&nbsp; Est. 2019</div>
       <blockquote class="fq">"I ride these mountains because that's the only way to find the real thing — the honey tucked inside a Deodar forest, the ghee made before sunrise in a Kangra valley home. No store can give you that."</blockquote>
-      <div class="faut-row">
-        <span class="faut-line"></span>
-        <span class="faut">FOUNDER · PAHADI ROOTS · DELHI</span>
-      </div>
     </div>
-    <div class="founder-right">
-      <div class="founder-badge">🏔️ TRAVELLING HIMALAYAS SINCE 2019</div>
+    <div class="founder-photo-col">
+      <div class="founder-photo-col-clip">
+        <div id="founderBg" class="founder-photo-inner"></div>
+      </div>
+      <div class="founder-photo-col-overlay"></div>
+      <div class="founder-year-badge">🏔️ Travelling Himalayas Since 2019</div>
     </div>
   </div>
 </section>
@@ -1693,12 +1691,12 @@ function renderStates() {
     var imgs = s._images && s._images.length ? s._images : (s.tab_photo_url ? [s.tab_photo_url] : []);
     var imgHtml;
     if (imgs.length > 1) {
-      // Slideshow thumb
-      imgHtml = '<div class="stab-thumb stab-slide" data-imgs=\'' + JSON.stringify(imgs) + '\' data-idx="0">' +
+      // Slideshow thumb — stab-slide sits INSIDE stab-thumb
+      imgHtml = '<div class="stab-thumb"><div class="stab-slide" data-imgs=\'' + JSON.stringify(imgs) + '\' data-idx="0">' +
         imgs.map(function(u, ii) {
-          return '<img src="' + u + '" alt="' + s.name + '" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:55% 15%;transition:opacity .8s;opacity:' + (ii===0?'1':'0') + '" onerror="this.style.display=\'none\'">';
+          return '<img src="' + u + '" alt="' + s.name + '" loading="lazy" style="opacity:' + (ii===0?'1':'0') + '" onerror="this.style.display=\'none\'">';
         }).join('') +
-        '</div>';
+        '</div></div>';
     } else if (imgs.length === 1) {
       imgHtml = '<div class="stab-thumb"><img src="' + imgs[0] + '" alt="' + s.name + '" onerror="this.parentNode.style.display=\'none\'" loading="lazy"></div>';
     } else {
@@ -2235,7 +2233,7 @@ function renderUpsell() {
   if (!suggestions.length) { section.style.display = 'none'; return; }
   section.style.display = 'block';
   strip.innerHTML = suggestions.map(function(p) {
-    var imgHtml = p.image_url ? ('<img src="'+p.image_url+'" style="width:100%;height:100%;object-fit:cover">') : ('<span style="font-size:28px">'+(p.emoji||'🌿')+'</span>');
+    var imgHtml = p.image_url ? ('<img src="'+p.image_url+'" alt="'+p.name+'" style="width:100%;height:100%;object-fit:cover">') : ('<span style="font-size:28px">'+(p.emoji||'🌿')+'</span>');
     var addBtn = '<button onclick="addToCart('+JSON.stringify(p.id)+')" style="margin-top:6px;background:var(--g);color:#fff;border:none;border-radius:6px;padding:4px 10px;font-size:11px;font-weight:600;cursor:pointer;width:100%">+ Add</button>';
     return '<div class="cu-item"><div class="cu-img">'+imgHtml+'</div><div class="cu-name">'+p.name+'</div><div class="cu-price">&#8377;'+p.price+'</div>'+addBtn+'</div>';
   }).join('');
@@ -2690,16 +2688,14 @@ function loadFI() {
     if (!bg) return;
     function applyFounderImgs(urls) {
       if (!urls || !urls.length) return;
-      bg.style.cssText = 'position:relative;width:100%;line-height:0;display:block';
       if (urls.length === 1) {
-        bg.innerHTML = '<img src="' + urls[0] + '" alt="Sudhir Chambail" style="width:100%;height:auto;max-height:760px;display:block;object-fit:cover;object-position:40% center">';
+        bg.innerHTML = '<img src="' + urls[0] + '" alt="Sudhir Chambail" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top">';
       } else {
-        bg.innerHTML = '<div class="founder-slide" data-imgs=\'' + JSON.stringify(urls) + '\' data-idx="0" style="position:relative;width:100%;line-height:0">' +
+        bg.innerHTML = '<div class="founder-slide" data-imgs=\'' + JSON.stringify(urls) + '\' data-idx="0" style="position:absolute;inset:0">' +
           urls.map(function(u, i) {
-            return '<img src="' + u + '" alt="Sudhir Chambail" style="' + (i===0?'':'position:absolute;inset:0;') + 'width:100%;height:auto;max-height:760px;display:block;object-fit:cover;object-position:40% center;transition:opacity 1.2s;opacity:' + (i===0?'1':'0') + '">';
+            return '<img src="' + u + '" alt="Sudhir Chambail" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;transition:opacity 1.2s;opacity:' + (i===0?'1':'0') + '">';
           }).join('') +
         '</div>';
-        // Start slideshow after DOM is ready
         setTimeout(startSlideshows, 100);
       }
     }
