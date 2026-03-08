@@ -1616,13 +1616,27 @@ function openStateM(s) {
   document.getElementById('state-active').checked = s.is_active !== false;
   document.getElementById('state-file').value = '';
   document.getElementById('state-upload-status').textContent = '';
-  // Show current image in new multi-preview container
+  // Load all images from state_images table for this state
   const prevContainer = document.getElementById('state-img-previews');
   if (prevContainer) {
-    if (s.image_path) {
+    prevContainer.innerHTML = '';
+    if (s.id) {
+      GET('state_images', `state_id=eq.${s.id}&order=sort_order.asc`).then(rows => {
+        if (rows && rows.length) {
+          prevContainer.innerHTML = rows.map((r, i) =>
+            `<div style="position:relative;display:inline-block">
+              <img src="${r.image_url}" style="width:${i===0?'100%':'80px'};height:${i===0?'150px':'80px'};object-fit:cover;border-radius:8px;border:2px solid var(--bd)" onerror="this.style.display='none'">
+              <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,.6);color:#fff;font-size:9px;font-weight:700;padding:2px 5px;border-radius:4px">${i===0?'Main':`#${i+1}`}</div>
+            </div>`
+          ).join('');
+        } else if (s.image_path) {
+          prevContainer.innerHTML = `<img src="${s.image_path}" style="width:100%;height:150px;object-fit:cover;border-radius:8px;border:1px solid var(--bd)" onerror="this.style.display='none'">`;
+        }
+      }).catch(() => {
+        if (s.image_path) prevContainer.innerHTML = `<img src="${s.image_path}" style="width:100%;height:150px;object-fit:cover;border-radius:8px" onerror="this.style.display='none'">`;
+      });
+    } else if (s.image_path) {
       prevContainer.innerHTML = `<img src="${s.image_path}" style="width:100%;height:150px;object-fit:cover;border-radius:8px;border:1px solid var(--bd)" onerror="this.style.display='none'">`;
-    } else {
-      prevContainer.innerHTML = '';
     }
   }
   openM('state-modal');
@@ -1636,16 +1650,21 @@ function previewStateImgs(input) {
   files.forEach((file, i) => {
     const reader = new FileReader();
     reader.onload = e => {
+      const wrap = document.createElement('div');
+      wrap.style.cssText = 'position:relative;display:inline-block';
       const img = document.createElement('img');
       img.src = e.target.result;
-      img.style.cssText = `width:${i===0?'100%':'80px'};height:${i===0?'150px':'80px'};object-fit:cover;border-radius:8px;border:2px solid var(--gd)`;
+      img.style.cssText = `width:${i===0?'100%':'80px'};height:${i===0?'150px':'80px'};object-fit:cover;border-radius:8px;border:2px solid var(--gd);display:block`;
       img.title = `Image ${i+1}`;
-      container.appendChild(img);
+      const lbl = document.createElement('div');
+      lbl.style.cssText = 'position:absolute;top:4px;left:4px;background:rgba(0,0,0,.6);color:#fff;font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px';
+      lbl.textContent = i === 0 ? 'Main' : `+${i}`;
+      wrap.appendChild(img); wrap.appendChild(lbl);
+      container.appendChild(wrap);
     };
     reader.readAsDataURL(file);
   });
 }
-// Legacy
 function previewStateImg(input) { previewStateImgs(input); }
 
 async function saveState() {
@@ -1658,29 +1677,18 @@ async function saveState() {
   try {
     let imageUrl = document.getElementById('state-img-url').value.trim();
     const files = Array.from(document.getElementById('state-file').files);
-    if (files.length === 1) {
-      status.textContent = '⏳ Uploading image…';
-      imageUrl = await uploadToStorage(files[0], `states/${name.toLowerCase().replace(/\s+/g, '-')}`);
-      status.textContent = '✅ Image uploaded!';
-    } else if (files.length > 1) {
-      // Upload all images; store extra images as site_settings keys
-      status.textContent = '⏳ Uploading ' + files.length + ' images…';
-      const urls = [];
+    const uploadedUrls = [];
+
+    if (files.length >= 1) {
       for (let i = 0; i < files.length; i++) {
-        const suffix = i === 0 ? '' : '-' + (i + 1);
-        const url = await uploadToStorage(files[i], `states/${name.toLowerCase().replace(/\s+/g, '-')}${suffix}`);
-        urls.push(url);
-        status.textContent = '⏳ Uploaded ' + (i+1) + '/' + files.length + '…';
+        status.textContent = `⏳ Uploading image ${i+1}/${files.length}…`;
+        const url = await uploadToStorage(files[i], `states/${name.toLowerCase().replace(/\s+/g, '-')}-${Date.now()}-${i}`);
+        uploadedUrls.push(url);
       }
-      imageUrl = urls[0];
-      // Store extra images in site_settings as state_images_<id>
-      const stateId = id || name.toLowerCase().replace(/[^a-z]/g,'').slice(0,4);
-      const settingKey = 'state_images_' + stateId;
-      const ex = await GET('site_settings', 'key=eq.' + settingKey).catch(() => []);
-      if (ex && ex.length) await PATCH('site_settings', 'key=eq.' + settingKey, { value: urls.join(',') });
-      else await POST('site_settings', { key: settingKey, value: urls.join(',') });
-      status.textContent = '✅ ' + urls.length + ' images uploaded!';
+      imageUrl = uploadedUrls[0];
     }
+
+    // Save/update the state record
     const body = {
       name,
       description: document.getElementById('state-desc').value.trim() || null,
@@ -1688,12 +1696,33 @@ async function saveState() {
       is_active: document.getElementById('state-active').checked,
       updated_at: new Date().toISOString()
     };
-    if (id) await PATCH('states', `id=eq.${id}`, body);
-    else {
+    let stateId = id;
+    if (stateId) {
+      await PATCH('states', `id=eq.${stateId}`, body);
+    } else {
       const manualSlug = (document.getElementById('state-slug')?.value||'').trim().toLowerCase().replace(/[^a-z0-9]/g,'');
       const autoSlug = name.toLowerCase().replace(/[^a-z]/g,'').slice(0,4) + '-' + Date.now().toString().slice(-4);
-      await POST('states', { ...body, id: manualSlug || autoSlug });
+      stateId = manualSlug || autoSlug;
+      await POST('states', { ...body, id: stateId });
     }
+
+    // Save all uploaded images to state_images table
+    if (uploadedUrls.length > 0) {
+      status.textContent = '⏳ Saving images to DB…';
+      // Delete existing images for this state first
+      await DEL('state_images', `state_id=eq.${stateId}`).catch(() => {});
+      // Insert each image with sort_order
+      for (let i = 0; i < uploadedUrls.length; i++) {
+        await POST('state_images', { state_id: stateId, image_url: uploadedUrls[i], sort_order: i });
+      }
+      status.textContent = `✅ ${uploadedUrls.length} image(s) saved!`;
+    } else if (imageUrl) {
+      // URL pasted — save as single image in state_images table
+      await DEL('state_images', `state_id=eq.${stateId}`).catch(() => {});
+      await POST('state_images', { state_id: stateId, image_url: imageUrl, sort_order: 0 });
+      status.textContent = '✅ Image URL saved!';
+    }
+
     toast('State saved ✓', 'ok');
     closeM('state-modal');
     await loadStates();
@@ -1704,29 +1733,29 @@ async function saveState() {
   btn.disabled = false; btn.textContent = '💾 Save State';
 }
 
-async function deleteState(id) {
-  if (!confirm('Delete this state?')) return;
-  try { await DEL('states', `id=eq.${id}`); toast('Deleted ✓', 'ok'); await loadStates(); }
-  catch(e) { toast('Error: ' + e.message, 'er'); }
-}
 
 // ══════════════════════════════════════════════════════════
-// MEDIA — FOUNDER IMAGES (multi-image slideshow)
+// MEDIA — FOUNDER IMAGES (uses founder_images DB table)
 // ══════════════════════════════════════════════════════════
 async function loadMedia() {
   try {
-    const data = await GET('site_settings', 'key=like.founder_image_url*&select=key,value');
-    const urls = [];
-    if (data && data.length) {
-      // Sort: founder_image_url, founder_image_url_2, founder_image_url_3 ...
-      data.sort((a,b) => a.key.localeCompare(b.key));
-      data.forEach(r => { if(r.value) urls.push(r.value); });
-    }
+    // Load from founder_images table (sorted by sort_order)
+    const rows = await GET('founder_images', 'order=sort_order.asc&limit=10').catch(() => []);
     const container = document.getElementById('founder-previews');
-    if (container && urls.length) {
-      container.innerHTML = urls.map((url, i) =>
-        `<img src="${url}" style="width:${i===0?'140':'80'}px;height:${i===0?'160':'90'}px;object-fit:cover;border-radius:${i===0?'12':'8'}px;border:2px solid var(--bd);background:var(--bg2)" onerror="this.style.opacity='.3'" title="Image ${i+1}">`
+    if (container && rows && rows.length) {
+      container.innerHTML = rows.map((r, i) =>
+        `<div style="position:relative;display:inline-block">
+          <img src="${r.image_url}" style="width:${i===0?'140':'80'}px;height:${i===0?'160':'90'}px;object-fit:cover;border-radius:${i===0?'12':'8'}px;border:2px solid var(--bd)" onerror="this.style.opacity='.3'" title="Image ${i+1}">
+          <div style="position:absolute;top:4px;left:4px;background:rgba(0,0,0,.6);color:#fff;font-size:9px;font-weight:700;padding:2px 5px;border-radius:4px">${i===0?'Main':`#${i+1}`}</div>
+        </div>`
       ).join('');
+    } else if (container) {
+      // Fallback: check site_settings for old single image
+      const data = await GET('site_settings', 'key=eq.founder_image_url&select=value').catch(() => []);
+      const url = data?.[0]?.value || '';
+      if (url && container) {
+        container.innerHTML = `<img src="${url}" style="width:140px;height:160px;object-fit:cover;border-radius:12px;border:2px solid var(--bd)" onerror="this.style.opacity='.3'">`;
+      }
     }
   } catch(e) { console.warn('Media load:', e); }
 }
@@ -1739,136 +1768,180 @@ function previewFounders(input) {
   files.forEach((file, i) => {
     const reader = new FileReader();
     reader.onload = e => {
+      const wrap = document.createElement('div');
+      wrap.style.cssText = 'position:relative;display:inline-block';
       const img = document.createElement('img');
       img.src = e.target.result;
       img.style.cssText = `width:${i===0?'140':'80'}px;height:${i===0?'160':'90'}px;object-fit:cover;border-radius:${i===0?'12':'8'}px;border:2px solid var(--gd)`;
       img.title = `Image ${i+1}`;
-      container.appendChild(img);
+      const lbl = document.createElement('div');
+      lbl.style.cssText = 'position:absolute;top:4px;left:4px;background:rgba(0,0,0,.6);color:#fff;font-size:9px;font-weight:700;padding:2px 5px;border-radius:4px';
+      lbl.textContent = i === 0 ? 'Main' : `#${i+1}`;
+      wrap.appendChild(img); wrap.appendChild(lbl);
+      container.appendChild(wrap);
     };
     reader.readAsDataURL(file);
   });
 }
-// Legacy single-image preview
 function previewFounder(input) { previewFounders(input); }
 
 async function uploadFounderImages() {
   const files = Array.from(document.getElementById('founder-file').files);
   const status = document.getElementById('founder-status');
-  if (!files.length) { toast('Please select at least one file', 'er'); return; }
+  if (!files.length) { toast('Please select at least one photo', 'er'); return; }
   status.textContent = '⏳ Uploading ' + files.length + ' image(s)…';
+  const btn = document.querySelector('[onclick="uploadFounderImages()"]');
+  if (btn) { btn.disabled = true; btn.textContent = 'Uploading…'; }
   try {
-    // Delete old keys first
-    const existing = await GET('site_settings', 'key=like.founder_image_url*&select=key').catch(() => []);
-    for (const row of (existing || [])) {
-      await PATCH('site_settings', 'key=eq.' + row.key, { value: '' }).catch(() => {});
-    }
     const urls = [];
     for (let i = 0; i < files.length; i++) {
-      status.textContent = '⏳ Uploading image ' + (i+1) + ' of ' + files.length + '…';
-      const suffix = i === 0 ? '' : '_' + (i + 1);
-      const url = await uploadToStorage(files[i], 'founder/founder-image' + suffix);
+      status.textContent = `⏳ Uploading ${i+1}/${files.length}…`;
+      const url = await uploadToStorage(files[i], `founder/founder-${Date.now()}-${i}`);
       urls.push(url);
-      const key = 'founder_image_url' + suffix;
-      const ex = await GET('site_settings', 'key=eq.' + key).catch(() => []);
-      if (ex && ex.length > 0) {
-        await PATCH('site_settings', 'key=eq.' + key, { value: url });
-      } else {
-        await POST('site_settings', { key, value: url });
-      }
     }
-    status.textContent = '✅ ' + urls.length + ' image(s) saved! Refresh homepage to see slideshow.';
+    // Delete all existing founder images and re-insert
+    status.textContent = '⏳ Saving to DB…';
+    await DEL('founder_images', 'id=neq.00000000-0000-0000-0000-000000000000').catch(() => {});
+    for (let i = 0; i < urls.length; i++) {
+      await POST('founder_images', { image_url: urls[i], sort_order: i });
+    }
+    status.textContent = `✅ ${urls.length} image(s) saved! Refresh homepage to see slideshow.`;
     status.style.color = 'var(--grn)';
-    toast('Founder slideshow updated (' + urls.length + ' images) ✓', 'ok');
-    loadMedia();
+    toast(`Founder slideshow updated (${urls.length} images) ✓`, 'ok');
+    await loadMedia();
   } catch(e) {
     status.textContent = '❌ ' + e.message;
     status.style.color = 'var(--red)';
     toast('Upload failed: ' + e.message, 'er');
   }
+  if (btn) { btn.disabled = false; btn.textContent = '📤 Upload All & Save to Site'; }
 }
-// Legacy single-image upload still works
 async function uploadFounderImage() { return uploadFounderImages(); }
 
 
+// ══════════════════════════════════════════════════════════
+// PRODUCT IMAGE UPLOAD (uses product_images DB table)
+// ══════════════════════════════════════════════════════════
 
-// ══════════════════════════════════════════════════════════
-// PRODUCT IMAGE UPLOAD
-// ══════════════════════════════════════════════════════════
+// Current product ID being edited — set when upload modal opens
+let _currentProdId = null;
+
 function openProdImgUpload() {
+  _currentProdId = document.getElementById('p-id').value || null;
+  // Reset inputs
   document.getElementById('prod-img-file').value = '';
   document.getElementById('prod-img-status').textContent = '';
-  // Reset hover file too
-  const hf = document.getElementById('prod-hover-file');
-  if (hf) hf.value = '';
-  const hp = document.getElementById('prod-hover-preview');
-  if (hp) { hp.src = ''; hp.style.display = 'none'; }
-  const cur = document.getElementById('p-img').value;
-  const prev = document.getElementById('prod-img-preview');
-  if (cur) { prev.src = cur; prev.style.display = 'block'; }
-  else prev.style.display = 'none';
-  // Show existing hover image if any
-  const curHover = document.getElementById('p-extra-img')?.value;
-  if (curHover && hp) { hp.src = curHover; hp.style.display = 'block'; }
+  document.getElementById('prod-img-status').style.color = '';
+  // Show existing images from product_images table
+  const container = document.getElementById('prod-img-previews');
+  container.innerHTML = '<div style="color:var(--tx3);font-size:12px">Loading existing images…</div>';
+  if (_currentProdId) {
+    GET('product_images', `product_id=eq.${_currentProdId}&order=sort_order.asc`).then(rows => {
+      if (rows && rows.length) {
+        container.innerHTML = rows.map((r, i) => `
+          <div style="position:relative;display:inline-block">
+            <img src="${r.image_url}" style="width:${i===0?'100%':'72px'};height:${i===0?'160px':'72px'};object-fit:cover;border-radius:8px;border:2px solid ${i===0?'var(--gd)':'var(--bd)'};display:block" onerror="this.style.opacity='.3'">
+            <div style="position:absolute;top:3px;left:3px;background:rgba(0,0,0,.65);color:#fff;font-size:8.5px;font-weight:700;padding:2px 5px;border-radius:3px">${i===0?'Main':`#${i+1}`}</div>
+            <button onclick="deleteProdImg('${r.id}',this.parentNode)" style="position:absolute;top:3px;right:3px;background:rgba(220,50,50,.85);color:#fff;border:none;border-radius:3px;width:18px;height:18px;font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center">×</button>
+          </div>`
+        ).join('');
+      } else {
+        // Check main image_url on product
+        const cur = document.getElementById('p-img').value;
+        container.innerHTML = cur
+          ? `<img src="${cur}" style="width:100%;height:160px;object-fit:cover;border-radius:8px;border:1px solid var(--bd)" onerror="this.style.display='none'"><div style="font-size:11px;color:var(--tx3);margin-top:4px">↑ Current main image (from products.image_url)</div>`
+          : '<div style="color:var(--tx3);font-size:12px;text-align:center;padding:20px">No images yet</div>';
+      }
+    }).catch(() => {
+      const cur = document.getElementById('p-img').value;
+      container.innerHTML = cur ? `<img src="${cur}" style="width:100%;height:160px;object-fit:cover;border-radius:8px;border:1px solid var(--bd)">` : '';
+    });
+  } else {
+    container.innerHTML = '<div style="color:var(--tx3);font-size:12px">Save the product first to upload images</div>';
+  }
   openM('img-upload-modal');
 }
 
-function previewProdImg(input) {
-  const file = input.files[0]; if (!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    const prev = document.getElementById('prod-img-preview');
-    prev.src = e.target.result; prev.style.display = 'block';
-  };
-  reader.readAsDataURL(file);
+async function deleteProdImg(rowId, wrap) {
+  try {
+    await DEL('product_images', `id=eq.${rowId}`);
+    wrap.remove();
+    toast('Image removed ✓', 'ok');
+    // Re-sync first remaining image to products.image_url
+    if (_currentProdId) {
+      const rows = await GET('product_images', `product_id=eq.${_currentProdId}&order=sort_order.asc&limit=1`).catch(() => []);
+      const newMain = rows?.[0]?.image_url || '';
+      document.getElementById('p-img').value = newMain;
+      if (newMain) await PATCH('products', `id=eq.${_currentProdId}`, { image_url: newMain }).catch(() => {});
+    }
+  } catch(e) { toast('Delete failed: ' + e.message, 'er'); }
 }
 
-function previewProdHover(input) {
-  const file = input.files[0]; if (!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    const prev = document.getElementById('prod-hover-preview');
-    if (prev) { prev.src = e.target.result; prev.style.display = 'block'; }
-  };
-  reader.readAsDataURL(file);
+function previewProdImg(input) {
+  const files = Array.from(input.files); if (!files.length) return;
+  const container = document.getElementById('prod-img-new-previews');
+  container.innerHTML = '';
+  files.forEach((file, i) => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const wrap = document.createElement('div');
+      wrap.style.cssText = 'position:relative;display:inline-block';
+      const img = document.createElement('img');
+      img.src = e.target.result;
+      img.style.cssText = `width:${i===0?'100%':'72px'};height:${i===0?'100px':'72px'};object-fit:cover;border-radius:8px;border:2px solid var(--gd);display:block`;
+      const lbl = document.createElement('div');
+      lbl.style.cssText = 'position:absolute;top:3px;left:3px;background:rgba(0,0,0,.65);color:#fff;font-size:8.5px;font-weight:700;padding:2px 5px;border-radius:3px';
+      lbl.textContent = i === 0 ? 'Main' : `#${i+1}`;
+      wrap.appendChild(img); wrap.appendChild(lbl);
+      container.appendChild(wrap);
+    };
+    reader.readAsDataURL(file);
+  });
 }
 
 async function uploadProdImage() {
-  const file = document.getElementById('prod-img-file').files[0];
-  const hoverFile = document.getElementById('prod-hover-file')?.files[0];
+  const files = Array.from(document.getElementById('prod-img-file').files);
   const status = document.getElementById('prod-img-status');
   const btn = document.getElementById('prod-img-upload-btn');
-  if (!file && !hoverFile) { toast('Select at least one file', 'er'); return; }
+  if (!files.length) { toast('Select at least one image', 'er'); return; }
+  if (!_currentProdId) { toast('Save the product first, then upload images', 'er'); return; }
   btn.disabled = true; btn.textContent = 'Uploading…';
   try {
-    if (file) {
-      status.textContent = '⏳ Uploading main image…';
-      const url = await uploadToStorage(file, `products/product-${Date.now()}`);
-      document.getElementById('p-img').value = url;
-      status.textContent = '✅ Main image uploaded!';
+    // Get current max sort_order to append (not replace)
+    const existing = await GET('product_images', `product_id=eq.${_currentProdId}&order=sort_order.desc&limit=1`).catch(() => []);
+    let nextOrder = existing?.[0]?.sort_order !== undefined ? existing[0].sort_order + 1 : 0;
+    const isFirst = nextOrder === 0;
+
+    const uploadedUrls = [];
+    for (let i = 0; i < files.length; i++) {
+      status.textContent = `⏳ Uploading image ${i+1}/${files.length}…`;
+      const url = await uploadToStorage(files[i], `products/prod-${_currentProdId}-${Date.now()}-${i}`);
+      uploadedUrls.push(url);
+      await POST('product_images', { product_id: _currentProdId, image_url: url, sort_order: nextOrder + i });
     }
-    if (hoverFile) {
-      status.textContent = '⏳ Uploading hover image…';
-      const hurl = await uploadToStorage(hoverFile, `products/product-hover-${Date.now()}`);
-      // Store in p-extra-img field if it exists, else put in a hidden field
-      let extraEl = document.getElementById('p-extra-img');
-      if (!extraEl) {
-        extraEl = document.createElement('input');
-        extraEl.type = 'hidden'; extraEl.id = 'p-extra-img'; extraEl.name = 'extra_image_url';
-        document.getElementById('prod-form')?.appendChild(extraEl);
-      }
-      if (extraEl) extraEl.value = hurl;
-      status.textContent = '✅ Both images uploaded!';
+
+    // If these are the first images (or first upload), set product.image_url to first
+    if (isFirst && uploadedUrls.length > 0) {
+      document.getElementById('p-img').value = uploadedUrls[0];
+      await PATCH('products', `id=eq.${_currentProdId}`, { image_url: uploadedUrls[0] }).catch(() => {});
     }
+
+    status.textContent = `✅ ${uploadedUrls.length} image(s) uploaded!`;
     status.style.color = 'var(--grn)';
-    toast('Image(s) uploaded ✓', 'ok');
-    setTimeout(() => closeM('img-upload-modal'), 1400);
+    toast(`${uploadedUrls.length} image(s) uploaded ✓`, 'ok');
+    // Refresh the existing images preview
+    document.getElementById('prod-img-file').value = '';
+    document.getElementById('prod-img-new-previews').innerHTML = '';
+    openProdImgUpload(); // reload modal to show updated list
   } catch(e) {
     status.textContent = '❌ ' + e.message;
     status.style.color = 'var(--red)';
     toast('Upload failed: ' + e.message, 'er');
   }
-  btn.disabled = false; btn.textContent = '📤 Upload & Save';
+  btn.disabled = false; btn.textContent = '📤 Upload Images';
 }
+
+
 
 
 </script>
@@ -1920,22 +1993,27 @@ async function uploadProdImage() {
 
 <!-- PRODUCT IMAGE UPLOAD MODAL -->
 <div class="ov" id="img-upload-modal">
-  <div class="modal" style="max-width:440px">
+  <div class="modal" style="max-width:480px">
     <div class="m-hdr">
-      <h3>Upload Product Image</h3>
+      <h3>Product Images</h3>
       <button class="m-cls" onclick="closeM('img-upload-modal')">✕</button>
     </div>
-    <div style="padding:20px;display:flex;flex-direction:column;gap:12px">
-      <!-- Main image -->
-      <div style="font-size:11px;font-weight:700;color:var(--tx3);letter-spacing:.5px">MAIN IMAGE</div>
-      <img id="prod-img-preview" src="" style="width:100%;height:180px;object-fit:contain;border-radius:10px;border:1px solid var(--bd);background:var(--bg2);display:none">
-      <input type="file" id="prod-img-file" accept="image/*" class="fi" onchange="previewProdImg(this)">
-      <!-- Hover image (shown when customer hovers on product card) -->
-      <div style="font-size:11px;font-weight:700;color:var(--tx3);letter-spacing:.5px;margin-top:4px">HOVER IMAGE <span style="font-weight:400;text-transform:none;letter-spacing:0">(optional — shows on mouse-over)</span></div>
-      <img id="prod-hover-preview" src="" style="width:100%;height:120px;object-fit:contain;border-radius:10px;border:1px dashed var(--bd);background:var(--bg2);display:none">
-      <input type="file" id="prod-hover-file" accept="image/*" class="fi" onchange="previewProdHover(this)">
-      <button class="btn btn-g" onclick="uploadProdImage()" id="prod-img-upload-btn">📤 Upload & Save</button>
-      <div id="prod-img-status" style="font-size:12px;color:var(--tx3)"></div>
+    <div style="padding:20px;display:flex;flex-direction:column;gap:14px">
+      <!-- Existing images (from product_images table) -->
+      <div>
+        <div style="font-size:11px;font-weight:700;color:var(--tx3);letter-spacing:.5px;margin-bottom:8px">CURRENT IMAGES <span style="font-weight:400;letter-spacing:0">(1st = main, rest = hover slideshow)</span></div>
+        <div id="prod-img-previews" style="display:flex;flex-wrap:wrap;gap:8px;min-height:40px"></div>
+      </div>
+      <hr style="border:none;border-top:1px solid var(--bd);margin:0">
+      <!-- Upload new images -->
+      <div>
+        <div style="font-size:11px;font-weight:700;color:var(--tx3);letter-spacing:.5px;margin-bottom:6px">ADD MORE IMAGES</div>
+        <div id="prod-img-new-previews" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px"></div>
+        <input type="file" id="prod-img-file" accept="image/*" class="fi" multiple onchange="previewProdImg(this)" style="margin-bottom:4px">
+        <div style="font-size:11px;color:var(--tx3);margin-bottom:10px">📸 Select multiple — they'll slideshow on hover on the site</div>
+        <button class="btn btn-g" onclick="uploadProdImage()" id="prod-img-upload-btn" style="width:100%;justify-content:center">📤 Upload Images</button>
+        <div id="prod-img-status" style="font-size:12px;color:var(--tx3);margin-top:6px"></div>
+      </div>
     </div>
   </div>
 </div>
