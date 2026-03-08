@@ -404,13 +404,16 @@ textarea.fi{resize:vertical;min-height:80px}
     <p style="color:var(--tx3);font-size:13px;margin-bottom:16px">This appears as the background of the "Our Story" section on homepage</p>
     <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start">
       <div>
-        <div style="font-size:11px;color:var(--tx3);margin-bottom:6px;font-weight:600">CURRENT</div>
-        <img id="founder-preview" src="" style="width:140px;height:160px;object-fit:cover;border-radius:12px;border:2px solid var(--bd);background:var(--bg2);display:block" onerror="this.style.opacity='.3'">
+        <div style="font-size:11px;color:var(--tx3);margin-bottom:6px;font-weight:600">CURRENT SLIDESHOW</div>
+        <div id="founder-previews" style="display:flex;flex-wrap:wrap;gap:8px;min-width:140px">
+          <img id="founder-preview" src="" style="width:140px;height:160px;object-fit:cover;border-radius:12px;border:2px solid var(--bd);background:var(--bg2);display:block" onerror="this.style.opacity='.3'">
+        </div>
       </div>
       <div style="flex:1;min-width:200px">
-        <label class="lbl">Upload New Photo</label>
-        <input type="file" id="founder-file" accept="image/*" class="fi" onchange="previewFounder(this)" style="margin-bottom:10px">
-        <button class="btn btn-g" onclick="uploadFounderImage()" style="width:100%;justify-content:center;margin-bottom:8px">📤 Upload & Save to Site</button>
+        <label class="lbl">Upload Photos (select multiple for slideshow)</label>
+        <input type="file" id="founder-file" accept="image/*" class="fi" multiple onchange="previewFounders(this)" style="margin-bottom:6px">
+        <div style="font-size:11px;color:var(--tx3);margin-bottom:10px">📸 Select 2–5 images — they'll rotate every 3 seconds in the Editorial strip</div>
+        <button class="btn btn-g" onclick="uploadFounderImages()" style="width:100%;justify-content:center;margin-bottom:8px">📤 Upload All & Save to Site</button>
         <div id="founder-status" style="font-size:12px;color:var(--tx3)"></div>
       </div>
     </div>
@@ -1619,17 +1622,25 @@ function openStateM(s) {
   openM('state-modal');
 }
 
-function previewStateImg(input) {
-  const file = input.files[0]; if (!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    const prev = document.getElementById('state-img-preview');
-    prev.src = e.target.result;
-    prev.style.display = 'block';
-    document.getElementById('state-img-url').value = '';
-  };
-  reader.readAsDataURL(file);
+function previewStateImgs(input) {
+  const files = Array.from(input.files); if (!files.length) return;
+  const container = document.getElementById('state-img-previews');
+  container.innerHTML = '';
+  document.getElementById('state-img-url').value = '';
+  files.forEach((file, i) => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = document.createElement('img');
+      img.src = e.target.result;
+      img.style.cssText = `width:${i===0?'100%':'80px'};height:${i===0?'150px':'80px'};object-fit:cover;border-radius:8px;border:2px solid var(--gd)`;
+      img.title = `Image ${i+1}`;
+      container.appendChild(img);
+    };
+    reader.readAsDataURL(file);
+  });
 }
+// Legacy
+function previewStateImg(input) { previewStateImgs(input); }
 
 async function saveState() {
   const id = document.getElementById('state-id').value;
@@ -1640,11 +1651,29 @@ async function saveState() {
   btn.disabled = true; btn.textContent = 'Saving…';
   try {
     let imageUrl = document.getElementById('state-img-url').value.trim();
-    const file = document.getElementById('state-file').files[0];
-    if (file) {
+    const files = Array.from(document.getElementById('state-file').files);
+    if (files.length === 1) {
       status.textContent = '⏳ Uploading image…';
-      imageUrl = await uploadToStorage(file, `states/${name.toLowerCase().replace(/\s+/g, '-')}`);
+      imageUrl = await uploadToStorage(files[0], `states/${name.toLowerCase().replace(/\s+/g, '-')}`);
       status.textContent = '✅ Image uploaded!';
+    } else if (files.length > 1) {
+      // Upload all images; store extra images as site_settings keys
+      status.textContent = '⏳ Uploading ' + files.length + ' images…';
+      const urls = [];
+      for (let i = 0; i < files.length; i++) {
+        const suffix = i === 0 ? '' : '-' + (i + 1);
+        const url = await uploadToStorage(files[i], `states/${name.toLowerCase().replace(/\s+/g, '-')}${suffix}`);
+        urls.push(url);
+        status.textContent = '⏳ Uploaded ' + (i+1) + '/' + files.length + '…';
+      }
+      imageUrl = urls[0];
+      // Store extra images in site_settings as state_images_<id>
+      const stateId = id || name.toLowerCase().replace(/[^a-z]/g,'').slice(0,4);
+      const settingKey = 'state_images_' + stateId;
+      const ex = await GET('site_settings', 'key=eq.' + settingKey).catch(() => []);
+      if (ex && ex.length) await PATCH('site_settings', 'key=eq.' + settingKey, { value: urls.join(',') });
+      else await POST('site_settings', { key: settingKey, value: urls.join(',') });
+      status.textContent = '✅ ' + urls.length + ' images uploaded!';
     }
     const body = {
       name,
@@ -1676,47 +1705,85 @@ async function deleteState(id) {
 }
 
 // ══════════════════════════════════════════════════════════
-// MEDIA — FOUNDER IMAGE
+// MEDIA — FOUNDER IMAGES (multi-image slideshow)
 // ══════════════════════════════════════════════════════════
 async function loadMedia() {
   try {
-    const data = await GET('site_settings', 'key=eq.founder_image_url&select=value');
-    const url = data?.[0]?.value || '';
-    const img = document.getElementById('founder-preview');
-    if (url && img) { img.src = url; img.style.opacity = '1'; }
+    const data = await GET('site_settings', 'key=like.founder_image_url*&select=key,value');
+    const urls = [];
+    if (data && data.length) {
+      // Sort: founder_image_url, founder_image_url_2, founder_image_url_3 ...
+      data.sort((a,b) => a.key.localeCompare(b.key));
+      data.forEach(r => { if(r.value) urls.push(r.value); });
+    }
+    const container = document.getElementById('founder-previews');
+    if (container && urls.length) {
+      container.innerHTML = urls.map((url, i) =>
+        `<img src="${url}" style="width:${i===0?'140':'80'}px;height:${i===0?'160':'90'}px;object-fit:cover;border-radius:${i===0?'12':'8'}px;border:2px solid var(--bd);background:var(--bg2)" onerror="this.style.opacity='.3'" title="Image ${i+1}">`
+      ).join('');
+    }
   } catch(e) { console.warn('Media load:', e); }
 }
 
-function previewFounder(input) {
-  const file = input.files[0]; if (!file) return;
-  const reader = new FileReader();
-  reader.onload = e => { document.getElementById('founder-preview').src = e.target.result; };
-  reader.readAsDataURL(file);
+function previewFounders(input) {
+  const files = Array.from(input.files);
+  if (!files.length) return;
+  const container = document.getElementById('founder-previews');
+  container.innerHTML = '';
+  files.forEach((file, i) => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = document.createElement('img');
+      img.src = e.target.result;
+      img.style.cssText = `width:${i===0?'140':'80'}px;height:${i===0?'160':'90'}px;object-fit:cover;border-radius:${i===0?'12':'8'}px;border:2px solid var(--gd)`;
+      img.title = `Image ${i+1}`;
+      container.appendChild(img);
+    };
+    reader.readAsDataURL(file);
+  });
 }
+// Legacy single-image preview
+function previewFounder(input) { previewFounders(input); }
 
-async function uploadFounderImage() {
-  const file = document.getElementById('founder-file').files[0];
+async function uploadFounderImages() {
+  const files = Array.from(document.getElementById('founder-file').files);
   const status = document.getElementById('founder-status');
-  if (!file) { toast('Please select a file first', 'er'); return; }
-  status.textContent = '⏳ Uploading…';
+  if (!files.length) { toast('Please select at least one file', 'er'); return; }
+  status.textContent = '⏳ Uploading ' + files.length + ' image(s)…';
   try {
-    const url = await uploadToStorage(file, 'founder/founder-image');
-    const existing = await GET('site_settings', 'key=eq.founder_image_url').catch(() => []);
-    if (existing && existing.length > 0) {
-      await PATCH('site_settings', 'key=eq.founder_image_url', { value: url });
-    } else {
-      await POST('site_settings', { key: 'founder_image_url', value: url });
+    // Delete old keys first
+    const existing = await GET('site_settings', 'key=like.founder_image_url*&select=key').catch(() => []);
+    for (const row of (existing || [])) {
+      await PATCH('site_settings', 'key=eq.' + row.key, { value: '' }).catch(() => {});
     }
-    document.getElementById('founder-preview').src = url;
-    status.textContent = '✅ Saved! Refresh homepage to see changes.';
+    const urls = [];
+    for (let i = 0; i < files.length; i++) {
+      status.textContent = '⏳ Uploading image ' + (i+1) + ' of ' + files.length + '…';
+      const suffix = i === 0 ? '' : '_' + (i + 1);
+      const url = await uploadToStorage(files[i], 'founder/founder-image' + suffix);
+      urls.push(url);
+      const key = 'founder_image_url' + suffix;
+      const ex = await GET('site_settings', 'key=eq.' + key).catch(() => []);
+      if (ex && ex.length > 0) {
+        await PATCH('site_settings', 'key=eq.' + key, { value: url });
+      } else {
+        await POST('site_settings', { key, value: url });
+      }
+    }
+    status.textContent = '✅ ' + urls.length + ' image(s) saved! Refresh homepage to see slideshow.';
     status.style.color = 'var(--grn)';
-    toast('Founder image updated ✓', 'ok');
+    toast('Founder slideshow updated (' + urls.length + ' images) ✓', 'ok');
+    loadMedia();
   } catch(e) {
     status.textContent = '❌ ' + e.message;
     status.style.color = 'var(--red)';
     toast('Upload failed: ' + e.message, 'er');
   }
 }
+// Legacy single-image upload still works
+async function uploadFounderImage() { return uploadFounderImages(); }
+
+
 
 // ══════════════════════════════════════════════════════════
 // PRODUCT IMAGE UPLOAD
@@ -1792,9 +1859,10 @@ async function uploadProdImage() {
       </div>
       <div class="fg">
         <label class="lbl">State Image</label>
-        <img id="state-img-preview" src="" style="width:100%;height:150px;object-fit:cover;border-radius:10px;border:1px solid var(--bd);margin-bottom:8px;display:none">
-        <input type="file" id="state-file" accept="image/*" class="fi" style="margin-bottom:8px" onchange="previewStateImg(this)">
-        <label class="lbl">Or paste image URL</label>
+        <div id="state-img-previews" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px"></div>
+        <input type="file" id="state-file" accept="image/*" class="fi" style="margin-bottom:8px" multiple onchange="previewStateImgs(this)">
+        <div style="font-size:11px;color:var(--tx3);margin-bottom:6px">📸 Select multiple images — they'll auto-slideshow every 2.5s on the site</div>
+        <label class="lbl">Or paste image URL (main image)</label>
         <input class="fi" id="state-img-url" placeholder="https://...">
       </div>
       <div style="display:flex;align-items:center;gap:8px">
