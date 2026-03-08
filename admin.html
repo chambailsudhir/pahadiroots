@@ -399,18 +399,18 @@ textarea.fi{resize:vertical;min-height:80px}
 <!-- MEDIA / FOUNDER IMAGE -->
 <div class="pg" id="pg-media">
   <div class="ph"><div><h1>🖼️ Media & Site Settings</h1></div></div>
-  <div class="sc" style="max-width:600px">
-    <h4 style="margin-bottom:4px">👤 Founder / Story Section Image</h4>
-    <p style="color:var(--tx3);font-size:13px;margin-bottom:16px">This appears as the background of the "Our Story" section on homepage</p>
+  <div class="sc" style="max-width:640px">
+    <h4 style="margin-bottom:4px">👤 Founder / Story Section — Slideshow Images</h4>
+    <p style="color:var(--tx3);font-size:13px;margin-bottom:16px">Upload 2–3 photos — they'll auto-cycle in the "Our Story" section. Drag to reorder.</p>
+    <!-- Existing founder images -->
+    <div id="founder-imgs-existing" style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:12px"></div>
+    <!-- Upload new -->
     <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start">
-      <div>
-        <div style="font-size:11px;color:var(--tx3);margin-bottom:6px;font-weight:600">CURRENT</div>
-        <img id="founder-preview" src="" style="width:140px;height:160px;object-fit:cover;border-radius:12px;border:2px solid var(--bd);background:var(--bg2);display:block" onerror="this.style.opacity='.3'">
-      </div>
       <div style="flex:1;min-width:200px">
-        <label class="lbl">Upload New Photo</label>
-        <input type="file" id="founder-file" accept="image/*" class="fi" onchange="previewFounder(this)" style="margin-bottom:10px">
-        <button class="btn btn-g" onclick="uploadFounderImage()" style="width:100%;justify-content:center;margin-bottom:8px">📤 Upload & Save to Site</button>
+        <label class="lbl">Upload Photos (select multiple)</label>
+        <input type="file" id="founder-file" accept="image/*" multiple class="fi" onchange="previewFounderMulti(this)" style="margin-bottom:10px">
+        <div id="founder-new-previews" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px"></div>
+        <button class="btn btn-g" onclick="uploadFounderImages()" style="width:100%;justify-content:center;margin-bottom:8px">📤 Upload & Save to Site</button>
         <div id="founder-status" style="font-size:12px;color:var(--tx3)"></div>
       </div>
     </div>
@@ -1590,22 +1590,40 @@ function openStateM(s) {
   document.getElementById('state-active').checked = s.is_active !== false;
   document.getElementById('state-file').value = '';
   document.getElementById('state-upload-status').textContent = '';
-  const prev = document.getElementById('state-img-preview');
-  if (s.image_path) { prev.src = s.image_path; prev.style.display = 'block'; }
-  else { prev.src = ''; prev.style.display = 'none'; }
+  document.getElementById('state-new-previews').innerHTML = '';
+  // Load existing state images
+  const existingEl = document.getElementById('state-imgs-existing');
+  existingEl.innerHTML = '';
+  if (s.id) {
+    GET('state_images', `state_id=eq.${s.id}&order=sort_order.asc`).then(imgs => {
+      if (!imgs || !imgs.length) { existingEl.innerHTML = '<div style="font-size:12px;color:var(--tx3)">No images yet</div>'; return; }
+      existingEl.innerHTML = imgs.map(img => `
+        <div style="position:relative;width:90px">
+          <img src="${img.image_url}" style="width:90px;height:70px;object-fit:cover;border-radius:8px;border:1.5px solid var(--bd)">
+          <button onclick="deleteStateImg('${img.id}')" style="position:absolute;top:2px;right:2px;background:rgba(200,40,40,.85);color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:11px;cursor:pointer;line-height:20px;text-align:center">✕</button>
+          <div style="font-size:9px;color:var(--tx3);text-align:center;margin-top:2px">#${img.sort_order||0}</div>
+        </div>`).join('');
+    }).catch(() => { existingEl.innerHTML = '<div style="font-size:12px;color:var(--tx3)">Could not load</div>'; });
+  } else {
+    existingEl.innerHTML = '<div style="font-size:12px;color:var(--tx3)">Save state first, then add images</div>';
+  }
   openM('state-modal');
 }
 
-function previewStateImg(input) {
-  const file = input.files[0]; if (!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    const prev = document.getElementById('state-img-preview');
-    prev.src = e.target.result;
-    prev.style.display = 'block';
-    document.getElementById('state-img-url').value = '';
-  };
-  reader.readAsDataURL(file);
+function previewStateImgs(input) {
+  const files = Array.from(input.files);
+  const wrap = document.getElementById('state-new-previews');
+  wrap.innerHTML = '';
+  files.forEach((file, i) => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      wrap.innerHTML += `<div style="position:relative;width:80px">
+        <img src="${e.target.result}" style="width:80px;height:60px;object-fit:cover;border-radius:6px;border:1.5px solid var(--gd)">
+        <div style="font-size:9px;color:var(--tx3);text-align:center;margin-top:2px">New ${i+1}</div>
+      </div>`;
+    };
+    reader.readAsDataURL(file);
+  });
 }
 
 async function saveState() {
@@ -1617,12 +1635,30 @@ async function saveState() {
   btn.disabled = true; btn.textContent = 'Saving…';
   try {
     let imageUrl = document.getElementById('state-img-url').value.trim();
-    const file = document.getElementById('state-file').files[0];
-    if (file) {
-      status.textContent = '⏳ Uploading image…';
-      imageUrl = await uploadToStorage(file, `states/${name.toLowerCase().replace(/\s+/g, '-')}`);
-      status.textContent = '✅ Image uploaded!';
+    const files = Array.from(document.getElementById('state-file').files);
+
+    // Upload all selected files to state_images table
+    if (files.length) {
+      status.textContent = `⏳ Uploading ${files.length} image(s)…`;
+      // Get current max sort_order for this state
+      let existingImgs = [];
+      if (id) { try { existingImgs = await GET('state_images', `state_id=eq.${id}&select=sort_order&order=sort_order.desc&limit=1`); } catch(e){} }
+      let sortStart = existingImgs && existingImgs[0] ? (existingImgs[0].sort_order || 0) + 1 : 0;
+
+      for (let i = 0; i < files.length; i++) {
+        const url = await uploadToStorage(files[i], `states/${(id||name).toLowerCase().replace(/\s+/g,'-')}-${Date.now()}-${i}`);
+        if (i === 0 && !imageUrl) imageUrl = url; // first image = main image_path
+        if (id) {
+          await POST('state_images', { state_id: id, image_url: url, sort_order: sortStart + i });
+        } else {
+          // Will save after state is created
+          if (!window._pendingStateImgs) window._pendingStateImgs = [];
+          window._pendingStateImgs.push({ url, order: sortStart + i });
+        }
+      }
+      status.textContent = '✅ Images uploaded!';
     }
+
     const body = {
       name,
       description: document.getElementById('state-desc').value.trim() || null,
@@ -1630,11 +1666,22 @@ async function saveState() {
       is_active: document.getElementById('state-active').checked,
       updated_at: new Date().toISOString()
     };
-    if (id) await PATCH('states', `id=eq.${id}`, body);
-    else {
+    let savedId = id;
+    if (id) {
+      await PATCH('states', `id=eq.${id}`, body);
+    } else {
+      window._pendingStateImgs = [];
       const manualSlug = (document.getElementById('state-slug')?.value||'').trim().toLowerCase().replace(/[^a-z0-9]/g,'');
       const autoSlug = name.toLowerCase().replace(/[^a-z]/g,'').slice(0,4) + '-' + Date.now().toString().slice(-4);
-      await POST('states', { ...body, id: manualSlug || autoSlug });
+      savedId = manualSlug || autoSlug;
+      await POST('states', { ...body, id: savedId });
+      // Now save pending images
+      if (window._pendingStateImgs && window._pendingStateImgs.length) {
+        for (const img of window._pendingStateImgs) {
+          await POST('state_images', { state_id: savedId, image_url: img.url, sort_order: img.order }).catch(()=>{});
+        }
+        window._pendingStateImgs = [];
+      }
     }
     toast('State saved ✓', 'ok');
     closeM('state-modal');
@@ -1644,6 +1691,20 @@ async function saveState() {
     status.textContent = '❌ ' + e.message;
   }
   btn.disabled = false; btn.textContent = '💾 Save State';
+}
+
+async function deleteStateImg(imgId) {
+  if (!confirm('Remove this image?')) return;
+  try {
+    await DEL('state_images', `id=eq.${imgId}`);
+    toast('Image removed ✓', 'ok');
+    // Refresh the currently open state modal
+    const stateId = document.getElementById('state-id').value;
+    if (stateId) {
+      const s = await GET('states', `id=eq.${stateId}&limit=1`).catch(() => []);
+      if (s && s[0]) openStateM(s[0]);
+    }
+  } catch(e) { toast('Error: ' + e.message, 'er'); }
 }
 
 async function deleteState(id) {
@@ -1657,42 +1718,77 @@ async function deleteState(id) {
 // ══════════════════════════════════════════════════════════
 async function loadMedia() {
   try {
-    const data = await GET('site_settings', 'key=eq.founder_image_url&select=value');
-    const url = data?.[0]?.value || '';
-    const img = document.getElementById('founder-preview');
-    if (url && img) { img.src = url; img.style.opacity = '1'; }
-  } catch(e) { console.warn('Media load:', e); }
-}
-
-function previewFounder(input) {
-  const file = input.files[0]; if (!file) return;
-  const reader = new FileReader();
-  reader.onload = e => { document.getElementById('founder-preview').src = e.target.result; };
-  reader.readAsDataURL(file);
-}
-
-async function uploadFounderImage() {
-  const file = document.getElementById('founder-file').files[0];
-  const status = document.getElementById('founder-status');
-  if (!file) { toast('Please select a file first', 'er'); return; }
-  status.textContent = '⏳ Uploading…';
-  try {
-    const url = await uploadToStorage(file, 'founder/founder-image');
-    const existing = await GET('site_settings', 'key=eq.founder_image_url').catch(() => []);
-    if (existing && existing.length > 0) {
-      await PATCH('site_settings', 'key=eq.founder_image_url', { value: url });
-    } else {
-      await POST('site_settings', { key: 'founder_image_url', value: url });
+    // Load founder images from founder_images table
+    const imgs = await GET('founder_images', 'order=sort_order.asc').catch(() => []);
+    const wrap = document.getElementById('founder-imgs-existing');
+    if (!wrap) return;
+    if (!imgs || !imgs.length) {
+      wrap.innerHTML = '<div style="font-size:12px;color:var(--tx3)">No founder images yet. Upload below.</div>';
+      return;
     }
-    document.getElementById('founder-preview').src = url;
-    status.textContent = '✅ Saved! Refresh homepage to see changes.';
-    status.style.color = 'var(--grn)';
-    toast('Founder image updated ✓', 'ok');
+    wrap.innerHTML = imgs.map((img, i) => `
+      <div style="position:relative;width:100px">
+        <img src="${img.image_url}" style="width:100px;height:120px;object-fit:cover;border-radius:10px;border:2px solid var(--bd)">
+        <button onclick="deleteFounderImg('${img.id}')" style="position:absolute;top:4px;right:4px;background:rgba(200,40,40,.85);color:#fff;border:none;border-radius:50%;width:22px;height:22px;font-size:12px;cursor:pointer;line-height:22px;text-align:center">✕</button>
+        <div style="font-size:9px;color:var(--tx3);text-align:center;margin-top:4px">Photo ${i+1}</div>
+      </div>`).join('');
+  } catch(e) { console.warn('loadMedia:', e); }
+}
+
+function previewFounderMulti(input) {
+  const files = Array.from(input.files);
+  const wrap = document.getElementById('founder-new-previews');
+  wrap.innerHTML = '';
+  files.forEach((file, i) => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      wrap.innerHTML += `<div style="position:relative;width:90px">
+        <img src="${e.target.result}" style="width:90px;height:110px;object-fit:cover;border-radius:8px;border:1.5px solid var(--gd)">
+        <div style="font-size:9px;color:var(--tx3);text-align:center;margin-top:2px">New ${i+1}</div>
+      </div>`;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+async function uploadFounderImages() {
+  const files = Array.from(document.getElementById('founder-file').files);
+  const status = document.getElementById('founder-status');
+  if (!files.length) { toast('Select at least one photo', 'er'); return; }
+  status.textContent = `⏳ Uploading ${files.length} photo(s)…`;
+  try {
+    // Get current max sort_order
+    const existing = await GET('founder_images', 'select=sort_order&order=sort_order.desc&limit=1').catch(() => []);
+    let sortStart = existing && existing[0] ? (existing[0].sort_order || 0) + 1 : 0;
+    for (let i = 0; i < files.length; i++) {
+      status.textContent = `⏳ Uploading photo ${i+1} of ${files.length}…`;
+      const url = await uploadToStorage(files[i], `founder/founder-${Date.now()}-${i}`);
+      await POST('founder_images', { image_url: url, sort_order: sortStart + i });
+      // Also update legacy site_settings key for backward compat (first image)
+      if (i === 0) {
+        const ex = await GET('site_settings', 'key=eq.founder_image_url').catch(() => []);
+        if (ex && ex.length) await PATCH('site_settings', 'key=eq.founder_image_url', { value: url });
+        else await POST('site_settings', { key: 'founder_image_url', value: url });
+      }
+    }
+    status.textContent = `✅ ${files.length} photo(s) uploaded!`;
+    toast('Founder photos updated ✓', 'ok');
+    document.getElementById('founder-new-previews').innerHTML = '';
+    document.getElementById('founder-file').value = '';
+    await loadMedia();
   } catch(e) {
     status.textContent = '❌ ' + e.message;
-    status.style.color = 'var(--red)';
     toast('Upload failed: ' + e.message, 'er');
   }
+}
+
+async function deleteFounderImg(id) {
+  if (!confirm('Remove this founder photo?')) return;
+  try {
+    await DEL('founder_images', `id=eq.${id}`);
+    toast('Photo removed ✓', 'ok');
+    await loadMedia();
+  } catch(e) { toast('Error: ' + e.message, 'er'); }
 }
 
 // ══════════════════════════════════════════════════════════
@@ -1768,10 +1864,13 @@ async function uploadProdImage() {
         <textarea class="fi" id="state-desc" rows="2" placeholder="Brief description about this region..."></textarea>
       </div>
       <div class="fg">
-        <label class="lbl">State Image</label>
-        <img id="state-img-preview" src="" style="width:100%;height:150px;object-fit:cover;border-radius:10px;border:1px solid var(--bd);margin-bottom:8px;display:none">
-        <input type="file" id="state-file" accept="image/*" class="fi" style="margin-bottom:8px" onchange="previewStateImg(this)">
-        <label class="lbl">Or paste image URL</label>
+        <label class="lbl">State Images <span style="font-size:11px;color:var(--tx3)">(upload 2–3 for slideshow)</span></label>
+        <!-- Existing images from DB -->
+        <div id="state-imgs-existing" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px"></div>
+        <!-- New uploads queue -->
+        <input type="file" id="state-file" accept="image/*" multiple class="fi" style="margin-bottom:8px" onchange="previewStateImgs(this)">
+        <div id="state-new-previews" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px"></div>
+        <label class="lbl">Or paste image URL (main image)</label>
         <input class="fi" id="state-img-url" placeholder="https://...">
       </div>
       <div style="display:flex;align-items:center;gap:8px">
