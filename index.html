@@ -721,6 +721,11 @@ footer{background:#0d1a0f;padding:44px 40px 24px}
 /* Product hover image swap — single hover image */
 .piw .phover-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:2;opacity:0;transition:opacity .45s ease}
 .pcard:hover .piw .phover-img{opacity:1}
+/* Mobile tap indicator */
+@media(hover:none){
+  .piw::after{content:'👆 Tap to see more';position:absolute;bottom:6px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.55);color:#fff;font-size:9px;padding:3px 8px;border-radius:10px;white-space:nowrap;z-index:4;pointer-events:none;opacity:0;transition:opacity .3s}
+  .piw:has(.phover-img)::after{opacity:1}
+}
 .pcard:hover .pemo{opacity:0;transition:opacity .3s}
 /* Product hover cycle — multiple images cycling on hover */
 @keyframes hoverCycle{0%,45%{opacity:1}50%,95%{opacity:0}100%{opacity:1}}
@@ -1307,7 +1312,7 @@ function getStoreApiBase() {
 }
 
 // ── DATA LOADING ───────────────────────────────────────────────────
-async function loadData() {
+async async function loadData() {
   // Step 1: render fallback instantly
   STATES   = FALLBACK_STATES.map(s => Object.assign({}, s));
   PRODUCTS = FALLBACK_PRODUCTS.map(p => Object.assign({}, p));
@@ -1416,67 +1421,52 @@ async function loadData() {
       updated = true;
     }
 
+    // ── Apply state_images from store-data response ──
+    if (Array.isArray(data.state_images) && data.state_images.length) {
+      var byState = {};
+      data.state_images.forEach(function(row) {
+        if (!byState[row.state_id]) byState[row.state_id] = [];
+        byState[row.state_id].push(row);
+      });
+      Object.keys(byState).forEach(function(sid) {
+        var imgs = byState[sid].sort(function(a,b){ return (a.sort_order||0)-(b.sort_order||0); });
+        var urls = imgs.map(function(r){ return r.image_url; }).filter(Boolean);
+        if (!urls.length) return;
+        var st = STATES.find(function(s){ return s.id === sid; });
+        if (st) {
+          st._uploadedImgs = urls;
+          st.cover_photo_url = urls[0];
+          st.tab_photo_url   = urls[0];
+        }
+      });
+      updated = true;
+    }
+
+    // ── Apply product_images from store-data response ──
+    if (Array.isArray(data.product_images) && data.product_images.length) {
+      var byProd = {};
+      data.product_images.forEach(function(row) {
+        if (!byProd[row.product_id]) byProd[row.product_id] = [];
+        byProd[row.product_id].push(row);
+      });
+      Object.keys(byProd).forEach(function(pid) {
+        var imgs = byProd[pid].sort(function(a,b){ return (a.sort_order||0)-(b.sort_order||0); });
+        var urls = imgs.map(function(r){ return r.image_url; }).filter(Boolean);
+        if (!urls.length) return;
+        var pr = PRODUCTS.find(function(p){ return String(p.id) === String(pid); });
+        if (pr) {
+          pr._images = urls;
+          if (urls[0]) pr.image_url = urls[0]; // first image = main
+        }
+      });
+      updated = true;
+    }
+
+    // ── Render everything now that all data (including images) is ready ──
     if (updated) { renderProds(); renderStates(); observeRv(); injectProductSchema(); renderUpsell(); initAllStateSlides(); initProductHoverImages(); }
 
-    // ── Load state_images table (multiple images per state) ──
-    try {
-      var siResp = await fetch(getStoreApiBase() + '/store-data?table=state_images');
-      if (siResp.ok) {
-        var siData = await siResp.json();
-        if (Array.isArray(siData) && siData.length) {
-          // Group by state_id, sorted by sort_order
-          var byState = {};
-          siData.forEach(function(row) {
-            if (!byState[row.state_id]) byState[row.state_id] = [];
-            byState[row.state_id].push(row);
-          });
-          Object.keys(byState).forEach(function(sid) {
-            var imgs = byState[sid].sort(function(a,b){ return (a.sort_order||0)-(b.sort_order||0); });
-            var urls = imgs.map(function(r){ return r.image_url; }).filter(Boolean);
-            if (urls.length) {
-              var st = STATES.find(function(s){ return s.id === sid; });
-              if (st) {
-                st._uploadedImgs = urls;
-                if (!st.cover_photo_url) st.cover_photo_url = urls[0];
-                if (!st.tab_photo_url)   st.tab_photo_url   = urls[0];
-              }
-            }
-          });
-          renderStates(); initAllStateSlides();
-        }
-      }
-    } catch(e2) { console.info('state_images fetch skipped:', e2.message); }
-
-    // ── Load product_images table (multiple images per product for hover slideshow) ──
-    try {
-      var piResp = await fetch(getStoreApiBase() + '/store-data?table=product_images');
-      if (piResp.ok) {
-        var piData = await piResp.json();
-        if (Array.isArray(piData) && piData.length) {
-          // Group by product_id, sorted by sort_order
-          var byProd = {};
-          piData.forEach(function(row) {
-            if (!byProd[row.product_id]) byProd[row.product_id] = [];
-            byProd[row.product_id].push(row);
-          });
-          var changed = false;
-          Object.keys(byProd).forEach(function(pid) {
-            var imgs = byProd[pid].sort(function(a,b){ return (a.sort_order||0)-(b.sort_order||0); });
-            var urls = imgs.map(function(r){ return r.image_url; }).filter(Boolean);
-            if (!urls.length) return;
-            // pid may be UUID — match against PRODUCTS by id
-            var pr = PRODUCTS.find(function(p){ return String(p.id) === String(pid); });
-            if (pr) {
-              pr._images = urls;
-              // First image is always the main image
-              if (!pr.image_url && urls[0]) pr.image_url = urls[0];
-              changed = true;
-            }
-          });
-          if (changed) { renderProds(); renderStates(); setTimeout(initProductHoverImages, 80); }
-        }
-      }
-    } catch(e3) { console.info('product_images fetch skipped:', e3.message); }
+    // ── Founder slideshow ──
+    loadFIFromData(data);
 
   } catch(e) {
     console.info('Using local fallback data:', e.message);
@@ -1588,7 +1578,7 @@ function renderStates() {
   });
 
   tb.innerHTML = STATES.map(function(s, i) {
-    var imgSrc = s._uploadedImg || s.tab_photo_url || '';
+    var imgSrc = (s._uploadedImgs && s._uploadedImgs[0]) || s._uploadedImg || s.tab_photo_url || '';
     var imgHtml = imgSrc
       ? '<div class="stab-thumb"><img src="' + imgSrc + '" alt="' + s.name + '" onerror="this.parentNode.style.display=\'none\'" loading="lazy"></div>'
       : '<div class="stab-thumb stab-thumb-emo">' + s.emoji + '</div>';
@@ -1602,11 +1592,11 @@ function renderStates() {
     var stProds = PRODUCTS.filter(function(p) { return p.state_id === s.id; });
     var pills   = (s.pills||[]).map(function(p) { return '<span class="sstate-pill">' + p + '</span>'; }).join('');
     var bg      = s.panel_bg || 'linear-gradient(135deg,#1a3a1e,#2d5233)';
-    var coverSrc = s._uploadedImg || s.cover_photo_url || '';
+    var coverSrc = (s._uploadedImgs && s._uploadedImgs[0]) || s._uploadedImg || s.cover_photo_url || '';
     // Gather all images for this state (multi-image slideshow support)
     var stateImgs = [];
     if (s._uploadedImgs && s._uploadedImgs.length) {
-      stateImgs = s._uploadedImgs;
+      stateImgs = s._uploadedImgs;  // Use DB images array (already sorted by sort_order)
     } else if (s._uploadedImg) {
       stateImgs = [s._uploadedImg];
     } else if (s.cover_photo_url) {
@@ -1674,10 +1664,26 @@ function initStateSlideshow(sid, total) {
   if (total <= 1) return;
   _stateTimers[sid] = setInterval(function() {
     var el = document.getElementById('sshdr-' + sid);
-    if (!el || !document.getElementById('p-' + sid + '').classList.contains('active')) return; // only animate active panel
+    var panel = document.getElementById('p-' + sid);
+    if (!el || !panel || !panel.classList.contains('active')) return;
     var cur = parseInt(el.getAttribute('data-cur') || '0', 10);
     goStateSlide(sid, (cur + 1) % total);
   }, 2500);
+
+  // Touch/swipe support on mobile
+  var sshdrEl = document.getElementById('sshdr-' + sid);
+  if (sshdrEl && !sshdrEl._touchInited) {
+    sshdrEl._touchInited = true;
+    var _tx = 0;
+    sshdrEl.addEventListener('touchstart', function(e) { _tx = e.touches[0].clientX; }, {passive:true});
+    sshdrEl.addEventListener('touchend', function(e) {
+      var dx = e.changedTouches[0].clientX - _tx;
+      if (Math.abs(dx) < 40) return; // ignore tiny taps
+      var cur = parseInt(sshdrEl.getAttribute('data-cur') || '0', 10);
+      if (dx < 0) goStateSlide(sid, (cur + 1) % total);       // swipe left → next
+      else        goStateSlide(sid, (cur - 1 + total) % total); // swipe right → prev
+    }, {passive:true});
+  }
 }
 function initAllStateSlides() {
   document.querySelectorAll('.sshdr').forEach(function(el) {
@@ -1691,13 +1697,13 @@ function initAllStateSlides() {
 // Adds a second hover image to product cards that have extra images stored
 // Called after renderProds/renderStates
 function initProductHoverImages() {
-  // For each product that has _images (from product_images table), inject hover slideshow into .piw
+  var isMobile = window.matchMedia('(hover:none)').matches || ('ontouchstart' in window);
+
   PRODUCTS.forEach(function(p) {
-    // Support both _images array (from product_images table) and legacy extra_image_url
+    // Collect all hover images
     var hoverImgs = [];
     if (p._images && p._images.length > 1) {
-      // Skip index 0 (that's the main image already shown), use rest as hover slides
-      hoverImgs = p._images.slice(1);
+      hoverImgs = p._images.slice(1); // images after first (main)
     } else if (p.extra_image_url) {
       hoverImgs = [p.extra_image_url];
     }
@@ -1707,14 +1713,12 @@ function initProductHoverImages() {
       if (card.innerHTML.indexOf('addToCart(' + p.id + ')') === -1) return;
       var piw = card.querySelector('.piw');
       if (!piw || piw.querySelector('.phover-img')) return;
-      // Inject all hover images (they cycle on hover)
+
+      // Inject hover images
       hoverImgs.forEach(function(src, hi) {
         var img = document.createElement('img');
         img.className = 'phover-img';
-        img.src = src;
-        img.alt = p.name;
-        img.loading = 'lazy';
-        // If multiple hover images, cycle them
+        img.src = src; img.alt = p.name; img.loading = 'lazy';
         if (hoverImgs.length > 1) {
           img.style.animationDelay = (hi * 2) + 's';
           img.style.animationDuration = (hoverImgs.length * 2) + 's';
@@ -1722,6 +1726,22 @@ function initProductHoverImages() {
         }
         piw.appendChild(img);
       });
+
+      // MOBILE: tap card image to cycle through hover images
+      if (isMobile && hoverImgs.length >= 1) {
+        var _tapIdx = 0;
+        var _allImgs = [piw.querySelector('img:not(.phover-img)')].concat(Array.from(piw.querySelectorAll('.phover-img'))).filter(Boolean);
+        piw.style.cursor = 'pointer';
+        piw.addEventListener('click', function(e) {
+          e.stopPropagation();
+          if (_allImgs.length < 2) return;
+          _tapIdx = (_tapIdx + 1) % _allImgs.length;
+          _allImgs.forEach(function(im, ii) {
+            im.style.opacity = ii === _tapIdx ? '1' : '0';
+            im.style.zIndex  = ii === _tapIdx ? '3' : (ii === 0 ? '1' : '2');
+          });
+        });
+      }
     });
   });
 }
@@ -2628,35 +2648,31 @@ var _founderIdx = 0;
 var _founderTimer = null;
 
 function loadFI() {
+  // Called on initial page load before main data arrives — does its own fetch
+  fetch(getStoreApiBase() + '/store-data')
+  .then(function(r){ return r.json(); })
+  .then(function(data){ loadFIFromData(data); })
+  .catch(function(){});
+}
+
+function loadFIFromData(data) {
+  // Called by loadData() with already-fetched data — no extra network call
   try {
-    // First try founder_images table (proper DB table)
-    fetch(getStoreApiBase() + '/store-data?table=founder_images')
-    .then(function(r){ return r.ok ? r.json() : null; })
-    .then(function(rows){
-      var urls = [];
-      if (Array.isArray(rows) && rows.length) {
-        // Sort by sort_order, take image_url
-        rows.sort(function(a,b){ return (a.sort_order||0)-(b.sort_order||0); });
-        urls = rows.map(function(r){ return r.image_url; }).filter(Boolean);
+    var urls = [];
+    if (Array.isArray(data.founder_images) && data.founder_images.length) {
+      urls = data.founder_images
+        .slice().sort(function(a,b){ return (a.sort_order||0)-(b.sort_order||0); })
+        .map(function(r){ return r.image_url; }).filter(Boolean);
+    }
+    // Fallback: site_settings
+    if (!urls.length && data.settings) {
+      if (data.settings.founder_image_url) urls.push(data.settings.founder_image_url);
+      for (var i = 2; i <= 10; i++) {
+        var k = 'founder_image_url_' + i;
+        if (data.settings[k]) urls.push(data.settings[k]);
       }
-      if (urls.length) {
-        initFounderSlideshow(urls);
-        return;
-      }
-      // Fallback: site_settings keys
-      return fetch(getStoreApiBase() + '/store-data').then(function(r){ return r.json(); })
-      .then(function(data){
-        var fallbackUrls = [];
-        if (data && data.settings) {
-          if (data.settings.founder_image_url) fallbackUrls.push(data.settings.founder_image_url);
-          for (var i = 2; i <= 10; i++) {
-            var k = 'founder_image_url_' + i;
-            if (data.settings[k]) fallbackUrls.push(data.settings[k]);
-          }
-        }
-        if (fallbackUrls.length) initFounderSlideshow(fallbackUrls);
-      });
-    }).catch(function(){});
+    }
+    if (urls.length) initFounderSlideshow(urls);
   } catch(e) {}
 }
 
