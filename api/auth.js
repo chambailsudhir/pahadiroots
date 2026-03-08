@@ -452,5 +452,59 @@ export default async function handler(req, res) {
     }
   }
 
+  // ── Google OAuth ─────────────────────────────────────────────
+  if (action === 'google_oauth') {
+    const redirectUrl = body.redirectUrl || process.env.SITE_URL || 'https://pahadiroots.com';
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: redirectUrl,
+        queryParams: { access_type: 'offline', prompt: 'consent' }
+      }
+    });
+    if (error) return err(400, error.message);
+    return res.status(200).json({ url: data.url });
+  }
+
+  if (action === 'google_callback') {
+    const { code, redirectUrl } = body;
+    if (!code) return err(400, 'No code provided');
+    const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+    if (error) return err(400, error.message);
+    const session = data.session;
+    const user = data.user;
+    // Upsert customer record
+    let profile = null;
+    try {
+      const nameParts = (user.user_metadata?.full_name || '').split(' ');
+      const firstName = nameParts[0] || '';
+      const lastName = nameParts.slice(1).join(' ') || '';
+      const { data: existing } = await supabase
+        .from('customers')
+        .select('*')
+        .eq('auth_user_id', user.id)
+        .single();
+      if (!existing) {
+        const { data: newCust } = await supabase
+          .from('customers')
+          .insert({
+            auth_user_id: user.id,
+            email: user.email,
+            first_name: firstName,
+            last_name: lastName,
+            avatar_url: user.user_metadata?.avatar_url || null
+          })
+          .select()
+          .single();
+        profile = newCust;
+      } else {
+        profile = existing;
+      }
+    } catch(e) {}
+    return res.status(200).json({ session, profile, user });
+  }
+
   return err(400, `Unknown action: ${action}`);
 }
+
+
