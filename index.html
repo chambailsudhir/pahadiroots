@@ -338,11 +338,15 @@ section.sec{padding:52px 40px}
 /* OUR PROMISE */
 .why-bg{background:linear-gradient(180deg,#faf6ee,#f2eadc);padding:20px 40px}
 .pgr{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;max-width:1150px;margin:0 auto}
-.pillar{background:#fff;border-radius:12px;padding:12px 14px;position:relative;overflow:hidden;box-shadow:0 1px 8px rgba(0,0,0,.05)}
+.pillar{background:#fff;border-radius:16px;padding:14px 14px 16px;position:relative;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.07);display:flex;flex-direction:column;align-items:center;text-align:center;transition:transform .35s cubic-bezier(.22,.68,0,1.4),box-shadow .35s ease;cursor:default}
+.pillar::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:28px;height:3px;border-radius:2px;background:var(--gd);transition:width .35s cubic-bezier(.22,.68,0,1.2),opacity .3s}
+.pillar:hover{transform:translateY(-10px);box-shadow:0 20px 40px rgba(0,0,0,.13)}
+.pillar:hover::after{width:72%}
 .pillar .pnum{font-size:24px;font-weight:900;color:rgba(26,58,30,.07);position:absolute;top:-2px;right:7px;font-family:'Playfair Display',serif}
-.pillar .pico{font-size:20px;display:block;margin-bottom:4px}
-.pillar .pt{font-size:12px;font-weight:700;color:var(--g);margin-bottom:2px}
-.pillar .pd{font-size:11px;color:var(--tx3);line-height:1.5}
+.pillar .pico{display:block;margin-bottom:8px;width:100%;max-width:160px}
+.pillar .pico svg{width:100%;height:auto;display:block}
+.pillar .pt{font-size:12px;font-weight:700;color:var(--g);margin-bottom:4px}
+.pillar .pd{font-size:11px;color:var(--tx3);line-height:1.5;text-align:center}
 
 /* REVIEWS */
 .rev-bg{background:linear-gradient(180deg,#f7f2ea,#faf6ee);padding:20px 40px}
@@ -807,17 +811,187 @@ footer{background:#0d1a0f;padding:44px 40px 24px}
   <div id="noResults" style="display:none;text-align:center;padding:40px;color:var(--tx3);font-family:'Playfair Display',serif;font-style:italic">No products found for this filter 🏔️</div>
 </section>
 <section class="sec state-sec" id="states">
-  <div class="rv" id="regions" style="margin-bottom:20px"><div class="chip">Shop by State</div><h2 class="sh2">Every State, a Unique Flavour</h2><p class="ssub" style="margin-bottom:0">From snow-capped Himalayas to the lush Northeast — click any state to explore its authentic products and culture.</p></div>
+  <div class="rv" id="regions" style="margin-bottom:20px"><div class="chip">Explore the Mountains</div><h2 class="sh2">Discover the Himalayas</h2><p class="ssub" style="margin-bottom:0">Each region carries centuries of tradition — explore a state and uncover the pure flavours, ancient wisdom, and stories hidden in its mountains.</p></div>
   <div class="stabs" id="stabs"></div>
   <div class="spnls" id="spnls"></div>
 </section>
 <section class="sec why-bg">
   <div class="ct rv"><div class="chip">Our Promise</div><h2 class="sh2">Why Pahadi Roots</h2><p class="ssub">Four pillars that define everything we do — mountain to doorstep.</p></div>
   <div class="pgr">
-    <div class="pillar rv" style="transition-delay:.08s"><div class="pnum">01</div><span class="pico">🔬</span><div class="pt">Lab Tested Purity</div><p class="pd">Every batch tested for heavy metals, pesticides & adulterants. Certificate with every order.</p></div>
-    <div class="pillar rv" style="transition-delay:.16s"><div class="pnum">02</div><span class="pico">🌱</span><div class="pt">Direct from Farmers</div><p class="pd">Zero middlemen. 200+ farming families across 12 Himalayan states — fair wages, always.</p></div>
-    <div class="pillar rv" style="transition-delay:.24s"><div class="pnum">03</div><span class="pico">📦</span><div class="pt">Eco Packaging</div><p class="pd">Glass jars, recycled cardboard, zero single-use plastic. Packaging as clean as our products.</p></div>
-    <div class="pillar rv" style="transition-delay:.32s"><div class="pnum">04</div><span class="pico">♻️</span><div class="pt">Give-Back Program</div><p class="pd">5% of every order funds Himalayan forest restoration and village school programs.</p></div>
+    <!-- PILLAR 1: Lab Tested Purity -->
+    <div class="pillar rv" style="transition-delay:.08s">
+      <div class="pnum">01</div>
+      <span class="pico">
+        <svg viewBox="0 0 220 200" xmlns="http://www.w3.org/2000/svg">
+          <ellipse cx="110" cy="105" rx="100" ry="95" fill="#1a5c5e"/>
+          <circle cx="40" cy="38" r="2.5" fill="#f5c842" opacity="0.9"/><circle cx="175" cy="32" r="2" fill="#f5c842" opacity="0.8"/><circle cx="55" cy="65" r="1.5" fill="#f5c842" opacity="0.7"/><circle cx="168" cy="62" r="1.8" fill="#f5c842" opacity="0.7"/><circle cx="30" cy="108" r="1.5" fill="#f5c842" opacity="0.6"/><circle cx="186" cy="118" r="2" fill="#f5c842" opacity="0.7"/>
+          <circle cx="162" cy="44" r="16" fill="#d94f3d"/>
+          <polygon points="20,152 65,82 110,152" fill="#2d7a5f"/><polygon points="90,152 140,76 190,152" fill="#245c4a"/><polygon points="55,152 100,98 145,152" fill="#3a9c78"/>
+          <polygon points="100,98 94,114 106,114" fill="white" opacity="0.9"/><polygon points="140,76 134,94 146,94" fill="white" opacity="0.9"/><polygon points="65,82 59,98 71,98" fill="white" opacity="0.9"/>
+          <rect x="10" y="150" width="200" height="22" rx="5" fill="#1a4a3c"/>
+          <g transform="translate(38,100)">
+            <path d="M10,0 L10,22 Q0,34 5,46 Q10,55 20,55 Q30,55 35,46 Q40,34 30,22 L30,0 Z" fill="#5ecfb2" opacity="0.9"/>
+            <rect x="12" y="0" width="6" height="24" rx="3" fill="white" opacity="0.3"/>
+            <rect x="8" y="-4" width="24" height="7" rx="3" fill="#2c8c74"/>
+            <circle cx="18" cy="42" r="4" fill="white" opacity="0.4"/><circle cx="26" cy="36" r="3" fill="white" opacity="0.3"/>
+          </g>
+          <g transform="translate(108,88)">
+            <rect x="5" y="58" width="55" height="7" rx="4" fill="#d94f3d"/>
+            <rect x="25" y="18" width="10" height="44" rx="5" fill="#c94030"/>
+            <path d="M30,18 Q30,4 48,4" stroke="#c94030" stroke-width="8" fill="none" stroke-linecap="round"/>
+            <rect x="42" y="-5" width="12" height="14" rx="6" fill="#c94030"/>
+            <circle cx="48" cy="-1" r="5" fill="#1a2a2a"/><circle cx="46" cy="-3" r="2" fill="white" opacity="0.6"/>
+            <rect x="12" y="38" width="42" height="5" rx="3" fill="#c94030"/>
+            <rect x="25" y="20" width="10" height="16" rx="4" fill="#a83020"/>
+            <rect x="22" y="33" width="20" height="3" rx="1" fill="#f0e0c0" opacity="0.8"/>
+          </g>
+          <rect x="30" y="168" width="160" height="20" rx="4" fill="#d94f3d"/>
+          <text x="110" y="183" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="700" fill="white" letter-spacing="2">LAB TESTED PURITY</text>
+        </svg>
+      </span>
+      <div class="pt">Lab Tested Purity</div>
+      <p class="pd">Every batch tested for heavy metals, pesticides &amp; adulterants. Certificate with every order.</p>
+    </div>
+
+    <!-- PILLAR 2: Direct from Farmers — Option 5 (palm + floating farm) -->
+    <div class="pillar rv" style="transition-delay:.16s">
+      <div class="pnum">02</div>
+      <span class="pico">
+        <svg viewBox="0 0 220 200" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <radialGradient id="p5bg" cx="50%" cy="50%"><stop offset="0%" stop-color="#d8f0d8"/><stop offset="100%" stop-color="#a0c8a0"/></radialGradient>
+            <radialGradient id="p5fg" cx="40%" cy="35%"><stop offset="0%" stop-color="#c8e8b8"/><stop offset="100%" stop-color="#6aaa6a"/></radialGradient>
+          </defs>
+          <circle cx="110" cy="100" r="98" fill="url(#p5bg)"/>
+          <clipPath id="cp5"><circle cx="110" cy="100" r="95"/></clipPath>
+          <g clip-path="url(#cp5)">
+            <rect width="220" height="200" fill="url(#p5bg)"/>
+            <polygon points="0,130 40,78 80,130" fill="#5aaa7a" opacity="0.25"/><polygon points="100,130 150,68 200,130" fill="#4a9a6a" opacity="0.25"/>
+            <!-- Palm base -->
+            <rect x="82" y="168" width="56" height="22" rx="10" fill="#d4a870"/>
+            <ellipse cx="110" cy="162" rx="44" ry="26" fill="#d4a870"/>
+            <!-- Fingers -->
+            <rect x="72" y="130" width="14" height="34" rx="7" fill="#c8956a"/>
+            <rect x="88" y="122" width="16" height="42" rx="8" fill="#d4a870"/>
+            <rect x="106" y="118" width="16" height="46" rx="8" fill="#d4a870"/>
+            <rect x="124" y="122" width="16" height="42" rx="8" fill="#d4a870"/>
+            <rect x="140" y="132" width="13" height="32" rx="6" fill="#c8956a"/>
+            <path d="M86,158 Q100,152 118,156" stroke="#b88050" stroke-width="1.5" fill="none" opacity="0.5"/>
+            <!-- Floating farm scene oval -->
+            <ellipse cx="110" cy="108" rx="56" ry="36" fill="url(#p5fg)"/>
+            <ellipse cx="110" cy="146" rx="38" ry="7" fill="#6aaa6a" opacity="0.25"/>
+            <!-- Mini mountains -->
+            <polygon points="68,122 85,90 102,122" fill="#1a5c2e"/><polygon points="88,122 108,82 128,122" fill="#145028"/><polygon points="115,122 132,92 150,122" fill="#1a5c2e"/>
+            <polygon points="108,82 104,96 112,96" fill="white" opacity="0.85"/>
+            <!-- Mini pines -->
+            <polygon points="62,122 68,110 74,122" fill="#0a3020"/><polygon points="142,122 148,110 154,122" fill="#0a3020"/>
+            <!-- Mini river -->
+            <path d="M68,122 Q90,117 110,120 Q130,123 152,120" stroke="#5dade2" stroke-width="3.5" fill="none" opacity="0.8"/>
+            <!-- Mini house -->
+            <rect x="98" y="104" width="22" height="14" rx="1" fill="#e8c878"/>
+            <polygon points="93,105 109,94 125,105" fill="#c94a3a"/>
+            <rect x="105" y="111" width="8" height="7" rx="1" fill="#8b5e3c"/>
+            <!-- Sparkles -->
+            <circle cx="60" cy="90" r="3" fill="#f5c842" opacity="0.8"/><circle cx="162" cy="94" r="3" fill="#f5c842" opacity="0.8"/>
+            <circle cx="70" cy="75" r="2" fill="#f5c842" opacity="0.6"/><circle cx="155" cy="78" r="2" fill="#f5c842" opacity="0.6"/>
+            <circle cx="110" cy="66" r="2.5" fill="#f5c842" opacity="0.7"/>
+          </g>
+          <circle cx="110" cy="100" r="98" fill="none" stroke="#a0d0a0" stroke-width="2.5"/>
+        </svg>
+      </span>
+      <div class="pt">Direct from Farmers</div>
+      <p class="pd">Zero middlemen. 200+ farming families across 12 Himalayan states — fair wages, always.</p>
+    </div>
+
+    <!-- PILLAR 3: Eco Packaging — light blue globe + leaf + orbit -->
+    <div class="pillar rv" style="transition-delay:.24s">
+      <div class="pnum">03</div>
+      <span class="pico">
+        <svg viewBox="0 0 220 200" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <radialGradient id="p3globe" cx="40%" cy="35%"><stop offset="0%" stop-color="#aed6f1"/><stop offset="100%" stop-color="#5dade2"/></radialGradient>
+          </defs>
+          <circle cx="110" cy="100" r="96" fill="#e8f0e8"/>
+          <circle cx="110" cy="100" r="70" fill="url(#p3globe)"/>
+          <!-- Land masses -->
+          <ellipse cx="98" cy="82" rx="18" ry="23" fill="#5cb85c" transform="rotate(-10,98,82)"/>
+          <ellipse cx="88" cy="108" rx="14" ry="10" fill="#5cb85c" transform="rotate(-5,88,108)"/>
+          <ellipse cx="122" cy="92" rx="12" ry="17" fill="#5cb85c" transform="rotate(15,122,92)"/>
+          <ellipse cx="130" cy="114" rx="10" ry="8" fill="#5cb85c"/>
+          <ellipse cx="105" cy="124" rx="8" ry="6" fill="#5cb85c" transform="rotate(-20,105,124)"/>
+          <!-- Orbit dashed -->
+          <ellipse cx="110" cy="100" rx="86" ry="24" fill="none" stroke="#5dade2" stroke-width="1.5" stroke-dasharray="6 4" opacity="0.6" transform="rotate(-15,110,100)"/>
+          <!-- Leaf sprout -->
+          <line x1="110" y1="30" x2="110" y2="40" stroke="#2d7a2e" stroke-width="3" stroke-linecap="round"/>
+          <path d="M110,40 Q110,28 103,21 Q100,14 110,12 Q120,14 117,21 Q110,28 110,40" fill="#4caf50"/>
+          <path d="M110,34 Q118,29 125,20 Q119,12 110,22" fill="#66bb6a" opacity="0.85"/>
+          <path d="M110,34 Q102,29 95,20 Q101,12 110,22" fill="#81c784" opacity="0.75"/>
+          <!-- ECO badge -->
+          <circle cx="162" cy="44" r="18" fill="#f5c842"/>
+          <text x="162" y="49" text-anchor="middle" font-family="sans-serif" font-size="10" font-weight="700" fill="#2c5f2e">ECO</text>
+          <!-- Label -->
+          <rect x="25" y="178" width="170" height="20" rx="4" fill="#2d7a2e"/>
+          <text x="110" y="193" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="700" fill="white" letter-spacing="1.5">ECO PACKAGING</text>
+        </svg>
+      </span>
+      <div class="pt">Eco Packaging</div>
+      <p class="pd">Glass jars, recycled cardboard, zero single-use plastic. Packaging as clean as our products.</p>
+    </div>
+
+    <!-- PILLAR 4: Give-Back — river + village + pine forest -->
+    <div class="pillar rv" style="transition-delay:.32s">
+      <div class="pnum">04</div>
+      <span class="pico">
+        <svg viewBox="0 0 220 200" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <radialGradient id="p4sky" cx="50%" cy="30%"><stop offset="0%" stop-color="#d6eaf8"/><stop offset="100%" stop-color="#aed6f1"/></radialGradient>
+          </defs>
+          <circle cx="110" cy="100" r="96" fill="url(#p4sky)"/>
+          <clipPath id="cp4"><circle cx="110" cy="100" r="93"/></clipPath>
+          <g clip-path="url(#cp4)">
+            <rect width="220" height="200" fill="#aed6f1"/>
+            <!-- Sun -->
+            <circle cx="170" cy="32" r="22" fill="#f5c842" opacity="0.9"/>
+            <!-- Back mountains -->
+            <polygon points="-5,130 45,40 95,130" fill="#1a5c2e"/><polygon points="40,130 100,30 160,130" fill="#145028"/><polygon points="110,130 175,34 240,130" fill="#1a5c2e"/>
+            <polygon points="45,40 39,58 51,58" fill="white" opacity="0.9"/><polygon points="100,30 94,50 106,50" fill="white" opacity="0.9"/><polygon points="175,34 169,53 181,53" fill="white" opacity="0.9"/>
+            <!-- Pine trees -->
+            <polygon points="0,142 8,122 16,142" fill="#0f3d1c"/><polygon points="12,142 20,120 28,142" fill="#0f3d1c"/><polygon points="24,142 33,120 42,142" fill="#0f3d1c"/><polygon points="36,144 46,122 56,144" fill="#145028"/>
+            <polygon points="166,144 176,122 186,144" fill="#0f3d1c"/><polygon points="180,142 190,120 200,142" fill="#0f3d1c"/><polygon points="194,142 204,120 214,142" fill="#0f3d1c"/>
+            <polygon points="140,142 148,124 156,142" fill="#0f3d1c"/>
+            <!-- River -->
+            <path d="M0,156 Q30,148 60,156 Q90,164 120,156 Q150,148 180,156 Q210,164 240,156 L240,172 Q210,180 180,172 Q150,164 120,172 Q90,180 60,172 Q30,164 0,172 Z" fill="#5dade2" opacity="0.85"/>
+            <path d="M20,160 Q50,154 80,160" stroke="white" stroke-width="1.5" fill="none" opacity="0.4"/>
+            <path d="M130,158 Q160,152 190,158" stroke="white" stroke-width="1.5" fill="none" opacity="0.4"/>
+            <!-- House -->
+            <rect x="88" y="122" width="44" height="28" rx="2" fill="#e8c878"/>
+            <polygon points="82,124 110,104 138,124" fill="#c94a3a"/>
+            <rect x="102" y="135" width="16" height="15" rx="2" fill="#8b5e3c"/>
+            <rect x="90" y="128" width="12" height="9" rx="1" fill="#aed6f1"/>
+            <line x1="96" y1="128" x2="96" y2="137" stroke="white" stroke-width="1"/>
+            <line x1="90" y1="133" x2="102" y2="133" stroke="white" stroke-width="1"/>
+            <rect x="118" y="128" width="12" height="9" rx="1" fill="#aed6f1"/>
+            <line x1="124" y1="128" x2="124" y2="137" stroke="white" stroke-width="1"/>
+            <line x1="118" y1="133" x2="130" y2="133" stroke="white" stroke-width="1"/>
+            <rect x="122" y="106" width="8" height="12" rx="2" fill="#a83020"/>
+            <path d="M126,106 Q123,100 127,95 Q131,90 128,84" stroke="#c8c8c8" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.5"/>
+            <polygon points="68,142 75,124 82,142" fill="#1a5c2e"/><polygon points="138,142 146,124 154,142" fill="#1a5c2e"/>
+            <!-- Foreground -->
+            <rect x="0" y="178" width="220" height="30" fill="#2d6a30"/>
+          </g>
+          <!-- 5% badge -->
+          <circle cx="46" cy="36" r="20" fill="#f5c842"/>
+          <text x="46" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" font-weight="700" fill="#2c5f2e">5%</text>
+          <text x="46" y="44" text-anchor="middle" font-family="sans-serif" font-size="7" fill="#2c5f2e" font-weight="600">BACK</text>
+          <circle cx="110" cy="100" r="96" fill="none" stroke="#d4e8c0" stroke-width="2.5"/>
+          <!-- Label -->
+          <rect x="20" y="178" width="180" height="20" rx="4" fill="#1a5c2e"/>
+          <text x="110" y="193" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="700" fill="white" letter-spacing="1">GIVE-BACK PROGRAM</text>
+        </svg>
+      </span>
+      <div class="pt">Give-Back Program</div>
+      <p class="pd">5% of every order funds Himalayan forest restoration and village school programs.</p>
+    </div>
   </div>
 </section>
 <section class="sec rev-bg" style="padding:16px 40px 18px">
