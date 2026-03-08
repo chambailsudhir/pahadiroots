@@ -129,7 +129,6 @@ button{cursor:pointer;font-family:inherit}
 body.dark{background:#0d1a0f;color:#f0f0f0}
 body.dark nav#mNav{background:rgba(13,26,15,.97)}
 body.dark .pcard{background:#1a2b1c;border-color:rgba(255,255,255,.06)}
-body.dark .spgrid{background:#0d1a0f}
 body.dark .filter-btn{background:#1a2b1c;border-color:rgba(255,255,255,.1);color:#c0c0c0}
 body.dark .filter-btn.active{background:var(--g);color:#fff}
 body.dark .filter-sort{background:#1a2b1c;color:#c0c0c0;border-color:rgba(255,255,255,.1)}
@@ -246,8 +245,6 @@ section.sec{padding:52px 40px}
 .pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:18px;max-width:1280px;margin:0 auto}
 .pcard{background:#fff;border:1.5px solid var(--bd);border-radius:18px;overflow:hidden;transition:transform .3s,box-shadow .3s;position:relative;cursor:pointer}
 .pcard:hover{transform:translateY(-4px);box-shadow:0 12px 32px rgba(0,0,0,.1)}
-.pcard:hover .pi-hover{opacity:1!important}
-.pcard:hover .pi-main{opacity:0!important}
 .piw{position:relative;height:180px;display:flex;align-items:center;justify-content:center;overflow:hidden}
 .pemo{font-size:54px;position:relative;z-index:0}
 .pbadge{position:absolute;top:10px;left:10px;font-size:9.5px;font-weight:800;padding:4px 10px;border-radius:12px;letter-spacing:.4px;z-index:2}
@@ -293,10 +290,7 @@ section.sec{padding:52px 40px}
 .stab{flex:0 0 auto;width:140px;padding:0;border:none;border-radius:8px 8px 0 0;background:#fff;cursor:pointer;display:flex;flex-direction:column;align-items:stretch;transition:all .22s;position:relative;font-family:'Lato',sans-serif;box-shadow:0 1px 4px rgba(0,0,0,.08);overflow:hidden}
 .stab:hover{transform:translateY(-2px);box-shadow:0 4px 14px rgba(0,0,0,.14)}
 .stab.active{background:var(--g);box-shadow:0 4px 18px rgba(26,58,30,.3);transform:translateY(-2px)}
-.stab-thumb{width:100%;height:90px;overflow:hidden;display:block;background:#d8cfbb;flex-shrink:0;position:relative}
-.stab-slide{position:absolute;inset:0;width:100%;height:100%}
-.stab-slide img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.spnl-slide{position:absolute;inset:0}
+.stab-thumb{width:100%;height:90px;overflow:hidden;display:block;background:#d8cfbb;flex-shrink:0}
 .stab-thumb img{width:100%;height:100%;object-fit:cover;object-position:55% 15%;display:block;transition:transform .4s}
 .stab:hover .stab-thumb img{transform:scale(1.06)}
 .stab-thumb-emo{width:100%;height:88px;display:flex;align-items:center;justify-content:center;font-size:38px;background:linear-gradient(135deg,var(--g),var(--g3))}
@@ -322,21 +316,33 @@ section.sec{padding:52px 40px}
 .sstate-desc{font-size:13px;color:rgba(255,255,255,.78);line-height:1.75;margin-bottom:16px;display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden}
 .sstate-pills{display:flex;flex-wrap:wrap;gap:6px}
 .sstate-pill{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);color:rgba(255,255,255,.9);font-size:10px;font-weight:700;letter-spacing:.5px;padding:4px 12px;border-radius:20px}
-.spgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:18px;padding:28px 40px 36px;background:#fff}
-.spgrid .pcard:hover{transform:translateY(-4px);box-shadow:0 12px 32px rgba(0,0,0,.1)}
+.spgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;padding:24px 40px;background:#0d1f0e}
+.spgrid .pcard{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09)}
+.spgrid .pcard:hover{background:rgba(255,255,255,.09);border-color:rgba(200,146,10,.45);transform:translateY(-4px);box-shadow:0 14px 36px rgba(0,0,0,.35)}
+.spgrid .pname,.spgrid .pstars{color:#fff}
+.spgrid .pregion{color:var(--gd)}
+.spgrid .pdesc{color:rgba(255,255,255,.52)}
+.spgrid .pnow{color:var(--gd2)}
+.spgrid .pwas{color:rgba(255,255,255,.25)}
+.spgrid .punt{color:rgba(255,255,255,.35)}
+.spgrid .prc{color:rgba(255,255,255,.3)}
+.spgrid .atc{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.18)}
+.spgrid .atc:hover{background:var(--gd);border-color:var(--gd);color:#1a3a1e}
+.spgrid .wl-btn{color:rgba(255,255,255,.6)}
+.spgrid .stock-bar{background:rgba(255,255,255,.1)}
+.spgrid .cmp-btn{border-color:rgba(255,255,255,.18);color:rgba(255,255,255,.45);background:transparent}
+.spgrid .stock-label.high{color:rgba(80,210,80,.8)}
+.spgrid .stock-label.mid{color:rgba(255,180,50,.85)}
+.spgrid .stock-label.low{color:rgba(255,100,100,.85)}
 
 /* OUR PROMISE */
 .why-bg{background:linear-gradient(180deg,#faf6ee,#f2eadc);padding:20px 40px}
 .pgr{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;max-width:1150px;margin:0 auto}
-.pillar{background:#fff;border-radius:16px;padding:14px 14px 16px;position:relative;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.07);display:flex;flex-direction:column;align-items:center;text-align:center;transition:transform .35s cubic-bezier(.22,.68,0,1.4),box-shadow .35s ease;cursor:default}
-.pillar::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:28px;height:3px;border-radius:2px;background:var(--gd);transition:width .35s cubic-bezier(.22,.68,0,1.2),opacity .3s}
-.pillar:hover{transform:translateY(-10px);box-shadow:0 20px 40px rgba(0,0,0,.13)}
-.pillar:hover::after{width:72%}
+.pillar{background:#fff;border-radius:12px;padding:12px 14px;position:relative;overflow:hidden;box-shadow:0 1px 8px rgba(0,0,0,.05)}
 .pillar .pnum{font-size:24px;font-weight:900;color:rgba(26,58,30,.07);position:absolute;top:-2px;right:7px;font-family:'Playfair Display',serif}
-.pillar .pico{display:block;margin-bottom:8px;width:100%;max-width:160px}
-.pillar .pico svg{width:100%;height:auto;display:block}
-.pillar .pt{font-size:12px;font-weight:700;color:var(--g);margin-bottom:4px}
-.pillar .pd{font-size:11px;color:var(--tx3);line-height:1.5;text-align:center}
+.pillar .pico{font-size:20px;display:block;margin-bottom:4px}
+.pillar .pt{font-size:12px;font-weight:700;color:var(--g);margin-bottom:2px}
+.pillar .pd{font-size:11px;color:var(--tx3);line-height:1.5}
 
 /* REVIEWS */
 .rev-bg{background:linear-gradient(180deg,#f7f2ea,#faf6ee);padding:20px 40px}
@@ -458,20 +464,6 @@ footer{background:#0d1a0f;padding:44px 40px 24px}
 .qv-inner{display:grid;grid-template-columns:1fr 1fr}
 .qv-img-col{background:#f5f0e8;border-radius:20px 0 0 20px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;font-size:80px;padding:28px;min-height:320px;position:relative;overflow:hidden}
 .qv-img-col img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:20px 0 0 20px}
-/* Gallery overrides */
-.qv-gallery{position:absolute;inset:0;border-radius:20px 0 0 20px;overflow:hidden}
-.qv-gallery-slide{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:20px 0 0 20px;transition:opacity .4s ease;opacity:0}
-.qv-gallery-slide.active{opacity:1}
-.qv-gallery-dots{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:3}
-.qv-gallery-dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.5);border:none;cursor:pointer;padding:0;transition:all .25s}
-.qv-gallery-dot.active{background:#fff;transform:scale(1.3)}
-.qv-gallery-arr{position:absolute;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.88);border:none;border-radius:50%;width:32px;height:32px;font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:3;transition:background .2s;box-shadow:0 2px 8px rgba(0,0,0,.15)}
-.qv-gallery-arr:hover{background:#fff}
-.qv-gallery-arr.prev{left:10px}
-.qv-gallery-arr.next{right:10px}
-.qv-thumb-strip{position:absolute;bottom:38px;left:50%;transform:translateX(-50%);display:flex;gap:5px;z-index:3}
-.qv-thumb{width:38px;height:38px;object-fit:cover;border-radius:6px;cursor:pointer;border:2px solid transparent;opacity:.65;transition:all .2s}
-.qv-thumb.active{border-color:#fff;opacity:1}
 .qv-content{padding:32px 28px;display:flex;flex-direction:column}
 .qv-close{position:absolute;top:14px;right:14px;background:rgba(0,0,0,.07);border:none;border-radius:50%;width:32px;height:32px;font-size:18px;display:flex;align-items:center;justify-content:center;z-index:2;cursor:pointer}
 .qv-region{font-size:11px;font-weight:700;color:var(--gd);letter-spacing:.5px;margin-bottom:6px}
@@ -498,7 +490,7 @@ footer{background:#0d1a0f;padding:44px 40px 24px}
 .pin-res.fail{background:rgba(229,57,53,.08);color:#c62828}
 .qv-tags{display:flex;flex-wrap:wrap;gap:6px}
 .qv-tag{background:rgba(26,58,30,.07);color:var(--g);border-radius:10px;padding:4px 10px;font-size:11px;font-weight:700}
-@media(max-width:640px){.qv-inner{grid-template-columns:1fr}.qv-img-col{border-radius:20px 20px 0 0;min-height:200px}.qv-img-col img{border-radius:20px 20px 0 0}.qv-gallery{border-radius:20px 20px 0 0}.qv-gallery-slide{border-radius:20px 20px 0 0}.qv-thumb-strip{display:none}.qv-gallery-dots{bottom:8px}.qv-gallery-arr{width:26px;height:26px;font-size:14px}}
+@media(max-width:640px){.qv-inner{grid-template-columns:1fr}.qv-img-col{border-radius:20px 20px 0 0;min-height:200px}.qv-img-col img{border-radius:20px 20px 0 0}}
 
 /* FULL-SCREEN CART */
 .cart-page{position:fixed;inset:0;z-index:8000;background:#f7f2ea;display:none;flex-direction:column;overflow:hidden}
@@ -621,13 +613,13 @@ footer{background:#0d1a0f;padding:44px 40px 24px}
 .rv.anim.vis{opacity:1;transform:translateY(0)}
 
 /* STICKY ATC removed */
-
+.sticky-atc{display:none}
 
 /* RESPONSIVE */
 @media(max-width:960px){
-
-
-
+  .founder-content{flex-direction:column;padding:40px 28px 32px;align-items:flex-start}
+  .founder-left{max-width:100%}
+  .founder-right{display:none}
 
 
   .trust{grid-template-columns:repeat(2,1fr)}
@@ -641,9 +633,9 @@ footer{background:#0d1a0f;padding:44px 40px 24px}
   .spgrid{grid-template-columns:1fr 1fr;padding:16px 20px}
   .stab{flex:0 0 auto;width:110px}
   .stab-thumb{height:70px}
-
-
-
+  .founder-content{flex-direction:column;padding:0 20px 32px;align-items:flex-start}
+  .founder-left{max-width:100%}
+  .founder-right{display:none}
 
   .fname{font-size:clamp(28px,6vw,40px)}
   .cpage-body{grid-template-columns:1fr;overflow:auto}
@@ -669,35 +661,20 @@ footer{background:#0d1a0f;padding:44px 40px 24px}
 .rv-strip{display:flex;gap:12px;overflow-x:auto;padding-bottom:6px}
 
 /* ── FOUNDER — Full-width cinematic (Image 2 style) ── */
-.founder-sec{position:relative;overflow:hidden;background:#050e06}
-.founder-bg{display:none}
-.founder-editorial{display:grid;grid-template-columns:1.1fr 0.9fr;height:480px}
-.founder-text-col{padding:48px 56px;display:flex;flex-direction:column;justify-content:center;position:relative;background:#050e06;z-index:1}
-.founder-text-col::after{content:'';position:absolute;right:0;top:15%;bottom:15%;width:1px;background:linear-gradient(180deg,transparent,rgba(200,146,10,.35),transparent)}
-.founder-photo-col{position:relative;overflow:hidden}
-.founder-photo-inner{position:absolute;inset:0}
-.founder-photo-inner img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 20%}
-.founder-photo-inner .founder-slide{position:absolute;inset:0}
-.founder-photo-inner .founder-slide img{transition:opacity 1.2s ease}
-.founder-photo-col-overlay{position:absolute;inset:0;z-index:1;background:linear-gradient(90deg,rgba(5,14,6,.8) 0%,rgba(5,14,6,.3) 30%,transparent 55%);pointer-events:none}
-.founder-photo-col-clip{display:none}
-.founder-year-badge{position:absolute;bottom:24px;right:24px;z-index:2;background:rgba(200,146,10,.12);border:1px solid rgba(200,146,10,.38);color:#c8920a;font-size:8.5px;font-weight:800;letter-spacing:2px;padding:10px 16px;border-radius:3px;text-transform:uppercase;backdrop-filter:blur(4px)}
-.ftag{color:#c8920a;font-size:8.5px;font-weight:800;letter-spacing:3.5px;margin-bottom:14px;opacity:.85;text-transform:uppercase}
-.fname{font-family:'Playfair Display',serif;font-size:clamp(30px,3.5vw,52px);color:#fff;font-weight:900;margin-bottom:4px;line-height:1.0}
-.fname em{color:#c8920a;font-style:normal}
-.fsubtitle-big{font-size:11px;color:rgba(255,255,255,.35);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:24px}
-.fq{font-size:13.5px;color:rgba(255,255,255,.65);line-height:1.85;font-style:italic;border-left:2px solid #c8920a;padding-left:18px;margin-bottom:0;max-width:440px}
-.faut-row{display:none}
-.founder-badge{display:none}
-.founder-overlay{display:none}
-.founder-content{display:none}
-@media(max-width:768px){
-  .founder-editorial{grid-template-columns:1fr;height:auto}
-  .founder-text-col{padding:36px 28px;order:2}
-  .founder-text-col::after{display:none}
-  .founder-photo-col{height:260px;order:1}
-  .founder-year-badge{bottom:12px;right:12px}
-}
+.founder-sec{position:relative;overflow:hidden;display:flex;align-items:stretch;background:#071408}
+.founder-bg{position:relative;width:100%;line-height:0;display:block;background:linear-gradient(135deg,#071408 0%,#0a1e0c 50%,#0e2b12 100%);min-height:200px}
+.founder-overlay{position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,rgba(0,0,0,0) 0%,rgba(0,0,0,0) 42%,rgba(0,0,0,.5) 70%,rgba(0,0,0,.85) 100%),linear-gradient(90deg,rgba(0,0,0,.4) 0%,rgba(0,0,0,.15) 40%,rgba(0,0,0,0) 65%)}
+.founder-content{position:absolute;bottom:0;left:0;right:0;z-index:2;display:flex;align-items:flex-end;justify-content:space-between;padding:0 64px 24px;gap:32px}
+.founder-left{max-width:520px;flex:1}
+.founder-right{flex-shrink:0;display:flex;align-items:flex-end;padding-bottom:4px}
+.founder-badge{display:flex;align-items:center;gap:8px;background:rgba(13,47,16,.85);border:1px solid rgba(200,146,10,.35);color:var(--gd2);font-size:9.5px;font-weight:800;letter-spacing:2.2px;padding:13px 22px;border-radius:3px;white-space:nowrap;backdrop-filter:blur(6px)}
+.ftag{color:var(--gd2);font-size:9.5px;font-weight:800;letter-spacing:4px;margin-bottom:16px;opacity:.8;text-transform:uppercase}
+.fname{font-family:'Playfair Display',serif;font-size:clamp(32px,4.8vw,60px);color:#fff;font-weight:900;margin-bottom:12px;line-height:1.05;text-shadow:0 2px 20px rgba(0,0,0,.4)}
+.fsubtitle-big{font-family:'Playfair Display',serif;font-size:clamp(17px,2.3vw,28px);color:var(--gd2);font-style:italic;margin-bottom:24px;line-height:1.35;font-weight:400}
+.fq{font-size:clamp(12.5px,1.25vw,14.5px);color:rgba(255,255,255,.76);line-height:1.85;font-style:italic;margin-bottom:22px;max-width:460px}
+.faut-row{display:flex;align-items:center;gap:12px}
+.faut-line{width:38px;height:1.5px;background:var(--gd2);opacity:.7;display:block;flex-shrink:0}
+.faut{font-size:10px;font-weight:700;letter-spacing:2.5px;color:rgba(255,255,255,.45);text-transform:uppercase}
 .fvis{display:none}
 .ftxt{display:none}
 .fport{display:none}
@@ -830,187 +807,17 @@ footer{background:#0d1a0f;padding:44px 40px 24px}
   <div id="noResults" style="display:none;text-align:center;padding:40px;color:var(--tx3);font-family:'Playfair Display',serif;font-style:italic">No products found for this filter 🏔️</div>
 </section>
 <section class="sec state-sec" id="states">
-  <div class="rv" id="regions" style="margin-bottom:20px"><div class="chip">Explore the Mountains</div><h2 class="sh2">Discover the Himalayas</h2><p class="ssub" style="margin-bottom:0">Each region carries centuries of tradition — explore a state and uncover the pure flavours, ancient wisdom, and stories hidden in its mountains.</p></div>
+  <div class="rv" id="regions" style="margin-bottom:20px"><div class="chip">Shop by State</div><h2 class="sh2">Every State, a Unique Flavour</h2><p class="ssub" style="margin-bottom:0">From snow-capped Himalayas to the lush Northeast — click any state to explore its authentic products and culture.</p></div>
   <div class="stabs" id="stabs"></div>
   <div class="spnls" id="spnls"></div>
 </section>
 <section class="sec why-bg">
   <div class="ct rv"><div class="chip">Our Promise</div><h2 class="sh2">Why Pahadi Roots</h2><p class="ssub">Four pillars that define everything we do — mountain to doorstep.</p></div>
   <div class="pgr">
-    <!-- PILLAR 1: Lab Tested Purity -->
-    <div class="pillar rv" style="transition-delay:.08s">
-      <div class="pnum">01</div>
-      <span class="pico">
-        <svg viewBox="0 0 220 200" xmlns="http://www.w3.org/2000/svg">
-          <ellipse cx="110" cy="105" rx="100" ry="95" fill="#1a5c5e"/>
-          <circle cx="40" cy="38" r="2.5" fill="#f5c842" opacity="0.9"/><circle cx="175" cy="32" r="2" fill="#f5c842" opacity="0.8"/><circle cx="55" cy="65" r="1.5" fill="#f5c842" opacity="0.7"/><circle cx="168" cy="62" r="1.8" fill="#f5c842" opacity="0.7"/><circle cx="30" cy="108" r="1.5" fill="#f5c842" opacity="0.6"/><circle cx="186" cy="118" r="2" fill="#f5c842" opacity="0.7"/>
-          <circle cx="162" cy="44" r="16" fill="#d94f3d"/>
-          <polygon points="20,152 65,82 110,152" fill="#2d7a5f"/><polygon points="90,152 140,76 190,152" fill="#245c4a"/><polygon points="55,152 100,98 145,152" fill="#3a9c78"/>
-          <polygon points="100,98 94,114 106,114" fill="white" opacity="0.9"/><polygon points="140,76 134,94 146,94" fill="white" opacity="0.9"/><polygon points="65,82 59,98 71,98" fill="white" opacity="0.9"/>
-          <rect x="10" y="150" width="200" height="22" rx="5" fill="#1a4a3c"/>
-          <g transform="translate(38,100)">
-            <path d="M10,0 L10,22 Q0,34 5,46 Q10,55 20,55 Q30,55 35,46 Q40,34 30,22 L30,0 Z" fill="#5ecfb2" opacity="0.9"/>
-            <rect x="12" y="0" width="6" height="24" rx="3" fill="white" opacity="0.3"/>
-            <rect x="8" y="-4" width="24" height="7" rx="3" fill="#2c8c74"/>
-            <circle cx="18" cy="42" r="4" fill="white" opacity="0.4"/><circle cx="26" cy="36" r="3" fill="white" opacity="0.3"/>
-          </g>
-          <g transform="translate(108,88)">
-            <rect x="5" y="58" width="55" height="7" rx="4" fill="#d94f3d"/>
-            <rect x="25" y="18" width="10" height="44" rx="5" fill="#c94030"/>
-            <path d="M30,18 Q30,4 48,4" stroke="#c94030" stroke-width="8" fill="none" stroke-linecap="round"/>
-            <rect x="42" y="-5" width="12" height="14" rx="6" fill="#c94030"/>
-            <circle cx="48" cy="-1" r="5" fill="#1a2a2a"/><circle cx="46" cy="-3" r="2" fill="white" opacity="0.6"/>
-            <rect x="12" y="38" width="42" height="5" rx="3" fill="#c94030"/>
-            <rect x="25" y="20" width="10" height="16" rx="4" fill="#a83020"/>
-            <rect x="22" y="33" width="20" height="3" rx="1" fill="#f0e0c0" opacity="0.8"/>
-          </g>
-          <rect x="30" y="168" width="160" height="20" rx="4" fill="#d94f3d"/>
-          <text x="110" y="183" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="700" fill="white" letter-spacing="2">LAB TESTED PURITY</text>
-        </svg>
-      </span>
-      <div class="pt">Lab Tested Purity</div>
-      <p class="pd">Every batch tested for heavy metals, pesticides &amp; adulterants. Certificate with every order.</p>
-    </div>
-
-    <!-- PILLAR 2: Direct from Farmers — Option 5 (palm + floating farm) -->
-    <div class="pillar rv" style="transition-delay:.16s">
-      <div class="pnum">02</div>
-      <span class="pico">
-        <svg viewBox="0 0 220 200" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <radialGradient id="p5bg" cx="50%" cy="50%"><stop offset="0%" stop-color="#d8f0d8"/><stop offset="100%" stop-color="#a0c8a0"/></radialGradient>
-            <radialGradient id="p5fg" cx="40%" cy="35%"><stop offset="0%" stop-color="#c8e8b8"/><stop offset="100%" stop-color="#6aaa6a"/></radialGradient>
-          </defs>
-          <circle cx="110" cy="100" r="98" fill="url(#p5bg)"/>
-          <clipPath id="cp5"><circle cx="110" cy="100" r="95"/></clipPath>
-          <g clip-path="url(#cp5)">
-            <rect width="220" height="200" fill="url(#p5bg)"/>
-            <polygon points="0,130 40,78 80,130" fill="#5aaa7a" opacity="0.25"/><polygon points="100,130 150,68 200,130" fill="#4a9a6a" opacity="0.25"/>
-            <!-- Palm base -->
-            <rect x="82" y="168" width="56" height="22" rx="10" fill="#d4a870"/>
-            <ellipse cx="110" cy="162" rx="44" ry="26" fill="#d4a870"/>
-            <!-- Fingers -->
-            <rect x="72" y="130" width="14" height="34" rx="7" fill="#c8956a"/>
-            <rect x="88" y="122" width="16" height="42" rx="8" fill="#d4a870"/>
-            <rect x="106" y="118" width="16" height="46" rx="8" fill="#d4a870"/>
-            <rect x="124" y="122" width="16" height="42" rx="8" fill="#d4a870"/>
-            <rect x="140" y="132" width="13" height="32" rx="6" fill="#c8956a"/>
-            <path d="M86,158 Q100,152 118,156" stroke="#b88050" stroke-width="1.5" fill="none" opacity="0.5"/>
-            <!-- Floating farm scene oval -->
-            <ellipse cx="110" cy="108" rx="56" ry="36" fill="url(#p5fg)"/>
-            <ellipse cx="110" cy="146" rx="38" ry="7" fill="#6aaa6a" opacity="0.25"/>
-            <!-- Mini mountains -->
-            <polygon points="68,122 85,90 102,122" fill="#1a5c2e"/><polygon points="88,122 108,82 128,122" fill="#145028"/><polygon points="115,122 132,92 150,122" fill="#1a5c2e"/>
-            <polygon points="108,82 104,96 112,96" fill="white" opacity="0.85"/>
-            <!-- Mini pines -->
-            <polygon points="62,122 68,110 74,122" fill="#0a3020"/><polygon points="142,122 148,110 154,122" fill="#0a3020"/>
-            <!-- Mini river -->
-            <path d="M68,122 Q90,117 110,120 Q130,123 152,120" stroke="#5dade2" stroke-width="3.5" fill="none" opacity="0.8"/>
-            <!-- Mini house -->
-            <rect x="98" y="104" width="22" height="14" rx="1" fill="#e8c878"/>
-            <polygon points="93,105 109,94 125,105" fill="#c94a3a"/>
-            <rect x="105" y="111" width="8" height="7" rx="1" fill="#8b5e3c"/>
-            <!-- Sparkles -->
-            <circle cx="60" cy="90" r="3" fill="#f5c842" opacity="0.8"/><circle cx="162" cy="94" r="3" fill="#f5c842" opacity="0.8"/>
-            <circle cx="70" cy="75" r="2" fill="#f5c842" opacity="0.6"/><circle cx="155" cy="78" r="2" fill="#f5c842" opacity="0.6"/>
-            <circle cx="110" cy="66" r="2.5" fill="#f5c842" opacity="0.7"/>
-          </g>
-          <circle cx="110" cy="100" r="98" fill="none" stroke="#a0d0a0" stroke-width="2.5"/>
-        </svg>
-      </span>
-      <div class="pt">Direct from Farmers</div>
-      <p class="pd">Zero middlemen. 200+ farming families across 12 Himalayan states — fair wages, always.</p>
-    </div>
-
-    <!-- PILLAR 3: Eco Packaging — light blue globe + leaf + orbit -->
-    <div class="pillar rv" style="transition-delay:.24s">
-      <div class="pnum">03</div>
-      <span class="pico">
-        <svg viewBox="0 0 220 200" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <radialGradient id="p3globe" cx="40%" cy="35%"><stop offset="0%" stop-color="#aed6f1"/><stop offset="100%" stop-color="#5dade2"/></radialGradient>
-          </defs>
-          <circle cx="110" cy="100" r="96" fill="#e8f0e8"/>
-          <circle cx="110" cy="100" r="70" fill="url(#p3globe)"/>
-          <!-- Land masses -->
-          <ellipse cx="98" cy="82" rx="18" ry="23" fill="#5cb85c" transform="rotate(-10,98,82)"/>
-          <ellipse cx="88" cy="108" rx="14" ry="10" fill="#5cb85c" transform="rotate(-5,88,108)"/>
-          <ellipse cx="122" cy="92" rx="12" ry="17" fill="#5cb85c" transform="rotate(15,122,92)"/>
-          <ellipse cx="130" cy="114" rx="10" ry="8" fill="#5cb85c"/>
-          <ellipse cx="105" cy="124" rx="8" ry="6" fill="#5cb85c" transform="rotate(-20,105,124)"/>
-          <!-- Orbit dashed -->
-          <ellipse cx="110" cy="100" rx="86" ry="24" fill="none" stroke="#5dade2" stroke-width="1.5" stroke-dasharray="6 4" opacity="0.6" transform="rotate(-15,110,100)"/>
-          <!-- Leaf sprout -->
-          <line x1="110" y1="30" x2="110" y2="40" stroke="#2d7a2e" stroke-width="3" stroke-linecap="round"/>
-          <path d="M110,40 Q110,28 103,21 Q100,14 110,12 Q120,14 117,21 Q110,28 110,40" fill="#4caf50"/>
-          <path d="M110,34 Q118,29 125,20 Q119,12 110,22" fill="#66bb6a" opacity="0.85"/>
-          <path d="M110,34 Q102,29 95,20 Q101,12 110,22" fill="#81c784" opacity="0.75"/>
-          <!-- ECO badge -->
-          <circle cx="162" cy="44" r="18" fill="#f5c842"/>
-          <text x="162" y="49" text-anchor="middle" font-family="sans-serif" font-size="10" font-weight="700" fill="#2c5f2e">ECO</text>
-          <!-- Label -->
-          <rect x="25" y="178" width="170" height="20" rx="4" fill="#2d7a2e"/>
-          <text x="110" y="193" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="700" fill="white" letter-spacing="1.5">ECO PACKAGING</text>
-        </svg>
-      </span>
-      <div class="pt">Eco Packaging</div>
-      <p class="pd">Glass jars, recycled cardboard, zero single-use plastic. Packaging as clean as our products.</p>
-    </div>
-
-    <!-- PILLAR 4: Give-Back — river + village + pine forest -->
-    <div class="pillar rv" style="transition-delay:.32s">
-      <div class="pnum">04</div>
-      <span class="pico">
-        <svg viewBox="0 0 220 200" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <radialGradient id="p4sky" cx="50%" cy="30%"><stop offset="0%" stop-color="#d6eaf8"/><stop offset="100%" stop-color="#aed6f1"/></radialGradient>
-          </defs>
-          <circle cx="110" cy="100" r="96" fill="url(#p4sky)"/>
-          <clipPath id="cp4"><circle cx="110" cy="100" r="93"/></clipPath>
-          <g clip-path="url(#cp4)">
-            <rect width="220" height="200" fill="#aed6f1"/>
-            <!-- Sun -->
-            <circle cx="170" cy="32" r="22" fill="#f5c842" opacity="0.9"/>
-            <!-- Back mountains -->
-            <polygon points="-5,130 45,40 95,130" fill="#1a5c2e"/><polygon points="40,130 100,30 160,130" fill="#145028"/><polygon points="110,130 175,34 240,130" fill="#1a5c2e"/>
-            <polygon points="45,40 39,58 51,58" fill="white" opacity="0.9"/><polygon points="100,30 94,50 106,50" fill="white" opacity="0.9"/><polygon points="175,34 169,53 181,53" fill="white" opacity="0.9"/>
-            <!-- Pine trees -->
-            <polygon points="0,142 8,122 16,142" fill="#0f3d1c"/><polygon points="12,142 20,120 28,142" fill="#0f3d1c"/><polygon points="24,142 33,120 42,142" fill="#0f3d1c"/><polygon points="36,144 46,122 56,144" fill="#145028"/>
-            <polygon points="166,144 176,122 186,144" fill="#0f3d1c"/><polygon points="180,142 190,120 200,142" fill="#0f3d1c"/><polygon points="194,142 204,120 214,142" fill="#0f3d1c"/>
-            <polygon points="140,142 148,124 156,142" fill="#0f3d1c"/>
-            <!-- River -->
-            <path d="M0,156 Q30,148 60,156 Q90,164 120,156 Q150,148 180,156 Q210,164 240,156 L240,172 Q210,180 180,172 Q150,164 120,172 Q90,180 60,172 Q30,164 0,172 Z" fill="#5dade2" opacity="0.85"/>
-            <path d="M20,160 Q50,154 80,160" stroke="white" stroke-width="1.5" fill="none" opacity="0.4"/>
-            <path d="M130,158 Q160,152 190,158" stroke="white" stroke-width="1.5" fill="none" opacity="0.4"/>
-            <!-- House -->
-            <rect x="88" y="122" width="44" height="28" rx="2" fill="#e8c878"/>
-            <polygon points="82,124 110,104 138,124" fill="#c94a3a"/>
-            <rect x="102" y="135" width="16" height="15" rx="2" fill="#8b5e3c"/>
-            <rect x="90" y="128" width="12" height="9" rx="1" fill="#aed6f1"/>
-            <line x1="96" y1="128" x2="96" y2="137" stroke="white" stroke-width="1"/>
-            <line x1="90" y1="133" x2="102" y2="133" stroke="white" stroke-width="1"/>
-            <rect x="118" y="128" width="12" height="9" rx="1" fill="#aed6f1"/>
-            <line x1="124" y1="128" x2="124" y2="137" stroke="white" stroke-width="1"/>
-            <line x1="118" y1="133" x2="130" y2="133" stroke="white" stroke-width="1"/>
-            <rect x="122" y="106" width="8" height="12" rx="2" fill="#a83020"/>
-            <path d="M126,106 Q123,100 127,95 Q131,90 128,84" stroke="#c8c8c8" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.5"/>
-            <polygon points="68,142 75,124 82,142" fill="#1a5c2e"/><polygon points="138,142 146,124 154,142" fill="#1a5c2e"/>
-            <!-- Foreground -->
-            <rect x="0" y="178" width="220" height="30" fill="#2d6a30"/>
-          </g>
-          <!-- 5% badge -->
-          <circle cx="46" cy="36" r="20" fill="#f5c842"/>
-          <text x="46" y="32" text-anchor="middle" font-family="sans-serif" font-size="10" font-weight="700" fill="#2c5f2e">5%</text>
-          <text x="46" y="44" text-anchor="middle" font-family="sans-serif" font-size="7" fill="#2c5f2e" font-weight="600">BACK</text>
-          <circle cx="110" cy="100" r="96" fill="none" stroke="#d4e8c0" stroke-width="2.5"/>
-          <!-- Label -->
-          <rect x="20" y="178" width="180" height="20" rx="4" fill="#1a5c2e"/>
-          <text x="110" y="193" text-anchor="middle" font-family="sans-serif" font-size="9" font-weight="700" fill="white" letter-spacing="1">GIVE-BACK PROGRAM</text>
-        </svg>
-      </span>
-      <div class="pt">Give-Back Program</div>
-      <p class="pd">5% of every order funds Himalayan forest restoration and village school programs.</p>
-    </div>
+    <div class="pillar rv" style="transition-delay:.08s"><div class="pnum">01</div><span class="pico">🔬</span><div class="pt">Lab Tested Purity</div><p class="pd">Every batch tested for heavy metals, pesticides & adulterants. Certificate with every order.</p></div>
+    <div class="pillar rv" style="transition-delay:.16s"><div class="pnum">02</div><span class="pico">🌱</span><div class="pt">Direct from Farmers</div><p class="pd">Zero middlemen. 200+ farming families across 12 Himalayan states — fair wages, always.</p></div>
+    <div class="pillar rv" style="transition-delay:.24s"><div class="pnum">03</div><span class="pico">📦</span><div class="pt">Eco Packaging</div><p class="pd">Glass jars, recycled cardboard, zero single-use plastic. Packaging as clean as our products.</p></div>
+    <div class="pillar rv" style="transition-delay:.32s"><div class="pnum">04</div><span class="pico">♻️</span><div class="pt">Give-Back Program</div><p class="pd">5% of every order funds Himalayan forest restoration and village school programs.</p></div>
   </div>
 </section>
 <section class="sec rev-bg" style="padding:16px 40px 18px">
@@ -1022,17 +829,22 @@ footer{background:#0d1a0f;padding:44px 40px 24px}
   </div>
 </section>
 <section class="founder-sec" id="story">
-  <div class="founder-editorial">
-    <div class="founder-text-col">
-      <div class="ftag">The Man Behind Pahadi Roots</div>
-      <h2 class="fname">Sudhir <em>Chambail</em></h2>
-      <div class="fsubtitle-big">Himachal Pradesh &nbsp;·&nbsp; Est. 2019</div>
+  <!-- Full-width background image — set from admin Site Settings -->
+  <div class="founder-bg" id="founderBg"></div>
+  <div class="founder-overlay"></div>
+  <div class="founder-content">
+    <div class="founder-left">
+      <div class="ftag">THE MAN BEHIND PAHADI ROOTS</div>
+      <h2 class="fname">Sudhir Chambail</h2>
+      <p class="fsubtitle-big">Born in Himachal. Living in Delhi.<br>Always on the road.</p>
       <blockquote class="fq">"I ride these mountains because that's the only way to find the real thing — the honey tucked inside a Deodar forest, the ghee made before sunrise in a Kangra valley home. No store can give you that."</blockquote>
+      <div class="faut-row">
+        <span class="faut-line"></span>
+        <span class="faut">FOUNDER · PAHADI ROOTS · DELHI</span>
+      </div>
     </div>
-    <div class="founder-photo-col">
-      <div id="founderBg" class="founder-photo-inner"></div>
-      <div class="founder-photo-col-overlay"></div>
-      <div class="founder-year-badge">🏔️ Travelling Himalayas Since 2019</div>
+    <div class="founder-right">
+      <div class="founder-badge">🏔️ TRAVELLING HIMALAYAS SINCE 2019</div>
     </div>
   </div>
 </section>
@@ -1515,17 +1327,6 @@ async function loadData() {
           });
         }
       });
-      // Attach multiple images from state_images table
-      if (Array.isArray(data.state_images) && data.state_images.length) {
-        STATES.forEach(function(s) {
-          var imgs = data.state_images
-            .filter(function(r) { return r.state_id === s.id; })
-            .sort(function(a,b) { return (a.sort_order||0)-(b.sort_order||0); })
-            .map(function(r) { return r.image_url; });
-          if (imgs.length) s._images = imgs;
-          else if (s.cover_photo_url) s._images = [s.cover_photo_url];
-        });
-      }
       updated = true;
     }
 
@@ -1565,19 +1366,7 @@ async function loadData() {
       updated = true;
     }
 
-    // Attach multiple images from product_images table
-    if (Array.isArray(data.product_images) && data.product_images.length) {
-      PRODUCTS.forEach(function(p) {
-        var imgs = data.product_images
-          .filter(function(r) { return r.product_id === p.id; })
-          .sort(function(a,b) { return (a.sort_order||0)-(b.sort_order||0); })
-          .map(function(r) { return r.image_url; });
-        if (imgs.length) p._images = imgs;
-        else if (p.image_url) p._images = [p.image_url];
-      });
-    }
-
-    if (updated) { renderProds(); renderStates(); observeRv(); injectProductSchema(); renderUpsell(); setTimeout(startSlideshows, 200); }
+    if (updated) { renderProds(); renderStates(); observeRv(); injectProductSchema(); renderUpsell(); }
   } catch(e) {
     console.info('Using local fallback data:', e.message);
   }
@@ -1601,15 +1390,9 @@ function mkProd(p) {
   var sPct   = Math.min(100, Math.round(stock / 50 * 100));
   var sLbl   = stock <= 0 ? 'Out of Stock' : stock > 20 ? 'In Stock' : ('Only ' + stock + ' left');
   var inWL   = wishlist.includes(p.id);
-  var imgHtml;
-  var img1 = (p._images && p._images[0]) || p.image_url || '';
-  var img2 = (p._images && p._images[1]) || '';
-  if (img1) {
-    imgHtml = '<img class="pi-main" src="'+img1+'" alt="'+p.name+'" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;transition:opacity .45s ease" onerror="this.style.display=\'none\'">' +
-      (img2 ? '<img class="pi-hover" src="'+img2+'" alt="'+p.name+'" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:2;opacity:0;transition:opacity .45s ease" onerror="this.style.display=\'none\'">' : '');
-  } else {
-    imgHtml = '';
-  }
+  var imgHtml = p.image_url
+    ? '<img src="' + p.image_url + '" alt="' + p.name + '" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1" onerror="this.style.display=\'none\'">'
+    : '';
   var img = '<div class="piw" style="background:' + (p.card_bg||'#f9f4ec') + '">' +
     imgHtml +
     '<span class="pemo" style="position:relative;z-index:0">' + (p.emoji||'🌿') + '</span>' +
@@ -1684,21 +1467,19 @@ function renderStates() {
   var pn = document.getElementById('spnls');
   if (!tb || !pn) return;
 
+  // Merge localStorage uploaded images into STATES before rendering
+  STATES.forEach(function(s) {
+    try {
+      var up = localStorage.getItem('pr_state_img_' + s.id);
+      if (up) { s._uploadedImg = up; }
+    } catch(e) {}
+  });
+
   tb.innerHTML = STATES.map(function(s, i) {
-    var imgs = s._images && s._images.length ? s._images : (s.tab_photo_url ? [s.tab_photo_url] : []);
-    var imgHtml;
-    if (imgs.length > 1) {
-      // Slideshow thumb — stab-slide sits INSIDE stab-thumb
-      imgHtml = '<div class="stab-thumb"><div class="stab-slide" data-imgs=\'' + JSON.stringify(imgs) + '\' data-idx="0">' +
-        imgs.map(function(u, ii) {
-          return '<img src="' + u + '" alt="' + s.name + '" loading="lazy" style="opacity:' + (ii===0?'1':'0') + '" onerror="this.style.display=\'none\'">';
-        }).join('') +
-        '</div></div>';
-    } else if (imgs.length === 1) {
-      imgHtml = '<div class="stab-thumb"><img src="' + imgs[0] + '" alt="' + s.name + '" onerror="this.parentNode.style.display=\'none\'" loading="lazy"></div>';
-    } else {
-      imgHtml = '<div class="stab-thumb stab-thumb-emo">' + s.emoji + '</div>';
-    }
+    var imgSrc = s._uploadedImg || s.tab_photo_url || '';
+    var imgHtml = imgSrc
+      ? '<div class="stab-thumb"><img src="' + imgSrc + '" alt="' + s.name + '" onerror="this.parentNode.style.display=\'none\'" loading="lazy"></div>'
+      : '<div class="stab-thumb stab-thumb-emo">' + s.emoji + '</div>';
     return '<button class="stab' + (i===0?' active':'') + '" onclick="swState(\'' + s.id + '\')" id="t-' + s.id + '">' +
       imgHtml +
       '<div class="stab-label"><span class="stab-name">' + s.name + '</span><span class="stab-tag">' + (s.tagline||'') + '</span></div>' +
@@ -1709,24 +1490,12 @@ function renderStates() {
     var stProds = PRODUCTS.filter(function(p) { return p.state_id === s.id; });
     var pills   = (s.pills||[]).map(function(p) { return '<span class="sstate-pill">' + p + '</span>'; }).join('');
     var bg      = s.panel_bg || 'linear-gradient(135deg,#1a3a1e,#2d5233)';
-    var coverImgs = s._images && s._images.length ? s._images : (s.cover_photo_url ? [s.cover_photo_url] : []);
-    var photoHtml;
-    if (coverImgs.length > 1) {
-      photoHtml = '<div class="shdr-img-col spnl-slide" data-imgs=\'' + JSON.stringify(coverImgs) + '\' data-idx="0" style="position:relative;background:' + bg + '">' +
-        '<div class="shdr-fallback" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:80px;opacity:.35">' + s.emoji + '</div>' +
-        coverImgs.map(function(u, ii) {
-          return '<img src="' + u + '" alt="' + s.name + ' culture" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;display:block;transition:opacity 1s;opacity:' + (ii===0?'1':'0') + '" loading="lazy" onerror="this.style.display=\'none\'">';
-        }).join('') +
-        '<div style="position:absolute;inset:0;background:linear-gradient(to right,rgba(0,0,0,.15),transparent);pointer-events:none"></div>' +
-      '</div>';
-    } else {
-      var coverSrc = coverImgs[0] || '';
-      photoHtml = '<div class="shdr-img-col" style="position:relative;background:' + bg + '">' +
-        '<div class="shdr-fallback" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:80px;opacity:.35">' + s.emoji + '</div>' +
-        (coverSrc ? '<img src="' + coverSrc + '" alt="' + s.name + ' culture" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;display:block" loading="lazy" onerror="this.style.display=\'none\'">' : '') +
-        '<div style="position:absolute;inset:0;background:linear-gradient(to right,rgba(0,0,0,.15),transparent)"></div>' +
-      '</div>';
-    }
+    var coverSrc = s._uploadedImg || s.cover_photo_url || '';
+    var photoHtml = '<div class="shdr-img-col" style="position:relative;background:' + bg + '">' +
+      '<div class="shdr-fallback" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:80px;opacity:.35">' + s.emoji + '</div>' +
+      (coverSrc ? '<img src="' + coverSrc + '" alt="' + s.name + ' culture" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;display:block" loading="lazy" onerror="this.style.display=\'none\'">' : '') +
+      '<div style="position:absolute;inset:0;background:linear-gradient(to right,rgba(0,0,0,.15),transparent)"></div>' +
+    '</div>';
     var prodsHtml = stProds.length
       ? stProds.map(function(p) { return mkProd(p); }).join('')
       : '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--tx3);font-family:\'Playfair Display\',serif;font-style:italic">🏔️ Products coming soon from ' + s.name + '…</div>';
@@ -1741,29 +1510,6 @@ function renderStates() {
       '<div class="spgrid">' + prodsHtml + '</div>' +
     '</div>';
   }).join('');
-
-  // Start all slideshows
-  startSlideshows();
-}
-
-// ── SLIDESHOW ENGINE ────────────────────────────────────────────────
-var _slideshowTimers = [];
-function startSlideshows() {
-  _slideshowTimers.forEach(clearInterval);
-  _slideshowTimers = [];
-  document.querySelectorAll('.stab-slide, .spnl-slide, .founder-slide').forEach(function(el) {
-    var imgs;
-    try { imgs = JSON.parse(el.getAttribute('data-imgs')); } catch(e) { return; }
-    if (!imgs || imgs.length < 2) return;
-    var idx = 0;
-    var allImgs = el.querySelectorAll('img');
-    var t = setInterval(function() {
-      allImgs[idx].style.opacity = '0';
-      idx = (idx + 1) % imgs.length;
-      allImgs[idx].style.opacity = '1';
-    }, 2500);
-    _slideshowTimers.push(t);
-  });
 }
 
 function swState(id) {
@@ -2230,7 +1976,7 @@ function renderUpsell() {
   if (!suggestions.length) { section.style.display = 'none'; return; }
   section.style.display = 'block';
   strip.innerHTML = suggestions.map(function(p) {
-    var imgHtml = p.image_url ? ('<img src="'+p.image_url+'" alt="'+p.name+'" style="width:100%;height:100%;object-fit:cover">') : ('<span style="font-size:28px">'+(p.emoji||'🌿')+'</span>');
+    var imgHtml = p.image_url ? ('<img src="'+p.image_url+'" style="width:100%;height:100%;object-fit:cover">') : ('<span style="font-size:28px">'+(p.emoji||'🌿')+'</span>');
     var addBtn = '<button onclick="addToCart('+JSON.stringify(p.id)+')" style="margin-top:6px;background:var(--g);color:#fff;border:none;border-radius:6px;padding:4px 10px;font-size:11px;font-weight:600;cursor:pointer;width:100%">+ Add</button>';
     return '<div class="cu-item"><div class="cu-img">'+imgHtml+'</div><div class="cu-name">'+p.name+'</div><div class="cu-price">&#8377;'+p.price+'</div>'+addBtn+'</div>';
   }).join('');
@@ -2330,37 +2076,12 @@ function openQV(id) {
   var stockTxt   = stock <= 0 ? '❌ Out of Stock' : stock > 20 ? '✅ In Stock' : ('⚠️ Only ' + stock + ' left');
   var box = document.getElementById('qvBox');
   if (!box) return;
-
-  // Build image gallery
-  var imgs = (p._images && p._images.length) ? p._images : (p.image_url ? [p.image_url] : []);
-  var hasGallery = imgs.length > 1;
-  var galleryHtml;
-  if (imgs.length === 0) {
-    galleryHtml = '<span style="font-size:80px">' + (p.emoji||'🌿') + '</span>';
-  } else if (!hasGallery) {
-    galleryHtml = '<img src="' + imgs[0] + '" alt="' + p.name + '" onerror="this.style.display=\'none\'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:20px 0 0 20px">';
-  } else {
-    var slides = imgs.map(function(u, i) {
-      return '<img class="qv-gallery-slide' + (i===0?' active':'') + '" src="' + u + '" alt="' + p.name + '" onerror="this.style.display=\'none\'">';
-    }).join('');
-    var thumbs = imgs.length > 1 ? '<div class="qv-thumb-strip">' + imgs.map(function(u, i) {
-      return '<img class="qv-thumb' + (i===0?' active':'') + '" src="' + u + '" onclick="qvGoto(' + i + ')" alt="' + (i+1) + '">';
-    }).join('') + '</div>' : '';
-    var dots = '<div class="qv-gallery-dots">' + imgs.map(function(_, i) {
-      return '<button class="qv-gallery-dot' + (i===0?' active':'') + '" onclick="qvGoto(' + i + ')"></button>';
-    }).join('') + '</div>';
-    var arrows = imgs.length > 1
-      ? '<button class="qv-gallery-arr prev" onclick="qvGoto(-1,true)">‹</button><button class="qv-gallery-arr next" onclick="qvGoto(1,true)">›</button>'
-      : '';
-    galleryHtml = '<div class="qv-gallery">' + slides + arrows + thumbs + dots + '</div><span style="font-size:60px;opacity:.15;z-index:0">' + (p.emoji||'🌿') + '</span>';
-  }
-  window._qvImgCount = imgs.length;
-  window._qvImgIdx = 0;
-
   box.innerHTML = '<div style="position:relative">' +
     '<button class="qv-close" onclick="closeQV()">✕</button>' +
     '<div class="qv-inner">' +
-      '<div class="qv-img-col">' + galleryHtml + '</div>' +
+      '<div class="qv-img-col">' + (p.emoji||'🌿') +
+        (p.image_url ? '<img src="' + p.image_url + '" alt="' + p.name + '" onerror="this.style.display=\'none\'">' : '') +
+      '</div>' +
       '<div class="qv-content">' +
         '<div class="qv-region">📍 ' + (p.region||'') + '</div>' +
         '<div class="qv-name">' + p.name + '</div>' +
@@ -2392,22 +2113,6 @@ function openQV(id) {
     '</div>' +
   '</div>';
   document.getElementById('qvOv').classList.add('open');
-}
-
-function qvGoto(idx, relative) {
-  var total = window._qvImgCount || 0;
-  if (total < 2) return;
-  if (relative) {
-    window._qvImgIdx = (window._qvImgIdx + idx + total) % total;
-  } else {
-    window._qvImgIdx = (idx + total) % total;
-  }
-  var i = window._qvImgIdx;
-  var box = document.getElementById('qvBox');
-  if (!box) return;
-  box.querySelectorAll('.qv-gallery-slide').forEach(function(el, ii) { el.classList.toggle('active', ii===i); });
-  box.querySelectorAll('.qv-gallery-dot').forEach(function(el, ii) { el.classList.toggle('active', ii===i); });
-  box.querySelectorAll('.qv-thumb').forEach(function(el, ii) { el.classList.toggle('active', ii===i); });
 }
 function closeQV() { document.getElementById('qvOv').classList.remove('open'); }
 function handleQvClick(e) { if (e.target === document.getElementById('qvOv')) closeQV(); }
@@ -2604,6 +2309,24 @@ function trackOrder() {
   });
 }
 
+// ── STICKY ADD-TO-CART ─────────────────────────────────────────────
+var _stickyProdId = null;
+function showStickyAtc(id) {
+  var p = PRODUCTS.find(function(x) { return x.id === id; });
+  if (!p) return;
+  _stickyProdId = id;
+  var se = document.getElementById('satcEmoji');
+  var sn = document.getElementById('satcName');
+  var sp = document.getElementById('satcPrice');
+  var sa = document.getElementById('stickyAtc');
+  if (se) se.textContent = p.emoji || '🌿';
+  if (sn) sn.textContent = p.name;
+  if (sp) sp.textContent = '₹' + p.price + (p.unit||'');
+  if (sa) sa.classList.add('show');
+}
+function hideStickyAtc() { var sa = document.getElementById('stickyAtc'); if(sa) sa.classList.remove('show'); _stickyProdId = null; }
+function stickyAddToCart() { if (_stickyProdId) addToCart(_stickyProdId); }
+
 // ── HERO STATS COUNTER ────────────────────────────────────────────
 function animateCounters() {
   document.querySelectorAll('.hstat-num[data-target]').forEach(function(el) {
@@ -2647,6 +2370,21 @@ function addBulkBadges() {
 }
 
 // ── STICKY ATC INIT (removed) ──────────────────────────────────────
+function initStickyAtcStub() {
+  if (!window.IntersectionObserver) return;
+  var obs = new IntersectionObserver(function(entries) {
+    entries.forEach(function(e) {
+      if (e.isIntersecting) {
+        var btn = e.target.querySelector('.atc[onclick*="addToCart"]');
+        if (btn) {
+          var match = btn.getAttribute('onclick').match(/\d+/);
+          if (match) showStickyAtc(parseInt(match[0]));
+        }
+      }
+    });
+  }, {threshold: 0.8});
+  document.querySelectorAll('.pcard').forEach(function(c) { obs.observe(c); });
+}
 
 // ── SUBSCRIBE (newsletter) ─────────────────────────────────────────
 function subscribe() {
@@ -2683,26 +2421,18 @@ function loadFI() {
   try {
     var bg = document.getElementById('founderBg');
     if (!bg) return;
-    function applyFounderImgs(urls) {
-      if (!urls || !urls.length) return;
-      if (urls.length === 1) {
-        bg.innerHTML = '<img src="' + urls[0] + '" alt="Sudhir Chambail" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 20%">';
-      } else {
-        bg.innerHTML = '<div class="founder-slide" data-imgs=\'' + JSON.stringify(urls) + '\' data-idx="0" style="position:absolute;inset:0">' +
-          urls.map(function(u, i) {
-            return '<img src="' + u + '" alt="Sudhir Chambail" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 20%;transition:opacity 1.2s;opacity:' + (i===0?'1':'0') + '">';
-          }).join('') +
-        '</div>';
-        setTimeout(startSlideshows, 100);
-      }
+    // Always clear stale cache so updated admin image shows immediately
+    try { localStorage.removeItem('pr_founder_image'); } catch(e){}
+    function applyFounderImg(url) {
+      if (!url) return;
+      bg.style.cssText = 'position:relative;width:100%;line-height:0;display:block';
+      bg.innerHTML = '<img src="' + url + '" alt="Sudhir Chambail" style="width:100%;height:auto;max-height:760px;display:block;object-fit:cover;object-position:40% center" onerror="this.style.display=\'none\'">';
     }
-    // Fetch founder images from store-data
+    // Always fetch fresh from API — single source of truth is site_settings DB
     fetch(getStoreApiBase() + '/store-data').then(function(r){ return r.json(); })
     .then(function(data){
-      var urls = (data && data.founder_images && data.founder_images.length)
-        ? data.founder_images.map(function(f){ return f.image_url; })
-        : (data && data.settings && data.settings.founder_image_url ? [data.settings.founder_image_url] : []);
-      if (urls.length) applyFounderImgs(urls);
+      var url = (data && data.settings && data.settings.founder_image_url) ? data.settings.founder_image_url : '';
+      if (url) applyFounderImg(url);
     }).catch(function(){});
   } catch(e) {}
 }
@@ -3711,6 +3441,6 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
-
+<!-- sticky-atc removed -->
 </body>
 </html>
