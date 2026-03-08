@@ -662,50 +662,49 @@ footer{background:#0d1a0f;padding:44px 40px 24px}
 
 /* ── FOUNDER — Full-width cinematic (Image 2 style) ── */
 /* ── FOUNDER SECTION — EDITORIAL STRIP (Magazine / Luxury Brand) ── */
-.founder-sec{position:relative;overflow:hidden;background:#0c1a0d;display:block}
-/* Slideshow container */
-.founder-slideshow{position:relative;width:100%;height:520px;display:flex;overflow:hidden}
-.founder-slide{position:absolute;inset:0;opacity:0;transition:opacity 1s ease;display:flex;align-items:stretch}
-.founder-slide.active{opacity:1;z-index:1}
-/* Left text panel (dark) */
-.founder-text-panel{flex:0 0 52%;background:#0c1a0d;position:relative;display:flex;flex-direction:column;justify-content:center;padding:52px 56px;clip-path:polygon(0 0,100% 0,92% 100%,0 100%);z-index:2}
-.founder-text-panel::before{content:'';position:absolute;inset:0;background:linear-gradient(145deg,#071408 0%,#0f2410 100%);clip-path:inherit;z-index:-1}
-/* Gold accent bar on left edge */
-.founder-text-panel::after{content:'';position:absolute;left:0;top:15%;bottom:15%;width:3px;background:linear-gradient(to bottom,transparent,var(--gd),transparent)}
-/* Right photo panel */
-.founder-photo-panel{flex:1;position:relative;overflow:hidden;background:linear-gradient(135deg,#1a4a1e,#0a2010)}
-.founder-photo-panel img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;display:block;transition:transform 8s ease}
+/* Exactly replicates Option C from founder-preview.html */
+.founder-sec{position:relative;overflow:hidden;background:#050e06;display:block}
+/* Slideshow wrapper */
+.founder-slideshow{position:relative;width:100%;overflow:hidden}
+.founder-slide{display:none;height:360px;border-bottom:1px solid rgba(200,146,10,.12)}
+.founder-slide.active{display:grid;grid-template-columns:1.1fr 0.9fr}
+/* LEFT — dark text side */
+.founder-text-panel{padding:44px 52px;display:flex;flex-direction:column;justify-content:center;position:relative;background:#050e06}
+/* vertical gold separator line between text and photo */
+.founder-text-panel::after{content:'';position:absolute;right:0;top:20%;bottom:20%;width:1px;background:linear-gradient(180deg,transparent,rgba(200,146,10,.3),transparent)}
+/* RIGHT — angled photo side */
+.founder-photo-panel{position:relative;overflow:hidden;background:linear-gradient(135deg,#1a4a1e,#0a2010)}
+/* Angled clip — matches opt-c exactly: text bleeds into photo panel */
+.founder-photo-panel::before{content:'';position:absolute;inset:0;z-index:1;background:linear-gradient(90deg,rgba(5,14,6,.7) 0%,transparent 40%);pointer-events:none}
+.founder-photo-panel img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;display:block;transition:transform 8s ease;clip-path:polygon(12% 0%,100% 0%,100% 100%,0% 100%)}
 .founder-slide.active .founder-photo-panel img{transform:scale(1.04)}
-.founder-photo-panel::before{content:'';position:absolute;inset:0;z-index:1;background:linear-gradient(90deg,rgba(12,26,13,.55) 0%,transparent 35%)}
-.founder-photo-panel .fp-fallback{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:72px;opacity:.18;z-index:0}
+.founder-photo-panel .fp-fallback{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:72px;opacity:.18;z-index:0;clip-path:polygon(12% 0%,100% 0%,100% 100%,0% 100%)}
 /* Since badge bottom right of photo */
-.founder-since-badge{position:absolute;bottom:28px;right:28px;z-index:3;background:rgba(12,26,13,.88);border:1px solid rgba(200,146,10,.5);color:var(--gd2);font-size:9px;font-weight:800;letter-spacing:2.5px;padding:12px 20px;border-radius:2px;backdrop-filter:blur(8px);display:flex;align-items:center;gap:8px}
+.founder-since-badge{position:absolute;bottom:28px;right:28px;z-index:3;background:rgba(200,146,10,.15);border:1px solid rgba(200,146,10,.4);color:var(--gd2);font-size:8.5px;font-weight:800;letter-spacing:2px;padding:10px 16px;border-radius:3px;backdrop-filter:blur(4px);text-transform:uppercase}
 /* Dot indicators */
-.founder-dots{position:absolute;bottom:20px;left:56px;z-index:10;display:flex;gap:7px}
+.founder-dots{position:absolute;bottom:16px;left:52px;z-index:10;display:flex;gap:7px}
 .founder-dot{width:22px;height:3px;background:rgba(255,255,255,.22);border-radius:2px;cursor:pointer;transition:all .3s}
 .founder-dot.active{background:var(--gd);width:36px}
-/* Text elements */
-.ftag{color:var(--gd2);font-size:9px;font-weight:800;letter-spacing:4.5px;margin-bottom:20px;opacity:.85;text-transform:uppercase;display:flex;align-items:center;gap:10px}
-.ftag::before{content:'';display:inline-block;width:28px;height:1px;background:var(--gd);opacity:.7}
-.fname{font-family:'Playfair Display',serif;font-size:clamp(34px,4.5vw,62px);color:#fff;font-weight:900;margin-bottom:8px;line-height:1.02;letter-spacing:-.5px}
-.fname span{color:var(--gd)}
-.fsubtitle-big{font-size:clamp(10px,1vw,12px);font-weight:800;letter-spacing:3px;color:rgba(255,255,255,.38);text-transform:uppercase;margin-bottom:28px}
-.fq{font-size:clamp(12.5px,1.15vw,14px);color:rgba(255,255,255,.72);line-height:1.9;font-style:italic;margin-bottom:24px;max-width:420px;border-left:2px solid var(--gd);padding-left:18px}
-.faut-row{display:flex;align-items:center;gap:12px}
-.faut-line{width:32px;height:1px;background:var(--gd2);opacity:.55;display:block;flex-shrink:0}
-.faut{font-size:9.5px;font-weight:700;letter-spacing:2.5px;color:rgba(255,255,255,.38);text-transform:uppercase}
-/* Upload overlay button (hidden, used only internally) */
+/* Text elements — matching opt-c exactly */
+.ftag{font-size:8px;font-weight:800;letter-spacing:4px;color:var(--gd2);text-transform:uppercase;margin-bottom:16px;opacity:.9}
+.fname{font-family:'Playfair Display',serif;font-size:clamp(30px,3.5vw,52px);color:#fff;font-weight:900;line-height:1;margin-bottom:4px;letter-spacing:-.3px}
+.fname span{color:var(--gd);font-style:normal}
+.fsubtitle-big{font-size:12px;color:rgba(255,255,255,.38);letter-spacing:1px;text-transform:uppercase;margin-bottom:24px}
+.fq{font-size:13.5px;color:rgba(255,255,255,.65);line-height:1.8;font-style:italic;border-left:2px solid var(--gd);padding-left:16px;max-width:440px}
+.faut-row{display:none}
+/* Suppress old layout */
 .founder-upload-overlay{display:none}
 .fvis{display:none}.ftxt{display:none}.fport{display:none}
 .founder-bg{display:none}
 .founder-overlay{display:none}
 .founder-content{display:none}
 @media(max-width:768px){
-  .founder-slideshow{height:auto;flex-direction:column}
-  .founder-text-panel{flex:none;clip-path:none;padding:40px 28px 32px}
+  .founder-slide.active{grid-template-columns:1fr;height:auto}
+  .founder-text-panel{padding:36px 24px 28px}
   .founder-text-panel::after{display:none}
-  .founder-photo-panel{height:280px;flex:none}
-  .founder-dots{left:28px;bottom:14px}
+  .founder-photo-panel{height:240px}
+  .founder-photo-panel img,.founder-photo-panel .fp-fallback{clip-path:none}
+  .founder-dots{left:24px;bottom:12px}
 }
 /* ── DELIVERY FORM ───────────────────────────── */
 .del-form{background:rgba(26,58,30,.06);border:1px solid rgba(26,58,30,.15);border-radius:10px;padding:16px;margin-bottom:14px}
@@ -2585,20 +2584,22 @@ function initFounderSlideshow(urls) {
   var dots = document.getElementById('founderDots');
   if (!ss) return;
 
-  // Keep the text panel from slide 0, rebuild photo panels
-  var textPanel = ss.querySelector('.founder-text-panel').cloneNode(true);
+  // Get the existing text panel (always keep it)
+  var textPanel = ss.querySelector('.founder-text-panel');
+  var textPanelHTML = textPanel ? textPanel.outerHTML : '';
 
+  // Rebuild: one slide per URL, each slide = text panel + photo panel
   ss.innerHTML = '';
   urls.forEach(function(url, i) {
     var slide = document.createElement('div');
     slide.className = 'founder-slide' + (i === 0 ? ' active' : '');
     slide.id = 'founderSlide' + i;
     slide.innerHTML =
-      (i === 0 ? textPanel.outerHTML : '') +
+      textPanelHTML +
       '<div class="founder-photo-panel">' +
         '<img src="' + url + '" alt="Sudhir Chambail" loading="' + (i===0?'eager':'lazy') + '" onerror="this.style.display=\'none\'">' +
         '<div class="fp-fallback">🏔️</div>' +
-        (i === 0 ? '<div class="founder-since-badge">🏔️ SINCE 2019</div>' : '') +
+        '<div class="founder-since-badge">🏔️ SINCE 2019</div>' +
       '</div>';
     ss.appendChild(slide);
   });

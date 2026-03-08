@@ -1616,9 +1616,15 @@ function openStateM(s) {
   document.getElementById('state-active').checked = s.is_active !== false;
   document.getElementById('state-file').value = '';
   document.getElementById('state-upload-status').textContent = '';
-  const prev = document.getElementById('state-img-preview');
-  if (s.image_path) { prev.src = s.image_path; prev.style.display = 'block'; }
-  else { prev.src = ''; prev.style.display = 'none'; }
+  // Show current image in new multi-preview container
+  const prevContainer = document.getElementById('state-img-previews');
+  if (prevContainer) {
+    if (s.image_path) {
+      prevContainer.innerHTML = `<img src="${s.image_path}" style="width:100%;height:150px;object-fit:cover;border-radius:8px;border:1px solid var(--bd)" onerror="this.style.display='none'">`;
+    } else {
+      prevContainer.innerHTML = '';
+    }
+  }
   openM('state-modal');
 }
 
@@ -1791,10 +1797,18 @@ async function uploadFounderImage() { return uploadFounderImages(); }
 function openProdImgUpload() {
   document.getElementById('prod-img-file').value = '';
   document.getElementById('prod-img-status').textContent = '';
+  // Reset hover file too
+  const hf = document.getElementById('prod-hover-file');
+  if (hf) hf.value = '';
+  const hp = document.getElementById('prod-hover-preview');
+  if (hp) { hp.src = ''; hp.style.display = 'none'; }
   const cur = document.getElementById('p-img').value;
   const prev = document.getElementById('prod-img-preview');
   if (cur) { prev.src = cur; prev.style.display = 'block'; }
   else prev.style.display = 'none';
+  // Show existing hover image if any
+  const curHover = document.getElementById('p-extra-img')?.value;
+  if (curHover && hp) { hp.src = curHover; hp.style.display = 'block'; }
   openM('img-upload-modal');
 }
 
@@ -1803,33 +1817,59 @@ function previewProdImg(input) {
   const reader = new FileReader();
   reader.onload = e => {
     const prev = document.getElementById('prod-img-preview');
-    prev.src = e.target.result;
-    prev.style.display = 'block';
+    prev.src = e.target.result; prev.style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+}
+
+function previewProdHover(input) {
+  const file = input.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const prev = document.getElementById('prod-hover-preview');
+    if (prev) { prev.src = e.target.result; prev.style.display = 'block'; }
   };
   reader.readAsDataURL(file);
 }
 
 async function uploadProdImage() {
   const file = document.getElementById('prod-img-file').files[0];
+  const hoverFile = document.getElementById('prod-hover-file')?.files[0];
   const status = document.getElementById('prod-img-status');
   const btn = document.getElementById('prod-img-upload-btn');
-  if (!file) { toast('Select a file first', 'er'); return; }
+  if (!file && !hoverFile) { toast('Select at least one file', 'er'); return; }
   btn.disabled = true; btn.textContent = 'Uploading…';
-  status.textContent = '⏳ Uploading image…';
   try {
-    const url = await uploadToStorage(file, `products/product-${Date.now()}`);
-    document.getElementById('p-img').value = url;
-    status.textContent = '✅ Done! URL filled in product form.';
+    if (file) {
+      status.textContent = '⏳ Uploading main image…';
+      const url = await uploadToStorage(file, `products/product-${Date.now()}`);
+      document.getElementById('p-img').value = url;
+      status.textContent = '✅ Main image uploaded!';
+    }
+    if (hoverFile) {
+      status.textContent = '⏳ Uploading hover image…';
+      const hurl = await uploadToStorage(hoverFile, `products/product-hover-${Date.now()}`);
+      // Store in p-extra-img field if it exists, else put in a hidden field
+      let extraEl = document.getElementById('p-extra-img');
+      if (!extraEl) {
+        extraEl = document.createElement('input');
+        extraEl.type = 'hidden'; extraEl.id = 'p-extra-img'; extraEl.name = 'extra_image_url';
+        document.getElementById('prod-form')?.appendChild(extraEl);
+      }
+      if (extraEl) extraEl.value = hurl;
+      status.textContent = '✅ Both images uploaded!';
+    }
     status.style.color = 'var(--grn)';
-    toast('Image uploaded ✓', 'ok');
-    setTimeout(() => closeM('img-upload-modal'), 1200);
+    toast('Image(s) uploaded ✓', 'ok');
+    setTimeout(() => closeM('img-upload-modal'), 1400);
   } catch(e) {
     status.textContent = '❌ ' + e.message;
     status.style.color = 'var(--red)';
     toast('Upload failed: ' + e.message, 'er');
   }
-  btn.disabled = false; btn.textContent = '📤 Upload Image';
+  btn.disabled = false; btn.textContent = '📤 Upload & Save';
 }
+
 
 </script>
 
@@ -1880,15 +1920,21 @@ async function uploadProdImage() {
 
 <!-- PRODUCT IMAGE UPLOAD MODAL -->
 <div class="ov" id="img-upload-modal">
-  <div class="modal" style="max-width:420px">
+  <div class="modal" style="max-width:440px">
     <div class="m-hdr">
       <h3>Upload Product Image</h3>
       <button class="m-cls" onclick="closeM('img-upload-modal')">✕</button>
     </div>
     <div style="padding:20px;display:flex;flex-direction:column;gap:12px">
-      <img id="prod-img-preview" src="" style="width:100%;height:200px;object-fit:contain;border-radius:10px;border:1px solid var(--bd);background:var(--bg2);display:none">
+      <!-- Main image -->
+      <div style="font-size:11px;font-weight:700;color:var(--tx3);letter-spacing:.5px">MAIN IMAGE</div>
+      <img id="prod-img-preview" src="" style="width:100%;height:180px;object-fit:contain;border-radius:10px;border:1px solid var(--bd);background:var(--bg2);display:none">
       <input type="file" id="prod-img-file" accept="image/*" class="fi" onchange="previewProdImg(this)">
-      <button class="btn btn-g" onclick="uploadProdImage()" id="prod-img-upload-btn">📤 Upload Image</button>
+      <!-- Hover image (shown when customer hovers on product card) -->
+      <div style="font-size:11px;font-weight:700;color:var(--tx3);letter-spacing:.5px;margin-top:4px">HOVER IMAGE <span style="font-weight:400;text-transform:none;letter-spacing:0">(optional — shows on mouse-over)</span></div>
+      <img id="prod-hover-preview" src="" style="width:100%;height:120px;object-fit:contain;border-radius:10px;border:1px dashed var(--bd);background:var(--bg2);display:none">
+      <input type="file" id="prod-hover-file" accept="image/*" class="fi" onchange="previewProdHover(this)">
+      <button class="btn btn-g" onclick="uploadProdImage()" id="prod-img-upload-btn">📤 Upload & Save</button>
       <div id="prod-img-status" style="font-size:12px;color:var(--tx3)"></div>
     </div>
   </div>
