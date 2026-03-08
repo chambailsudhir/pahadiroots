@@ -2777,48 +2777,58 @@ async function loginWithGoogle() {
   const SB = 'https://ulyrhnpoiypuvaurlqqi.supabase.co';
   const ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVseXJobnBvaXlwdXZhdXJscXFpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyOTE5NTYsImV4cCI6MjA4Nzg2Nzk1Nn0.lU_Wi4G84X54BPdjhG_h-N4u2_HSYiAF-12hekDnejk';
 
-  // Generate PKCE code verifier + challenge
-  function generateVerifier() {
+  // PKCE helpers
+  function genVerifier() {
     const arr = new Uint8Array(32);
     crypto.getRandomValues(arr);
-    return btoa(String.fromCharCode(...arr)).replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');
+    return btoa(String.fromCharCode(...arr)).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
   }
-  async function generateChallenge(verifier) {
-    const enc = new TextEncoder().encode(verifier);
-    const hash = await crypto.subtle.digest('SHA-256', enc);
-    return btoa(String.fromCharCode(...new Uint8Array(hash))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');
+  async function genChallenge(v) {
+    const hash = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(v));
+    return btoa(String.fromCharCode(...new Uint8Array(hash))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
   }
 
-  const verifier = generateVerifier();
-  const challenge = await generateChallenge(verifier);
-  sessionStorage.setItem('pkce_verifier', verifier);
+  const verifier = genVerifier();
+  const challenge = await genChallenge(verifier);
+
+  // Use localStorage so it survives the redirect
+  localStorage.setItem('pr_pkce_verifier', verifier);
 
   const redirectTo = encodeURIComponent(window.location.origin + '/');
-  window.location.href = SB + '/auth/v1/authorize?provider=google&redirect_to=' + redirectTo +
-    '&code_challenge=' + challenge + '&code_challenge_method=S256';
+  window.location.href = SB + '/auth/v1/authorize?provider=google&redirect_to=' + redirectTo
+    + '&code_challenge=' + challenge + '&code_challenge_method=S256';
 }
 
-// Handle Google OAuth callback
+// Handle Google OAuth callback (PKCE flow)
 (function(){
+  const SB   = 'https://ulyrhnpoiypuvaurlqqi.supabase.co';
   const ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVseXJobnBvaXlwdXZhdXJscXFpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyOTE5NTYsImV4cCI6MjA4Nzg2Nzk1Nn0.lU_Wi4G84X54BPdjhG_h-N4u2_HSYiAF-12hekDnejk';
-  const SB = 'https://ulyrhnpoiypuvaurlqqi.supabase.co';
 
-  // Check hash for implicit flow (#access_token=...)
-  const hashParams = new URLSearchParams(window.location.hash.replace('#',''));
-  const accessToken = hashParams.get('access_token');
-  const refreshToken = hashParams.get('refresh_token') || '';
+  const code = new URLSearchParams(window.location.search).get('code');
+  if (!code) return; // not a Google callback
 
-  // Check query for PKCE flow (?code=...)
-  const searchParams = new URLSearchParams(window.location.search);
-  const code = searchParams.get('code');
+  const verifier = localStorage.getItem('pr_pkce_verifier') || '';
+  localStorage.removeItem('pr_pkce_verifier'); // cleanup
 
-  async function handleToken(token, refresh) {
-    try {
-      const r = await fetch(SB + '/auth/v1/user', {
-        headers: { 'Authorization': 'Bearer ' + token, 'apikey': ANON }
-      });
-      const user = await r.json();
-      if(!user || !user.id) return;
+  // Exchange code + verifier for session
+  fetch(SB + '/auth/v1/token?grant_type=pkce', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'apikey': ANON },
+    body: JSON.stringify({ auth_code: code, code_verifier: verifier })
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (!data.access_token) {
+      console.error('Google PKCE failed:', data);
+      showToast('Google login failed. Try again.', 'error');
+      return;
+    }
+    // Get user profile
+    return fetch(SB + '/auth/v1/user', {
+      headers: { 'Authorization': 'Bearer ' + data.access_token, 'apikey': ANON }
+    })
+    .then(r => r.json())
+    .then(user => {
       const nameParts = (user.user_metadata?.full_name || user.email || '').split(' ');
       const profile = {
         first_name: nameParts[0] || '',
@@ -2827,36 +2837,17 @@ async function loginWithGoogle() {
         auth_user_id: user.id,
         avatar_url: user.user_metadata?.avatar_url || null
       };
-      saveAuthSession({ access_token: token, refresh_token: refresh }, profile);
+      const session = { access_token: data.access_token, refresh_token: data.refresh_token || '' };
+      saveAuthSession(session, profile);
       window.history.replaceState({}, '', '/');
-      setTimeout(()=>{
-        showToast('✅ Welcome ' + (profile.first_name || 'back') + '! Google se login ho gaye!', 'success');
+      setTimeout(() => {
+        showToast('✅ Welcome ' + (profile.first_name || '') + '! Google se login ho gaye!', 'success');
         loadCartFromDB();
         updateAuthUI();
-      }, 400);
-    } catch(e) { console.error('Google auth error:', e); }
-  }
-
-  async function handleCode(c) {
-    try {
-      const verifier = sessionStorage.getItem('pkce_verifier') || '';
-      const r = await fetch(SB + '/auth/v1/token?grant_type=pkce', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'apikey': ANON },
-        body: new URLSearchParams({ auth_code: c, code_verifier: verifier }).toString()
-      });
-      const data = await r.json();
-      console.log('PKCE exchange:', data);
-      if(data.access_token) await handleToken(data.access_token, data.refresh_token || '');
-      else console.error('No access_token in response:', data);
-    } catch(e) { console.error('PKCE exchange error:', e); }
-  }
-
-  if(accessToken) {
-    handleToken(accessToken, refreshToken);
-  } else if(code) {
-    handleCode(code);
-  }
+      }, 300);
+    });
+  })
+  .catch(e => console.error('Google login error:', e));
 })();
 
 // ── Auth Modal ──────────────────────────────────────────────────
