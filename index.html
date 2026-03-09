@@ -1317,15 +1317,8 @@ async function loadData() {
   // Step 1: render fallback instantly
   STATES   = FALLBACK_STATES.map(s => Object.assign({}, s));
   PRODUCTS = FALLBACK_PRODUCTS.map(p => Object.assign({}, p));
-  renderProds(); renderStates(); loadFI(); uCart(); observeRv();
+  renderProds(); renderStates(); uCart(); observeRv();
   initAllStateSlides(); initProductHoverImages();
-
-  // Load coupons from DB
-  fetch(getStoreApiBase() + '/store-data').then(r=>r.json()).then(data=>{
-    if(data.settings && data.settings.coupons) {
-      try { var dbC = JSON.parse(data.settings.coupons); Object.assign(COUPONS, dbC); } catch(e){}
-    }
-  }).catch(()=>{});
 
   // Step 2: try DB
   try {
@@ -1464,7 +1457,17 @@ async function loadData() {
     }
 
     // ── Render everything now that all data (including images) is ready ──
-    if (updated) { renderProds(); renderStates(); observeRv(); injectProductSchema(); renderUpsell(); initAllStateSlides(); initProductHoverImages(); }
+    if (updated) {
+      // Preserve currently active state before re-render
+      var activeStateEl = document.querySelector('.spnl.active');
+      var activeStateId = activeStateEl ? activeStateEl.id.replace('p-','') : null;
+      renderProds(); renderStates(); observeRv(); injectProductSchema(); renderUpsell();
+      // Restore active state if user had clicked one
+      if (activeStateId && activeStateId !== STATES[0].id) {
+        swState(activeStateId);
+      }
+      initAllStateSlides(); initProductHoverImages();
+    }
 
     // ── Founder slideshow ──
     loadFIFromData(data);
