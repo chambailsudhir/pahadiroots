@@ -15,7 +15,7 @@ const CORS = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'GET, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type',
-  'Cache-Control': 'public, s-maxage=10, stale-while-revalidate=20',
+  'Cache-Control': 'public, s-maxage=0, stale-while-revalidate=5',
 };
 
 async function sbGet(table, query = '') {
