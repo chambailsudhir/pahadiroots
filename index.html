@@ -1650,7 +1650,7 @@ function mkProd(p) {
     '</div>';
   var discBadge = pct ? '<span style="position:absolute;top:8px;right:36px;background:#e53;color:#fff;font-size:9px;font-weight:800;padding:2px 7px;border-radius:10px;z-index:2">-' + pct + '%</span>' : '';
   var notifyBtn = stock <= 0 ? '<button class="notify-btn" onclick="event.stopPropagation();openNotify(' + p.id + ')">🔔 Notify Me</button>' : '';
-  return '<div class="pcard" style="position:relative">' +
+  return '<div class="pcard" style="position:relative" onclick="goToProductPage(\'' + (p.slug || p.id) + '\')">' +
     '<span class="pbadge b' + bc + '">' + (p.badge_label||'') + '</span>' +
     '<button class="wl-btn' + (inWL?' active':'') + '" data-id="' + p.id + '" onclick="event.stopPropagation();toggleWishlist(' + p.id + ')" title="Wishlist mein save karo">' + (inWL ? '❤️ Saved' : '🤍 Save') + '</button>' +
     img + discBadge +
@@ -1666,7 +1666,7 @@ function mkProd(p) {
           var vars = p.variants && p.variants.length ? p.variants : [];
           var varHtml = '';
           if (vars.length > 0) {
-            varHtml = '<div style="margin-bottom:8px"><select class="fi variant-sel" id="vs-' + p.id + '" onchange="updateCardPrice(' + p.id + ',this)" onclick="event.stopPropagation()" style="padding:5px 8px;font-size:12px;border-radius:8px;width:100%;cursor:pointer">' +
+            varHtml = '<div style="margin-bottom:8px" onclick="event.stopPropagation()" onmousedown="event.stopPropagation()"><select class="fi variant-sel" id="vs-' + p.id + '" onchange="updateCardPrice(' + p.id + ',this)" style="padding:5px 8px;font-size:12px;border-radius:8px;width:100%;cursor:pointer">' +
               vars.map(function(vr) {
                 return '<option value="' + vr.id + '" data-price="' + vr.price + '" data-stock="' + vr.stock_quantity + '">' + vr.variant_value + ' — ₹' + vr.price + '</option>';
               }).join('') +
@@ -1947,6 +1947,10 @@ function initProductHoverImages() {
   });
 }
 
+
+function goToProductPage(slug) {
+  window.location.href = '/products/' + slug;
+}
 
 function updateCardPrice(prodId, sel) {
   var opt = sel.options[sel.selectedIndex];

@@ -526,9 +526,10 @@ CREATE INDEX IF NOT EXISTS idx_products_is_deleted ON products(is_deleted);</div
     <div class="m-body">
       <input type="hidden" id="p-id">
       <div class="gr gr2">
-        <div class="fg"><label>Name <span class="req">*</span></label><input class="fi" id="p-name"></div>
+        <div class="fg"><label>Name <span class="req">*</span></label><input class="fi" id="p-name" oninput="autoProductSlug()"></div>
         <div class="fg"><label>SKU</label><input class="fi" id="p-sku"></div>
       </div>
+      <div class="fg"><label>Slug <span style="color:var(--tx3);font-size:11px">(URL: pahadiroots.com/products/slug)</span></label><input class="fi" id="p-slug" placeholder="auto-generated from name"></div>
       <div class="gr gr3">
         <div class="fg"><label>Category</label><select class="fi" id="p-cat"></select></div>
         <div class="fg"><label>State <span class="req">*</span></label><select class="fi" id="p-state"></select></div>
@@ -542,6 +543,7 @@ CREATE INDEX IF NOT EXISTS idx_products_is_deleted ON products(is_deleted);</div
         <div class="fg"><label>Initial Stock <span style="color:var(--tx3);font-size:11px">(total set)</span></label><input type="number" class="fi" id="p-initial-stock" placeholder="Same as stock qty"></div>
       </div>
       <div class="fg"><label>Short Description</label><textarea class="fi" id="p-desc" rows="2"></textarea></div>
+      <div class="fg"><label>Long Description <span style="color:var(--tx3);font-size:11px">(shown on product page)</span></label><textarea class="fi" id="p-long-desc" rows="4" placeholder="Detailed product description for product page..."></textarea></div>
       <div class="gr gr2">
         <div class="fg"><label>Image URL</label><input class="fi" id="p-img" style="flex:1">
           <button type="button" class="btn btn-s" onclick="openProdImgUpload()" style="margin-top:6px">📤 Upload Image</button></div>
@@ -854,6 +856,8 @@ function openProdM(p){p=p||{};
   document.getElementById('p-stock').value=p.stock_quantity||'';
   document.getElementById('p-initial-stock').value=p.initial_stock||'';
   document.getElementById('p-desc').value=p.short_description||'';
+  document.getElementById('p-long-desc').value=p.long_description||'';
+  document.getElementById('p-slug').value=p.slug||'';
   document.getElementById('p-emoji').value=p.emoji||'';
   document.getElementById('p-img').value=p.image_url||'';
   document.getElementById('p-tags').value=(p.tags||[]).join(', ');
@@ -891,7 +895,7 @@ async function saveProd(){
   if(document.getElementById('p-org').checked)badges.push('organic');
   if(document.getElementById('p-new').checked)badges.push('new');
   const tags=v('p-tags').split(',').map(t=>t.trim()).filter(Boolean);
-  const body={name,price,sku:v('p-sku')||null,mrp:parseFloat(v('p-mrp'))||null,unit_label:v('p-unit')||null,stock_quantity:parseInt(v('p-stock'))||0,initial_stock:parseInt(v('p-initial-stock'))||parseInt(v('p-stock'))||0,short_description:v('p-desc')||null,emoji:v('p-emoji')||null,image_url:v('p-img')||null,tags:tags.length?tags:null,badges:badges.length?badges:null,category_id:v('p-cat')||null,state_id:v('p-state')||null,status:v('p-status')};
+  const body={name,price,sku:v('p-sku')||null,mrp:parseFloat(v('p-mrp'))||null,unit_label:v('p-unit')||null,stock_quantity:parseInt(v('p-stock'))||0,initial_stock:parseInt(v('p-initial-stock'))||parseInt(v('p-stock'))||0,short_description:v('p-desc')||null,long_description:v('p-long-desc')||null,slug:v('p-slug')||name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||null,emoji:v('p-emoji')||null,image_url:v('p-img')||null,tags:tags.length?tags:null,badges:badges.length?badges:null,category_id:v('p-cat')||null,state_id:v('p-state')||null,status:v('p-status')};
   const btn=document.getElementById('p-save-btn');btn.disabled=true;btn.textContent='Saving…';
   try{
     let prodId = id;
@@ -905,6 +909,12 @@ async function saveProd(){
 }
 
 // ── Variant row UI ────────────────────────────────────────────
+function autoProductSlug(){
+  if(!document.getElementById('p-id').value) {
+    document.getElementById('p-slug').value = document.getElementById('p-name').value.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+  }
+}
+
 function addVariantRow(v) {
   v = v || {};
   const list = document.getElementById('variants-list');
