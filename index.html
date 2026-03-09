@@ -666,14 +666,14 @@ footer{background:#0d1a0f;padding:44px 40px 24px}
 .founder-sec{position:relative;overflow:hidden;background:#050e06;display:block}
 /* Slideshow wrapper */
 .founder-slideshow{position:relative;width:100%;overflow:hidden}
-.founder-slide{display:none;height:420px;border-bottom:1px solid rgba(200,146,10,.12)}
-.founder-slide.active{display:grid;grid-template-columns:1.1fr 0.9fr}
+.founder-slide{display:none;min-height:500px;height:auto;border-bottom:1px solid rgba(200,146,10,.12)}
+.founder-slide.active{display:grid;grid-template-columns:1.1fr 0.9fr;align-items:stretch}
 /* LEFT — dark text side */
 .founder-text-panel{padding:44px 52px;display:flex;flex-direction:column;justify-content:center;position:relative;background:#050e06}
 /* vertical gold separator line between text and photo */
 .founder-text-panel::after{content:'';position:absolute;right:0;top:20%;bottom:20%;width:1px;background:linear-gradient(180deg,transparent,rgba(200,146,10,.3),transparent)}
 /* RIGHT — angled photo side */
-.founder-photo-panel{position:relative;overflow:hidden;background:linear-gradient(135deg,#1a4a1e,#0a2010);clip-path:polygon(6% 0%,100% 0%,100% 100%,0% 100%)}
+.founder-photo-panel{position:relative;overflow:hidden;background:linear-gradient(135deg,#1a4a1e,#0a2010);clip-path:polygon(6% 0%,100% 0%,100% 100%,0% 100%);min-height:500px}
 /* Angled clip — matches opt-c exactly: text bleeds into photo panel */
 .founder-photo-panel::before{content:'';position:absolute;inset:0;z-index:2;background:linear-gradient(90deg,rgba(5,14,6,.7) 0%,transparent 40%);pointer-events:none}
 .founder-photo-panel img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;display:block;transition:transform 8s ease;z-index:1}
