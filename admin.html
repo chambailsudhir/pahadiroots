@@ -556,6 +556,15 @@ CREATE INDEX IF NOT EXISTS idx_products_is_deleted ON products(is_deleted);</div
           <label style="display:flex;gap:6px;align-items:center;font-size:12.5px;font-weight:400"><input type="checkbox" id="p-new"> New Launch</label>
         </div>
       </div>
+
+      <!-- ── VARIANTS ──────────────────────────────────────── -->
+      <div class="fg" id="variants-section" style="display:none">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <label style="margin:0">📦 Variants</label>
+          <button type="button" class="btn btn-s" onclick="addVariantRow()" style="padding:4px 10px;font-size:12px">+ Add Variant</button>
+        </div>
+        <div id="variants-list" style="display:flex;flex-direction:column;gap:8px"></div>
+      </div>
     </div>
     <div class="m-foot">
       <button class="btn btn-s" onclick="closeM('prod-modal')">Cancel</button>
@@ -854,6 +863,19 @@ function openProdM(p){p=p||{};
   document.getElementById('p-status').value=p.status||'active';
   fillSel('p-cat',S.cats,'id','name',p.category_id);
   fillSel('p-state',S.states||[],'id','name',p.state_id);
+  // Load variants if editing existing product
+  const varSec = document.getElementById('variants-section');
+  const varList = document.getElementById('variants-list');
+  varList.innerHTML = '';
+  if (p.id) {
+    varSec.style.display = 'block';
+    GET('product_variants', `product_id=eq.${p.id}&order=sort_order.asc`).then(vars => {
+      varList.innerHTML = '';
+      (vars||[]).forEach(v => addVariantRow(v));
+    }).catch(()=>{});
+  } else {
+    varSec.style.display = 'block';
+  }
   openM('prod-modal');
 }
 function editProd(id){
@@ -872,10 +894,61 @@ async function saveProd(){
   const body={name,price,sku:v('p-sku')||null,mrp:parseFloat(v('p-mrp'))||null,unit_label:v('p-unit')||null,stock_quantity:parseInt(v('p-stock'))||0,initial_stock:parseInt(v('p-initial-stock'))||parseInt(v('p-stock'))||0,short_description:v('p-desc')||null,emoji:v('p-emoji')||null,image_url:v('p-img')||null,tags:tags.length?tags:null,badges:badges.length?badges:null,category_id:v('p-cat')||null,state_id:v('p-state')||null,status:v('p-status')};
   const btn=document.getElementById('p-save-btn');btn.disabled=true;btn.textContent='Saving…';
   try{
-    if(id) await PATCH('products',`id=eq.${id}`,body); else await POST('products',body);
+    let prodId = id;
+    if(id) await PATCH('products',`id=eq.${id}`,body);
+    else { const r=await POST('products',body); prodId=r?.[0]?.id; }
+    // Save variants
+    if(prodId) await saveVariants(prodId);
     toast('Product saved ✓','ok');closeM('prod-modal');await loadProducts(1);
   }catch(e){toast('Error: '+e.message,'er');}
   btn.disabled=false;btn.textContent='💾 Save Product';
+}
+
+// ── Variant row UI ────────────────────────────────────────────
+function addVariantRow(v) {
+  v = v || {};
+  const list = document.getElementById('variants-list');
+  const row = document.createElement('div');
+  row.className = 'variant-row';
+  row.dataset.variantId = v.id || '';
+  row.style.cssText = 'display:grid;grid-template-columns:1fr 1fr 80px 80px 70px 32px;gap:6px;align-items:center;background:var(--bg2);padding:8px;border-radius:8px';
+  row.innerHTML = `
+    <select class="fi v-type" style="padding:6px 8px;font-size:12px">
+      <option value="weight" ${v.variant_type==='weight'?'selected':''}>Weight</option>
+      <option value="volume" ${v.variant_type==='volume'?'selected':''}>Volume</option>
+      <option value="pack_size" ${v.variant_type==='pack_size'?'selected':''}>Pack Size</option>
+      <option value="grade" ${v.variant_type==='grade'?'selected':''}>Grade</option>
+    </select>
+    <input class="fi v-value" placeholder="e.g. 250g" value="${v.variant_value||''}" style="padding:6px 8px;font-size:12px">
+    <input class="fi v-price" type="number" placeholder="Price" value="${v.price||''}" style="padding:6px 8px;font-size:12px">
+    <input class="fi v-stock" type="number" placeholder="Stock" value="${v.stock_quantity||0}" style="padding:6px 8px;font-size:12px">
+    <select class="fi v-active" style="padding:6px 8px;font-size:12px">
+      <option value="true" ${v.is_active!==false?'selected':''}>Active</option>
+      <option value="false" ${v.is_active===false?'selected':''}>Off</option>
+    </select>
+    <button type="button" onclick="this.closest('.variant-row').remove()" style="background:#e74c3c;color:#fff;border:none;border-radius:6px;cursor:pointer;padding:4px 8px;font-size:14px">✕</button>
+  `;
+  list.appendChild(row);
+}
+
+async function saveVariants(prodId) {
+  const rows = document.querySelectorAll('.variant-row');
+  for (let i = 0; i < rows.length; i++) {
+    const row = rows[i];
+    const varId = row.dataset.variantId;
+    const varBody = {
+      product_id:    prodId,
+      variant_type:  row.querySelector('.v-type').value,
+      variant_value: row.querySelector('.v-value').value.trim(),
+      price:         parseFloat(row.querySelector('.v-price').value) || 0,
+      stock_quantity:parseInt(row.querySelector('.v-stock').value) || 0,
+      is_active:     row.querySelector('.v-active').value === 'true',
+      sort_order:    i,
+    };
+    if (!varBody.variant_value || !varBody.price) continue;
+    if (varId) await PATCH('product_variants', `id=eq.${varId}`, varBody).catch(()=>{});
+    else await POST('product_variants', varBody).catch(()=>{});
+  }
 }
 // 4. Soft delete instead of hard delete
 async function softDelProd(id,name){

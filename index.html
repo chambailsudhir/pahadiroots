@@ -267,6 +267,8 @@ section.sec{padding:52px 40px}
 .prow{display:flex;align-items:baseline;gap:6px}
 .pnow{font-size:15px;font-weight:900;color:var(--g)}
 .pwas{font-size:12px;color:var(--tx3);text-decoration:line-through}
+.variant-sel{border:1.5px solid var(--bd);background:var(--bg);color:var(--tx);border-radius:8px;font-size:12px;cursor:pointer}
+.variant-sel:focus{outline:none;border-color:var(--g)}
 .punt{font-size:11px;color:var(--tx3)}
 .atc{background:var(--g);color:#fff;border:none;border-radius:10px;padding:8px 14px;font-size:13px;font-weight:800;transition:all .2s;font-family:'Lato',sans-serif}
 .atc:hover{background:var(--g2);transform:translateY(-1px)}
@@ -1340,7 +1342,7 @@ const FALLBACK_PRODUCTS = [
 ];
 
 // ── RUNTIME STATE ─────────────────────────────────────────────────
-let STATES = [], PRODUCTS = [];
+let STATES = [], PRODUCTS = [], PRODUCT_VARIANTS = [];
 let cart = [];
 try { cart = JSON.parse(localStorage.getItem('pr_cart')||'[]'); } catch(e){ cart=[]; }
 const sv = () => localStorage.setItem('pr_cart', JSON.stringify(cart));
@@ -1602,6 +1604,15 @@ async function loadData() {
       initAllStateSlides(); initProductHoverImages();
     }
 
+    // ── Product Variants ──
+    if (Array.isArray(data.product_variants) && data.product_variants.length) {
+      PRODUCT_VARIANTS = data.product_variants;
+      // Attach variants to each product
+      PRODUCTS.forEach(function(p) {
+        p.variants = PRODUCT_VARIANTS.filter(function(v) { return String(v.product_id) === String(p.id); });
+      });
+    }
+
     // ── Founder slideshow ──
     loadFIFromData(data);
 
@@ -1649,7 +1660,19 @@ function mkProd(p) {
       '<div class="stock-bar"><div class="stock-fill ' + sClass + '" style="width:' + sPct + '%"></div></div>' +
       '<div class="stock-label ' + sClass + '">' + sLbl + '</div>' +
       '<div class="pfoot" style="margin-top:8px">' +
-        '<div class="prow"><span class="pnow">₹' + p.price + '</span>' +
+        (function() {
+          var vars = p.variants && p.variants.length ? p.variants : [];
+          var varHtml = '';
+          if (vars.length > 0) {
+            varHtml = '<div style="margin-bottom:8px"><select class="fi variant-sel" id="vs-' + p.id + '" onchange="updateCardPrice(' + p.id + ',this)" onclick="event.stopPropagation()" style="padding:5px 8px;font-size:12px;border-radius:8px;width:100%;cursor:pointer">' +
+              vars.map(function(vr) {
+                return '<option value="' + vr.id + '" data-price="' + vr.price + '" data-stock="' + vr.stock_quantity + '">' + vr.variant_value + ' — ₹' + vr.price + '</option>';
+              }).join('') +
+            '</select></div>';
+          }
+          return varHtml;
+        })() +
+        '<div class="prow"><span class="pnow" id="pnow-' + p.id + '">₹' + p.price + '</span>' +
           (p.original_price ? '<span class="pwas">₹' + p.original_price + '</span>' : '') +
           '<span class="punt">' + (p.unit||'') + '</span></div>' +
         '<div style="display:flex;gap:6px">' +
@@ -1923,23 +1946,43 @@ function initProductHoverImages() {
 }
 
 
+function updateCardPrice(prodId, sel) {
+  var opt = sel.options[sel.selectedIndex];
+  var price = parseFloat(opt.dataset.price);
+  var priceEl = document.getElementById('pnow-' + prodId);
+  if (priceEl && price) priceEl.textContent = '₹' + price;
+}
+
 function addToCart(id) {
   var p = PRODUCTS.find(function(x) { return x.id === id; });
   if (!p) return;
-  var ex = cart.find(function(x) { return x.id === id; });
+  // Check if variant selected
+  var varSel = document.getElementById('vs-' + id);
+  var variantId = null, variantLabel = '', price = p.price, stock = p.stock;
+  if (varSel && varSel.options.length > 0) {
+    var opt = varSel.options[varSel.selectedIndex];
+    variantId = opt.value;
+    variantLabel = opt.text.split(' — ')[0]; // e.g. "250g"
+    price = parseFloat(opt.dataset.price) || p.price;
+    stock = parseInt(opt.dataset.stock);
+  }
+  // Unique cart key = productId + variantId
+  var cartKey = variantId ? (id + '_' + variantId) : id;
+  var ex = cart.find(function(x) { return x.cartKey === cartKey; });
   var currentQty = ex ? ex.qty : 0;
   // Stock check
-  if (p.stock !== undefined && p.stock !== null && currentQty >= p.stock) {
-    showToast('⚠️ Only ' + p.stock + ' in stock!'); return;
+  if (stock !== undefined && stock !== null && currentQty >= stock) {
+    showToast('⚠️ Only ' + stock + ' in stock!'); return;
   }
+  var displayName = p.name + (variantLabel ? ' (' + variantLabel + ')' : '');
   if (ex) ex.qty++;
-  else cart.push({id:p.id, name:p.name, emoji:p.emoji, image:p.image_url||'', price:p.price, qty:1});
+  else cart.push({cartKey:cartKey, id:p.id, variantId:variantId||null, name:displayName, emoji:p.emoji, image:p.image_url||'', price:price, qty:1});
   sv(); uCart(); openCart();
-  showToast('✅ ' + p.name + ' added!');
+  showToast('✅ ' + displayName + ' added!');
 }
-function rmCart(id) { cart = cart.filter(function(x) { return x.id !== id; }); sv(); uCart(); }
+function rmCart(id) { cart = cart.filter(function(x) { return (x.cartKey||x.id) !== id; }); sv(); uCart(); }
 function chQty(id, d) {
-  var i = cart.find(function(x) { return x.id === id; });
+  var i = cart.find(function(x) { return (x.cartKey||x.id) === id; });
   if (i) { i.qty += d; if (i.qty < 1) rmCart(id); }
   sv(); uCart();
 }
@@ -2012,10 +2055,10 @@ function uCart() {
         '<div class="cname">' + i.name + '</div>' +
         '<div class="cprice">₹' + i.price + ' each</div>' +
         '<div class="cctrl">' +
-          '<button class="qb" onclick="chQty(' + i.id + ',-1)">−</button>' +
+          '<button class="qb" onclick="chQty(\'' + (i.cartKey||i.id) + '\',-1)">−</button>' +
           '<span class="qn">' + i.qty + '</span>' +
-          '<button class="qb" onclick="chQty(' + i.id + ',1)">+</button>' +
-          '<span class="crm" onclick="rmCart(' + i.id + ')">✕</span>' +
+          '<button class="qb" onclick="chQty(\'' + (i.cartKey||i.id) + '\',1)">+</button>' +
+          '<span class="crm" onclick="rmCart(\'' + (i.cartKey||i.id) + '\')">✕</span>' +
         '</div>' +
       '</div>' +
     '</div>';
@@ -2216,7 +2259,7 @@ async function saveOrderToDB(name, phone, email, addr, city, state, pin, final, 
         final, discount, shipCharge: shipCharge || 0, payMethod, paymentId,
         couponCode: activeCoupon ? activeCoupon.code : null,
         auth_user_id: (_authUser && _authUser.id) ? _authUser.id : null,
-        items: itemsToSave.map(function(i){ return {id:i.id||null, qty:i.qty, price:i.price, name:i.name||''}; })
+        items: itemsToSave.map(function(i){ return {id:i.id||null, variantId:i.variantId||null, qty:i.qty, price:i.price, name:i.name||''}; })
       })
     });
     var data = await res.json();
