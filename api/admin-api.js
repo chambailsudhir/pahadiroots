@@ -27,6 +27,7 @@ const ALLOWED_TABLES = new Set([
   'admin_logs', 'order_detailed', 'order_summary', 'site_settings',
   'revenue_summary', 'states', 'sales_summary', 'stock_overview', 'daily_revenue',
   'state_images', 'product_images', 'founder_images',
+  'product_variants',
 ]);
 
 const WRITE_METHODS = new Set(['POST', 'PATCH', 'DELETE']);
