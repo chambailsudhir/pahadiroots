@@ -1611,6 +1611,8 @@ async function loadData() {
       PRODUCTS.forEach(function(p) {
         p.variants = PRODUCT_VARIANTS.filter(function(v) { return String(v.product_id) === String(p.id); });
       });
+      // Re-render so variant dropdowns appear
+      renderProds();
     }
 
     // ── Founder slideshow ──
