@@ -1479,8 +1479,8 @@ async function loadData() {
     }
     // ── Load shipping + WhatsApp from settings ──
     if (data.settings) {
-      if (data.settings.free_shipping_min    != null) FREE_SHIP_THRESHOLD = parseInt(data.settings.free_shipping_min);
-      if (data.settings.flat_shipping_charge != null) FLAT_SHIP_CHARGE    = parseInt(data.settings.flat_shipping_charge);
+      if (data.settings.free_shipping_min    !== undefined && data.settings.free_shipping_min    !== '') FREE_SHIP_THRESHOLD = parseInt(data.settings.free_shipping_min,    10);
+      if (data.settings.flat_shipping_charge !== undefined && data.settings.flat_shipping_charge !== '') FLAT_SHIP_CHARGE    = parseInt(data.settings.flat_shipping_charge, 10);
       if (data.settings.whatsapp_number)      WHATSAPP_NUMBER     = data.settings.whatsapp_number;
     }
     var updated  = false;
@@ -1981,8 +1981,8 @@ function uCart() {
   var cc = document.getElementById('cartCount');
   if (cc) cc.textContent = cnt;
   // ── Dynamic shipping ──
-  var threshold   = FREE_SHIP_THRESHOLD || FREE_SHIP_MIN || 799;
-  var shipCharge  = (final > 0 && final < threshold) ? (FLAT_SHIP_CHARGE || 99) : 0;
+  var threshold   = (!isNaN(FREE_SHIP_THRESHOLD)) ? FREE_SHIP_THRESHOLD : 799;
+  var shipCharge  = (final > 0 && threshold > 0 && final < threshold) ? ((!isNaN(FLAT_SHIP_CHARGE)) ? FLAT_SHIP_CHARGE : 99) : 0;
   var grandTotal  = final + shipCharge;
   var cv = document.getElementById('ctval');
   if (cv) cv.textContent = '₹' + final.toLocaleString('en-IN');
@@ -2141,8 +2141,8 @@ async function checkoutRazorpay() {
   var t = cart.reduce(function(a,i){return a+i.price*i.qty;},0);
   var discount   = calcDiscount(t);
   var subtotal   = Math.max(0, t - discount);
-  var threshold  = FREE_SHIP_THRESHOLD || FREE_SHIP_MIN || 799;
-  var shipCharge = (subtotal > 0 && subtotal < threshold) ? (FLAT_SHIP_CHARGE || 99) : 0;
+  var threshold  = (!isNaN(FREE_SHIP_THRESHOLD)) ? FREE_SHIP_THRESHOLD : 799;
+  var shipCharge = (subtotal > 0 && threshold > 0 && subtotal < threshold) ? ((!isNaN(FLAT_SHIP_CHARGE)) ? FLAT_SHIP_CHARGE : 99) : 0;
   var final      = subtotal + shipCharge;
 
   var options = {
@@ -2253,8 +2253,8 @@ async function checkout() {
   var t = cart.reduce(function(a, i) { return a + i.price * i.qty; }, 0);
   var discount   = calcDiscount(t);
   var subtotal   = Math.max(0, t - discount);
-  var threshold  = FREE_SHIP_THRESHOLD || FREE_SHIP_MIN || 799;
-  var shipCharge = (subtotal > 0 && subtotal < threshold) ? (FLAT_SHIP_CHARGE || 99) : 0;
+  var threshold  = (!isNaN(FREE_SHIP_THRESHOLD)) ? FREE_SHIP_THRESHOLD : 799;
+  var shipCharge = (subtotal > 0 && threshold > 0 && subtotal < threshold) ? ((!isNaN(FLAT_SHIP_CHARGE)) ? FLAT_SHIP_CHARGE : 99) : 0;
   var final      = subtotal + shipCharge;
   var couponLine = activeCoupon ? '\n🎟️ Coupon ' + activeCoupon.code + ': -₹' + discount : '';
   var shipLine   = shipCharge > 0 ? '\n🚚 Shipping: ₹' + shipCharge : '\n🚚 Shipping: FREE';
@@ -2353,7 +2353,7 @@ function removeCoupon() {
 // ── FREE SHIPPING PROGRESS ─────────────────────────────────────────
 var FREE_SHIP_MIN = 799;  // legacy alias — real value is FREE_SHIP_THRESHOLD loaded from DB
 function updateShipProgress(subtotal) {
-  var threshold = FREE_SHIP_THRESHOLD || FREE_SHIP_MIN || 799;
+  var threshold = (!isNaN(FREE_SHIP_THRESHOLD)) ? FREE_SHIP_THRESHOLD : 799;
   var fill = document.getElementById('shipFill');
   var txt  = document.getElementById('shipTxt');
   if (!fill || !txt) return;
