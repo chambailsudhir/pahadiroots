@@ -886,10 +886,28 @@ footer{background:#0d1a0f;padding:44px 40px 24px}
     <!-- PILLAR 1: Lab Tested — original uploaded image -->
     <div class="pillar rv" style="transition-delay:.08s">
       <div class="pnum">01</div>
-      <div class="psvg" style="width:110px;height:110px;margin-bottom:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px">
-        <img src="https://ulyrhnpoiypuvaurlqqi.supabase.co/storage/v1/object/public/pahadi-images/lab_tested_final.png" alt="Lab Tested" style="width:100px;height:100px;border-radius:50%;object-fit:cover;box-shadow:0 4px 16px rgba(0,0,0,.15)" onerror="this.style.display='none'">
-        <span style="font-size:9px;font-weight:700;letter-spacing:1.5px;color:#c8920a;font-family:serif">ORGANIC FOOD</span>
-      </div>
+      <svg class="psvg" viewBox="0 0 148 148" xmlns="http://www.w3.org/2000/svg" style="width:110px;height:110px;margin-bottom:10px">
+        <defs><radialGradient id="lt1" cx="45%" cy="35%" r="65%"><stop offset="0%" stop-color="#f0f8e8"/><stop offset="100%" stop-color="#4a9858"/></radialGradient></defs>
+        <circle cx="74" cy="74" r="74" fill="url(#lt1)"/>
+        <rect x="54" y="112" width="40" height="6" rx="3" fill="#1a4828"/>
+        <rect x="68" y="90" width="12" height="24" rx="2" fill="#2a6840"/>
+        <rect x="68" y="58" width="8" height="36" rx="2" fill="#2a6840"/>
+        <rect x="68" y="56" width="30" height="8" rx="2" fill="#1a4828"/>
+        <rect x="70" y="44" width="8" height="16" rx="3" fill="#3a7850"/>
+        <circle cx="74" cy="42" r="6" fill="#1a4828"/>
+        <circle cx="74" cy="42" r="3" fill="#88c8f8" opacity=".8"/>
+        <rect x="40" y="86" width="28" height="8" rx="1" fill="#c8e8f8" opacity=".9"/>
+        <circle cx="52" cy="90" r="4" fill="#50a840" opacity=".7"/>
+        <circle cx="108" cy="44" r="18" fill="#f0c840" opacity=".95"/>
+        <circle cx="108" cy="44" r="14" fill="white" opacity=".9"/>
+        <polyline points="100,44 106,50 118,36" stroke="#1a4828" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <rect x="88" y="66" width="40" height="12" rx="3" fill="#1a4828" opacity=".85"/>
+        <text x="108" y="75" font-size="7" font-weight="700" fill="white" text-anchor="middle">CERTIFIED</text>
+        <circle cx="30" cy="44" r="4" fill="#c8920a" opacity=".5"/>
+        <circle cx="22" cy="58" r="3" fill="#c8920a" opacity=".4"/>
+        <circle cx="28" cy="30" r="11" fill="#f0c840" opacity=".88"/>
+        <text x="22" y="35" font-size="9" font-weight="700" fill="#7a6000">LAB</text>
+      </svg>
       <div class="pt">Lab Tested Purity</div>
       <p class="pd">Every batch tested for heavy metals, pesticides &amp; adulterants. Certificate with every order.</p>
     </div>
@@ -1988,7 +2006,7 @@ function uCart() {
   }
   ciw.innerHTML = cart.map(function(i) {
     return '<div class="ci">' +
-      '<div class="cimg">' + (i.image ? '<img src="' + i.image + '" alt="' + i.name + '" style="width:100%;height:100%;object-fit:cover">' : '<span style="font-size:26px">' + (i.emoji||'🌿') + '</span>') + '</div>' +
+      '<div class="cimg">' + (i.image ? '<img src="' + i.image + '" alt="' + i.name + '" loading="lazy" style="width:100%;height:100%;object-fit:cover">' : '<span style="font-size:26px">' + (i.emoji||'🌿') + '</span>') + '</div>' +
       '<div class="cinf">' +
         '<div class="cname">' + i.name + '</div>' +
         '<div class="cprice">₹' + i.price + ' each</div>' +
@@ -2358,7 +2376,7 @@ function renderUpsell() {
   if (!suggestions.length) { section.style.display = 'none'; return; }
   section.style.display = 'block';
   strip.innerHTML = suggestions.map(function(p) {
-    var imgHtml = p.image_url ? ('<img src="'+p.image_url+'" style="width:100%;height:100%;object-fit:cover">') : ('<span style="font-size:28px">'+(p.emoji||'🌿')+'</span>');
+    var imgHtml = p.image_url ? ('<img src="'+p.image_url+'" loading="lazy" style="width:100%;height:100%;object-fit:cover">') : ('<span style="font-size:28px">'+(p.emoji||'🌿')+'</span>');
     var addBtn = '<button onclick="addToCart('+JSON.stringify(p.id)+')" style="margin-top:6px;background:var(--g);color:#fff;border:none;border-radius:6px;padding:4px 10px;font-size:11px;font-weight:600;cursor:pointer;width:100%">+ Add</button>';
     return '<div class="cu-item"><div class="cu-img">'+imgHtml+'</div><div class="cu-name">'+p.name+'</div><div class="cu-price">&#8377;'+p.price+'</div>'+addBtn+'</div>';
   }).join('');
@@ -2389,7 +2407,7 @@ function onSearch(q) {
   if (!res) return;
   res.innerHTML = hits.map(function(p) {
     return '<div class="srch-item" onclick="closeSearch();openQV(' + p.id + ')">' +
-      '<div class="srch-thumb">' + (p.image_url ? '<img src="' + p.image_url + '" alt="' + p.name + '">' : (p.emoji||'🌿')) + '</div>' +
+      '<div class="srch-thumb">' + (p.image_url ? '<img src="' + p.image_url + '" alt="' + p.name + '" loading="lazy">' : (p.emoji||'🌿')) + '</div>' +
       '<div><div class="srch-iname">' + p.name + '</div>' +
       '<div class="srch-iregion">📍 ' + (p.region||'') + '</div>' +
       '<div class="srch-iprice">₹' + p.price + (p.unit||'') + '</div></div>' +
@@ -2437,7 +2455,7 @@ function renderWishlist() {
   body.innerHTML = '<div class="wl-grid">' + items.map(function(p) {
     return '<div class="wl-card" onclick="closeWishlist();openQV(' + p.id + ')">' +
       '<button class="wl-irm" onclick="event.stopPropagation();toggleWishlist(' + p.id + ');renderWishlist()">✕</button>' +
-      '<div class="wl-img">' + (p.image_url ? '<img src="' + p.image_url + '" alt="' + p.name + '">' : (p.emoji||'🌿')) + '</div>' +
+      '<div class="wl-img">' + (p.image_url ? '<img src="' + p.image_url + '" alt="' + p.name + '" loading="lazy">' : (p.emoji||'🌿')) + '</div>' +
       '<div class="wl-info"><div class="wl-iname">' + p.name + '</div><div class="wl-iprice">₹' + p.price + '</div>' +
       '<button class="wl-iadd" onclick="event.stopPropagation();addToCart(' + p.id + ')">Add to Cart</button></div>' +
     '</div>';
@@ -2462,7 +2480,7 @@ function openQV(id) {
     '<button class="qv-close" onclick="closeQV()">✕</button>' +
     '<div class="qv-inner">' +
       '<div class="qv-img-col">' + (p.emoji||'🌿') +
-        (p.image_url ? '<img src="' + p.image_url + '" alt="' + p.name + '" onerror="this.style.display=\'none\'">' : '') +
+        (p.image_url ? '<img src="' + p.image_url + '" alt="' + p.name + '" loading="lazy" onerror="this.style.display=\'none\'">' : '') +
       '</div>' +
       '<div class="qv-content">' +
         '<div class="qv-region">📍 ' + (p.region||'') + '</div>' +
@@ -2541,7 +2559,7 @@ function renderRecentlyViewed() {
   sec.style.display = 'block';
   strip.innerHTML = items.map(function(p) {
     return '<div class="rv-mini" onclick="openQV(' + p.id + ')">' +
-      '<div class="rv-mini-img">' + (p.image_url ? '<img src="' + p.image_url + '" alt="' + p.name + '">' : (p.emoji||'🌿')) + '</div>' +
+      '<div class="rv-mini-img">' + (p.image_url ? '<img src="' + p.image_url + '" alt="' + p.name + '" loading="lazy">' : (p.emoji||'🌿')) + '</div>' +
       '<div class="rv-mini-info"><div class="rv-mini-name">' + p.name + '</div><div class="rv-mini-price">₹' + p.price + '</div></div>' +
     '</div>';
   }).join('');
