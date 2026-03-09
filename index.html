@@ -285,20 +285,6 @@ section.sec{padding:52px 40px}
 .state-sec>.ct,.state-sec>#regions{text-align:left;margin-bottom:0}
 .state-sec .sh2{color:var(--g);font-size:clamp(28px,4vw,52px)}
 .state-sec .ssub{color:var(--tx2);margin-bottom:24px}
-/* ── REGION STORYTELLING CARDS ──────────────────── */
-.story-card{flex:0 0 auto;width:200px;border-radius:14px;overflow:hidden;position:relative;cursor:pointer;transition:transform .3s,box-shadow .3s;box-shadow:0 3px 14px rgba(0,0,0,.1)}
-.story-card:hover{transform:translateY(-5px);box-shadow:0 12px 32px rgba(0,0,0,.18)}
-.story-card-img{width:100%;height:130px;object-fit:cover;object-position:center top;display:block}
-.story-card-emo{width:100%;height:130px;display:flex;align-items:center;justify-content:center;font-size:52px}
-.story-card-body{padding:12px 14px 14px;background:#fff}
-.story-card-name{font-family:'Playfair Display',serif;font-size:13px;font-weight:700;color:var(--g);margin-bottom:3px}
-.story-card-tag{font-size:10px;color:var(--gd);font-weight:700;letter-spacing:.5px;margin-bottom:5px}
-.story-card-line{font-size:11px;color:var(--tx3);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.story-card.active-state .story-card-body{background:var(--g)}
-.story-card.active-state .story-card-name{color:#fff}
-.story-card.active-state .story-card-tag{color:var(--gd2)}
-.story-card.active-state .story-card-line{color:rgba(255,255,255,.65)}
-#storyCards::-webkit-scrollbar{display:none}
 .stabs{display:flex;flex-wrap:wrap;overflow-x:visible;scrollbar-width:none;background:#f0e8d4;border:none;padding:8px 8px 0;gap:6px}
 .stabs::-webkit-scrollbar{display:none}
 .stab{flex:0 0 auto;width:140px;padding:0;border:none;border-radius:8px 8px 0 0;background:#fff;cursor:pointer;display:flex;flex-direction:column;align-items:stretch;transition:all .22s;position:relative;font-family:'Lato',sans-serif;box-shadow:0 1px 4px rgba(0,0,0,.08);overflow:hidden}
@@ -330,7 +316,7 @@ section.sec{padding:52px 40px}
 .sstate-desc{font-size:13px;color:rgba(255,255,255,.78);line-height:1.75;margin-bottom:16px;display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden}
 .sstate-pills{display:flex;flex-wrap:wrap;gap:6px}
 .sstate-pill{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);color:rgba(255,255,255,.9);font-size:10px;font-weight:700;letter-spacing:.5px;padding:4px 12px;border-radius:20px}
-.spgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:18px;padding:24px 40px;background:#0d1f0e}
+.spgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;padding:24px 40px;background:#0d1f0e}
 .spgrid .pcard{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09)}
 .spgrid .pcard:hover{background:rgba(255,255,255,.09);border-color:rgba(200,146,10,.45);transform:translateY(-4px);box-shadow:0 14px 36px rgba(0,0,0,.35)}
 .spgrid .pname,.spgrid .pstars{color:#fff}
@@ -352,10 +338,11 @@ section.sec{padding:52px 40px}
 /* OUR PROMISE */
 .why-bg{background:linear-gradient(180deg,#faf6ee,#f2eadc);padding:20px 40px}
 .pgr{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;max-width:1150px;margin:0 auto}
-.pillar{background:#fff;border-radius:12px;padding:12px 14px;position:relative;overflow:hidden;box-shadow:0 1px 8px rgba(0,0,0,.05)}
+.pillar{background:#fff;border-radius:16px;padding:20px 16px 16px;position:relative;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.07);display:flex;flex-direction:column;align-items:center;text-align:center;transition:transform .3s,box-shadow .3s}
+.pillar:hover{transform:translateY(-4px);box-shadow:0 8px 28px rgba(0,0,0,.12)}
 .pillar .pnum{font-size:24px;font-weight:900;color:rgba(26,58,30,.07);position:absolute;top:-2px;right:7px;font-family:'Playfair Display',serif}
-.pillar .pico{font-size:20px;display:block;margin-bottom:4px}
-.pillar .pt{font-size:12px;font-weight:700;color:var(--g);margin-bottom:2px}
+.pillar .psvg{width:110px;height:110px;margin-bottom:10px}
+.pillar .pt{font-size:13px;font-weight:700;color:var(--g);margin-bottom:4px}
 .pillar .pd{font-size:11px;color:var(--tx3);line-height:1.5}
 
 /* REVIEWS */
@@ -675,52 +662,23 @@ footer{background:#0d1a0f;padding:44px 40px 24px}
 .rv-strip{display:flex;gap:12px;overflow-x:auto;padding-bottom:6px}
 
 /* ── FOUNDER — Full-width cinematic (Image 2 style) ── */
-/* ── FOUNDER SECTION — EDITORIAL STRIP (Magazine / Luxury Brand) ── */
-/* Exactly replicates Option C from founder-preview.html */
-.founder-sec{position:relative;overflow:hidden;background:#050e06;display:block}
-/* Slideshow wrapper */
-.founder-slideshow{position:relative;width:100%;overflow:hidden}
-.founder-slide{display:none;min-height:500px;height:auto;border-bottom:1px solid rgba(200,146,10,.12)}
-.founder-slide.active{display:grid;grid-template-columns:1.1fr 0.9fr;align-items:stretch}
-/* LEFT — dark text side */
-.founder-text-panel{padding:44px 52px;display:flex;flex-direction:column;justify-content:center;position:relative;background:#050e06}
-/* vertical gold separator line between text and photo */
-.founder-text-panel::after{content:'';position:absolute;right:0;top:20%;bottom:20%;width:1px;background:linear-gradient(180deg,transparent,rgba(200,146,10,.3),transparent)}
-/* RIGHT — angled photo side */
-.founder-photo-panel{position:relative;overflow:hidden;background:linear-gradient(135deg,#1a4a1e,#0a2010);clip-path:polygon(6% 0%,100% 0%,100% 100%,0% 100%);min-height:500px}
-/* Angled clip — matches opt-c exactly: text bleeds into photo panel */
-.founder-photo-panel::before{content:'';position:absolute;inset:0;z-index:2;background:linear-gradient(90deg,rgba(5,14,6,.7) 0%,transparent 40%);pointer-events:none}
-.founder-photo-panel img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;display:block;transition:transform 8s ease;z-index:1}
-.founder-slide.active .founder-photo-panel img{transform:scale(1.04)}
-.founder-photo-panel .fp-fallback{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:72px;opacity:.18;z-index:0}
-/* Since badge bottom right of photo */
-.founder-since-badge{position:absolute;bottom:28px;right:28px;z-index:3;background:rgba(200,146,10,.15);border:1px solid rgba(200,146,10,.4);color:var(--gd2);font-size:8.5px;font-weight:800;letter-spacing:2px;padding:10px 16px;border-radius:3px;backdrop-filter:blur(4px);text-transform:uppercase}
-/* Dot indicators */
-.founder-dots{position:absolute;bottom:16px;left:52px;z-index:10;display:flex;gap:7px}
-.founder-dot{width:22px;height:3px;background:rgba(255,255,255,.22);border-radius:2px;cursor:pointer;transition:all .3s}
-.founder-dot.active{background:var(--gd);width:36px}
-/* Text elements — matching opt-c exactly */
-.ftag{font-size:8px;font-weight:800;letter-spacing:4px;color:var(--gd2);text-transform:uppercase;margin-bottom:16px;opacity:.9}
-.fname{font-family:'Playfair Display',serif;font-size:clamp(30px,3.5vw,52px);color:#fff;font-weight:900;line-height:1;margin-bottom:4px;letter-spacing:-.3px}
-.fname span{color:var(--gd);font-style:normal}
-.fsubtitle-big{font-size:12px;color:rgba(255,255,255,.38);letter-spacing:1px;text-transform:uppercase;margin-bottom:24px}
-.fq{font-size:13.5px;color:rgba(255,255,255,.65);line-height:1.8;font-style:italic;border-left:2px solid var(--gd);padding-left:16px;max-width:440px}
-.faut-row{display:none}
-/* Suppress old layout */
-.founder-upload-overlay{display:none}
-.fvis{display:none}.ftxt{display:none}.fport{display:none}
-.founder-bg{display:none}
-.founder-overlay{display:none}
-.founder-content{display:none}
-@media(max-width:768px){
-  .founder-slide.active{grid-template-columns:1fr;height:auto}
-  .founder-text-panel{padding:36px 24px 28px}
-  .founder-text-panel::after{display:none}
-  .founder-photo-panel{height:280px}
-  .founder-photo-panel{clip-path:none}
-  .founder-photo-panel img,.founder-photo-panel .fp-fallback{clip-path:none}
-  .founder-dots{left:24px;bottom:12px}
-}
+.founder-sec{position:relative;overflow:hidden;display:flex;align-items:stretch;background:#071408}
+.founder-bg{position:relative;width:100%;line-height:0;display:block;background:linear-gradient(135deg,#071408 0%,#0a1e0c 50%,#0e2b12 100%);min-height:200px}
+.founder-overlay{position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,rgba(0,0,0,0) 0%,rgba(0,0,0,0) 42%,rgba(0,0,0,.5) 70%,rgba(0,0,0,.85) 100%),linear-gradient(90deg,rgba(0,0,0,.4) 0%,rgba(0,0,0,.15) 40%,rgba(0,0,0,0) 65%)}
+.founder-content{position:absolute;bottom:0;left:0;right:0;z-index:2;display:flex;align-items:flex-end;justify-content:space-between;padding:0 64px 24px;gap:32px}
+.founder-left{max-width:520px;flex:1}
+.founder-right{flex-shrink:0;display:flex;align-items:flex-end;padding-bottom:4px}
+.founder-badge{display:flex;align-items:center;gap:8px;background:rgba(13,47,16,.85);border:1px solid rgba(200,146,10,.35);color:var(--gd2);font-size:9.5px;font-weight:800;letter-spacing:2.2px;padding:13px 22px;border-radius:3px;white-space:nowrap;backdrop-filter:blur(6px)}
+.ftag{color:var(--gd2);font-size:9.5px;font-weight:800;letter-spacing:4px;margin-bottom:16px;opacity:.8;text-transform:uppercase}
+.fname{font-family:'Playfair Display',serif;font-size:clamp(32px,4.8vw,60px);color:#fff;font-weight:900;margin-bottom:12px;line-height:1.05;text-shadow:0 2px 20px rgba(0,0,0,.4)}
+.fsubtitle-big{font-family:'Playfair Display',serif;font-size:clamp(17px,2.3vw,28px);color:var(--gd2);font-style:italic;margin-bottom:24px;line-height:1.35;font-weight:400}
+.fq{font-size:clamp(12.5px,1.25vw,14.5px);color:rgba(255,255,255,.76);line-height:1.85;font-style:italic;margin-bottom:22px;max-width:460px}
+.faut-row{display:flex;align-items:center;gap:12px}
+.faut-line{width:38px;height:1.5px;background:var(--gd2);opacity:.7;display:block;flex-shrink:0}
+.faut{font-size:10px;font-weight:700;letter-spacing:2.5px;color:rgba(255,255,255,.45);text-transform:uppercase}
+.fvis{display:none}
+.ftxt{display:none}
+.fport{display:none}
 /* ── DELIVERY FORM ───────────────────────────── */
 .del-form{background:rgba(26,58,30,.06);border:1px solid rgba(26,58,30,.15);border-radius:10px;padding:16px;margin-bottom:14px}
 .del-form-title{font-size:12.5px;font-weight:800;letter-spacing:.5px;color:var(--g);margin-bottom:12px;text-transform:uppercase;display:flex;align-items:center;gap:6px}
@@ -730,23 +688,6 @@ footer{background:#0d1a0f;padding:44px 40px 24px}
 .del-input{width:100%;background:#fff;border:1.5px solid #e0d8c8;border-radius:7px;padding:8px 11px;font-size:13px;color:#333;font-family:'Lato',sans-serif;outline:none;transition:border-color .15s}
 .del-input:focus{border-color:var(--g)}
 .del-input.req-err{border-color:#e05252}
-/* State image slideshow dots */
-.sshdr-dot{display:inline-block;width:20px;height:3px;background:rgba(255,255,255,.3);border-radius:2px;cursor:pointer;transition:all .3s}
-.sshdr-dot.active{background:var(--gd);width:32px}
-/* Product hover image swap — single hover image */
-.piw .phover-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:2;opacity:0;transition:opacity .45s ease}
-.pcard:hover .piw .phover-img{opacity:1}
-/* Mobile tap indicator */
-@media(hover:none){
-  .piw::after{content:'👆 Tap to see more';position:absolute;bottom:6px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.55);color:#fff;font-size:9px;padding:3px 8px;border-radius:10px;white-space:nowrap;z-index:4;pointer-events:none;opacity:0;transition:opacity .3s}
-  .piw:has(.phover-img)::after{opacity:1}
-}
-.pcard:hover .pemo{opacity:0;transition:opacity .3s}
-/* Product hover cycle — multiple images cycling on hover */
-@keyframes hoverCycle{0%,45%{opacity:1}50%,95%{opacity:0}100%{opacity:1}}
-.phover-cycle{animation:none}
-.pcard:hover .phover-cycle{animation:hoverCycle var(--hc-dur,4s) ease infinite;opacity:0}
-.pcard:hover .phover-cycle:first-of-type{opacity:1}
 </style>
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 </head>
@@ -867,13 +808,7 @@ footer{background:#0d1a0f;padding:44px 40px 24px}
   <div id="noResults" style="display:none;text-align:center;padding:40px;color:var(--tx3);font-family:'Playfair Display',serif;font-style:italic">No products found for this filter 🏔️</div>
 </section>
 <section class="sec state-sec" id="states">
-  <div class="rv" id="regions" style="margin-bottom:20px">
-    <div class="chip">Explore by Region</div>
-    <h2 class="sh2">Discover the Himalayas</h2>
-    <p class="ssub" style="margin-bottom:0">Each state carries its own story — ancient forests, sacred rivers, and flavours shaped by altitude. Click to explore.</p>
-  </div>
-  <!-- Region Storytelling Cards -->
-  <div id="storyCards" style="display:flex;gap:14px;overflow-x:auto;padding:0 0 18px;scrollbar-width:none;margin-bottom:8px"></div>
+  <div class="rv" id="regions" style="margin-bottom:20px"><div class="chip">Shop by State</div><h2 class="sh2">Every State, a Unique Flavour</h2><p class="ssub" style="margin-bottom:0">From snow-capped Himalayas to the lush Northeast — click any state to explore its authentic products and culture.</p></div>
   <div class="stabs" id="stabs"></div>
   <div class="spnls" id="spnls"></div>
 </section>
@@ -883,17 +818,19 @@ footer{background:#0d1a0f;padding:44px 40px 24px}
     <!-- PILLAR 1: Lab Tested — original uploaded image -->
     <div class="pillar rv" style="transition-delay:.08s">
       <div class="pnum">01</div>
-      <div class="psvg" style="width:110px;height:110px;margin-bottom:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px">
-        <img src="https://ulyrhnpoiypuvaurlqqi.supabase.co/storage/v1/object/public/pahadi-images/lab_tested_final.png" alt="Lab Tested" style="width:100px;height:100px;border-radius:50%;object-fit:cover;box-shadow:0 4px 16px rgba(0,0,0,.15)" onerror="this.style.display='none'">
+      <div class="psvg" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px">
+        <img src="https://ulyrhnpoiypuvaurlqqi.supabase.co/storage/v1/object/public/pahadi-images/lab_tested_final.png" alt="Lab Tested" style="width:100px;height:100px;border-radius:50%;object-fit:cover;box-shadow:0 4px 16px rgba(0,0,0,.15)" onerror="this.outerHTML='<svg viewBox=&quot;0 0 148 148&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot; style=&quot;width:110px;height:110px&quot;><defs><radialGradient id=&quot;la2&quot; cx=&quot;50%&quot; cy=&quot;45%&quot; r=&quot;65%&quot;><stop offset=&quot;0%&quot; stop-color=&quot;#e8d8f8&quot;/><stop offset=&quot;100%&quot; stop-color=&quot;#a878c8&quot;/></radialGradient></defs><circle cx=&quot;74&quot; cy=&quot;74&quot; r=&quot;74&quot; fill=&quot;url(#la2)&quot;/><text x=&quot;74&quot; y=&quot;82&quot; font-size=&quot;40&quot; text-anchor=&quot;middle&quot;>🔬</text></svg>'">
         <span style="font-size:9px;font-weight:700;letter-spacing:1.5px;color:#c8920a;font-family:serif">ORGANIC FOOD</span>
       </div>
+
       <div class="pt">Lab Tested Purity</div>
       <p class="pd">Every batch tested for heavy metals, pesticides &amp; adulterants. Certificate with every order.</p>
     </div>
-    <!-- PILLAR 2: Direct from Farmers -->
+
+    <!-- PILLAR 2: Direct from Farmers (Option 5 - Farm to Home) -->
     <div class="pillar rv" style="transition-delay:.16s">
       <div class="pnum">02</div>
-      <svg class="psvg" viewBox="0 0 148 148" xmlns="http://www.w3.org/2000/svg" style="width:110px;height:110px;margin-bottom:10px">
+      <svg class="psvg" viewBox="0 0 148 148" xmlns="http://www.w3.org/2000/svg">
         <defs><radialGradient id="fd2" cx="45%" cy="35%" r="65%"><stop offset="0%" stop-color="#d8f0d8"/><stop offset="100%" stop-color="#4a9858"/></radialGradient></defs>
         <circle cx="74" cy="74" r="74" fill="url(#fd2)"/>
         <polygon points="0,90 24,52 50,72 74,42 98,68 124,48 148,80 148,148 0,148" fill="#2a6840" opacity=".4"/>
@@ -923,10 +860,11 @@ footer{background:#0d1a0f;padding:44px 40px 24px}
       <div class="pt">Direct from Farmers</div>
       <p class="pd">Zero middlemen. 200+ farming families across 12 Himalayan states — fair wages, always.</p>
     </div>
-    <!-- PILLAR 3: Eco Packaging — ECO D -->
+
+    <!-- PILLAR 3: Eco Packaging (Option D - Earth + Leaf) -->
     <div class="pillar rv" style="transition-delay:.24s">
       <div class="pnum">03</div>
-      <svg class="psvg" viewBox="0 0 148 148" xmlns="http://www.w3.org/2000/svg" style="width:110px;height:110px;margin-bottom:10px">
+      <svg class="psvg" viewBox="0 0 148 148" xmlns="http://www.w3.org/2000/svg">
         <defs><radialGradient id="ed3" cx="45%" cy="42%" r="65%"><stop offset="0%" stop-color="#c8e8f8"/><stop offset="100%" stop-color="#5890c0"/></radialGradient></defs>
         <circle cx="74" cy="74" r="74" fill="url(#ed3)"/>
         <circle cx="74" cy="80" r="46" fill="#2878b8" opacity=".7"/>
@@ -948,10 +886,11 @@ footer{background:#0d1a0f;padding:44px 40px 24px}
       <div class="pt">Eco Packaging</div>
       <p class="pd">Glass jars, recycled cardboard, zero single-use plastic. Packaging as clean as our products.</p>
     </div>
-    <!-- PILLAR 4: Give-Back — GIVEBACK B -->
+
+    <!-- PILLAR 4: Give-Back (Option B - River + Village + Forest) -->
     <div class="pillar rv" style="transition-delay:.32s">
       <div class="pnum">04</div>
-      <svg class="psvg" viewBox="0 0 148 148" xmlns="http://www.w3.org/2000/svg" style="width:110px;height:110px;margin-bottom:10px">
+      <svg class="psvg" viewBox="0 0 148 148" xmlns="http://www.w3.org/2000/svg">
         <defs><radialGradient id="gb3" cx="45%" cy="35%" r="65%"><stop offset="0%" stop-color="#c8e8f8"/><stop offset="100%" stop-color="#5888b8"/></radialGradient></defs>
         <circle cx="74" cy="74" r="74" fill="url(#gb3)"/>
         <polygon points="0,90 24,52 50,72 74,42 98,68 124,48 148,80 148,148 0,148" fill="#4a7850" opacity=".4"/>
@@ -986,31 +925,24 @@ footer{background:#0d1a0f;padding:44px 40px 24px}
   </div>
 </section>
 <section class="founder-sec" id="story">
-  <!-- Editorial Strip — Magazine / Luxury Brand -->
-  <div class="founder-slideshow" id="founderSlideshow">
-    <!-- Slides injected by JS — fallback slide always present -->
-    <div class="founder-slide active" id="founderSlide0">
-      <div class="founder-text-panel">
-        <div class="ftag">Founder · Pahadi Roots</div>
-        <h2 class="fname">Sudhir <span>Chambail</span></h2>
-        <div class="fsubtitle-big">Himachal Pradesh · Est. 2019</div>
-        <blockquote class="fq">"I ride these mountains because that's the only way to find the real thing — the honey tucked inside a Deodar forest, the ghee made before sunrise."</blockquote>
-        <div class="faut-row">
-          <span class="faut-line"></span>
-          <span class="faut">Founder · Pahadi Roots · Delhi</span>
-        </div>
-      </div>
-      <div class="founder-photo-panel" id="founderPhotoPanel0">
-        <div class="fp-fallback">🏔️</div>
-        <div class="founder-since-badge">🏔️ SINCE 2019</div>
+  <!-- Full-width background image — set from admin Site Settings -->
+  <div class="founder-bg" id="founderBg"></div>
+  <div class="founder-overlay"></div>
+  <div class="founder-content">
+    <div class="founder-left">
+      <div class="ftag">THE MAN BEHIND PAHADI ROOTS</div>
+      <h2 class="fname">Sudhir Chambail</h2>
+      <p class="fsubtitle-big">Born in Himachal. Living in Delhi.<br>Always on the road.</p>
+      <blockquote class="fq">"I ride these mountains because that's the only way to find the real thing — the honey tucked inside a Deodar forest, the ghee made before sunrise in a Kangra valley home. No store can give you that."</blockquote>
+      <div class="faut-row">
+        <span class="faut-line"></span>
+        <span class="faut">FOUNDER · PAHADI ROOTS · DELHI</span>
       </div>
     </div>
+    <div class="founder-right">
+      <div class="founder-badge">🏔️ TRAVELLING HIMALAYAS SINCE 2019</div>
+    </div>
   </div>
-  <div class="founder-dots" id="founderDots"></div>
-  <!-- Legacy hidden elements kept for backward compat -->
-  <div class="founder-bg" id="founderBg" style="display:none"></div>
-  <div class="founder-overlay" style="display:none"></div>
-  <div class="founder-content" style="display:none"></div>
 </section>
 <!-- Order Tracking -->
 <section class="track-sec">
@@ -1304,7 +1236,7 @@ const FALLBACK_STATES = [
 ];
 
 const FALLBACK_PRODUCTS = [
-  {id:1,name:"Himalayan Wild Honey",emoji:"🍯",description:"Raw forest honey from Himachal Pradesh — dark, medicinal & intensely floral.",price:549,original_price:699,unit:"/500g",badge_type:"bs",badge_label:"Bestseller",card_bg:"#fdf3e3",state_id:"hp",region:"Kullu Valley, Himachal Pradesh",stock:35,
+  {id:1,name:"Himalayan Wild Honey",emoji:"🍯",description:"Raw, unfiltered honey from Himachal Pradesh's forests — dark, medicinal & intensely floral.",price:549,original_price:699,unit:"/500g",badge_type:"bs",badge_label:"Bestseller",card_bg:"#fdf3e3",state_id:"hp",region:"Kullu Valley, Himachal Pradesh",stock:35,
    image_url:"https://images.unsplash.com/photo-1587049352846-4a222e784d38?w=400&h=400&fit=crop&q=80"},
   {id:2,name:"Bilona A2 Cow Ghee",emoji:"🥛",description:"Traditional hand-churned bilona ghee from indigenous cows. Golden, grainy & deeply aromatic.",price:849,original_price:1100,unit:"/500g",badge_type:"og",badge_label:"Organic",card_bg:"#f5f5e6",state_id:"uk",region:"Tehri Garhwal, Uttarakhand",stock:18,
    image_url:"https://images.unsplash.com/photo-1631897642056-97a7abebacb2?w=400&h=400&fit=crop&q=80"},
@@ -1428,8 +1360,14 @@ async function loadData() {
   // Step 1: render fallback instantly
   STATES   = FALLBACK_STATES.map(s => Object.assign({}, s));
   PRODUCTS = FALLBACK_PRODUCTS.map(p => Object.assign({}, p));
-  renderProds(); renderStates(); uCart(); observeRv();
-  initAllStateSlides(); initProductHoverImages();
+  renderProds(); renderStates(); loadFI(); uCart(); observeRv();
+
+  // Load coupons from DB
+  fetch(getStoreApiBase() + '/store-data').then(r=>r.json()).then(data=>{
+    if(data.settings && data.settings.coupons) {
+      try { var dbC = JSON.parse(data.settings.coupons); Object.assign(COUPONS, dbC); } catch(e){}
+    }
+  }).catch(()=>{});
 
   // Step 2: try DB
   try {
@@ -1519,70 +1457,12 @@ async function loadData() {
           category_id:    db.category_id,
           sku:            db.sku,
           tags:           db.tags,
-          extra_image_url: db.extra_image_url || null,
-          _images:        [],  // populated from product_images table after load
         };
       });
       updated = true;
     }
 
-    // ── Apply state_images from store-data response ──
-    if (Array.isArray(data.state_images) && data.state_images.length) {
-      var byState = {};
-      data.state_images.forEach(function(row) {
-        if (!byState[row.state_id]) byState[row.state_id] = [];
-        byState[row.state_id].push(row);
-      });
-      Object.keys(byState).forEach(function(sid) {
-        var imgs = byState[sid].sort(function(a,b){ return (a.sort_order||0)-(b.sort_order||0); });
-        var urls = imgs.map(function(r){ return r.image_url; }).filter(Boolean);
-        if (!urls.length) return;
-        var st = STATES.find(function(s){ return s.id === sid; });
-        if (st) {
-          st._uploadedImgs = urls;
-          st.cover_photo_url = urls[0];
-          st.tab_photo_url   = urls[0];
-        }
-      });
-      updated = true;
-    }
-
-    // ── Apply product_images from store-data response ──
-    if (Array.isArray(data.product_images) && data.product_images.length) {
-      var byProd = {};
-      data.product_images.forEach(function(row) {
-        if (!byProd[row.product_id]) byProd[row.product_id] = [];
-        byProd[row.product_id].push(row);
-      });
-      Object.keys(byProd).forEach(function(pid) {
-        var imgs = byProd[pid].sort(function(a,b){ return (a.sort_order||0)-(b.sort_order||0); });
-        var urls = imgs.map(function(r){ return r.image_url; }).filter(Boolean);
-        if (!urls.length) return;
-        var pr = PRODUCTS.find(function(p){ return String(p.id) === String(pid); });
-        if (pr) {
-          pr._images = urls;
-          if (urls[0]) pr.image_url = urls[0]; // first image = main
-        }
-      });
-      updated = true;
-    }
-
-    // ── Render everything now that all data (including images) is ready ──
-    if (updated) {
-      // Preserve currently active state before re-render
-      var activeStateEl = document.querySelector('.spnl.active');
-      var activeStateId = activeStateEl ? activeStateEl.id.replace('p-','') : null;
-      renderProds(); renderStates(); observeRv(); injectProductSchema(); renderUpsell();
-      // Restore active state if user had clicked one
-      if (activeStateId && activeStateId !== STATES[0].id) {
-        swState(activeStateId);
-      }
-      initAllStateSlides(); initProductHoverImages();
-    }
-
-    // ── Founder slideshow ──
-    loadFIFromData(data);
-
+    if (updated) { renderProds(); renderStates(); observeRv(); injectProductSchema(); renderUpsell(); }
   } catch(e) {
     console.info('Using local fallback data:', e.message);
   }
@@ -1667,7 +1547,6 @@ function renderProds() {
   if (nr) nr.style.display = 'none';
   g.innerHTML = list.map(function(p) { return mkProd(p); }).join('');
   updateAllWLButtons();
-  setTimeout(initProductHoverImages, 50);
 }
 
 function setFilter(f, btn) {
@@ -1693,7 +1572,7 @@ function renderStates() {
   });
 
   tb.innerHTML = STATES.map(function(s, i) {
-    var imgSrc = (s._uploadedImgs && s._uploadedImgs[0]) || s._uploadedImg || s.tab_photo_url || '';
+    var imgSrc = s._uploadedImg || s.tab_photo_url || '';
     var imgHtml = imgSrc
       ? '<div class="stab-thumb"><img src="' + imgSrc + '" alt="' + s.name + '" onerror="this.parentNode.style.display=\'none\'" loading="lazy"></div>'
       : '<div class="stab-thumb stab-thumb-emo">' + s.emoji + '</div>';
@@ -1707,37 +1586,12 @@ function renderStates() {
     var stProds = PRODUCTS.filter(function(p) { return p.state_id === s.id; });
     var pills   = (s.pills||[]).map(function(p) { return '<span class="sstate-pill">' + p + '</span>'; }).join('');
     var bg      = s.panel_bg || 'linear-gradient(135deg,#1a3a1e,#2d5233)';
-    var coverSrc = (s._uploadedImgs && s._uploadedImgs[0]) || s._uploadedImg || s.cover_photo_url || '';
-    // Gather all images for this state (multi-image slideshow support)
-    var stateImgs = [];
-    if (s._uploadedImgs && s._uploadedImgs.length) {
-      stateImgs = s._uploadedImgs;  // Use DB images array (already sorted by sort_order)
-    } else if (s._uploadedImg) {
-      stateImgs = [s._uploadedImg];
-    } else if (s.cover_photo_url) {
-      stateImgs = [s.cover_photo_url];
-    }
-    var photoHtml;
-    if (stateImgs.length > 1) {
-      var slidesHtml = stateImgs.map(function(url, si) {
-        return '<img class="sshdr-img' + (si===0?' active':'') + '" src="' + url + '" alt="' + s.name + '" loading="lazy" onerror="this.style.display=\'none\'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;display:block;opacity:' + (si===0?'1':'0') + ';transition:opacity 1s ease;z-index:1">';
-      }).join('');
-      var dotsHtml = stateImgs.map(function(_,si){
-        return '<span class="sshdr-dot' + (si===0?' active':'') + '" onclick="event.stopPropagation();goStateSlide(\'' + s.id + '\',' + si + ')"></span>';
-      }).join('');
-      photoHtml = '<div class="shdr-img-col sshdr" id="sshdr-' + s.id + '" data-sid="' + s.id + '" data-total="' + stateImgs.length + '" data-cur="0" style="position:relative;background:' + bg + '">' +
-        '<div class="shdr-fallback" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:80px;opacity:.25">' + s.emoji + '</div>' +
-        slidesHtml +
-        '<div style="position:absolute;inset:0;background:linear-gradient(to right,rgba(0,0,0,.15),transparent);z-index:2;pointer-events:none"></div>' +
-        '<div class="sshdr-dots" style="position:absolute;bottom:12px;left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:3">' + dotsHtml + '</div>' +
-      '</div>';
-    } else {
-      photoHtml = '<div class="shdr-img-col" style="position:relative;background:' + bg + '">' +
-        '<div class="shdr-fallback" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:80px;opacity:.35">' + s.emoji + '</div>' +
-        (coverSrc ? '<img src="' + coverSrc + '" alt="' + s.name + ' culture" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;display:block" loading="lazy" onerror="this.style.display=\'none\'">' : '') +
-        '<div style="position:absolute;inset:0;background:linear-gradient(to right,rgba(0,0,0,.15),transparent)"></div>' +
-      '</div>';
-    }
+    var coverSrc = s._uploadedImg || s.cover_photo_url || '';
+    var photoHtml = '<div class="shdr-img-col" style="position:relative;background:' + bg + '">' +
+      '<div class="shdr-fallback" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:80px;opacity:.35">' + s.emoji + '</div>' +
+      (coverSrc ? '<img src="' + coverSrc + '" alt="' + s.name + ' culture" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;display:block" loading="lazy" onerror="this.style.display=\'none\'">' : '') +
+      '<div style="position:absolute;inset:0;background:linear-gradient(to right,rgba(0,0,0,.15),transparent)"></div>' +
+    '</div>';
     var prodsHtml = stProds.length
       ? stProds.map(function(p) { return mkProd(p); }).join('')
       : '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--tx3);font-family:\'Playfair Display\',serif;font-style:italic">🏔️ Products coming soon from ' + s.name + '…</div>';
@@ -1754,30 +1608,6 @@ function renderStates() {
   }).join('');
 }
 
-
-// ── STORY CARDS ──────────────────────────────────────────────
-var _storySnippets = {"hp": "Dev Bhoomi — where Deodar forests hide cliff-hive honey & Kangra tea perfumes alpine air.", "uk": "Sacred rivers, ancient temples & meadows above 3,000m yielding wild honey and Badri ghee.", "jk": "Saffron fields turn violet each October. The world"s finest spice, harvested before sunrise.", "la": "Roof of the world. Shilajit oozes from granite at 3,500m. Seabuckthorn lines the Indus.", "sk": "India"s only fully organic state. Cardamom groves under forest shade, Temi tea above clouds.", "as": "Brahmaputra valley — world-famous malty black tea & Black Joha rice with a pandan scent.", "ml": "Wettest land on earth. Lakadong turmeric with 7.5% curcumin — highest on the planet.", "nl": "Ghost Pepper country. Hornbill Festival, 16 tribes, and fermented Axone — fierce & proud.", "mn": "Purple Chakhao rice, Loktak Lake, and a matrilineal society where women rule the market.", "tr": "Queen pineapple so sweet it needs no sugar. Wild honey from ancient Chakma bark hives."};
-function renderStoryCards(activeId) {
-  var el = document.getElementById('storyCards');
-  if (!el) return;
-  el.innerHTML = STATES.map(function(s) {
-    var imgSrc = (s._uploadedImgs && s._uploadedImgs[0]) || s._uploadedImg || s.tab_photo_url || '';
-    var imgHtml = imgSrc
-      ? '<img class="story-card-img" src="' + imgSrc + '" alt="' + s.name + '" loading="lazy" onerror="this.style.display=\'none\">'
-      : '<div class="story-card-emo" style="background:' + (s.panel_bg||'linear-gradient(135deg,#1a3a1e,#2d5233)') + '">' + s.emoji + '</div>';
-    var snippet = _storySnippets[s.id] || s.description.substring(0, 90) + '…';
-    var isActive = s.id === (activeId || STATES[0].id);
-    return '<div class="story-card' + (isActive ? ' active-state' : '') + '" onclick="swState(\''+s.id+'\');renderStoryCards(\''+s.id+'\')">'+
-      imgHtml +
-      '<div class="story-card-body">'+
-        '<div class="story-card-name">' + s.emoji + ' ' + s.name + '</div>'+
-        '<div class="story-card-tag">' + (s.tagline||'') + '</div>'+
-        '<div class="story-card-line">' + snippet + '</div>'+
-      '</div>'+
-    '</div>';
-  }).join('');
-}
-
 function swState(id) {
   document.querySelectorAll('.stab').forEach(function(t) { t.classList.remove('active'); });
   document.querySelectorAll('.spnl').forEach(function(p) { p.classList.remove('active'); });
@@ -1785,111 +1615,9 @@ function swState(id) {
   var p = document.getElementById('p-' + id);
   if (t) t.classList.add('active');
   if (p) p.classList.add('active');
-  // Update story cards active state
-  document.querySelectorAll('.story-card').forEach(function(c) {
-    c.classList.toggle('active-state', c.getAttribute('onclick') && c.getAttribute('onclick').includes("'"+id+"'"));
-  });
 }
 
-// ── STATE IMAGE SLIDESHOW ────────────────────────────────────────────
-var _stateTimers = {};
-function goStateSlide(sid, idx) {
-  var el = document.getElementById('sshdr-' + sid);
-  if (!el) return;
-  var imgs = el.querySelectorAll('.sshdr-img');
-  var dots = el.querySelectorAll('.sshdr-dot');
-  imgs.forEach(function(img, i) { img.style.opacity = i === idx ? '1' : '0'; img.classList.toggle('active', i===idx); });
-  dots.forEach(function(d, i) { d.classList.toggle('active', i===idx); });
-  el.setAttribute('data-cur', idx);
-}
-function initStateSlideshow(sid, total) {
-  if (_stateTimers[sid]) clearInterval(_stateTimers[sid]);
-  if (total <= 1) return;
-  _stateTimers[sid] = setInterval(function() {
-    var el = document.getElementById('sshdr-' + sid);
-    var panel = document.getElementById('p-' + sid);
-    if (!el || !panel || !panel.classList.contains('active')) return;
-    var cur = parseInt(el.getAttribute('data-cur') || '0', 10);
-    goStateSlide(sid, (cur + 1) % total);
-  }, 2500);
-
-  // Touch/swipe support on mobile
-  var sshdrEl = document.getElementById('sshdr-' + sid);
-  if (sshdrEl && !sshdrEl._touchInited) {
-    sshdrEl._touchInited = true;
-    var _tx = 0;
-    sshdrEl.addEventListener('touchstart', function(e) { _tx = e.touches[0].clientX; }, {passive:true});
-    sshdrEl.addEventListener('touchend', function(e) {
-      var dx = e.changedTouches[0].clientX - _tx;
-      if (Math.abs(dx) < 40) return; // ignore tiny taps
-      var cur = parseInt(sshdrEl.getAttribute('data-cur') || '0', 10);
-      if (dx < 0) goStateSlide(sid, (cur + 1) % total);       // swipe left → next
-      else        goStateSlide(sid, (cur - 1 + total) % total); // swipe right → prev
-    }, {passive:true});
-  }
-}
-function initAllStateSlides() {
-  document.querySelectorAll('.sshdr').forEach(function(el) {
-    var sid = el.getAttribute('data-sid');
-    var total = parseInt(el.getAttribute('data-total') || '1', 10);
-    if (total > 1) initStateSlideshow(sid, total);
-  });
-}
-
-// ── PRODUCT HOVER IMAGE SWAP ─────────────────────────────────────────
-// Adds a second hover image to product cards that have extra images stored
-// Called after renderProds/renderStates
-function initProductHoverImages() {
-  var isMobile = window.matchMedia('(hover:none)').matches || ('ontouchstart' in window);
-
-  PRODUCTS.forEach(function(p) {
-    // Collect all hover images
-    var hoverImgs = [];
-    if (p._images && p._images.length > 1) {
-      hoverImgs = p._images.slice(1); // images after first (main)
-    } else if (p.extra_image_url) {
-      hoverImgs = [p.extra_image_url];
-    }
-    if (!hoverImgs.length) return;
-
-    document.querySelectorAll('.pcard').forEach(function(card) {
-      if (card.innerHTML.indexOf('addToCart(' + p.id + ')') === -1) return;
-      var piw = card.querySelector('.piw');
-      if (!piw || piw.querySelector('.phover-img')) return;
-
-      // Inject hover images
-      hoverImgs.forEach(function(src, hi) {
-        var img = document.createElement('img');
-        img.className = 'phover-img';
-        img.src = src; img.alt = p.name; img.loading = 'lazy';
-        if (hoverImgs.length > 1) {
-          img.style.animationDelay = (hi * 2) + 's';
-          img.style.animationDuration = (hoverImgs.length * 2) + 's';
-          img.classList.add('phover-cycle');
-        }
-        piw.appendChild(img);
-      });
-
-      // MOBILE: tap card image to cycle through hover images
-      if (isMobile && hoverImgs.length >= 1) {
-        var _tapIdx = 0;
-        var _allImgs = [piw.querySelector('img:not(.phover-img)')].concat(Array.from(piw.querySelectorAll('.phover-img'))).filter(Boolean);
-        piw.style.cursor = 'pointer';
-        piw.addEventListener('click', function(e) {
-          e.stopPropagation();
-          if (_allImgs.length < 2) return;
-          _tapIdx = (_tapIdx + 1) % _allImgs.length;
-          _allImgs.forEach(function(im, ii) {
-            im.style.opacity = ii === _tapIdx ? '1' : '0';
-            im.style.zIndex  = ii === _tapIdx ? '3' : (ii === 0 ? '1' : '2');
-          });
-        });
-      }
-    });
-  });
-}
-
-
+// ── CART ────────────────────────────────────────────────────────────
 function addToCart(id) {
   var p = PRODUCTS.find(function(x) { return x.id === id; });
   if (!p) return;
@@ -2785,99 +2513,24 @@ function observeRv() {
   }
 }
 
-// ── FOUNDER SLIDESHOW ──────────────────────────────────────────────
-var _founderSlides = [];
-var _founderIdx = 0;
-var _founderTimer = null;
-
 function loadFI() {
-  // Called on initial page load before main data arrives — does its own fetch
-  fetch(getStoreApiBase() + '/store-data')
-  .then(function(r){ return r.json(); })
-  .then(function(data){ loadFIFromData(data); })
-  .catch(function(){});
-}
-
-function loadFIFromData(data) {
-  // Called by loadData() with already-fetched data — no extra network call
   try {
-    var urls = [];
-    if (Array.isArray(data.founder_images) && data.founder_images.length) {
-      urls = data.founder_images
-        .slice().sort(function(a,b){ return (a.sort_order||0)-(b.sort_order||0); })
-        .map(function(r){ return r.image_url; }).filter(Boolean);
+    var bg = document.getElementById('founderBg');
+    if (!bg) return;
+    // Always clear stale cache so updated admin image shows immediately
+    try { localStorage.removeItem('pr_founder_image'); } catch(e){}
+    function applyFounderImg(url) {
+      if (!url) return;
+      bg.style.cssText = 'position:relative;width:100%;line-height:0;display:block';
+      bg.innerHTML = '<img src="' + url + '" alt="Sudhir Chambail" style="width:100%;height:auto;max-height:760px;display:block;object-fit:cover;object-position:40% center" onerror="this.style.display=\'none\'">';
     }
-    // Fallback: site_settings
-    if (!urls.length && data.settings) {
-      if (data.settings.founder_image_url) urls.push(data.settings.founder_image_url);
-      for (var i = 2; i <= 10; i++) {
-        var k = 'founder_image_url_' + i;
-        if (data.settings[k]) urls.push(data.settings[k]);
-      }
-    }
-    if (urls.length) initFounderSlideshow(urls);
+    // Always fetch fresh from API — single source of truth is site_settings DB
+    fetch(getStoreApiBase() + '/store-data').then(function(r){ return r.json(); })
+    .then(function(data){
+      var url = (data && data.settings && data.settings.founder_image_url) ? data.settings.founder_image_url : '';
+      if (url) applyFounderImg(url);
+    }).catch(function(){});
   } catch(e) {}
-}
-
-function initFounderSlideshow(urls) {
-  if (!urls || !urls.length) return;
-  _founderSlides = urls;
-  var ss = document.getElementById('founderSlideshow');
-  var dots = document.getElementById('founderDots');
-  if (!ss) return;
-
-  // Get the existing text panel (always keep it)
-  var textPanel = ss.querySelector('.founder-text-panel');
-  var textPanelHTML = textPanel ? textPanel.outerHTML : '';
-
-  // Rebuild: one slide per URL, each slide = text panel + photo panel
-  ss.innerHTML = '';
-  urls.forEach(function(url, i) {
-    var slide = document.createElement('div');
-    slide.className = 'founder-slide' + (i === 0 ? ' active' : '');
-    slide.id = 'founderSlide' + i;
-    slide.innerHTML =
-      textPanelHTML +
-      '<div class="founder-photo-panel">' +
-        '<img src="' + url + '" alt="Sudhir Chambail" loading="' + (i===0?'eager':'lazy') + '" onerror="this.style.display=\'none\'">' +
-        '<div class="fp-fallback">🏔️</div>' +
-        '<div class="founder-since-badge">🏔️ SINCE 2019</div>' +
-      '</div>';
-    ss.appendChild(slide);
-  });
-
-  // Dots
-  if (dots) {
-    dots.innerHTML = '';
-    if (urls.length > 1) {
-      urls.forEach(function(_, i) {
-        var d = document.createElement('span');
-        d.className = 'founder-dot' + (i===0?' active':'');
-        d.onclick = (function(idx){ return function(){ goFounderSlide(idx); }; })(i);
-        dots.appendChild(d);
-      });
-    }
-  }
-
-  if (urls.length > 1) startFounderSlideshow();
-}
-
-function goFounderSlide(idx) {
-  var slides = document.querySelectorAll('.founder-slide');
-  var dots = document.querySelectorAll('.founder-dot');
-  slides.forEach(function(s){ s.classList.remove('active'); });
-  dots.forEach(function(d){ d.classList.remove('active'); });
-  if (slides[idx]) slides[idx].classList.add('active');
-  if (dots[idx]) dots[idx].classList.add('active');
-  _founderIdx = idx;
-}
-
-function startFounderSlideshow() {
-  if (_founderTimer) clearInterval(_founderTimer);
-  _founderTimer = setInterval(function() {
-    var next = (_founderIdx + 1) % _founderSlides.length;
-    goFounderSlide(next);
-  }, 3000);
 }
 
 function injectProductSchema() {
