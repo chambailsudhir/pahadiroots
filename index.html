@@ -1312,7 +1312,7 @@ function getStoreApiBase() {
 }
 
 // ── DATA LOADING ───────────────────────────────────────────────────
-async async function loadData() {
+async function loadData() {
   // Step 1: render fallback instantly
   STATES   = FALLBACK_STATES.map(s => Object.assign({}, s));
   PRODUCTS = FALLBACK_PRODUCTS.map(p => Object.assign({}, p));
