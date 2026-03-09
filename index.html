@@ -755,17 +755,17 @@ footer{background:#0d1a0f;padding:44px 40px 24px}
 </head>
 
 <body>
-<div class="ann">🌿 Free Shipping above ₹799 &nbsp;|&nbsp; <a href="#pay-sec">UPI · Cards · COD</a> &nbsp;|&nbsp; 12+ Himalayan Regions Covered</div>
+<div class="ann">🌿 Free Shipping above ₹<span id="annShipAmt">799</span> &nbsp;|&nbsp; <a href="#pay-sec">UPI · Cards · COD</a> &nbsp;|&nbsp; 10 Himalayan States Covered</div>
 <!-- Announcement Ticker -->
 <div class="ticker-wrap" aria-label="Announcements">
   <div class="ticker-track" id="tickerTrack">
     <span class="ticker-item">🎁 Use code <strong>WELCOME50</strong> <span>·</span> ₹50 off your first order</span>
-    <span class="ticker-item">🚚 Free shipping <span>·</span> On orders above ₹799 — Pan India</span>
+    <span class="ticker-item">🚚 Free shipping <span>·</span> On orders above ₹<span class="dynShipAmt">799</span> — Pan India</span>
     <span class="ticker-item">🌿 100% Organic <span>·</span> Lab-tested, certified pure</span>
     <span class="ticker-item">🏔️ Direct from farmers <span>·</span> 200+ mountain families</span>
     <span class="ticker-item">⭐ Rated 4.9/5 <span>·</span> 10,000+ happy customers</span>
     <span class="ticker-item">🎁 Use code <strong>WELCOME50</strong> <span>·</span> ₹50 off your first order</span>
-    <span class="ticker-item">🚚 Free shipping <span>·</span> On orders above ₹799 — Pan India</span>
+    <span class="ticker-item">🚚 Free shipping <span>·</span> On orders above ₹<span class="dynShipAmt">799</span> — Pan India</span>
     <span class="ticker-item">🌿 100% Organic <span>·</span> Lab-tested, certified pure</span>
     <span class="ticker-item">🏔️ Direct from farmers <span>·</span> 200+ mountain families</span>
     <span class="ticker-item">⭐ Rated 4.9/5 <span>·</span> 10,000+ happy customers</span>
@@ -822,7 +822,7 @@ footer{background:#0d1a0f;padding:44px 40px 24px}
   <div class="hstats" id="hstats">
     <div class="hstat"><div class="hstat-num" data-target="500">0<em>+</em></div><div class="hstat-lbl">Farmer Families</div></div>
     <div class="hstat-div"></div>
-    <div class="hstat"><div class="hstat-num" data-target="12">0<em>+</em></div><div class="hstat-lbl">Himalayan States</div></div>
+    <div class="hstat"><div class="hstat-num" data-target="10">0<em>+</em></div><div class="hstat-lbl">Himalayan States</div></div>
     <div class="hstat-div"></div>
     <div class="hstat"><div class="hstat-num" data-target="10000">0<em>+</em></div><div class="hstat-lbl">Happy Customers</div></div>
     <div class="hstat-div"></div>
@@ -834,12 +834,12 @@ footer{background:#0d1a0f;padding:44px 40px 24px}
   <div class="tc"><span class="tico">🌿</span><div><div class="tlb">100% Organic</div><div class="tds">No chemicals, no preservatives</div></div></div>
   <div class="tc"><span class="tico">🏔️</span><div><div class="tlb">Himalayan Sourced</div><div class="tds">Directly from mountain villages</div></div></div>
   <div class="tc"><span class="tico">🤝</span><div><div class="tlb">Fair Trade</div><div class="tds">Supporting local farmers always</div></div></div>
-  <div class="tc"><span class="tico">🚚</span><div><div class="tlb">Free Shipping</div><div class="tds">On orders above ₹799</div></div></div>
+  <div class="tc"><span class="tico">🚚</span><div><div class="tlb">Free Shipping</div><div class="tds">On orders above ₹<span class="dynShipAmt">799</span></div></div></div>
 </div>
 <section class="sec coll-bg" id="shop">
   <div class="ct rv"><div class="chip">Browse Collections</div><h2 class="sh2">What the Mountains Offer</h2><p class="ssub">Every category tells a story of altitude, tradition, and purity.</p></div>
   <div class="cgrid" id="cgrid">
-    <a href="#" class="cc rv" style="transition-delay:.08s"><span class="cemo">🍯</span><div class="cname">Wild Honey</div><div class="cnum">12+ Varieties</div></a>
+    <a href="#" class="cc rv" style="transition-delay:.08s"><span class="cemo">🍯</span><div class="cname">Wild Honey</div><div class="cnum">10+ Varieties</div></a>
     <a href="#" class="cc rv" style="transition-delay:.13s"><span class="cemo">🥛</span><div class="cname">A2 Ghee</div><div class="cnum">Bilona Method</div></a>
     <a href="#" class="cc rv" style="transition-delay:.18s"><span class="cemo">🌿</span><div class="cname">Herbs & Spices</div><div class="cnum">40+ Varieties</div></a>
     <a href="#" class="cc rv" style="transition-delay:.23s"><span class="cemo">🍵</span><div class="cname">Himalayan Teas</div><div class="cnum">Rare Blends</div></a>
@@ -848,7 +848,7 @@ footer{background:#0d1a0f;padding:44px 40px 24px}
   </div>
 </section>
 <section class="sec" id="products" style="background:#fff;padding:28px 40px 36px">
-  <div class="ct rv"><div class="chip">Bestsellers</div><h2 class="sh2">Our Finest Offerings</h2><p class="ssub">Curated from 12+ Himalayan regions — the products our customers love most.</p></div>
+  <div class="ct rv"><div class="chip">Bestsellers</div><h2 class="sh2">Our Finest Offerings</h2><p class="ssub">Curated from 10 Himalayan states — the products our customers love most.</p></div>
   <!-- Filter bar -->
   <div class="filter-bar" id="filterBar">
     <button class="filter-btn active" onclick="setFilter('all',this)">🌿 All</button>
@@ -1119,7 +1119,7 @@ footer{background:#0d1a0f;padding:44px 40px 24px}
         <div class="logo-icon">🌿</div>
         <div class="logo-words"><div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;color:#fff">Pahadi Roots</div><div class="logo-tl">Est. in the Himalayas</div></div>
       </div>
-      <p class="fdesc">Born in the mountains, delivered to your doorstep. Pure Himalayan organic products, sourced with love from farming communities across 12+ states.</p>
+      <p class="fdesc">Born in the mountains, delivered to your doorstep. Pure Himalayan organic products, sourced with love from farming communities across 10 Himalayan states.</p>
       <div class="srow"><a href="#" class="soc">📘</a><a href="#" class="soc">📸</a><a href="#" class="soc">🐦</a><a href="#" class="soc">▶️</a></div>
     </div>
     <div><div class="fh">Shop</div><ul class="ful"><li><a href="#">Wild Honey</a></li><li><a href="#">A2 Ghee</a></li><li><a href="#">Herbs & Spices</a></li><li><a href="#">Himalayan Teas</a></li><li><a href="#">Ancient Grains</a></li><li><a href="#">Dry Fruits</a></li></ul></div>
@@ -1167,7 +1167,7 @@ footer{background:#0d1a0f;padding:44px 40px 24px}
     <div class="cpage-left">
       <!-- Free shipping progress -->
       <div class="ship-prog">
-        <div class="ship-prog-txt" id="shipTxt">Add ₹<span>799</span> more for FREE shipping 🚚</div>
+        <div class="ship-prog-txt" id="shipTxt">Add ₹<span id="shipProgAmt">799</span> more for FREE shipping 🚚</div>
         <div class="ship-prog-bar"><div class="ship-prog-fill" id="shipFill" style="width:0%"></div></div>
       </div>
       <div class="ciw" id="ciw"></div>
@@ -1203,7 +1203,7 @@ footer{background:#0d1a0f;padding:44px 40px 24px}
         <!-- Totals -->
         <div class="csum-rows">
           <div class="csum-row"><span>Subtotal</span><span id="ctval">₹0</span></div>
-          <div class="csum-row"><span>Shipping</span><span class="csum-free" id="shipLabel">Free on ₹799+</span></div>
+          <div class="csum-row"><span>Shipping</span><span class="csum-free" id="shipLabel">Free on ₹<span class="dynShipAmt">799</span>+</span></div>
           <div class="csum-divider"></div>
           <div class="csum-row csum-total"><span>Total</span><span id="ctvalTotal">₹0</span></div>
         </div>
@@ -1482,6 +1482,7 @@ async function loadData() {
       if (data.settings.free_shipping_min    !== undefined && data.settings.free_shipping_min    !== '') FREE_SHIP_THRESHOLD = parseInt(data.settings.free_shipping_min,    10);
       if (data.settings.flat_shipping_charge !== undefined && data.settings.flat_shipping_charge !== '') FLAT_SHIP_CHARGE    = parseInt(data.settings.flat_shipping_charge, 10);
       if (data.settings.whatsapp_number)      WHATSAPP_NUMBER     = data.settings.whatsapp_number;
+      updateShipAmountDisplays();
     }
     var updated  = false;
 
@@ -2352,11 +2353,57 @@ function removeCoupon() {
 
 // ── FREE SHIPPING PROGRESS ─────────────────────────────────────────
 var FREE_SHIP_MIN = 799;  // legacy alias — real value is FREE_SHIP_THRESHOLD loaded from DB
+
+// Update all hardcoded shipping amount displays after DB settings load
+function updateShipAmountDisplays() {
+  var amt = FREE_SHIP_THRESHOLD;
+  if (!amt && amt !== 0) return;
+  var freeAll = (amt === 0);
+  // Update all .dynShipAmt spans
+  document.querySelectorAll('.dynShipAmt').forEach(function(el) {
+    el.textContent = freeAll ? 'all orders' : amt;
+  });
+  // Update announcement bar
+  var ann = document.getElementById('annShipAmt');
+  if (ann) ann.parentElement.innerHTML = freeAll
+    ? '🌿 Free Shipping on all orders! &nbsp;|&nbsp; <a href="#pay-sec">UPI · Cards · COD</a> &nbsp;|&nbsp; 10 Himalayan States Covered'
+    : '🌿 Free Shipping above ₹<span id="annShipAmt">' + amt + '</span> &nbsp;|&nbsp; <a href="#pay-sec">UPI · Cards · COD</a> &nbsp;|&nbsp; 10 Himalayan States Covered';
+  // Update ticker items
+  document.querySelectorAll('.ticker-item').forEach(function(el) {
+    if (el.textContent.indexOf('Free shipping') !== -1) {
+      el.innerHTML = freeAll
+        ? '🚚 Free shipping <span>·</span> On all orders — Pan India'
+        : '🚚 Free shipping <span>·</span> On orders above ₹<span class="dynShipAmt">' + amt + '</span> — Pan India';
+    }
+  });
+  // Update trust bar
+  var tds = document.querySelector('.tc .tds');
+  if (tds && tds.textContent.indexOf('orders above') !== -1) {
+    tds.innerHTML = freeAll ? 'On all orders' : 'On orders above ₹<span class="dynShipAmt">' + amt + '</span>';
+  }
+  // Update shipLabel in cart
+  var lbl = document.getElementById('shipLabel');
+  if (lbl) {
+    lbl.innerHTML = freeAll
+      ? '🎉 Free on all orders!'
+      : 'Free on ₹<span class="dynShipAmt">' + amt + '</span>+';
+  }
+  // Re-run progress bar with current cart
+  var subtotal = cart.reduce(function(a,i){return a+i.price*i.qty;},0);
+  var discount = calcDiscount(subtotal);
+  updateShipProgress(Math.max(0, subtotal - discount));
+}
+
 function updateShipProgress(subtotal) {
   var threshold = (!isNaN(FREE_SHIP_THRESHOLD)) ? FREE_SHIP_THRESHOLD : 799;
   var fill = document.getElementById('shipFill');
   var txt  = document.getElementById('shipTxt');
   if (!fill || !txt) return;
+  if (threshold === 0) {
+    fill.style.width = '100%';
+    txt.innerHTML = '🎉 <span>Free shipping on all orders!</span>';
+    return;
+  }
   var pct = Math.min(100, Math.round(subtotal / threshold * 100));
   fill.style.width = pct + '%';
   if (subtotal >= threshold) {
@@ -2507,7 +2554,7 @@ function openQV(id) {
         '<div class="pin-res" id="pinRes"></div>' +
         '<div class="qv-tags">' +
           (p.badge_label ? '<span class="qv-tag">' + p.badge_label + '</span>' : '') +
-          '<span class="qv-tag">🌿 Organic</span><span class="qv-tag">🏔️ Himalayan</span><span class="qv-tag">🚚 Free Shipping ₹799+</span>' +
+          '<span class="qv-tag">🌿 Organic</span><span class="qv-tag">🏔️ Himalayan</span><span class="qv-tag">🚚 Free Shipping ₹' + (FREE_SHIP_THRESHOLD || '') + (FREE_SHIP_THRESHOLD > 0 ? '+' : ' on all orders!') + '</span>' +
         '</div>' +
       '</div>' +
     '</div>' +
@@ -2538,7 +2585,7 @@ function checkPin() {
     if (!res) return;
     var days = (parseInt(pin) % 3) + 2;
     res.className = 'pin-res ok';
-    res.textContent = '✅ Delivery in ' + days + ' business days · Free shipping on ₹799+';
+    res.textContent = '✅ Delivery in ' + days + ' business days · Free shipping on ₹' + (FREE_SHIP_THRESHOLD > 0 ? FREE_SHIP_THRESHOLD + '+' : 'all orders!');
   }, 600);
 }
 
