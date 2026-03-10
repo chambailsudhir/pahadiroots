@@ -2309,6 +2309,7 @@ async function checkoutRazorpay() {
         '🛒 *Items*\n'+
         cart.map(function(i){return '• '+i.name+' ×'+i.qty+' = ₹'+(i.price*i.qty);}).join('\n')+
         shipLine + '\n\n*Total Paid: ₹'+final+'*';
+      var savedCartForConfirm = (cartSnapshot || cart).slice();
       cart = []; uCart();
       try{ localStorage.removeItem('pr_cart'); }catch(e){}
       try{ localStorage.removeItem('pr_cust_info'); }catch(e){}
@@ -2319,12 +2320,10 @@ async function checkoutRazorpay() {
       var cf = document.getElementById('coupForm'); if(cf) cf.style.display='block';
       var ca = document.getElementById('coupApplied'); if(ca) ca.style.display='none';
       _orderProcessing = false;
-      showToast('🎉 Payment successful! Order confirmed.');
       window.open('https://wa.me/' + WHATSAPP_NUMBER + '?text='+encodeURIComponent(msg),'_blank');
-      setTimeout(function(){
-        closeCart();
-        window.scrollTo({top:0, behavior:'smooth'});
-      }, 800);
+      // Redirect to order confirmation page
+      var confUrl = '/order-confirmation?id=' + (orderId||'') + '&num=' + encodeURIComponent(orderNumber||'') + '&total=' + final + '&payment=' + encodeURIComponent(response.razorpay_payment_id||'');
+      setTimeout(function(){ window.location.href = confUrl; }, 600);
     },
     modal: {
       ondismiss: function(){ _orderProcessing = false; showToast('Payment cancelled'); }
@@ -2431,12 +2430,19 @@ async function checkout() {
   var ca = document.getElementById('coupApplied'); if(ca) ca.style.display='none';
   var ci = document.getElementById('coupInp'); if(ci) ci.value='';
   _orderProcessing = false;
-  showToast('✅ Order placed! We will confirm via WhatsApp shortly.');
-  closeCart();
+  showToast('✅ Order placed! Redirecting...');
 
-  // Save to DB in background (non-blocking) — use cartSnapshot, not cleared cart
+  // Save to DB and redirect to confirmation page
   saveOrderToDB(name, phone, email, addr, city, state, pin, final, discount, shipCharge, 'whatsapp_cod', null, cartSnapshot)
-    .catch(function(e){ console.warn('DB save failed:', e); });
+    .then(function(orderId) {
+      // Also get order_number via a second call isn't needed - use orderId
+      var confUrl = '/order-confirmation?id=' + (orderId||'') + '&total=' + final;
+      setTimeout(function(){ window.location.href = confUrl; }, 600);
+    })
+    .catch(function(e) {
+      console.warn('DB save failed:', e);
+      setTimeout(function(){ window.location.href = '/order-confirmation?total=' + final; }, 600);
+    });
 }
 // Pre-fill delivery form from saved info
 
@@ -3809,17 +3815,33 @@ function renderAcctTab() {
 function renderOrders(orders) {
   if (!orders.length) return '<div class="acct-loading" style="padding:40px">📦 No orders yet.<br><br><small>Your orders will appear here after you shop.</small></div>';
   var statusClass = {pending:'os-pending',confirmed:'os-confirmed',processing:'os-processing',shipped:'os-shipped',delivered:'os-delivered',cancelled:'os-cancelled'};
+  var courierUrls = {
+    'Delhivery': 'https://www.delhivery.com/track/package/',
+    'BlueDart': 'https://www.bluedart.com/tracking?trackFor=0&trackNum=',
+    'DTDC': 'https://tracking.dtdc.com/ctbs-tracking/customerInterface.tr?submitName=showCustLoginPage&cType=self&trackType=cnNo&strCNno=',
+    'Ekart': 'https://ekartlogistics.com/shipmenttrack/',
+    'Xpressbees': 'https://www.xpressbees.com/track?awbnumber=',
+  };
   return '<div class="acct-section"><div class="acct-section-title">Your Orders (' + orders.length + ')</div>' +
     orders.map(function(o) {
       var items = (o.items||[]).slice(0,2).map(function(i){ return (i.emoji||'🌿') + ' ' + i.name + ' ×' + i.qty; }).join(', ');
       if (o.items && o.items.length > 2) items += ' +' + (o.items.length-2) + ' more';
       var sc = statusClass[o.order_status] || 'os-pending';
       var date = o.created_at ? new Date(o.created_at).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : '';
+      // Tracking link
+      var trackHtml = '';
+      if (o.tracking_number) {
+        var tUrl = courierUrls[o.courier] ? courierUrls[o.courier] + o.tracking_number : ('https://www.google.com/search?q=' + encodeURIComponent((o.courier||'') + ' tracking ' + o.tracking_number));
+        trackHtml = '<a href="' + tUrl + '" target="_blank" style="display:inline-flex;align-items:center;gap:4px;margin-top:8px;background:#1a3a1e;color:#fff;padding:5px 12px;border-radius:20px;font-size:11px;font-weight:700;text-decoration:none">🚚 Track — ' + o.tracking_number + '</a>';
+      }
+      // View order link
+      var viewLink = o.id ? '<a href="/order-confirmation?id=' + o.id + '&num=' + encodeURIComponent(o.order_number||'') + '" style="font-size:11px;color:#2d6a4f;font-weight:700;text-decoration:none;margin-left:8px">View →</a>' : '';
       return '<div class="order-card">' +
-        '<div class="order-card-hdr"><span class="order-num">' + (o.order_number||'#'+o.id.slice(0,8)) + '</span>' +
+        '<div class="order-card-hdr"><span class="order-num">' + (o.order_number||'#'+o.id.slice(0,8)) + viewLink + '</span>' +
         '<span class="order-status ' + sc + '">' + (o.order_status||'pending') + '</span></div>' +
         '<div class="order-items">' + (items || 'Items loading…') + '</div>' +
-        '<div class="order-footer"><span class="order-total">₹' + (o.total_amount||0).toLocaleString('en-IN') + '</span>' +
+        trackHtml +
+        '<div class="order-footer" style="margin-top:8px"><span class="order-total">₹' + (o.total_amount||0).toLocaleString('en-IN') + '</span>' +
         '<span class="order-date">' + date + '</span></div></div>';
     }).join('') + '</div>';
 }
@@ -3890,7 +3912,38 @@ function renderProfile(p, user) {
       ? '<div style="padding:10px 12px;background:#e8f5e9;border-radius:9px;font-size:13px;margin-bottom:8px">📧 Email: <strong>' + linkedEmail + '</strong> <span style="color:#2d6a4f">✓ Linked</span></div>'
       : '<div class="link-section"><div class="link-section-title">📧 Link Email</div><div class="profile-field"><input class="profile-input" id="link-email" type="email" placeholder="your@email.com"></div><div class="profile-field"><input class="profile-input" id="link-email-pass" type="password" placeholder="Set a password (min 6 chars)"></div><button class="acct-btn acct-btn-p" onclick="linkEmail()">Link Email</button><div id="link-email-msg" style="font-size:12px;margin-top:6px;color:#c0392b;display:none"></div></div>') +
     '</div>' +
+    '<div class="acct-section" style="margin-top:4px">' +
+    '<div class="acct-section-title">🔒 Change Password</div>' +
+    '<div class="profile-field"><label>New Password</label><input class="profile-input" id="cp-new" type="password" placeholder="Minimum 6 characters"></div>' +
+    '<div class="profile-field"><label>Confirm Password</label><input class="profile-input" id="cp-confirm" type="password" placeholder="Repeat new password"></div>' +
+    '<button class="acct-btn acct-btn-p" onclick="changePassword()" style="margin-top:4px">🔒 Update Password</button>' +
+    '<div id="cp-msg" style="font-size:12px;margin-top:8px;display:none"></div>' +
+    '</div>' +
     '<div style="margin-top:8px"><button class="acct-btn acct-btn-r" onclick="logoutAccount()">🚪 Logout</button></div>';
+}
+
+async function changePassword() {
+  var np = (document.getElementById('cp-new') || {}).value || '';
+  var cp = (document.getElementById('cp-confirm') || {}).value || '';
+  var msg = document.getElementById('cp-msg');
+  if (!np || np.length < 6) {
+    if (msg) { msg.style.color='#c0392b'; msg.textContent='❌ Password min 6 characters chahiye'; msg.style.display='block'; }
+    return;
+  }
+  if (np !== cp) {
+    if (msg) { msg.style.color='#c0392b'; msg.textContent='❌ Passwords match nahi kar rahe'; msg.style.display='block'; }
+    return;
+  }
+  try {
+    if (msg) { msg.style.color='#888'; msg.textContent='Updating...'; msg.style.display='block'; }
+    await callAuth('change_password', { new_password: np }, true);
+    if (msg) { msg.style.color='#2d6a4f'; msg.textContent='✅ Password updated successfully!'; }
+    document.getElementById('cp-new').value = '';
+    document.getElementById('cp-confirm').value = '';
+    setTimeout(function(){ if(msg) msg.style.display='none'; }, 3000);
+  } catch(e) {
+    if (msg) { msg.style.color='#c0392b'; msg.textContent='❌ ' + (e.message || 'Update failed'); msg.style.display='block'; }
+  }
 }
 
 // ── Profile Save Actions ────────────────────────────────────────
@@ -4166,6 +4219,13 @@ function prefillDelivery() {
 document.addEventListener('DOMContentLoaded', function() {
   updateAccountBtn();
   // opencart=1 handled in loadData()
+  // Open orders tab if redirected from order confirmation page
+  if (window.location.search.includes('openorders=1')) {
+    history.replaceState(null, '', '/');
+    if (_authToken) {
+      setTimeout(function() { openAccount(); }, 500);
+    }
+  }
   // Update WA float button href dynamically
   var waBtn = document.getElementById('waFloatBtn');
   if (waBtn) waBtn.href = 'https://wa.me/' + WHATSAPP_NUMBER;

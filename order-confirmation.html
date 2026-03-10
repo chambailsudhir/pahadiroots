@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Order Confirmed — Pahadi Roots</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --g:    #1a3a1e;
+    --g2:   #2d6a4f;
+    --g3:   #40916c;
+    --gd:   #c8920a;
+    --gd2:  #f4a261;
+    --bg:   #faf7f2;
+    --bg2:  #f0ebe2;
+    --bd:   #e8e0d0;
+    --tx:   #1a1a1a;
+    --tx2:  #444;
+    --tx3:  #888;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--tx);
+    min-height: 100vh;
+  }
+
+  /* ── NAV ── */
+  .nav {
+    background: var(--g);
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .nav-logo {
+    display: flex; align-items: center; gap: 10px;
+    text-decoration: none;
+  }
+  .logo-name { font-family: 'Playfair Display', serif; font-size: 20px; color: #fff; font-weight: 900; }
+  .logo-tl   { font-size: 10px; color: rgba(255,255,255,.55); letter-spacing: 1.5px; text-transform: uppercase; }
+  .nav-back {
+    color: rgba(255,255,255,.8); font-size: 13px; font-weight: 600;
+    text-decoration: none; display: flex; align-items: center; gap: 6px;
+    transition: color .2s;
+  }
+  .nav-back:hover { color: #fff; }
+
+  /* ── HERO CONFIRM ── */
+  .confirm-hero {
+    background: linear-gradient(135deg, var(--g) 0%, var(--g2) 100%);
+    padding: 52px 24px 40px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .confirm-hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+  .check-circle {
+    width: 80px; height: 80px;
+    background: rgba(255,255,255,.15);
+    border: 3px solid rgba(255,255,255,.4);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 20px;
+    font-size: 38px;
+    animation: popIn .5s cubic-bezier(.34,1.56,.64,1) both;
+  }
+  @keyframes popIn {
+    from { transform: scale(0); opacity: 0; }
+    to   { transform: scale(1); opacity: 1; }
+  }
+  .confirm-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 32px; font-weight: 900;
+    color: #fff; margin-bottom: 8px;
+    animation: fadeUp .5s .2s both;
+  }
+  .confirm-sub {
+    font-size: 15px; color: rgba(255,255,255,.75);
+    animation: fadeUp .5s .3s both;
+  }
+  @keyframes fadeUp {
+    from { transform: translateY(16px); opacity: 0; }
+    to   { transform: translateY(0);    opacity: 1; }
+  }
+  .order-num-badge {
+    display: inline-block;
+    background: rgba(255,255,255,.15);
+    border: 1.5px solid rgba(255,255,255,.3);
+    border-radius: 20px;
+    padding: 6px 18px;
+    font-size: 13px; font-weight: 700; color: #fff;
+    margin-top: 14px;
+    letter-spacing: .5px;
+    animation: fadeUp .5s .4s both;
+  }
+
+  /* ── MAIN LAYOUT ── */
+  .main { max-width: 720px; margin: 0 auto; padding: 28px 16px 60px; }
+
+  /* ── CARDS ── */
+  .card {
+    background: #fff;
+    border-radius: 16px;
+    border: 1.5px solid var(--bd);
+    padding: 22px 22px;
+    margin-bottom: 16px;
+    animation: fadeUp .4s both;
+  }
+  .card:nth-child(1) { animation-delay: .1s; }
+  .card:nth-child(2) { animation-delay: .2s; }
+  .card:nth-child(3) { animation-delay: .3s; }
+  .card:nth-child(4) { animation-delay: .4s; }
+  .card-title {
+    font-size: 12px; font-weight: 700; color: var(--tx3);
+    text-transform: uppercase; letter-spacing: 1px;
+    margin-bottom: 14px; display: flex; align-items: center; gap: 8px;
+  }
+  .card-title::after {
+    content: ''; flex: 1; height: 1px; background: var(--bd);
+  }
+
+  /* ── STATUS STEPPER ── */
+  .stepper { display: flex; align-items: flex-start; gap: 0; }
+  .step { flex: 1; display: flex; flex-direction: column; align-items: center; position: relative; }
+  .step:not(:last-child)::after {
+    content: ''; position: absolute;
+    top: 16px; left: 50%; width: 100%; height: 2px;
+    background: var(--bd); z-index: 0;
+  }
+  .step.done:not(:last-child)::after { background: var(--g2); }
+  .step-dot {
+    width: 32px; height: 32px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; z-index: 1; position: relative;
+    border: 2px solid var(--bd); background: #fff;
+    transition: all .3s;
+  }
+  .step.done .step-dot  { background: var(--g2); border-color: var(--g2); color: #fff; }
+  .step.active .step-dot{ background: #fff; border-color: var(--g2); color: var(--g2); box-shadow: 0 0 0 4px rgba(45,106,79,.12); }
+  .step-label { font-size: 10px; font-weight: 700; color: var(--tx3); margin-top: 6px; text-align: center; text-transform: uppercase; letter-spacing: .5px; }
+  .step.done .step-label, .step.active .step-label { color: var(--g2); }
+
+  /* ── ORDER ITEMS ── */
+  .order-item {
+    display: flex; align-items: center; gap: 14px;
+    padding: 12px 0; border-bottom: 1px solid var(--bg2);
+  }
+  .order-item:last-child { border-bottom: none; padding-bottom: 0; }
+  .item-img {
+    width: 54px; height: 54px; border-radius: 10px;
+    background: var(--bg2); overflow: hidden; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px;
+  }
+  .item-img img { width: 100%; height: 100%; object-fit: cover; }
+  .item-info { flex: 1; }
+  .item-name  { font-size: 14px; font-weight: 700; color: var(--tx); }
+  .item-meta  { font-size: 12px; color: var(--tx3); margin-top: 2px; }
+  .item-price { font-size: 14px; font-weight: 800; color: var(--g); }
+
+  /* ── SUMMARY ROW ── */
+  .sum-row { display: flex; justify-content: space-between; padding: 7px 0; font-size: 14px; }
+  .sum-row.total { border-top: 2px solid var(--bd); margin-top: 6px; padding-top: 12px; font-size: 17px; font-weight: 900; color: var(--g); }
+  .sum-row .lbl { color: var(--tx2); }
+  .sum-row .val { font-weight: 700; }
+  .free-ship { color: var(--g2); font-weight: 700; }
+
+  /* ── DELIVERY INFO ── */
+  .del-info { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .del-field label { font-size: 11px; font-weight: 700; color: var(--tx3); text-transform: uppercase; letter-spacing: .5px; display: block; margin-bottom: 3px; }
+  .del-field span  { font-size: 14px; font-weight: 600; color: var(--tx); }
+
+  /* ── DELIVERY TIMELINE ── */
+  .timeline { display: flex; flex-direction: column; gap: 0; }
+  .tl-item { display: flex; gap: 14px; padding-bottom: 16px; position: relative; }
+  .tl-item:not(:last-child)::before {
+    content: ''; position: absolute; left: 16px; top: 32px;
+    width: 2px; height: calc(100% - 16px);
+    background: var(--bd);
+  }
+  .tl-dot {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: var(--bg2); border: 2px solid var(--bd);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; flex-shrink: 0; z-index: 1;
+  }
+  .tl-dot.active { background: var(--g2); border-color: var(--g2); }
+  .tl-body { padding-top: 4px; }
+  .tl-title { font-size: 13px; font-weight: 700; color: var(--tx); }
+  .tl-date  { font-size: 12px; color: var(--tx3); margin-top: 2px; }
+
+  /* ── TRACKING ── */
+  .track-box {
+    background: var(--bg2); border-radius: 12px; padding: 14px 16px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .track-box .track-icon { font-size: 28px; }
+  .track-box .track-info { flex: 1; }
+  .track-box .track-label { font-size: 11px; font-weight: 700; color: var(--tx3); text-transform: uppercase; letter-spacing: .5px; }
+  .track-box .track-val   { font-size: 15px; font-weight: 800; color: var(--g); margin-top: 2px; }
+  .track-link {
+    display: inline-block; background: var(--g); color: #fff;
+    padding: 8px 16px; border-radius: 8px; font-size: 12px;
+    font-weight: 700; text-decoration: none; margin-top: 10px;
+    transition: background .2s;
+  }
+  .track-link:hover { background: var(--g2); }
+
+  /* ── ACTION BUTTONS ── */
+  .actions { display: flex; gap: 12px; margin-top: 8px; flex-wrap: wrap; }
+  .btn-primary {
+    flex: 1; min-width: 160px;
+    background: var(--g); color: #fff;
+    border: none; border-radius: 12px; padding: 14px 20px;
+    font-size: 14px; font-weight: 700; cursor: pointer;
+    text-align: center; text-decoration: none;
+    transition: background .2s, transform .15s;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .btn-primary:hover { background: var(--g2); transform: translateY(-1px); }
+  .btn-secondary {
+    flex: 1; min-width: 160px;
+    background: #fff; color: var(--g);
+    border: 2px solid var(--bd); border-radius: 12px; padding: 13px 20px;
+    font-size: 14px; font-weight: 700; cursor: pointer;
+    text-align: center; text-decoration: none;
+    transition: all .2s;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .btn-secondary:hover { border-color: var(--g); background: var(--bg2); }
+
+  /* ── UPSELL ── */
+  .upsell-grid { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+  .upsell-grid::-webkit-scrollbar { display: none; }
+  .upsell-card {
+    min-width: 140px; background: var(--bg2); border-radius: 12px;
+    padding: 12px; text-align: center; cursor: pointer;
+    transition: transform .2s, box-shadow .2s; border: 1.5px solid var(--bd);
+    flex-shrink: 0;
+  }
+  .upsell-card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,.1); }
+  .upsell-emoji { font-size: 32px; margin-bottom: 6px; }
+  .upsell-name  { font-size: 12px; font-weight: 700; color: var(--tx); }
+  .upsell-price { font-size: 13px; font-weight: 800; color: var(--g2); margin-top: 3px; }
+  .upsell-add   { display: inline-block; background: var(--g); color: #fff; border: none; border-radius: 7px; padding: 5px 12px; font-size: 11px; font-weight: 700; margin-top: 7px; cursor: pointer; }
+
+  /* ── LOADING ── */
+  .skeleton { background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: shimmer 1.2s infinite; border-radius: 8px; }
+  @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+
+  /* ── EMPTY/ERROR ── */
+  .error-box { text-align: center; padding: 60px 20px; }
+  .error-box .err-icon { font-size: 48px; margin-bottom: 16px; }
+  .error-box h2 { font-family: 'Playfair Display', serif; font-size: 24px; color: var(--g); margin-bottom: 8px; }
+  .error-box p  { color: var(--tx3); font-size: 14px; margin-bottom: 24px; }
+
+  @media(max-width:600px) {
+    .confirm-title { font-size: 26px; }
+    .del-info { grid-template-columns: 1fr; }
+    .actions { flex-direction: column; }
+    .btn-primary, .btn-secondary { min-width: unset; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <a href="/" class="nav-logo">
+    <span style="font-size:22px">🌿</span>
+    <div>
+      <div class="logo-name">Pahadi Roots</div>
+      <div class="logo-tl">Himalayan Organic Store</div>
+    </div>
+  </a>
+  <a href="/" class="nav-back">← Continue Shopping</a>
+</nav>
+
+<!-- HERO (shown after data loads) -->
+<div id="confirmHero" class="confirm-hero" style="display:none">
+  <div class="check-circle">✅</div>
+  <div class="confirm-title">Order Confirmed!</div>
+  <div class="confirm-sub">Thank you! Your mountain goodness is on its way 🌿</div>
+  <div class="order-num-badge" id="heroOrderNum">Loading...</div>
+</div>
+
+<!-- MAIN -->
+<div class="main" id="mainContent">
+  <!-- Loading skeleton -->
+  <div id="loadingState">
+    <div class="card">
+      <div class="skeleton" style="height:16px;width:40%;margin-bottom:16px"></div>
+      <div style="display:flex;gap:16px">
+        <div class="skeleton" style="width:54px;height:54px;border-radius:10px;flex-shrink:0"></div>
+        <div style="flex:1">
+          <div class="skeleton" style="height:14px;width:70%;margin-bottom:8px"></div>
+          <div class="skeleton" style="height:12px;width:40%"></div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="skeleton" style="height:16px;width:40%;margin-bottom:16px"></div>
+      <div class="skeleton" style="height:12px;margin-bottom:8px"></div>
+      <div class="skeleton" style="height:12px;width:80%"></div>
+    </div>
+  </div>
+
+  <!-- Actual content (populated by JS) -->
+  <div id="orderContent" style="display:none"></div>
+
+  <!-- Error state -->
+  <div id="errorState" class="error-box" style="display:none">
+    <div class="err-icon">📦</div>
+    <h2>Order placed!</h2>
+    <p>We couldn't load your order details right now.<br>Check your email or WhatsApp for confirmation.</p>
+    <a href="/" class="btn-primary" style="max-width:220px;margin:0 auto">← Back to Store</a>
+  </div>
+</div>
+
+<script>
+// ── CONFIG ──
+var STORE_API = '/api/store-data';
+var ADMIN_API = '/api/admin-api';
+var WHATSAPP_NUMBER = '919899984895'; // fallback
+
+// ── GET URL PARAMS ──
+var params   = new URLSearchParams(window.location.search);
+var orderId  = params.get('id')  || '';
+var orderNum = params.get('num') || '';
+var total    = params.get('total') || '';
+var payId    = params.get('payment') || '';
+
+// ── COURIER TRACKING URLS ──
+var courierUrls = {
+  'delhivery':   'https://www.delhivery.com/track/package/',
+  'bluedart':    'https://www.bluedart.com/tracking',
+  'dtdc':        'https://www.dtdc.in/tracking.asp',
+  'ecom':        'https://ecomexpress.in/tracking/',
+  'xpressbees':  'https://www.xpressbees.com/shipment/tracking',
+  'shadowfax':   'https://track.shadowfax.in/',
+  'shiprocket':  'https://shiprocket.co/tracking/',
+};
+
+function getTrackingUrl(courier, trackingNum) {
+  if (!courier || !trackingNum) return null;
+  var base = courierUrls[courier.toLowerCase().replace(/\s/g,'')] || null;
+  if (!base) return null;
+  return base + trackingNum;
+}
+
+// ── RENDER DELIVERY ESTIMATE ──
+function getDeliveryEstimate(createdAt) {
+  var d = createdAt ? new Date(createdAt) : new Date();
+  var lo = new Date(d); lo.setDate(lo.getDate() + 5);
+  var hi = new Date(d); hi.setDate(hi.getDate() + 7);
+  var fmt = function(dt) { return dt.toLocaleDateString('en-IN', {day:'numeric', month:'short'}); };
+  return fmt(lo) + ' – ' + fmt(hi);
+}
+
+// ── RENDER ORDER ──
+function renderOrder(order) {
+  var items   = order.items || [];
+  var status  = order.order_status || 'confirmed';
+  var paymentStatus = order.payment_status || 'pending';
+  var total   = order.total_amount || 0;
+  var sub     = order.subtotal || total;
+  var ship    = order.shipping_charge || 0;
+  var disc    = order.discount_amount || 0;
+  var date    = order.created_at ? new Date(order.created_at).toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'}) : '';
+  var trackNum = order.tracking_number || '';
+  var courier  = order.courier || '';
+  var trackUrl = getTrackingUrl(courier, trackNum);
+  var estimate = getDeliveryEstimate(order.created_at);
+
+  // Show hero
+  document.getElementById('confirmHero').style.display = 'block';
+  document.getElementById('heroOrderNum').textContent = '📋 ' + (order.order_number || 'Order #' + orderId.slice(0,8));
+
+  // Stepper
+  var steps = [
+    {key:'confirmed',  icon:'✅', label:'Confirmed'},
+    {key:'processing', icon:'📦', label:'Processing'},
+    {key:'shipped',    icon:'🚚', label:'Shipped'},
+    {key:'delivered',  icon:'🎉', label:'Delivered'},
+  ];
+  var statusOrder = ['pending','confirmed','processing','shipped','delivered'];
+  var curIdx = statusOrder.indexOf(status);
+
+  var stepperHtml = '<div class="stepper">' + steps.map(function(s,i) {
+    var sIdx = statusOrder.indexOf(s.key);
+    var cls  = sIdx < curIdx ? 'step done' : sIdx === curIdx ? 'step active' : 'step';
+    return '<div class="' + cls + '"><div class="step-dot">' + s.icon + '</div><div class="step-label">' + s.label + '</div></div>';
+  }).join('') + '</div>';
+
+  // Items
+  var itemsHtml = items.map(function(i) {
+    var img = i.image_url ? '<img src="' + i.image_url + '" alt="' + (i.name||'') + '">' : '<span>' + (i.emoji||'🌿') + '</span>';
+    return '<div class="order-item">' +
+      '<div class="item-img">' + img + '</div>' +
+      '<div class="item-info"><div class="item-name">' + (i.name||'Product') + '</div>' +
+      '<div class="item-meta">Qty: ' + (i.qty||i.quantity||1) + (i.variant_value ? ' · ' + i.variant_value : '') + '</div></div>' +
+      '<div class="item-price">₹' + ((i.price||i.price_at_time||0) * (i.qty||i.quantity||1)).toLocaleString('en-IN') + '</div>' +
+    '</div>';
+  }).join('') || '<div style="color:#888;font-size:13px;padding:8px 0">Items loading…</div>';
+
+  // Summary
+  var sumHtml =
+    '<div class="sum-row"><span class="lbl">Subtotal</span><span class="val">₹' + sub.toLocaleString('en-IN') + '</span></div>' +
+    (disc > 0 ? '<div class="sum-row"><span class="lbl" style="color:#2d6a4f">Discount</span><span class="val" style="color:#2d6a4f">−₹' + disc.toLocaleString('en-IN') + '</span></div>' : '') +
+    '<div class="sum-row"><span class="lbl">Shipping</span><span class="val ' + (ship===0?'free-ship':'') + '">' + (ship===0?'🎉 FREE':'₹'+ship) + '</span></div>' +
+    '<div class="sum-row total"><span>Total Paid</span><span>₹' + total.toLocaleString('en-IN') + '</span></div>';
+
+  // Delivery info
+  var addr = [order.address, order.city, order.state, order.pincode].filter(Boolean).join(', ');
+  var delHtml =
+    '<div class="del-info">' +
+    '<div class="del-field"><label>Name</label><span>' + (order.customer_name||'—') + '</span></div>' +
+    '<div class="del-field"><label>Phone</label><span>' + (order.customer_phone||'—') + '</span></div>' +
+    '<div class="del-field" style="grid-column:1/-1"><label>Address</label><span>' + (addr||'—') + '</span></div>' +
+    '<div class="del-field"><label>Estimated Delivery</label><span>🗓 ' + estimate + '</span></div>' +
+    '<div class="del-field"><label>Payment</label><span>' + (order.payment_method === 'razorpay_online' ? '💳 Online' : '📱 COD + WhatsApp') + '</span></div>' +
+    '</div>';
+
+  // Tracking section
+  var trackHtml = '';
+  if (trackNum) {
+    trackHtml = '<div class="track-box"><span class="track-icon">🚚</span><div class="track-info"><div class="track-label">Tracking Number</div><div class="track-val">' + trackNum + (courier ? ' · ' + courier : '') + '</div>' +
+      (trackUrl ? '<a href="' + trackUrl + '" target="_blank" class="track-link">Track your order →</a>' : '') +
+    '</div></div>';
+  } else {
+    trackHtml = '<div class="track-box"><span class="track-icon">📦</span><div class="track-info"><div class="track-label">Tracking</div><div class="track-val" style="font-size:13px;color:#666;font-weight:500">Tracking details will be shared on WhatsApp once your order ships.</div></div></div>';
+  }
+
+  // Full HTML
+  return '<div class="card">' +
+      '<div class="card-title">📊 Order Status</div>' +
+      stepperHtml +
+    '</div>' +
+    '<div class="card">' +
+      '<div class="card-title">🛒 Order Items</div>' +
+      itemsHtml +
+    '</div>' +
+    '<div class="card">' +
+      '<div class="card-title">💰 Price Summary</div>' +
+      sumHtml +
+    '</div>' +
+    '<div class="card">' +
+      '<div class="card-title">📍 Delivery Details</div>' +
+      delHtml +
+    '</div>' +
+    '<div class="card">' +
+      '<div class="card-title">🚚 Tracking</div>' +
+      trackHtml +
+    '</div>' +
+    '<div class="actions">' +
+      '<a href="/my-orders" onclick="openProfileOrders(event)" class="btn-primary">📦 View All Orders</a>' +
+      '<a href="/" class="btn-secondary">🌿 Continue Shopping</a>' +
+    '</div>';
+}
+
+// ── FETCH ORDER DATA ──
+async function loadOrder() {
+  if (!orderId && !orderNum) {
+    // No ID - show basic confirmation with URL params
+    document.getElementById('loadingState').style.display = 'none';
+    document.getElementById('confirmHero').style.display  = 'block';
+    document.getElementById('heroOrderNum').textContent   = total ? 'Total Paid: ₹' + total : '✅ Order Placed';
+    document.getElementById('errorState').style.display   = 'block';
+    return;
+  }
+
+  try {
+    // Fetch from admin-api using anon key (public order view by ID)
+    var query = orderId
+      ? 'id=eq.' + orderId + '&select=*,items:order_items(product_id,quantity,price_at_time,name,emoji,image_url,variant_value)'
+      : 'order_number=eq.' + encodeURIComponent(orderNum) + '&select=*,items:order_items(product_id,quantity,price_at_time,name,emoji,image_url,variant_value)';
+
+    var res = await fetch(ADMIN_API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'get_order_public', orderId: orderId, orderNumber: orderNum })
+    });
+
+    var data = await res.json();
+    if (!res.ok || !data.order) throw new Error(data.error || 'Order not found');
+
+    document.getElementById('loadingState').style.display  = 'none';
+    document.getElementById('orderContent').style.display  = 'block';
+    document.getElementById('orderContent').innerHTML = renderOrder(data.order);
+
+  } catch(e) {
+    console.warn('Order load failed:', e.message);
+    document.getElementById('loadingState').style.display = 'none';
+    document.getElementById('confirmHero').style.display  = 'block';
+    document.getElementById('heroOrderNum').textContent   = orderNum ? '📋 ' + orderNum : (total ? 'Total: ₹' + total : '✅ Order Placed');
+    document.getElementById('errorState').style.display   = 'block';
+  }
+}
+
+function openProfileOrders(e) {
+  e.preventDefault();
+  window.location.href = '/?openorders=1';
+}
+
+loadOrder();
+</script>
+</body>
+</html>
