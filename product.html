@@ -18,9 +18,10 @@
 
     /* ── NAV ── */
     .nav{position:sticky;top:0;z-index:100;background:#fff;border-bottom:1px solid var(--bd);padding:0 20px;display:flex;align-items:center;justify-content:space-between;height:60px;box-shadow:0 2px 12px rgba(0,0,0,.06)}
-    .logo{display:flex;align-items:center;gap:10px}
-    .logo-name{font-family:'Playfair Display',serif;font-size:19px;font-weight:900;color:var(--g)}
-    .logo-tag{font-size:9px;color:var(--gd);letter-spacing:.8px;font-weight:700}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+    .logo-icon{font-size:24px;line-height:1}
+    .logo-name{font-family:'Playfair Display',serif;font-size:19px;font-weight:900;color:var(--g);line-height:1.1}
+    .logo-tl{font-size:10.5px;color:var(--gd);font-weight:600;letter-spacing:.5px}
     .nav-back{display:flex;align-items:center;gap:6px;color:var(--g);font-weight:700;font-size:14px;cursor:pointer;padding:8px 14px;border-radius:20px;border:1.5px solid var(--bd);transition:all .2s}
     .nav-back:hover{background:var(--g);color:#fff;border-color:var(--g)}
     .cart-btn{background:var(--g);color:#fff;border:none;border-radius:20px;padding:7px 16px;font-size:13px;font-weight:700;display:flex;align-items:center;gap:6px;cursor:pointer;transition:background .2s}
@@ -146,12 +147,13 @@
 
 <!-- NAV -->
 <nav class="nav">
-  <div class="logo">
-    <a href="/" style="display:flex;flex-direction:column">
+  <a href="/" class="logo">
+    <div class="logo-icon">🌿</div>
+    <div style="display:flex;flex-direction:column">
       <span class="logo-name">Pahadi Roots</span>
-      <span class="logo-tag">PURE HIMALAYAN</span>
-    </a>
-  </div>
+      <span class="logo-tl">Himalayan Organic Store</span>
+    </div>
+  </a>
   <button class="nav-back" onclick="history.back()">← Back to Store</button>
   <button class="cart-btn" onclick="window.location='/'">🛒 Cart</button>
 </nav>

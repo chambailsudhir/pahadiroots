@@ -271,6 +271,8 @@ section.sec{padding:52px 40px}
 .variant-sel:focus{outline:none;border-color:var(--g)}
 .punt{font-size:11px;color:var(--tx3)}
 .atc{background:var(--g);color:#fff;border:none;border-radius:10px;padding:8px 14px;font-size:13px;font-weight:800;transition:all .2s;font-family:'Lato',sans-serif}
+.atc-hint{font-size:12px;font-weight:700;color:var(--g);margin-top:6px;opacity:.7}
+.pcard:hover .atc-hint{opacity:1}
 .atc:hover{background:var(--g2);transform:translateY(-1px)}
 .cmp-btn{background:none;border:1.5px solid var(--bd);border-radius:10px;padding:5px 10px;font-size:10.5px;font-weight:700;color:var(--tx2);transition:all .2s;font-family:'Lato',sans-serif}
 .cmp-btn:hover,.cmp-btn.active{border-color:var(--g);color:var(--g)}
@@ -1677,15 +1679,7 @@ function mkProd(p) {
         '<div class="prow"><span class="pnow" id="pnow-' + p.id + '">₹' + p.price + '</span>' +
           (p.original_price ? '<span class="pwas">₹' + p.original_price + '</span>' : '') +
           '<span class="punt">' + (p.unit||'') + '</span></div>' +
-        '<div style="display:flex;gap:6px">' +
-          '<button class="atc" onclick="event.stopPropagation();openQV(' + p.id + ')" title="Quick View" style="background:rgba(26,58,30,.1);color:var(--g)">👁</button>' +
-          '<button class="atc" onclick="event.stopPropagation();addToCart(' + p.id + ')">+</button>' +
-        '</div>' +
-      '</div>' +
-      '<div style="display:flex;gap:6px;margin-top:6px">' +
-        '<button class="cmp-btn" data-cmpid="' + p.id + '" onclick="event.stopPropagation();toggleCompare(' + p.id + ',this)">+ Compare</button>' +
-        notifyBtn +
-      '</div>' +
+        (stock <= 0 ? notifyBtn : '<div class="atc-hint">View Details →</div>') +
     '</div>' +
   '</div>';
 }
