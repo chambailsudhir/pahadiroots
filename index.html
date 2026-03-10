@@ -1198,6 +1198,13 @@ if(window.location.search.includes('opencart=1')){
         <div class="ship-prog-bar"><div class="ship-prog-fill" id="shipFill" style="width:0%"></div></div>
       </div>
       <div class="ciw" id="ciw"></div>
+      <!-- Session expired / login required banner -->
+      <div id="cart-login-banner" style="display:none;background:linear-gradient(135deg,#fff8e1,#fff3cd);border:1.5px solid #f4c430;border-radius:14px;padding:20px 22px;margin:8px 0 4px;text-align:center">
+        <div style="font-size:28px;margin-bottom:8px">🔒</div>
+        <div style="font-weight:800;font-size:15px;color:#1a3a1e;margin-bottom:4px">Login Required to Checkout</div>
+        <div style="font-size:13px;color:#666;margin-bottom:14px">Your cart is saved! Login karo aur order place karo.</div>
+        <button onclick="cartLoginRedirect()" style="background:linear-gradient(135deg,#2d6a4f,#40916c);color:#fff;border:none;padding:11px 28px;border-radius:10px;font-size:14px;font-weight:800;cursor:pointer;width:100%">👤 Login / Sign Up</button>
+      </div>
       <!-- Upsell — You might have missed -->
       <div class="cart-upsell" id="cartUpsell" style="display:none">
         <div class="cu-title">🛍️ You might have missed</div>
@@ -2090,9 +2097,33 @@ function uCart() {
   }).join('');
 }
 
+function showCartLoginBanner() {
+  // Hide checkout buttons, show login banner
+  var banner = document.getElementById('cart-login-banner');
+  if (banner) {
+    banner.style.display = 'block';
+    banner.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+  // Save intent to return to cart after login
+  try { localStorage.setItem('pr_return_to', 'cart'); } catch(e) {}
+  showToast('⚠️ Pehle login karo, cart safe hai!');
+}
+
+function cartLoginRedirect() {
+  // Save cart state and open auth
+  try { localStorage.setItem('pr_return_to', 'cart'); } catch(e) {}
+  closeCart();
+  openAuth();
+}
+
 function openCart() {
   var cp = document.getElementById('cartPage');
   if (cp) { cp.classList.add('open'); document.body.style.overflow = 'hidden'; }
+  // Hide login banner if user is now logged in
+  if (_authToken) {
+    var banner = document.getElementById('cart-login-banner');
+    if (banner) banner.style.display = 'none';
+  }
   // If logged in but profile not loaded yet, fetch it first
   if (_authToken && !_authProfile) {
     callAuth('get_profile', {}, true).then(function(data) {
@@ -2188,6 +2219,7 @@ function closeCart() {
 // ── RAZORPAY PAYMENT ────────────────────────────────────────────────
 async function checkoutRazorpay() {
   if (!cart.length) { showToast('🛒 Cart is empty!'); return; }
+  if (!_authToken) { showCartLoginBanner(); return; }
   if (_orderProcessing) { showToast('⏳ Processing, please wait…'); return; }
 
   var name  = (document.getElementById('del-name') ||{}).value||'';
@@ -2298,6 +2330,7 @@ async function saveOrderToDB(name, phone, email, addr, city, state, pin, final, 
 
 async function checkout() {
   if (!cart.length) { showToast('🛒 Cart is empty!'); return; }
+  if (!_authToken) { showCartLoginBanner(); return; }
   if (_orderProcessing) { showToast('⏳ Processing, please wait…'); return; }
   _orderProcessing = true;
 
@@ -3440,6 +3473,7 @@ async function loginWithGoogle() {
       window.history.replaceState({}, '', '/');
       setTimeout(function() {
         showToast('✅ Welcome ' + (profile.first_name || '') + '! Google se login ho gaye!', 'success');
+        handlePostLogin();
         updateAccountBtn();
         uCart();
       }, 300);
@@ -3454,6 +3488,22 @@ function openAuth() {
   document.body.style.overflow = 'hidden';
   setTimeout(function(){ document.getElementById('auth-phone-num').focus(); }, 300);
 }
+function handlePostLogin() {
+  // Return to cart if that was the intent
+  try {
+    var returnTo = localStorage.getItem('pr_return_to');
+    if (returnTo === 'cart') {
+      localStorage.removeItem('pr_return_to');
+      setTimeout(function() {
+        var banner = document.getElementById('cart-login-banner');
+        if (banner) banner.style.display = 'none';
+        openCart();
+        setTimeout(function(){ showToast('✅ Login ho gaye! Ab checkout karo 🎉'); }, 300);
+      }, 500);
+    }
+  } catch(e) {}
+}
+
 function closeAuth() {
   document.getElementById('authModal').classList.remove('open');
   document.body.style.overflow = '';
@@ -3545,6 +3595,7 @@ async function verifyOtp() {
     closeAuth();
     updateAccountBtn();
     showToast('🎉 Welcome to Pahadi Roots!');
+    handlePostLogin();
   } catch(e) {
     errEl.textContent = e.message || 'Invalid OTP. Try again.';
     errEl.classList.add('show');
@@ -3568,6 +3619,7 @@ async function emailLogin() {
     closeAuth();
     updateAccountBtn();
     showToast('🎉 Welcome back!');
+    handlePostLogin();
   } catch(e) {
     errEl.textContent = e.message || 'Invalid email or password';
     errEl.classList.add('show');
@@ -3690,7 +3742,8 @@ async function loadAccountData() {
   } catch(e) {
     if (e.message && e.message.includes('Session expired')) {
       clearAuthSession(); updateAccountBtn(); closeAccount();
-      showToast('Session expired — please login again');
+      showToast('Session expire ho gayi — pehle login karo, cart safe hai!');
+      try { localStorage.setItem('pr_return_to', 'cart'); } catch(e) {}
       setTimeout(openAuth, 600);
     } else {
       document.getElementById('acctBody').innerHTML = '<div class="acct-loading">⚠️ Could not load account. Please try again.</div>';
