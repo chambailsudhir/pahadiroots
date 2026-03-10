@@ -1609,12 +1609,10 @@ async function loadData() {
     // ── Product Variants ──
     if (Array.isArray(data.product_variants) && data.product_variants.length) {
       PRODUCT_VARIANTS = data.product_variants;
-      // Attach variants to each product
       PRODUCTS.forEach(function(p) {
         p.variants = PRODUCT_VARIANTS.filter(function(v) { return String(v.product_id) === String(p.id); });
       });
-      // Re-render so variant dropdowns appear
-      renderProds();
+      // No re-render needed — variants shown on product detail page
     }
 
     // ── Founder slideshow ──
@@ -1664,22 +1662,11 @@ function mkProd(p) {
       '<div class="stock-bar"><div class="stock-fill ' + sClass + '" style="width:' + sPct + '%"></div></div>' +
       '<div class="stock-label ' + sClass + '">' + sLbl + '</div>' +
       '<div class="pfoot" style="margin-top:8px">' +
-        (function() {
-          var vars = p.variants && p.variants.length ? p.variants : [];
-          var varHtml = '';
-          if (vars.length > 0) {
-            varHtml = '<div style="margin-bottom:8px" onclick="event.stopPropagation()" onmousedown="event.stopPropagation()"><select class="fi variant-sel" id="vs-' + p.id + '" onchange="updateCardPrice(' + p.id + ',this)" style="padding:5px 8px;font-size:12px;border-radius:8px;width:100%;cursor:pointer">' +
-              vars.map(function(vr) {
-                return '<option value="' + vr.id + '" data-price="' + vr.price + '" data-stock="' + vr.stock_quantity + '">' + vr.variant_value + ' — ₹' + vr.price + '</option>';
-              }).join('') +
-            '</select></div>';
-          }
-          return varHtml;
-        })() +
         '<div class="prow"><span class="pnow" id="pnow-' + p.id + '">₹' + p.price + '</span>' +
           (p.original_price ? '<span class="pwas">₹' + p.original_price + '</span>' : '') +
           '<span class="punt">' + (p.unit||'') + '</span></div>' +
         (stock <= 0 ? notifyBtn : '<div class="atc-hint">View Details →</div>') +
+      '</div>' +
     '</div>' +
   '</div>';
 }
