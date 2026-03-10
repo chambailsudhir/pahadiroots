@@ -1244,12 +1244,10 @@ if(window.location.search.includes('opencart=1')){
         <!-- DELIVERY INFO FORM -->
         <div class="del-form" id="del-form" autocomplete="off">
           <div class="del-form-title">📍 Delivery Details</div>
-          <!-- Saved addresses dropdown (shown only when logged in) -->
-          <div id="saved-addr-bar" style="display:none;margin-bottom:14px">
-            <label style="font-size:11px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.5px">📋 Select Saved Address</label>
-            <select id="saved-addr-select" onchange="fillSavedAddress(this.value)" style="width:100%;margin-top:6px;padding:10px 12px;border:1.5px solid #ddd;border-radius:10px;font-size:13px;color:#333;background:#fff;cursor:pointer">
-              <option value="">— Choose a saved address —</option>
-            </select>
+          <!-- Saved addresses (shown only when logged in) -->
+          <div id="saved-addr-bar" style="display:none;margin-bottom:16px">
+            <div style="font-size:11px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">📋 Saved Addresses — Select to use</div>
+            <div id="saved-addr-cards" style="display:flex;flex-direction:column;gap:8px"></div>
           </div>
           <div class="del-row">
             <div class="del-field">
@@ -2123,6 +2121,17 @@ function openCart() {
   if (_authToken) {
     var banner = document.getElementById('cart-login-banner');
     if (banner) banner.style.display = 'none';
+    // Always re-render addresses when cart opens (profile might have updated)
+    if (_authProfile) { prefillDelivery(); renderSavedAddresses(); }
+    else if (_authToken) {
+      callAuth('get_profile', {}, true).then(function(d) {
+        if (d && d.profile) {
+          _authProfile = d.profile;
+          try { localStorage.setItem('pr_auth_profile', JSON.stringify(d.profile)); } catch(e) {}
+          prefillDelivery(); renderSavedAddresses();
+        }
+      }).catch(function(){});
+    }
   }
   // If logged in but profile not loaded yet, fetch it first
   if (_authToken && !_authProfile) {
@@ -2151,15 +2160,15 @@ async function setSavedAddresses(addrs) {
 }
 
 function renderSavedAddresses() {
-  var bar    = document.getElementById('saved-addr-bar');
-  var select = document.getElementById('saved-addr-select');
-  if (!bar || !select) return;
+  var bar   = document.getElementById('saved-addr-bar');
+  var cards = document.getElementById('saved-addr-cards');
+  if (!bar || !cards) return;
   if (!_authProfile) { bar.style.display = 'none'; return; }
 
-  // Build address list: Default from profile + extras from DB saved_addresses
+  // Build address list
   var allAddrs = [];
 
-  // 1. Always add Default from profile fields (most up-to-date)
+  // 1. Default from profile fields
   var defPhone = (_authProfile.phone || '').replace(/^\+91/, '').replace(/\D/g,'').slice(-10);
   if (_authProfile.address_line1 || defPhone) {
     allAddrs.push({
@@ -2174,7 +2183,7 @@ function renderSavedAddresses() {
     });
   }
 
-  // 2. Add extra saved addresses (exclude any stale Default entries)
+  // 2. Extra saved addresses
   var extras = getSavedAddresses().filter(function(a){ return a.label !== 'Default'; });
   allAddrs = allAddrs.concat(extras);
 
@@ -2182,24 +2191,50 @@ function renderSavedAddresses() {
   bar.style.display = 'block';
   window._savedAddresses = allAddrs;
 
-  select.innerHTML = allAddrs.map(function(a, idx) {
-    return '<option value="' + idx + '">📍 ' + (a.label || 'Address '+(idx+1)) + ' — ' + a.addr + (a.city ? ', ' + a.city : '') + '</option>';
+  // Render as clickable cards
+  cards.innerHTML = allAddrs.map(function(a, idx) {
+    var icon = a.label === 'Default' ? '🏠' : a.label === 'Parents' ? '👨‍👩‍👦' : a.label === 'Office' ? '🏢' : '📍';
+    var addrLine = [a.addr, a.city, a.pin].filter(Boolean).join(', ');
+    return '<div class="addr-card" id="addr-card-' + idx + '" onclick="selectAddressCard(' + idx + ')" style="border:2px solid #e8e8e8;border-radius:12px;padding:11px 14px;cursor:pointer;transition:all .2s;background:#fafafa">' +
+      '<div style="display:flex;align-items:center;justify-content:space-between">' +
+        '<div style="display:flex;align-items:center;gap:8px">' +
+          '<span style="font-size:18px">' + icon + '</span>' +
+          '<span style="font-weight:800;font-size:13px;color:#1a3a1e">' + (a.label || 'Address '+(idx+1)) + '</span>' +
+        '</div>' +
+        '<div id="addr-tick-' + idx + '" style="display:none;color:#2d6a4f;font-weight:900;font-size:16px">✓</div>' +
+      '</div>' +
+      '<div style="font-size:12px;color:#555;margin-top:4px;padding-left:26px">' + (a.name ? a.name + ' · ' : '') + addrLine + '</div>' +
+    '</div>';
   }).join('');
 
-  // Auto-select + auto-fill Default (index 0)
-  select.value = '0';
-  fillSavedAddress('0');
+  // Auto-select first address
+  selectAddressCard(0);
+}
+
+function selectAddressCard(idx) {
+  // Reset all cards
+  (window._savedAddresses || []).forEach(function(_, i) {
+    var card = document.getElementById('addr-card-' + i);
+    var tick = document.getElementById('addr-tick-' + i);
+    if (card) { card.style.border = '2px solid #e8e8e8'; card.style.background = '#fafafa'; }
+    if (tick) tick.style.display = 'none';
+  });
+  // Highlight selected
+  var selCard = document.getElementById('addr-card-' + idx);
+  var selTick = document.getElementById('addr-tick-' + idx);
+  if (selCard) { selCard.style.border = '2px solid #2d6a4f'; selCard.style.background = '#f0f7f4'; }
+  if (selTick) selTick.style.display = 'block';
+  // Fill form
+  fillSavedAddress(idx);
 }
 
 function fillSavedAddress(idx) {
   if (idx === '' || idx === null || idx === undefined) return;
   var a = (window._savedAddresses || [])[parseInt(idx)];
   if (!a) return;
-  // Clean phone — strip +91, keep 10 digits
   var phone = (a.phone || '').replace(/^\+91/, '').replace(/\D/g,'').slice(-10);
   var map = { 'del-name': a.name, 'del-phone': phone, 'del-addr': a.addr, 'del-city': a.city, 'del-state': a.state, 'del-pin': a.pin, 'del-email': a.email };
   Object.entries(map).forEach(function(kv){ var el = document.getElementById(kv[0]); if(el) el.value = kv[1] || ''; });
-  showToast('📍 Address filled!');
 }
 
 function showNewAddressForm() {
@@ -3489,17 +3524,30 @@ function openAuth() {
   setTimeout(function(){ document.getElementById('auth-phone-num').focus(); }, 300);
 }
 function handlePostLogin() {
-  // Return to cart if that was the intent
   try {
     var returnTo = localStorage.getItem('pr_return_to');
     if (returnTo === 'cart') {
       localStorage.removeItem('pr_return_to');
-      setTimeout(function() {
+      // Fetch fresh profile (has saved_addresses) before opening cart
+      callAuth('get_profile', {}, true).then(function(data) {
+        if (data && data.profile) {
+          _authProfile = data.profile;
+          try { localStorage.setItem('pr_auth_profile', JSON.stringify(data.profile)); } catch(e) {}
+        }
         var banner = document.getElementById('cart-login-banner');
         if (banner) banner.style.display = 'none';
         openCart();
+        prefillDelivery();
+        renderSavedAddresses();
         setTimeout(function(){ showToast('✅ Login ho gaye! Ab checkout karo 🎉'); }, 300);
-      }, 500);
+      }).catch(function() {
+        // Even if profile fetch fails, open cart
+        var banner = document.getElementById('cart-login-banner');
+        if (banner) banner.style.display = 'none';
+        openCart();
+        prefillDelivery();
+        renderSavedAddresses();
+      });
     }
   } catch(e) {}
 }
