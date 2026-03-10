@@ -807,7 +807,7 @@ if(window.location.search.includes('opencart=1')){
         <div onclick="closeAcctDropdown();openAccount()" style="padding:11px 16px;font-size:13px;color:#333;cursor:pointer;display:flex;align-items:center;gap:10px" onmouseover="this.style.background='#f9f9f9'" onmouseout="this.style.background=''"><span>👤</span> Profile & Address</div>
         <div style="padding:8px 16px;border-top:1px solid #f5f5f5">
           <button id="dd-login-btn" onclick="closeAcctDropdown();openAuth()" style="width:100%;padding:9px;background:#1a3a1e;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer">Login / Sign Up</button>
-          <button id="dd-logout-btn" onclick="closeAcctDropdown();logoutUser()" style="display:none;width:100%;padding:9px;background:#fdecea;color:#c0392b;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;margin-top:6px">Logout</button>
+          <button id="dd-logout-btn" onclick="closeAcctDropdown();logoutAccount()" style="display:none;width:100%;padding:9px;background:#fdecea;color:#c0392b;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;margin-top:6px">Logout</button>
         </div>
       </div>
     </div>
@@ -1247,7 +1247,7 @@ if(window.location.search.includes('opencart=1')){
           <!-- Saved addresses (shown only when logged in) -->
           <div id="saved-addr-bar" style="display:none;margin-bottom:16px">
             <div style="font-size:11px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">📋 Saved Addresses — Select to use</div>
-            <div id="saved-addr-cards" style="display:flex;flex-direction:column;gap:8px"></div>
+            <div id="saved-addr-cards" style="display:flex;flex-direction:column;gap:8px;max-height:220px;overflow-y:auto;padding-right:2px"></div>
           </div>
           <div class="del-row">
             <div class="del-field">
