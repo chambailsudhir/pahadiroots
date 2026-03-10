@@ -1930,7 +1930,7 @@ function initProductHoverImages() {
 
 
 function goToProductPage(slug) {
-  window.location.href = '/products/' + slug;
+  window.open('/products/' + slug, '_blank');
 }
 
 function updateCardPrice(prodId, sel) {
@@ -3980,6 +3980,11 @@ function prefillDelivery() {
 // ── Boot: restore session UI ────────────────────────────────────
 document.addEventListener('DOMContentLoaded', function() {
   updateAccountBtn();
+  // Open cart if redirected from product page
+  if (window.location.search.includes('opencart=1')) {
+    setTimeout(function() { openCart(); }, 400);
+    history.replaceState(null, '', '/');
+  }
   // Update WA float button href dynamically
   var waBtn = document.getElementById('waFloatBtn');
   if (waBtn) waBtn.href = 'https://wa.me/' + WHATSAPP_NUMBER;

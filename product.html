@@ -155,7 +155,7 @@
     </div>
   </a>
   <button class="nav-back" onclick="history.back()">← Back to Store</button>
-  <button class="cart-btn" onclick="window.location='/'">🛒 Cart</button>
+  <button class="cart-btn" onclick="goToCart()" id="nav-cart-btn">🛒 Cart <span id="nav-cart-count" style="background:rgba(255,255,255,.3);border-radius:10px;padding:1px 7px;font-size:11px;display:none">0</span></button>
 </nav>
 
 <!-- BREADCRUMB -->
@@ -185,6 +185,21 @@ var selectedVariant = null;
 var qty = 1;
 var cart = [];
 var wishlist = [];
+
+// ── Cart count from localStorage ──
+function updateNavCart() {
+  var total = cart.reduce(function(s, x) { return s + (x.qty || 1); }, 0);
+  var el = document.getElementById('nav-cart-count');
+  if (el) {
+    el.textContent = total;
+    el.style.display = total > 0 ? 'inline' : 'none';
+  }
+}
+
+// ── Go to cart — passes cart state back to main site ──
+function goToCart() {
+  window.location.href = '/?opencart=1';
+}
 
 // ── Load cart from localStorage ──
 try { cart = JSON.parse(localStorage.getItem('pr_cart') || '[]'); } catch(e) { cart = []; }
@@ -420,6 +435,7 @@ function addToCartProduct() {
   else cart.push({ cartKey: cartKey, id: PRODUCT.id, variantId: variantId, name: displayName, emoji: PRODUCT.emoji, image: PRODUCT.image_url || '', price: price, qty: qty });
 
   try { localStorage.setItem('pr_cart', JSON.stringify(cart)); } catch(e) {}
+  updateNavCart();
   showToast('✅ ' + displayName + ' × ' + qty + ' added!');
   document.getElementById('atc-btn').textContent = '✅ Added!';
   setTimeout(function() { document.getElementById('atc-btn').innerHTML = '🛒 Add to Cart'; }, 1500);
@@ -449,6 +465,7 @@ function showNotFound(msg) {
 }
 
 // ── Init ──
+updateNavCart();
 loadProduct();
 </script>
 </body>
