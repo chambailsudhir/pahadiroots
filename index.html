@@ -2483,7 +2483,7 @@ function onSearch(q) {
   if (!hits.length) { if(res) res.innerHTML = '<div class="srch-empty">No products found for "' + q + '"</div>'; return; }
   if (!res) return;
   res.innerHTML = hits.map(function(p) {
-    return '<div class="srch-item" onclick="closeSearch();openQV(' + p.id + ')">' +
+    return '<div class="srch-item" onclick="closeSearch();goToProductPage(\'' + (p.slug||p.id) + '\')" style="cursor:pointer">' +
       '<div class="srch-thumb">' + (p.image_url ? '<img src="' + p.image_url + '" alt="' + p.name + '" loading="lazy">' : (p.emoji||'🌿')) + '</div>' +
       '<div><div class="srch-iname">' + p.name + '</div>' +
       '<div class="srch-iregion">📍 ' + (p.region||'') + '</div>' +
@@ -2530,7 +2530,7 @@ function renderWishlist() {
     return;
   }
   body.innerHTML = '<div class="wl-grid">' + items.map(function(p) {
-    return '<div class="wl-card" onclick="closeWishlist();openQV(' + p.id + ')">' +
+    return '<div class="wl-card" onclick="closeWishlist();goToProductPage(\'' + (p.slug||p.id) + '\')" style="cursor:pointer">' +
       '<button class="wl-irm" onclick="event.stopPropagation();toggleWishlist(' + p.id + ');renderWishlist()">✕</button>' +
       '<div class="wl-img">' + (p.image_url ? '<img src="' + p.image_url + '" alt="' + p.name + '" loading="lazy">' : (p.emoji||'🌿')) + '</div>' +
       '<div class="wl-info"><div class="wl-iname">' + p.name + '</div><div class="wl-iprice">₹' + p.price + '</div>' +
@@ -2635,7 +2635,7 @@ function renderRecentlyViewed() {
   if (!items.length) { sec.style.display = 'none'; return; }
   sec.style.display = 'block';
   strip.innerHTML = items.map(function(p) {
-    return '<div class="rv-mini" onclick="openQV(' + p.id + ')">' +
+    return '<div class="rv-mini" onclick="goToProductPage(\'' + (p.slug||p.id) + '\')" style="cursor:pointer">' +
       '<div class="rv-mini-img">' + (p.image_url ? '<img src="' + p.image_url + '" alt="' + p.name + '" loading="lazy">' : (p.emoji||'🌿')) + '</div>' +
       '<div class="rv-mini-info"><div class="rv-mini-name">' + p.name + '</div><div class="rv-mini-price">₹' + p.price + '</div></div>' +
     '</div>';
@@ -2848,19 +2848,7 @@ function addBulkBadges() {
 
 // ── STICKY ATC INIT (removed) ──────────────────────────────────────
 function initStickyAtcStub() {
-  if (!window.IntersectionObserver) return;
-  var obs = new IntersectionObserver(function(entries) {
-    entries.forEach(function(e) {
-      if (e.isIntersecting) {
-        var btn = e.target.querySelector('.atc[onclick*="addToCart"]');
-        if (btn) {
-          var match = btn.getAttribute('onclick').match(/\d+/);
-          if (match) showStickyAtc(parseInt(match[0]));
-        }
-      }
-    });
-  }, {threshold: 0.8});
-  document.querySelectorAll('.pcard').forEach(function(c) { obs.observe(c); });
+  // Cards now link to product detail page — sticky ATC not used
 }
 
 // ── SUBSCRIBE (newsletter) ─────────────────────────────────────────
@@ -3980,10 +3968,22 @@ function prefillDelivery() {
 // ── Boot: restore session UI ────────────────────────────────────
 document.addEventListener('DOMContentLoaded', function() {
   updateAccountBtn();
-  // Open cart if redirected from product page
+  // Open cart if redirected from product page — instantly, no flash
   if (window.location.search.includes('opencart=1')) {
-    setTimeout(function() { openCart(); }, 400);
     history.replaceState(null, '', '/');
+    var cp = document.getElementById('cartPage');
+    if (cp) { cp.classList.add('open'); document.body.style.overflow = 'hidden'; }
+    uCart();
+    if (_authToken && !_authProfile) {
+      callAuth('get_profile', {}, true).then(function(data) {
+        _authProfile = data.profile;
+        prefillDelivery();
+        renderSavedAddresses();
+      }).catch(function(){});
+    } else {
+      prefillDelivery();
+      renderSavedAddresses();
+    }
   }
   // Update WA float button href dynamically
   var waBtn = document.getElementById('waFloatBtn');
