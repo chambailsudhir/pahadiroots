@@ -155,7 +155,7 @@
     </div>
   </a>
   <button class="nav-back" onclick="document.referrer ? history.back() : window.location.href='/'">← Back to Store</button>
-  <button class="cart-btn" onclick="goToCart()" id="nav-cart-btn">🛒 Cart <span id="nav-cart-count" style="background:rgba(255,255,255,.3);border-radius:10px;padding:1px 7px;font-size:11px;display:none">0</span></button>
+  <button class="cart-btn" onclick="goToCart()" id="nav-cart-btn">🛒 Cart (<span id="nav-cart-count">0</span>)</button>
 </nav>
 
 <!-- BREADCRUMB -->
@@ -188,12 +188,12 @@ var wishlist = [];
 
 // ── Cart count from localStorage ──
 function updateNavCart() {
-  var total = cart.reduce(function(s, x) { return s + (x.qty || 1); }, 0);
+  var latestCart;
+  try { latestCart = JSON.parse(localStorage.getItem('pr_cart') || '[]'); } catch(e) { latestCart = []; }
+  cart = latestCart; // keep global in sync
+  var total = latestCart.reduce(function(s, x) { return s + (parseInt(x.qty) || 1); }, 0);
   var el = document.getElementById('nav-cart-count');
-  if (el) {
-    el.textContent = total;
-    el.style.display = total > 0 ? 'inline' : 'none';
-  }
+  if (el) el.textContent = total;
 }
 
 // ── Go to cart — passes cart state back to main site ──
@@ -440,15 +440,22 @@ function addToCartProduct() {
   var cartKey = variantId ? (PRODUCT.id + '_' + variantId) : PRODUCT.id;
   var displayName = PRODUCT.name + (variantLabel ? ' (' + variantLabel + ')' : '');
 
-  var ex = cart.find(function(x) { return (x.cartKey || x.id) === cartKey; });
+  var cartKeyStr = String(cartKey);
+  var ex = cart.find(function(x) { return String(x.cartKey || x.id) === cartKeyStr; });
   if (ex) ex.qty += qty;
   else cart.push({ cartKey: cartKey, id: PRODUCT.id, variantId: variantId, name: displayName, emoji: PRODUCT.emoji, image: PRODUCT.image_url || '', price: price, qty: qty });
 
   try { localStorage.setItem('pr_cart', JSON.stringify(cart)); } catch(e) {}
   updateNavCart();
-  showToast('✅ ' + displayName + ' × ' + qty + ' added!');
+  showToast('✅ ' + displayName + ' added! Cart: ' + cart.reduce(function(s,x){return s+(x.qty||0);},0) + ' items');
   document.getElementById('atc-btn').textContent = '✅ Added!';
   setTimeout(function() { document.getElementById('atc-btn').innerHTML = '🛒 Add to Cart'; }, 1500);
+  // Reset qty to 1 after adding
+  qty = 1;
+  var qd = document.getElementById('qty-display');
+  if (qd) qd.textContent = '1';
+  var minusBtn = document.querySelector('.qty-ctrl .qty-btn:first-child');
+  if (minusBtn) minusBtn.style.opacity = '0.3';
 }
 
 // ── Toggle wishlist ──
