@@ -759,15 +759,12 @@ footer{background:#0d1a0f;padding:44px 40px 24px}
 </head>
 
 <body>
-<script>if(window.location.search.includes('opencart=1')){document.addEventListener('DOMContentLoaded',function(){var cp=document.getElementById('cartPage');if(cp){cp.classList.add('open');document.body.style.overflow='hidden';}},{once:true});}</script>
 <script>
-// Instantly open cart page if redirected from product — prevents flash
+// Hide main content instantly if opencart=1 to prevent flash
 if(window.location.search.includes('opencart=1')){
-  document.addEventListener('DOMContentLoaded',function(){
-    var cp=document.getElementById('cartPage');
-    if(cp){cp.classList.add('open');document.body.style.overflow='hidden';}
-  },{once:true});
+  document.write('<style>.hero,.pgrid,.section,.trust,.ticker,.ann{visibility:hidden!important}</style>');
 }
+</script>
 </script>
 <div class="ann">🌿 Free Shipping above ₹<span id="annShipAmt">799</span> &nbsp;|&nbsp; <a href="#pay-sec">UPI · Cards · COD</a> &nbsp;|&nbsp; 10 Himalayan States Covered</div>
 <!-- Announcement Ticker -->
@@ -797,7 +794,23 @@ if(window.location.search.includes('opencart=1')){
   <div class="nav-right">
     <button class="nib" onclick="openSearch()" title="Search products" aria-label="Search">🔍</button>
     <button class="nib" onclick="openWishlist()" title="Wishlist — Apni pasandida products save karo" aria-label="Wishlist" style="position:relative">❤️<span class="wl-badge" id="wlBadge"></span></button>
-    <button class="nib" id="accountBtn" onclick="openAccount()" title="My Account" aria-label="My Account" style="position:relative">👤<span id="accountDot" style="display:none;position:absolute;top:4px;right:4px;width:7px;height:7px;background:#2d6a4f;border-radius:50%;border:1.5px solid #fff"></span></button>
+    <div style="position:relative" id="acctHoverZone" onmouseenter="showAcctDropdown()" onmouseleave="hideAcctDropdown()">
+      <button class="nib" id="accountBtn" onclick="openAccount()" title="My Account" aria-label="My Account" style="position:relative">👤<span id="accountDot" style="display:none;position:absolute;top:4px;right:4px;width:7px;height:7px;background:#2d6a4f;border-radius:50%;border:1.5px solid #fff"></span></button>
+      <!-- Hover dropdown -->
+      <div id="acctDropdown" style="display:none;position:absolute;top:100%;right:0;width:220px;background:#fff;border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,.15);border:1px solid #f0f0f0;z-index:9999;overflow:hidden;padding:8px 0">
+        <div style="padding:12px 16px;border-bottom:1px solid #f5f5f5">
+          <div style="font-size:13px;font-weight:800;color:#1a3a1e" id="dd-name">Welcome!</div>
+          <div style="font-size:11px;color:#888;margin-top:2px" id="dd-sub">Login to manage your account</div>
+        </div>
+        <div onclick="closeAcctDropdown();openAccount()" style="padding:11px 16px;font-size:13px;color:#333;cursor:pointer;display:flex;align-items:center;gap:10px" onmouseover="this.style.background='#f9f9f9'" onmouseout="this.style.background=''"><span>📦</span> My Orders</div>
+        <div onclick="closeAcctDropdown();openWishlist()" style="padding:11px 16px;font-size:13px;color:#333;cursor:pointer;display:flex;align-items:center;gap:10px" onmouseover="this.style.background='#f9f9f9'" onmouseout="this.style.background=''"><span>🤍</span> Wishlist</div>
+        <div onclick="closeAcctDropdown();openAccount()" style="padding:11px 16px;font-size:13px;color:#333;cursor:pointer;display:flex;align-items:center;gap:10px" onmouseover="this.style.background='#f9f9f9'" onmouseout="this.style.background=''"><span>👤</span> Profile & Address</div>
+        <div style="padding:8px 16px;border-top:1px solid #f5f5f5">
+          <button id="dd-login-btn" onclick="closeAcctDropdown();openAuth()" style="width:100%;padding:9px;background:#1a3a1e;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer">Login / Sign Up</button>
+          <button id="dd-logout-btn" onclick="closeAcctDropdown();logoutUser()" style="display:none;width:100%;padding:9px;background:#fdecea;color:#c0392b;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;margin-top:6px">Logout</button>
+        </div>
+      </div>
+    </div>
     <button class="dark-btn" onclick="toggleDark()" id="darkBtn" title="Toggle dark mode">🌙</button>
     <button class="cart-btn" onclick="openCart()">🛒 Cart <span class="cbadge" id="cartCount">0</span></button>
     <button class="mob-menu-btn" onclick="openMobNav()" aria-label="Menu">☰</button>
@@ -1465,6 +1478,20 @@ async function loadData() {
   PRODUCTS = FALLBACK_PRODUCTS.map(p => Object.assign({}, p));
   renderProds(); renderStates(); uCart(); observeRv();
   initAllStateSlides(); initProductHoverImages();
+  // Open cart instantly if redirected from product page
+  if (window.location.search.includes('opencart=1')) {
+    history.replaceState(null, '', '/');
+    var cp = document.getElementById('cartPage');
+    if (cp) { cp.classList.add('open'); document.body.style.overflow = 'hidden'; }
+    // Auth + address fill (async, non-blocking)
+    if (_authToken && !_authProfile) {
+      callAuth('get_profile', {}, true).then(function(d) {
+        _authProfile = d.profile; prefillDelivery(); renderSavedAddresses();
+      }).catch(function(){});
+    } else {
+      prefillDelivery(); renderSavedAddresses();
+    }
+  }
 
   // Step 2: try DB
   try {
@@ -1977,10 +2004,11 @@ function addToCart(id) {
   sv(); uCart(); openCart();
   showToast('✅ ' + displayName + ' added!');
 }
-function rmCart(id) { cart = cart.filter(function(x) { return (x.cartKey||x.id) !== id; }); sv(); uCart(); }
+function rmCart(id) { var sid=String(id); cart = cart.filter(function(x) { return String(x.cartKey||x.id) !== sid; }); sv(); uCart(); }
 function chQty(id, d) {
-  var i = cart.find(function(x) { return (x.cartKey||x.id) === id; });
-  if (i) { i.qty += d; if (i.qty < 1) rmCart(id); }
+  var sid = String(id);
+  var i = cart.find(function(x) { return String(x.cartKey||x.id) === sid; });
+  if (i) { i.qty += d; if (i.qty < 1) { rmCart(id); return; } }
   sv(); uCart();
 }
 
@@ -3578,6 +3606,45 @@ async function emailSignup() {
 function updateAccountBtn() {
   var dot = document.getElementById('accountDot');
   if (dot) dot.style.display = _authToken ? 'block' : 'none';
+  // Update dropdown state
+  var ddName = document.getElementById('dd-name');
+  var ddSub = document.getElementById('dd-sub');
+  var ddLogin = document.getElementById('dd-login-btn');
+  var ddLogout = document.getElementById('dd-logout-btn');
+  if (_authToken && _authProfile) {
+    var name = [_authProfile.first_name, _authProfile.last_name].filter(Boolean).join(' ') || 'Account';
+    if (ddName) ddName.textContent = 'Hi, ' + name.split(' ')[0] + '! 👋';
+    if (ddSub) ddSub.textContent = _authProfile.email || '';
+    if (ddLogin) ddLogin.style.display = 'none';
+    if (ddLogout) ddLogout.style.display = 'block';
+  } else if (_authToken) {
+    if (ddName) ddName.textContent = 'My Account';
+    if (ddLogin) ddLogin.style.display = 'none';
+    if (ddLogout) ddLogout.style.display = 'block';
+  } else {
+    if (ddName) ddName.textContent = 'Welcome!';
+    if (ddSub) ddSub.textContent = 'Login to manage your account';
+    if (ddLogin) ddLogin.style.display = 'block';
+    if (ddLogout) ddLogout.style.display = 'none';
+  }
+}
+
+var _acctDropTimer = null;
+function showAcctDropdown() {
+  clearTimeout(_acctDropTimer);
+  updateAccountBtn();
+  var dd = document.getElementById('acctDropdown');
+  if (dd) dd.style.display = 'block';
+}
+function hideAcctDropdown() {
+  _acctDropTimer = setTimeout(function() {
+    var dd = document.getElementById('acctDropdown');
+    if (dd) dd.style.display = 'none';
+  }, 200);
+}
+function closeAcctDropdown() {
+  var dd = document.getElementById('acctDropdown');
+  if (dd) dd.style.display = 'none';
 }
 
 // ── Account Panel ───────────────────────────────────────────────
@@ -3585,6 +3652,7 @@ var _acctTab = 'orders';
 var _acctData = null;
 
 function openAccount() {
+  closeAcctDropdown();
   if (!_authToken) { openAuth(); return; }
   document.getElementById('acctPanel').classList.add('open');
   document.getElementById('acctBg').classList.add('open');
@@ -3996,23 +4064,7 @@ function prefillDelivery() {
 // ── Boot: restore session UI ────────────────────────────────────
 document.addEventListener('DOMContentLoaded', function() {
   updateAccountBtn();
-  // Open cart if redirected from product page — instantly, no flash
-  if (window.location.search.includes('opencart=1')) {
-    history.replaceState(null, '', '/');
-    var cp = document.getElementById('cartPage');
-    if (cp) { cp.classList.add('open'); document.body.style.overflow = 'hidden'; }
-    uCart();
-    if (_authToken && !_authProfile) {
-      callAuth('get_profile', {}, true).then(function(data) {
-        _authProfile = data.profile;
-        prefillDelivery();
-        renderSavedAddresses();
-      }).catch(function(){});
-    } else {
-      prefillDelivery();
-      renderSavedAddresses();
-    }
-  }
+  // opencart=1 handled in loadData()
   // Update WA float button href dynamically
   var waBtn = document.getElementById('waFloatBtn');
   if (waBtn) waBtn.href = 'https://wa.me/' + WHATSAPP_NUMBER;

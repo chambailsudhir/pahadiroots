@@ -424,6 +424,11 @@ function changeQty(d) {
   var stock = selectedVariant ? selectedVariant.stock_quantity : (PRODUCT ? PRODUCT.stock_quantity : 99);
   qty = Math.max(1, Math.min(qty + d, stock || 99));
   document.getElementById('qty-display').textContent = qty;
+  // Visually disable minus at 1, plus at stock limit
+  var minusBtn = document.querySelector('.qty-ctrl .qty-btn:first-child');
+  var plusBtn = document.querySelector('.qty-ctrl .qty-btn:last-child');
+  if (minusBtn) minusBtn.style.opacity = qty <= 1 ? '0.3' : '1';
+  if (plusBtn) plusBtn.style.opacity = qty >= (stock || 99) ? '0.3' : '1';
 }
 
 // ── Add to cart ──
