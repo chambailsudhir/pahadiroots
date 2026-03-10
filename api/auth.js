@@ -504,6 +504,21 @@ export default async function handler(req, res) {
     return res.status(200).json({ session, profile, user });
   }
 
+  // ── change_password ──────────────────────────────────────────
+  if (action === 'change_password') {
+    const token = (req.headers['authorization'] || '').replace('Bearer ', '');
+    const { new_password } = body;
+    if (!token) return err(401, 'Not logged in');
+    if (!new_password || new_password.length < 6) return err(400, 'Password min 6 characters');
+    try {
+      const user = await sbAuth('/user', null, token);
+      await sbAdmin('PUT', `/auth/v1/admin/users/${user.id}`, { password: new_password });
+      return ok({ success: true });
+    } catch(e) {
+      return err(e.status || 400, e.message || 'Password update failed');
+    }
+  }
+
   return err(400, `Unknown action: ${action}`);
 }
 

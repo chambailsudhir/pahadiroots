@@ -120,7 +120,7 @@ export default async function handler(req, res) {
   }
 
   const pw = req.headers['x-admin-password'] || '';
-  const isPublicAction = reqBody.action === 'save_order';
+  const isPublicAction = reqBody.action === 'save_order' || reqBody.action === 'public_get_order';
   if (!isPublicAction && (!pw || pw.length !== ADMIN_PW.length || pw !== ADMIN_PW)) {
     return err(401, 'Unauthorized');
   }
@@ -267,6 +267,36 @@ export default async function handler(req, res) {
     } catch(e) {
       console.error('save_order error:', e);
       return err(500, 'Order save failed: ' + (e.message || JSON.stringify(e)));
+    }
+  }
+
+  // ── public_get_order — order confirmation page ──────────────────
+  if (reqBody.action === 'public_get_order') {
+    const { order_id } = reqBody;
+    if (!order_id) return err(400, 'order_id required');
+    try {
+      const orderRes = await fetch(
+        `${SUPABASE_URL}/rest/v1/orders?id=eq.${order_id}&select=id,order_number,order_status,payment_status,total_amount,subtotal,discount_amount,shipping_charge,customer_name,customer_phone,delivery_address,city,state,pincode,tracking_number,courier,shipped_at,delivered_at,created_at,payment_method`,
+        { headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY } }
+      );
+      const orders = await orderRes.json();
+      if (!orders || !orders.length) return err(404, 'Order not found');
+      const order = orders[0];
+      const itemsRes = await fetch(
+        `${SUPABASE_URL}/rest/v1/order_items?order_id=eq.${order_id}&select=product_id,quantity,price_at_time,products(name,emoji,image_url)`,
+        { headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY } }
+      );
+      const rawItems = await itemsRes.json();
+      order.items = (rawItems || []).map(i => ({
+        name: i.products?.name || 'Product',
+        emoji: i.products?.emoji || '🌿',
+        image_url: i.products?.image_url || null,
+        qty: i.quantity,
+        price: i.price_at_time
+      }));
+      return ok({ order });
+    } catch(e) {
+      return err(500, e.message || 'Failed to fetch order');
     }
   }
 
