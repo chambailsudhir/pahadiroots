@@ -2299,7 +2299,8 @@ async function checkoutRazorpay() {
     theme: { color: '#2d6a4f' },
     handler: async function(response) {
       showToast('✅ Payment successful! Saving order...');
-      var orderResult = await saveOrderToDB(name, phone, email, addr, city, state, pin, final, discount, shipCharge, 'razorpay_online', response.razorpay_payment_id);
+      var cartSnapshot = cart.slice(); // snapshot before clearing
+      var orderResult = await saveOrderToDB(name, phone, email, addr, city, state, pin, final, discount, shipCharge, 'razorpay_online', response.razorpay_payment_id, cartSnapshot);
       var orderId = (orderResult && orderResult.orderId) || '';
       var orderNumber = (orderResult && orderResult.orderNumber) || '';
       // Send WhatsApp confirmation
@@ -2309,9 +2310,8 @@ async function checkoutRazorpay() {
         '👤 *'+name.trim()+'*\n📱 '+phone.trim()+'\n\n'+
         '📍 '+addr.trim()+', '+city.trim()+' - '+pin.trim()+'\n\n'+
         '🛒 *Items*\n'+
-        cart.map(function(i){return '• '+i.name+' ×'+i.qty+' = ₹'+(i.price*i.qty);}).join('\n')+
+        cartSnapshot.map(function(i){return '• '+i.name+' ×'+i.qty+' = ₹'+(i.price*i.qty);}).join('\n')+
         shipLine + '\n\n*Total Paid: ₹'+final+'*';
-      var savedCartForConfirm = (cartSnapshot || cart).slice();
       cart = []; uCart();
       try{ localStorage.removeItem('pr_cart'); }catch(e){}
       try{ localStorage.removeItem('pr_cust_info'); }catch(e){}
