@@ -485,7 +485,7 @@ async function loadOrder() {
     var res = await fetch(ADMIN_API, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'get_order_public', orderId: orderId, orderNumber: orderNum })
+      body: JSON.stringify({ action: 'public_get_order', order_id: orderId, orderNumber: orderNum })
     });
 
     var data = await res.json();
