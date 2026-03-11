@@ -348,7 +348,7 @@ function renderProduct(p, images, related, data, stateMap) {
           (displayMrp && displayMrp > displayPrice ? '<span class="price-was" id="dp-mrp">₹' + displayMrp + '</span><span class="price-save" id="dp-save">Save ₹' + (displayMrp - displayPrice) + '</span>' : '') +
         '</div>' +
         variantHtml +
-        '<div class="stock-row"><div class="stock-dot ' + stockClass + '"></div><span>' + stockLabel + '</span></div>' +
+        '<div class="stock-row"><div class="stock-dot ' + stockClass + '" id="stock-dot"></div><span id="stock-label">' + stockLabel + '</span></div>' +
         '<div class="qty-atc">' +
           '<div class="qty-ctrl">' +
             '<button class="qty-btn" onclick="changeQty(-1)">−</button>' +
@@ -450,6 +450,24 @@ function addToCartProduct() {
   showToast('✅ ' + displayName + ' added! Cart: ' + cart.reduce(function(s,x){return s+(x.qty||0);},0) + ' items');
   document.getElementById('atc-btn').textContent = '✅ Added!';
   setTimeout(function() { document.getElementById('atc-btn').innerHTML = '⚡ Buy Now'; }, 1500);
+  // ✅ FIX: Update in-memory stock and refresh stock display on page
+  if (selectedVariant) {
+    selectedVariant.stock_quantity = Math.max(0, (selectedVariant.stock_quantity || 0) - qty);
+  } else if (PRODUCT) {
+    PRODUCT.stock_quantity = Math.max(0, (PRODUCT.stock_quantity || 0) - qty);
+  }
+  var currentStock = selectedVariant ? selectedVariant.stock_quantity : (PRODUCT ? PRODUCT.stock_quantity : 0);
+  var newStockLabel = currentStock <= 0 ? 'Out of Stock' : currentStock <= 5 ? 'Only ' + currentStock + ' left!' : currentStock <= 20 ? currentStock + ' in stock' : 'In Stock';
+  var newStockClass = currentStock > 20 ? '' : currentStock > 5 ? 'low' : 'oos';
+  var stockLabelEl = document.getElementById('stock-label');
+  var stockDotEl   = document.getElementById('stock-dot');
+  if (stockLabelEl) stockLabelEl.textContent = newStockLabel;
+  if (stockDotEl)   stockDotEl.className = 'stock-dot ' + newStockClass;
+  if (currentStock <= 0) {
+    var atcBtn2 = document.getElementById('atc-btn');
+    if (atcBtn2) { atcBtn2.disabled = true; atcBtn2.textContent = 'Out of Stock'; }
+  }
+
   // Reset qty to 1 after adding
   qty = 1;
   var qd = document.getElementById('qty-display');
