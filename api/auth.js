@@ -100,7 +100,7 @@ async function syncCustomerProfile(user) {
 async function getCustomerOrders(customerId) {
   try {
     const orders = await sbAdmin('GET',
-      `/rest/v1/orders?customer_id=eq.${customerId}&order=created_at.desc&limit=20&select=id,order_number,total_amount,order_status,payment_status,payment_method,created_at`
+      `/rest/v1/orders?customer_id=eq.${customerId}&order=created_at.desc&limit=20&select=id,order_number,total_amount,order_status,payment_status,payment_method,created_at,tracking_number,courier`
     );
     if (!orders || !orders.length) return [];
     // Get items for each order
@@ -110,7 +110,7 @@ async function getCustomerOrders(customerId) {
     ).catch(() => []);
     return orders.map(o => ({
       ...o,
-      items: (items || []).filter(i => i.order_id === o.id).map(i => ({
+      items: (items || []).filter(i => String(i.order_id) === String(o.id)).map(i => ({
         qty:   i.quantity,
         price: i.price_at_time,
         name:  i.products?.name || 'Product',
@@ -324,7 +324,7 @@ export default async function handler(req, res) {
       if (city             !== undefined) updates.city             = city;
       if (state            !== undefined) updates.state            = state;
       if (postal_code      !== undefined) updates.postal_code      = postal_code;
-      if (saved_addresses  !== undefined) updates.saved_addresses  = saved_addresses;
+      if (saved_addresses  !== undefined) updates.saved_addresses  = typeof saved_addresses === 'string' ? saved_addresses : JSON.stringify(saved_addresses);
       await sbAdmin('PATCH', `/rest/v1/customers?id=eq.${profile.id}`, updates);
       return ok({ success: true, profile: { ...profile, ...updates } });
     } catch(e) {
@@ -370,14 +370,8 @@ export default async function handler(req, res) {
         return ok({ success: true });
       }
 
-      // Step 2: Build reset URL pointing to pahadiroots.com
-      const actionLink = genData.action_link || '';
-      // Replace Supabase URL with our site URL
-      const resetUrl = actionLink.replace(/^https?:\/\/[^\/]+/, SUPABASE_URL)
-        .replace('redirect_to=', 'redirect_to=' + encodeURIComponent(SITE_URL) + '&_=');
-
-      // Use the hashed token directly
-      const token       = genData.hashed_token || '';
+      // Step 2: Build reset URL using hashed token
+      const token         = genData.hashed_token || '';
       const finalResetUrl = `${SITE_URL}#access_token=${token}&type=recovery`;
 
       // Step 3: Send via Resend
@@ -452,56 +446,23 @@ export default async function handler(req, res) {
     }
   }
 
-  // ── Google OAuth ─────────────────────────────────────────────
-  if (action === 'google_oauth') {
-    const redirectUrl = body.redirectUrl || process.env.SITE_URL || 'https://pahadiroots.com';
-    const { data, error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: redirectUrl,
-        queryParams: { access_type: 'offline', prompt: 'consent' }
-      }
-    });
-    if (error) return err(400, error.message);
-    return res.status(200).json({ url: data.url });
-  }
-
+  // ── Google OAuth callback — handle token from Supabase redirect ──
   if (action === 'google_callback') {
-    const { code, redirectUrl } = body;
-    if (!code) return err(400, 'No code provided');
-    const { data, error } = await supabase.auth.exchangeCodeForSession(code);
-    if (error) return err(400, error.message);
-    const session = data.session;
-    const user = data.user;
-    // Upsert customer record
-    let profile = null;
+    const { access_token, refresh_token } = body;
+    if (!access_token) return err(400, 'No access_token provided');
     try {
-      const nameParts = (user.user_metadata?.full_name || '').split(' ');
-      const firstName = nameParts[0] || '';
-      const lastName = nameParts.slice(1).join(' ') || '';
-      const { data: existing } = await supabase
-        .from('customers')
-        .select('*')
-        .eq('auth_user_id', user.id)
-        .single();
-      if (!existing) {
-        const { data: newCust } = await supabase
-          .from('customers')
-          .insert({
-            auth_user_id: user.id,
-            email: user.email,
-            first_name: firstName,
-            last_name: lastName,
-            avatar_url: user.user_metadata?.avatar_url || null
-          })
-          .select()
-          .single();
-        profile = newCust;
-      } else {
-        profile = existing;
-      }
-    } catch(e) {}
-    return res.status(200).json({ session, profile, user });
+      const user = await sbAuth('/user', null, access_token);
+      const profile = await syncCustomerProfile(user);
+      return ok({
+        success: true,
+        access_token,
+        refresh_token: refresh_token || null,
+        user: { id: user.id, email: user.email, phone: user.phone || null },
+        profile,
+      });
+    } catch(e) {
+      return err(401, 'Google login failed: ' + (e.message || 'Unknown error'));
+    }
   }
 
   // ── change_password ──────────────────────────────────────────
@@ -521,5 +482,3 @@ export default async function handler(req, res) {
 
   return err(400, `Unknown action: ${action}`);
 }
-
-

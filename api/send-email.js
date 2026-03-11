@@ -19,7 +19,9 @@ export default async function handler(req, res) {
   try { body = req.body || {}; if (typeof body === 'string') body = JSON.parse(body); }
   catch(e) { return res.status(400).json({ error: 'Invalid JSON' }); }
 
-  const { type, to, orderNumber, orderId, name, items, total, discount, shipping, address, city, state, pin, payMethod } = body;
+  const { type, to, orderNumber, orderId, name, items, total, discount, shipping, address, city, state, pin, payMethod, whatsappNumber } = body;
+  const WA_NUMBER = whatsappNumber || process.env.WHATSAPP_NUMBER || '919899984895';
+  const WA_DISPLAY = WA_NUMBER.replace(/^91/, '+91 ').replace(/(\d{5})(\d{5})$/, '$1 $2');
 
   if (!to || !to.includes('@')) return res.status(400).json({ error: 'Valid email required' });
   if (!type) return res.status(400).json({ error: 'Email type required' });
@@ -122,7 +124,7 @@ export default async function handler(req, res) {
         📦 Track Your Order
       </a>
       <p style="color:#aaa;font-size:12px;margin-top:16px">
-        Koi sawaal? WhatsApp karein: <a href="https://wa.me/919899984895" style="color:#1a3a1e">+91 98999 84895</a>
+        Koi sawaal? WhatsApp karein: <a href="https://wa.me/${WA_NUMBER}" style="color:#1a3a1e">${WA_DISPLAY}</a>
       </p>
     </div>
 
@@ -146,7 +148,7 @@ export default async function handler(req, res) {
     const r = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${RESEND_KEY}` },
-      body: JSON.stringify({ from: 'Pahadi Roots <orders@pahadiroots.com>', to: [to], subject, html })
+      body: JSON.stringify({ from: 'Pahadi Roots <noreply@pahadiroots.com>', to: [to], subject, html })
     });
     const data = await r.json();
     if (!r.ok) {

@@ -150,7 +150,7 @@ export default async function handler(req, res) {
   // ── Public Order Save (no password required) ──
   if (reqBody.action === 'save_order') {
     try {
-      const { name, phone, email, addr, city, state, pin, final, discount, shipCharge, payMethod, paymentId, items, auth_user_id, couponCode } = reqBody;
+      const { name, phone, email, addr, city, state, pin, final, discount, shipCharge, payMethod, paymentId, items, auth_user_id } = reqBody;
       if (!name || !phone || !final) return err(400, 'Missing required order fields');
 
       // 1. Upsert customer
@@ -225,33 +225,20 @@ export default async function handler(req, res) {
         }
       }
 
-      // 5. Decrement stock_quantity for each item
-      if (items && items.length) {
+      // 5. Stock deduction — only for Razorpay (already 'confirmed' on INSERT)
+      // COD orders start as 'pending' — DB trigger handles deduction when admin confirms
+      if (payMethod === 'razorpay_online' && items && items.length) {
         for (const item of items) {
           try {
-            let prod = null;
-            // Try by id first (UUID from DB products)
-            if (item.id) {
-              const res = await sbFetch('GET', 'products', `id=eq.${item.id}&select=id,stock_quantity,name`).catch(()=>[]);
-              if (res && res[0]) prod = res[0];
-            }
-            // Fallback: try by name (for fallback/hardcoded products)
-            if (!prod && item.name) {
-              const nameQ = encodeURIComponent('*' + item.name + '*');
-              const res = await sbFetch('GET', 'products', `name=ilike.${nameQ}&select=id,stock_quantity,name&limit=1`).catch(()=>[]);
-              if (res && res[0]) prod = res[0];
-            }
+            if (!item.id) continue;
+            const prods = await sbFetch('GET', 'products', `id=eq.${item.id}&select=id,stock_quantity`).catch(()=>[]);
+            const prod = prods && prods[0];
             if (prod) {
-              const newStock = Math.max(0, (prod.stock_quantity || 0) - (item.qty || 1));
+              const deduct   = item.qty || 1;
+              const newStock = Math.max(0, (prod.stock_quantity || 0) - deduct);
               await sbFetch('PATCH', 'products', `id=eq.${prod.id}`, { stock_quantity: newStock });
-              await sbFetch('POST', 'inventory_logs', '', {
-                product_id: prod.id,
-                change_type: 'sale',
-                quantity_change: -(item.qty || 1),
-                reference_id: orderNumber || String(orderId)
-              }).catch(()=>{});
             }
-          } catch(e) { console.warn('stock decrement failed:', item.name, e); }
+          } catch(e) { console.warn('stock deduct failed:', item.id, e.message); }
         }
       }
 
@@ -272,8 +259,8 @@ export default async function handler(req, res) {
 
   // ── public_get_order — order confirmation page ──────────────────
   if (reqBody.action === 'public_get_order') {
-    const { order_id } = reqBody;
-    if (!order_id) return err(400, 'order_id required');
+    const order_id = reqBody.order_id ? parseInt(reqBody.order_id, 10) : null;
+    if (!order_id || isNaN(order_id)) return err(400, 'order_id required');
     try {
       // Fetch order with customer info joined
       const orderRes = await fetch(
