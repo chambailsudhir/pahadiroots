@@ -47,6 +47,9 @@
     transition: color .2s;
   }
   .nav-back:hover { color: #fff; }
+  .nav-right { display: flex; align-items: center; gap: 12px; }
+  .nav-acct { color: rgba(255,255,255,.8); font-size: 13px; font-weight: 600; text-decoration: none; display: flex; align-items: center; gap: 6px; padding: 7px 14px; border: 1.5px solid rgba(255,255,255,.3); border-radius: 20px; transition: all .2s; }
+  .nav-acct:hover { background: rgba(255,255,255,.15); color: #fff; border-color: rgba(255,255,255,.6); }
 
   /* ── HERO CONFIRM ── */
   .confirm-hero {
@@ -280,7 +283,10 @@
       <div class="logo-tl">Himalayan Organic Store</div>
     </div>
   </a>
-  <a href="/" class="nav-back">← Continue Shopping</a>
+  <div class="nav-right">
+    <a href="/account" class="nav-acct">👤 My Account</a>
+    <a href="/" class="nav-back">🌿 Continue Shopping</a>
+  </div>
 </nav>
 
 <!-- HERO (shown after data loads) -->

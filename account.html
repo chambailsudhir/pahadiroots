@@ -10,10 +10,10 @@
 <style>
 :root{--g:#1a3a1e;--g2:#2d5233;--g3:#3d6b42;--gd:#c8920a;--gd2:#e8b84b;--tx:#1a1a1a;--tx2:#4a4a4a;--tx3:#7a7a7a;--bd:#eeeeee}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Lato',sans-serif;background:#f7f3ee;min-height:100vh;color:var(--tx);margin:0}
+body{font-family:'Lato',sans-serif;background:#f7f3ee;min-height:100vh;color:var(--tx)}
 
 /* ── NAV ── */
-.nav{background:#fff;border-bottom:1px solid rgba(26,58,30,.08);padding:0 32px;height:64px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.05)}
+.nav{background:#fff;border-bottom:1px solid rgba(26,58,30,.1);padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 1px 8px rgba(0,0,0,.06)}
 .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
 .logo-icon{font-size:22px}
 .logo-name{font-family:'Playfair Display',serif;font-size:18px;font-weight:900;color:var(--g)}
@@ -22,46 +22,37 @@ body{font-family:'Lato',sans-serif;background:#f7f3ee;min-height:100vh;color:var
 .nav-right a:hover{background:var(--g);color:#fff}
 
 /* ── LAYOUT ── */
-.page-wrap{min-height:calc(100vh - 64px);display:flex;align-items:stretch}
-.sidebar-col{width:300px;flex-shrink:0;background:#fff;border-right:1px solid rgba(26,58,30,.08);position:sticky;top:64px;height:calc(100vh - 64px);overflow-y:auto;box-shadow:2px 0 16px rgba(26,58,30,.06)}
-.main-col{flex:1;padding:32px 36px 80px;min-width:0;background:linear-gradient(160deg,#f0ebe3 0%,#f7f3ee 60%,#eef4ef 100%);min-height:calc(100vh - 64px)}
-@media(max-width:768px){
-  .page-wrap{flex-direction:column}
-  .sidebar-col{display:none;width:100%;height:auto;position:relative;top:0}
-  .main-col{padding:16px 14px 80px}
-}
+.page{max-width:960px;margin:0 auto;padding:28px 16px 60px;display:grid;grid-template-columns:260px 1fr;gap:24px;align-items:stretch}
+@media(max-width:768px){.page{grid-template-columns:1fr;padding:0 0 60px}}
 
 /* ── SIDEBAR ── */
-.sidebar{height:100%;display:flex;flex-direction:column}
-.sb-profile{background:linear-gradient(145deg,var(--g) 0%,#2d5a34 60%,#1e4a24 100%);padding:32px 24px 28px;text-align:center;position:relative;overflow:hidden;flex-shrink:0}
-.sb-profile::before{content:'';position:absolute;top:-40px;right:-40px;width:130px;height:130px;background:rgba(255,255,255,.05);border-radius:50%}
-.sb-profile::after{content:'';position:absolute;bottom:-25px;left:-25px;width:90px;height:90px;background:rgba(255,255,255,.04);border-radius:50%}
-.sb-avatar{width:76px;height:76px;background:linear-gradient(135deg,rgba(255,255,255,.25),rgba(255,255,255,.1));border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:32px;font-weight:900;color:#fff;border:3px solid rgba(255,255,255,.35);margin:0 auto 14px;position:relative;z-index:1;box-shadow:0 6px 20px rgba(0,0,0,.25)}
-.sb-name{font-family:'Playfair Display',serif;font-size:19px;font-weight:900;color:#fff;margin-bottom:5px;position:relative;z-index:1}
-.sb-email{font-size:12px;color:rgba(255,255,255,.6);position:relative;z-index:1;word-break:break-all;line-height:1.4}
-.sb-nav{padding:12px 0;flex:1}
-.sb-item{display:flex;align-items:center;gap:14px;padding:15px 24px;cursor:pointer;transition:all .2s;border:none;background:none;width:100%;text-align:left;font-family:'Lato',sans-serif;font-size:14px;font-weight:700;color:var(--tx2);border-left:3px solid transparent}
-.sb-item:hover{background:rgba(26,58,30,.06);color:var(--g);padding-left:28px}
-.sb-item.active{background:linear-gradient(90deg,rgba(26,58,30,.1),rgba(26,58,30,.03));color:var(--g);border-left-color:var(--g)}
-.sb-item .icon{font-size:18px;width:24px;text-align:center}
-.sb-divider{height:1px;background:linear-gradient(90deg,transparent,#e0e8e0,transparent);margin:8px 20px}
+.sidebar{background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.06);position:sticky;top:76px;display:flex;flex-direction:column;min-height:min-content}
+.sb-profile{background:linear-gradient(135deg,var(--g),var(--g2));padding:24px;text-align:center}
+.sb-avatar{width:64px;height:64px;background:rgba(255,255,255,.2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:28px;font-weight:900;color:#fff;border:3px solid rgba(255,255,255,.3);margin:0 auto 12px}
+.sb-name{font-family:'Playfair Display',serif;font-size:18px;font-weight:900;color:#fff;margin-bottom:3px}
+.sb-email{font-size:12px;color:rgba(255,255,255,.65)}
+.sb-nav{padding:8px 0;flex:1}
+.sb-item{display:flex;align-items:center;gap:12px;padding:13px 20px;cursor:pointer;transition:all .2s;border:none;background:none;width:100%;text-align:left;font-family:'Lato',sans-serif;font-size:14px;font-weight:700;color:var(--tx2);border-left:3px solid transparent}
+.sb-item:hover{background:rgba(26,58,30,.05);color:var(--g)}
+.sb-item.active{background:rgba(26,58,30,.07);color:var(--g);border-left-color:var(--g)}
+.sb-item .icon{font-size:16px;width:20px;text-align:center}
+.sb-divider{height:1px;background:#f0f0f0;margin:8px 0}
 .sb-item.logout{color:#c0392b}
-.sb-item.logout:hover{background:#fdecea;padding-left:28px}
+.sb-item.logout:hover{background:#fdecea}
 
 /* ── MAIN PANEL ── */
-.main-panel{display:flex;flex-direction:column;gap:0;min-width:0}
+.main-panel{display:flex;flex-direction:column;gap:20px}
 
 /* ── CARDS ── */
-.card{background:#fff;border-radius:20px;padding:28px;box-shadow:0 2px 16px rgba(0,0,0,.05);border:1px solid rgba(26,58,30,.05);margin-bottom:20px}
-.card:last-child{margin-bottom:0}
-.card-title{font-family:'Playfair Display',serif;font-size:19px;font-weight:700;color:var(--g);margin-bottom:22px;display:flex;align-items:center;gap:10px;padding-bottom:14px;border-bottom:1px solid #f0f0f0}
+.card{background:#fff;border-radius:18px;padding:24px;box-shadow:0 2px 12px rgba(0,0,0,.06)}
+.card-title{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--g);margin-bottom:20px;display:flex;align-items:center;gap:8px}
 
 /* ── SECTION LABEL ── */
 .sec-label{font-size:11px;font-weight:800;color:#bbb;text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px}
 
 /* ── ORDER CARDS ── */
-.order-card{border:1.5px solid #eef0ee;border-radius:16px;padding:18px 20px;margin-bottom:12px;transition:all .25s;cursor:default;background:#fdfffe}
-.order-card:hover{border-color:var(--g3);box-shadow:0 4px 20px rgba(26,58,30,.08);transform:translateY(-1px)}
+.order-card{border:1.5px solid var(--bd);border-radius:14px;padding:16px;margin-bottom:10px;transition:border-color .2s;cursor:default}
+.order-card:hover{border-color:var(--g)}
 .oc-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:8px}
 .oc-num{font-weight:900;font-size:14px;color:var(--g)}
 .oc-badge{padding:3px 12px;border-radius:20px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.5px}
@@ -82,42 +73,15 @@ body{font-family:'Lato',sans-serif;background:#f7f3ee;min-height:100vh;color:var
 .view-chip:hover{background:var(--g);color:#fff}
 
 /* ── ADDRESS CARDS ── */
-.addr-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-bottom:20px}
-.addr-card{border:1.5px solid #e8ede8;border-radius:16px;padding:18px;transition:all .25s;background:#fdfffe;position:relative}
-.addr-card:hover{border-color:var(--g3);box-shadow:0 4px 16px rgba(26,58,30,.08)}
-.addr-card.default{border-color:#a8d5b5;background:linear-gradient(135deg,#f0f7f4,#e8f5ee)}
-.addr-type-badge{display:inline-flex;align-items:center;gap:5px;font-weight:800;font-size:11px;color:var(--g);background:rgba(26,58,30,.08);padding:4px 10px;border-radius:20px;margin-bottom:10px;text-transform:uppercase;letter-spacing:.4px}
-.addr-card.default .addr-type-badge{background:rgba(26,58,30,.12)}
-.addr-name{font-size:14px;font-weight:800;color:var(--tx);margin-bottom:4px}
+.addr-cards{display:flex;flex-direction:column;gap:10px}
+.addr-card{border:1.5px solid var(--bd);border-radius:14px;padding:14px 16px;transition:all .2s}
+.addr-card.default{border-color:#c8e6c9;background:#f0f7f4}
+.addr-label{display:flex;align-items:center;gap:6px;font-weight:800;font-size:13px;color:var(--g);margin-bottom:4px}
 .addr-line{font-size:13px;color:var(--tx2);line-height:1.6}
-.addr-actions{display:flex;gap:8px;margin-top:12px}
-.addr-btn{padding:6px 14px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;border:1.5px solid;font-family:'Lato',sans-serif;transition:all .2s}
-.addr-btn-del{border-color:#f5c6c6;color:#c0392b;background:#fff}
-.addr-btn-del:hover{background:#fdecea;border-color:#c0392b}
-.addr-btn-edit{border-color:#c8e6c9;color:var(--g);background:#fff}
-.addr-btn-edit:hover{background:#e8f5e9}
-/* Add address button card */
-.addr-add-card{border:2px dashed #c8ddc8;border-radius:16px;padding:28px 18px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;cursor:pointer;transition:all .25s;background:transparent;min-height:140px;color:var(--tx3)}
-.addr-add-card:hover{border-color:var(--g);background:rgba(26,58,30,.03);color:var(--g)}
-.addr-add-icon{width:44px;height:44px;background:rgba(26,58,30,.08);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;transition:all .25s}
-.addr-add-card:hover .addr-add-icon{background:rgba(26,58,30,.15)}
-.addr-add-text{font-size:13px;font-weight:700}
-
-/* ── ADD ADDRESS MODAL ── */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1000;display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(4px)}
-.modal-box{background:#fff;border-radius:22px;padding:28px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.2);animation:modalIn .25s ease}
-@keyframes modalIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
-.modal-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--g);margin-bottom:20px;display:flex;justify-content:space-between;align-items:center}
-.modal-close{background:none;border:none;font-size:22px;cursor:pointer;color:var(--tx3);line-height:1;padding:0 4px}
-.modal-close:hover{color:var(--tx)}
-/* Address type pills */
-.type-pills{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
-.type-pill{padding:8px 16px;border-radius:20px;border:1.5px solid #dde;font-size:13px;font-weight:700;cursor:pointer;font-family:'Lato',sans-serif;transition:all .2s;background:#fff;display:flex;align-items:center;gap:5px;color:var(--tx2)}
-.type-pill:hover{border-color:var(--g);color:var(--g)}
-.type-pill.selected{background:var(--g);color:#fff;border-color:var(--g)}
-.modal-actions{display:flex;gap:10px;margin-top:20px}
-.modal-actions .btn-primary{flex:1;justify-content:center}
-.modal-actions .btn-outline{padding:12px 20px}
+.addr-actions{display:flex;gap:8px;margin-top:10px}
+.addr-btn{padding:5px 12px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;border:1.5px solid;font-family:'Lato',sans-serif;transition:all .2s}
+.addr-btn-del{border-color:#fdecea;color:#c0392b;background:#fff}
+.addr-btn-del:hover{background:#fdecea}
 
 /* ── PROFILE FORM ── */
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
@@ -150,7 +114,7 @@ body{font-family:'Lato',sans-serif;background:#f7f3ee;min-height:100vh;color:var
 .empty-sub{font-size:14px;color:var(--tx3);margin-bottom:24px}
 
 /* ── LOGIN WALL ── */
-.login-wall{background:#fff;border-radius:18px;padding:48px 32px;text-align:center;box-shadow:0 2px 12px rgba(0,0,0,.06);max-width:480px;margin:40px auto}
+.login-wall{background:#fff;border-radius:18px;padding:48px 32px;text-align:center;box-shadow:0 2px 12px rgba(0,0,0,.06)}
 .lw-icon{font-size:56px;margin-bottom:16px}
 .lw-title{font-family:'Playfair Display',serif;font-size:26px;color:var(--g);margin-bottom:8px}
 .lw-sub{font-size:14px;color:var(--tx3);margin-bottom:28px;line-height:1.6}
@@ -162,10 +126,12 @@ body{font-family:'Lato',sans-serif;background:#f7f3ee;min-height:100vh;color:var
 
 /* ── MOBILE TABS (bottom bar on mobile) ── */
 @media(max-width:768px){
+  .sidebar{display:none}
   .mob-tabs{display:flex;position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #eee;z-index:100;box-shadow:0 -4px 16px rgba(0,0,0,.08)}
   .mob-tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 8px;border:none;background:none;cursor:pointer;font-family:'Lato',sans-serif;font-size:10px;font-weight:700;color:#aaa;gap:3px;transition:color .2s}
   .mob-tab.active{color:var(--g)}
   .mob-tab .mt-icon{font-size:20px}
+  .page{padding:16px 12px 80px}
 }
 @media(min-width:769px){.mob-tabs{display:none!important}}
 </style>
@@ -180,31 +146,27 @@ body{font-family:'Lato',sans-serif;background:#f7f3ee;min-height:100vh;color:var
   <div class="nav-right"><a href="/">🛍️ Continue Shopping</a></div>
 </nav>
 
-<div class="page-wrap">
+<div class="page" id="page">
   <!-- Sidebar (desktop) -->
-  <div class="sidebar-col" id="sidebar-col" style="display:none">
-    <div class="sidebar">
-      <div class="sb-profile">
-        <div class="sb-avatar" id="sb-avatar">?</div>
-        <div class="sb-name" id="sb-name">—</div>
-        <div class="sb-email" id="sb-email">—</div>
-      </div>
-      <div class="sb-nav">
-        <button class="sb-item active" data-tab="orders" onclick="switchTab('orders')"><span class="icon">📦</span> My Orders</button>
-        <button class="sb-item" data-tab="addresses" onclick="switchTab('addresses')"><span class="icon">📍</span> Addresses</button>
-        <button class="sb-item" data-tab="profile" onclick="switchTab('profile')"><span class="icon">👤</span> Profile</button>
-        <button class="sb-item" data-tab="password" onclick="switchTab('password')"><span class="icon">🔒</span> Change Password</button>
-        <div class="sb-divider"></div>
-        <button class="sb-item logout" onclick="doLogout()"><span class="icon">🚪</span> Logout</button>
-      </div>
+  <aside class="sidebar" id="sidebar" style="display:none">
+    <div class="sb-profile">
+      <div class="sb-avatar" id="sb-avatar">?</div>
+      <div class="sb-name" id="sb-name">—</div>
+      <div class="sb-email" id="sb-email">—</div>
     </div>
-  </div>
+    <div class="sb-nav">
+      <button class="sb-item active" data-tab="orders" onclick="switchTab('orders')"><span class="icon">📦</span> My Orders</button>
+      <button class="sb-item" data-tab="addresses" onclick="switchTab('addresses')"><span class="icon">📍</span> Addresses</button>
+      <button class="sb-item" data-tab="profile" onclick="switchTab('profile')"><span class="icon">👤</span> Profile</button>
+      <button class="sb-item" data-tab="password" onclick="switchTab('password')"><span class="icon">🔒</span> Change Password</button>
+      <div class="sb-divider"></div>
+      <button class="sb-item logout" onclick="doLogout()"><span class="icon">🚪</span> Logout</button>
+    </div>
+  </aside>
 
   <!-- Main panel -->
-  <div class="main-col">
-    <div class="main-panel" id="main-panel">
-      <div class="loading"><div class="spinner"></div><p style="color:var(--tx3);font-size:14px">Loading your account...</p></div>
-    </div>
+  <div class="main-panel" id="main-panel">
+    <div class="loading"><div class="spinner"></div><p style="color:var(--tx3);font-size:14px">Loading your account...</p></div>
   </div>
 </div>
 
@@ -220,50 +182,20 @@ body{font-family:'Lato',sans-serif;background:#f7f3ee;min-height:100vh;color:var
 <script>
 // ── Config ──
 var API_BASE = '/api';
-var _authToken = null, _authRefresh = null, _authUser = null, _authProfile = null;
+var _authToken = null, _authUser = null, _authProfile = null;
 var _currentTab = 'orders';
 var _orders = null;
 
 // ── Restore session ──
-try { _authToken   = localStorage.getItem('pr_auth_token') || null; } catch(e){}
-try { _authRefresh = localStorage.getItem('pr_auth_refresh') || null; } catch(e){}
-try { _authUser    = JSON.parse(localStorage.getItem('pr_auth_user') || 'null'); } catch(e){}
+try { _authToken = localStorage.getItem('pr_auth_token') || null; } catch(e){}
+try { _authUser = JSON.parse(localStorage.getItem('pr_auth_user') || 'null'); } catch(e){}
 try { _authProfile = JSON.parse(localStorage.getItem('pr_auth_profile') || 'null'); } catch(e){}
-
-// ── Token refresh ──
-async function tryRefreshToken() {
-  if (!_authRefresh) return false;
-  try {
-    var res = await fetch(API_BASE + '/auth', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'refresh_token', refresh_token: _authRefresh })
-    });
-    var data = await res.json();
-    if (res.ok && data.access_token) {
-      _authToken   = data.access_token;
-      _authRefresh = data.refresh_token || _authRefresh;
-      try { localStorage.setItem('pr_auth_token',   _authToken); } catch(e){}
-      try { localStorage.setItem('pr_auth_refresh',  _authRefresh); } catch(e){}
-      return true;
-    }
-  } catch(e) {}
-  return false;
-}
 
 // ── API helpers ──
 async function callAuth(action, body, useToken) {
   var headers = { 'Content-Type': 'application/json' };
   if (useToken && _authToken) headers['Authorization'] = 'Bearer ' + _authToken;
   var res = await fetch(API_BASE + '/auth', { method:'POST', headers, body: JSON.stringify({ action, ...body }) });
-  // Auto-refresh on 401
-  if (res.status === 401 && useToken) {
-    var refreshed = await tryRefreshToken();
-    if (refreshed) {
-      headers['Authorization'] = 'Bearer ' + _authToken;
-      res = await fetch(API_BASE + '/auth', { method:'POST', headers, body: JSON.stringify({ action, ...body }) });
-    }
-  }
   var data = await res.json();
   if (!res.ok) throw new Error(data.error || 'Error');
   return data;
@@ -272,29 +204,21 @@ async function callAuth(action, body, useToken) {
 
 // ── Init ──
 async function init() {
-  if (!_authToken && !_authRefresh) { showLoginWall(); return; }
-  // If no access token but refresh token exists, try refresh first
-  if (!_authToken && _authRefresh) {
-    var ok = await tryRefreshToken();
-    if (!ok) { showLoginWall(); return; }
-  }
+  if (!_authToken) { showLoginWall(); return; }
   try {
     var data = await callAuth('get_profile', {}, true);
     _authProfile = data.profile; _authUser = data.user;
+    // Store orders from profile call (already fetched!)
     if (data.orders) _orders = data.orders;
     try { localStorage.setItem('pr_auth_profile', JSON.stringify(data.profile)); } catch(e){}
-  } catch(e) {
-    // Both token and refresh failed — force login
-    try { localStorage.removeItem('pr_auth_token'); localStorage.removeItem('pr_auth_refresh'); } catch(x){}
-    showLoginWall(); return;
-  }
+  } catch(e) {}
   if (!_authProfile) { showLoginWall(); return; }
   showAccount();
   switchTab('orders');
 }
 
 function showLoginWall() {
-  document.getElementById('sidebar-col').style.display = 'none';
+  document.getElementById('sidebar').style.display = 'none';
   document.getElementById('mob-tabs').style.display = 'none';
   document.getElementById('main-panel').innerHTML = `
     <div class="login-wall">
@@ -316,7 +240,7 @@ function showAccount() {
   document.getElementById('sb-avatar').textContent = initials;
   document.getElementById('sb-name').textContent = fullName;
   document.getElementById('sb-email').textContent = email;
-  document.getElementById('sidebar-col').style.display = 'flex';
+  document.getElementById('sidebar').style.display = 'block';
   document.getElementById('mob-tabs').style.display = 'flex';
 }
 
@@ -339,22 +263,16 @@ function switchTab(tab, btn) {
 // ORDERS TAB
 // ══════════════════════════════════════════════
 async function renderOrdersTab() {
-  setPanel('<div class="loading"><div class="spinner"></div><p style="color:var(--tx3);font-size:13px;margin-top:8px">Orders load ho rahe hain...</p></div>');
+  setPanel('<div class="loading"><div class="spinner"></div></div>');
   try {
     if (!_orders) {
+      // Reload from server if needed
       var data = await callAuth('get_profile', {}, true);
       _orders = data.orders || [];
-      if (data.profile) { _authProfile = data.profile; }
     }
     setPanel(buildOrdersHtml(_orders));
   } catch(e) {
-    var errMsg = e.message || 'Unknown error';
-    setPanel('<div class="card"><div style="text-align:center;padding:32px 0">' +
-      '<div style="font-size:40px;margin-bottom:12px">⚠️</div>' +
-      '<div style="font-family:Playfair Display,serif;font-size:18px;color:var(--g);margin-bottom:8px">Orders load nahi hue</div>' +
-      '<div style="font-size:13px;color:var(--tx3);margin-bottom:20px">' + errMsg + '</div>' +
-      '<button class="btn-primary" onclick="_orders=null;renderOrdersTab()">🔄 Dobara Try Karein</button>' +
-      '</div></div>');
+    setPanel('<div class="card"><p style="color:var(--tx3)">Orders load nahi ho sake. Dobara try karein.</p></div>');
   }
 }
 
@@ -385,7 +303,7 @@ function buildOrdersHtml(orders) {
       var trackUrl = o.tracking_number ? (COURIER_URLS[o.courier] ? COURIER_URLS[o.courier] + o.tracking_number : 'https://www.google.com/search?q=' + encodeURIComponent((o.courier||'') + ' tracking ' + o.tracking_number)) : '';
       var viewUrl = '/order-confirmation?id=' + o.id + '&num=' + encodeURIComponent(o.order_number||'');
       return '<div class="order-card">' +
-        '<div class="oc-hdr"><span class="oc-num">' + (o.order_number||'#'+String(o.id).slice(0,8)) + '</span><span class="oc-badge ' + badge + '">' + (o.order_status||'pending') + '</span></div>' +
+        '<div class="oc-hdr"><span class="oc-num">' + (o.order_number||'#'+o.id.slice(0,8)) + '</span><span class="oc-badge ' + badge + '">' + (o.order_status||'pending') + '</span></div>' +
         (items ? '<div class="oc-items">' + items + '</div>' : '') +
         '<div class="oc-actions">' +
           '<a href="' + viewUrl + '" class="view-chip">📄 View Order</a>' +
@@ -400,163 +318,53 @@ function buildOrdersHtml(orders) {
 // ADDRESSES TAB
 // ══════════════════════════════════════════════
 function getSavedAddresses() {
-  try { return JSON.parse((_authProfile && _authProfile.saved_addresses) || '[]'); } catch(e) { return []; }
-}
-
-var ADDR_TYPES = [
-  { label:'Home',    icon:'🏠' },
-  { label:'Office',  icon:'🏢' },
-  { label:'Parents', icon:'👨‍👩‍👦' },
-  { label:'Friends', icon:'👫' },
-  { label:'Other',   icon:'📍' },
-];
-
-function getAddrIcon(label) {
-  var t = ADDR_TYPES.find(function(x){ return x.label === label; });
-  return t ? t.icon : '📍';
+  try { return JSON.parse((_authProfile && _authProfile.saved_addresses) || localStorage.getItem('pr_saved_addresses') || '[]'); } catch(e) { return []; }
 }
 
 function renderAddressesTab() {
   var p = _authProfile || {};
   var addrs = getSavedAddresses();
-
-  var cardsHtml = '<div class="addr-grid">';
+  var html = '<div class="card"><div class="card-title">📍 Delivery Addresses</div>';
 
   // Default address from profile
   if (p.address_line1) {
-    cardsHtml += '<div class="addr-card default">' +
-      '<div class="addr-type-badge">🏠 Default</div>' +
-      '<div class="addr-name">' + [p.first_name, p.last_name].filter(Boolean).join(' ') + '</div>' +
-      '<div class="addr-line">' + [p.address_line1, p.city, p.state, p.postal_code].filter(Boolean).join(', ') + '</div>' +
-      '<div class="addr-actions"><button class="addr-btn addr-btn-edit" onclick="switchTab(\'profile\')">✏️ Edit</button></div>' +
+    html += '<div class="addr-card default">' +
+      '<div class="addr-label">🏠 Default</div>' +
+      '<div class="addr-line">' + [p.first_name, p.last_name].filter(Boolean).join(' ') + '<br>' + [p.address_line1, p.city, p.state, p.postal_code].filter(Boolean).join(', ') + '</div>' +
+      '<div class="addr-actions"><button class="addr-btn" onclick="switchTab(\'profile\')" style="border-color:#c8e6c9;color:var(--g);background:#fff">✏️ Edit</button></div>' +
       '</div>';
   }
 
-  // Saved addresses
-  addrs.forEach(function(a, i) {
-    var icon = getAddrIcon(a.label);
-    cardsHtml += '<div class="addr-card">' +
-      '<div class="addr-type-badge">' + icon + ' ' + (a.label||'Address') + '</div>' +
-      '<div class="addr-name">' + (a.name||'') + '</div>' +
-      '<div class="addr-line">' + [a.addr, a.city, a.state, a.pin].filter(Boolean).join(', ') + '</div>' +
-      '<div class="addr-actions">' +
-        '<button class="addr-btn addr-btn-edit" onclick="openEditAddr(' + i + ')">✏️ Edit</button>' +
-        '<button class="addr-btn addr-btn-del" onclick="deleteSavedAddr(' + i + ')">🗑 Remove</button>' +
-      '</div></div>';
+  // Extra saved addresses
+  addrs.filter(function(a){ return a.label !== 'Default'; }).forEach(function(a, i) {
+    var icon = a.label === 'Parents' ? '👨‍👩‍👦' : a.label === 'Office' ? '🏢' : '📍';
+    html += '<div class="addr-card">' +
+      '<div class="addr-label">' + icon + ' ' + (a.label||'Address') + '</div>' +
+      '<div class="addr-line">' + (a.name||'') + (a.name?'<br>':'') + (a.addr||'') + ', ' + (a.city||'') + ' — ' + (a.pin||'') + '</div>' +
+      '<div class="addr-actions"><button class="addr-btn addr-btn-del" onclick="deleteSavedAddr(' + i + ')">🗑 Remove</button></div>' +
+      '</div>';
   });
 
-  // Add new address card
-  cardsHtml += '<div class="addr-add-card" onclick="openAddAddr()">' +
-    '<div class="addr-add-icon">+</div>' +
-    '<div class="addr-add-text">Add New Address</div>' +
-    '<div style="font-size:12px;color:var(--tx3)">Home, Office, Parents...</div>' +
-    '</div>';
-
-  cardsHtml += '</div>';
-
-  setPanel('<div class="card"><div class="card-title">📍 Delivery Addresses</div>' + cardsHtml + '</div>');
-}
-
-function openAddAddr(editIdx) {
-  var isEdit = editIdx !== undefined;
-  var addrs = getSavedAddresses();
-  var a = isEdit ? addrs[editIdx] : {};
-  var selectedType = a.label || 'Home';
-
-  var pillsHtml = ADDR_TYPES.map(function(t) {
-    return '<button class="type-pill' + (t.label === selectedType ? ' selected' : '') + '" onclick="selectAddrType(this,\'' + t.label + '\')">' + t.icon + ' ' + t.label + '</button>';
-  }).join('');
-
-  var modal = document.createElement('div');
-  modal.className = 'modal-overlay';
-  modal.id = 'addr-modal';
-  modal.innerHTML =
-    '<div class="modal-box">' +
-      '<div class="modal-title">' +
-        (isEdit ? '✏️ Edit Address' : '➕ New Address') +
-        '<button class="modal-close" onclick="closeAddrModal()">×</button>' +
-      '</div>' +
-      '<div style="margin-bottom:12px"><div class="field-label" style="margin-bottom:10px">Address Type</div>' +
-        '<div class="type-pills" id="type-pills">' + pillsHtml + '</div>' +
-      '</div>' +
-      '<div class="form-grid">' +
-        '<div class="form-full"><div class="field-label">Full Name</div><input class="field-input" id="na-name" placeholder="Recipient name" value="' + (a.name||'') + '"></div>' +
-        '<div class="form-full"><div class="field-label">Address Line</div><input class="field-input" id="na-addr" placeholder="House no., Street, Colony" value="' + (a.addr||'') + '"></div>' +
-        '<div><div class="field-label">City</div><input class="field-input" id="na-city" placeholder="City" value="' + (a.city||'') + '"></div>' +
-        '<div><div class="field-label">State</div><input class="field-input" id="na-state" placeholder="State" value="' + (a.state||'') + '"></div>' +
-        '<div><div class="field-label">Pincode</div><input class="field-input" id="na-pin" placeholder="110001" value="' + (a.pin||'') + '"></div>' +
-        '<div><div class="field-label">Phone (Optional)</div><input class="field-input" id="na-phone" placeholder="Mobile number" value="' + (a.phone||'') + '"></div>' +
-      '</div>' +
-      '<div class="err-msg" id="na-err" style="display:none"></div>' +
-      '<div class="modal-actions">' +
-        '<button class="btn-outline" onclick="closeAddrModal()">Cancel</button>' +
-        '<button class="btn-primary" onclick="saveAddr(' + (isEdit ? editIdx : -1) + ')">💾 Save Address</button>' +
-      '</div>' +
-    '</div>';
-  document.body.appendChild(modal);
-  modal.addEventListener('click', function(e){ if(e.target===modal) closeAddrModal(); });
-  // Set selected type in closure
-  modal._selectedType = selectedType;
-  document.getElementById('na-name').focus();
-}
-
-function openEditAddr(idx) { openAddAddr(idx); }
-
-function selectAddrType(btn, label) {
-  document.querySelectorAll('#type-pills .type-pill').forEach(function(b){ b.classList.remove('selected'); });
-  btn.classList.add('selected');
-  var modal = document.getElementById('addr-modal');
-  if (modal) modal._selectedType = label;
-}
-
-function closeAddrModal() {
-  var m = document.getElementById('addr-modal');
-  if (m) m.remove();
-}
-
-async function saveAddr(editIdx) {
-  var modal = document.getElementById('addr-modal');
-  var label = (modal && modal._selectedType) || 'Home';
-  var name  = (document.getElementById('na-name')||{}).value||'';
-  var addr  = (document.getElementById('na-addr')||{}).value||'';
-  var city  = (document.getElementById('na-city')||{}).value||'';
-  var state = (document.getElementById('na-state')||{}).value||'';
-  var pin   = (document.getElementById('na-pin')||{}).value||'';
-  var phone = (document.getElementById('na-phone')||{}).value||'';
-  var err   = document.getElementById('na-err');
-
-  if (!addr || !city || !pin) {
-    if(err){err.textContent='❌ Address, City aur Pincode zaroori hain';err.style.display='block';} return;
+  if (!p.address_line1 && !addrs.length) {
+    html += '<div class="empty-state"><div class="empty-icon">📍</div><div class="empty-title">No addresses saved</div><div class="empty-sub">Profile mein apna address add karein.</div><button class="btn-primary" onclick="switchTab(\'profile\')">+ Add Address</button></div>';
   }
 
-  var addrs = getSavedAddresses();
-  var newEntry = { label, icon: getAddrIcon(label), name, addr, city, state, pin, phone };
-
-  if (editIdx >= 0) addrs[editIdx] = newEntry;
-  else addrs.push(newEntry);
-
-  try {
-    await callAuth('update_profile', { saved_addresses: JSON.stringify(addrs) }, true);
-    _authProfile.saved_addresses = JSON.stringify(addrs);
-    try { localStorage.setItem('pr_auth_profile', JSON.stringify(_authProfile)); } catch(e){}
-    closeAddrModal();
-    renderAddressesTab();
-    showToast(editIdx >= 0 ? '✅ Address updated!' : '✅ Address saved!');
-  } catch(e) {
-    if(err){err.textContent='❌ Save failed: '+(e.message||'');err.style.display='block';}
-  }
+  html += '</div>';
+  setPanel(html);
 }
 
 async function deleteSavedAddr(idx) {
-  if (!confirm('Yeh address remove karein?')) return;
-  var addrs = getSavedAddresses();
-  addrs.splice(idx, 1);
+  var all = getSavedAddresses();
+  var nonDefault = all.filter(function(a){ return a.label !== 'Default'; });
+  nonDefault.splice(idx, 1);
+  var defaults = all.filter(function(a){ return a.label === 'Default'; });
+  var addrs = defaults.concat(nonDefault);
   try {
-    await callAuth('update_profile', { saved_addresses: JSON.stringify(addrs) }, true);
-    _authProfile.saved_addresses = JSON.stringify(addrs);
+    await callAuth('update_profile', { saved_addresses: JSON.stringify(nonDefault) }, true);
+    _authProfile.saved_addresses = JSON.stringify(nonDefault);
     try { localStorage.setItem('pr_auth_profile', JSON.stringify(_authProfile)); } catch(e){}
     renderAddressesTab();
-    showToast('🗑 Address removed');
+    showToast('Address removed');
   } catch(e) { showToast('❌ Remove failed'); }
 }
 
@@ -606,11 +414,8 @@ async function saveProfileInfo() {
     Object.assign(_authProfile, updates);
     try { localStorage.setItem('pr_auth_profile', JSON.stringify(_authProfile)); } catch(e){}
     showSaveMsg('pf-msg');
-    var newFullName = [updates.first_name, updates.last_name].filter(Boolean).join(' ');
-    var sbName = document.getElementById('sb-name');
-    var sbAvatar = document.getElementById('sb-avatar');
-    if (sbName) sbName.textContent = newFullName || 'User';
-    if (sbAvatar) sbAvatar.textContent = (updates.first_name && updates.first_name[0] ? updates.first_name[0] : (newFullName[0] || '?')).toUpperCase();
+    document.getElementById('sb-name').textContent = [updates.first_name, updates.last_name].filter(Boolean).join(' ');
+    document.getElementById('sb-avatar').textContent = (updates.first_name[0]||'?').toUpperCase();
   } catch(e) { showToast('❌ Save failed'); }
 }
 
@@ -676,17 +481,11 @@ function showSaveMsg(id) {
   setTimeout(function(){ el.style.display='none'; }, 2500);
 }
 function showToast(msg) {
-  var t = document.getElementById('_acct_toast');
-  if (!t) {
-    t = document.createElement('div');
-    t.id = '_acct_toast';
-    t.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#1a3a1e;color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;font-weight:700;z-index:9999;white-space:nowrap;box-shadow:0 4px 16px rgba(0,0,0,.2);transition:opacity .3s';
-    document.body.appendChild(t);
-  }
+  var t = document.createElement('div');
+  t.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#1a3a1e;color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;font-weight:700;z-index:9999;white-space:nowrap;box-shadow:0 4px 16px rgba(0,0,0,.2)';
   t.textContent = msg;
-  t.style.opacity = '1';
-  clearTimeout(t._timer);
-  t._timer = setTimeout(function(){ t.style.opacity = '0'; }, 2500);
+  document.body.appendChild(t);
+  setTimeout(function(){ t.remove(); }, 2500);
 }
 
 // ── Start ──
