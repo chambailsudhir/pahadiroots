@@ -795,16 +795,16 @@ if(window.location.search.includes('opencart=1')){
     <button class="nib" onclick="openSearch()" title="Search products" aria-label="Search">🔍</button>
     <button class="nib" onclick="openWishlist()" title="Wishlist — Apni pasandida products save karo" aria-label="Wishlist" style="position:relative">❤️<span class="wl-badge" id="wlBadge"></span></button>
     <div style="position:relative" id="acctHoverZone" onmouseenter="showAcctDropdown()" onmouseleave="hideAcctDropdown()">
-      <button class="nib" id="accountBtn" onclick="openAccount()" title="My Account" aria-label="My Account" style="position:relative">👤<span id="accountDot" style="display:none;position:absolute;top:4px;right:4px;width:7px;height:7px;background:#2d6a4f;border-radius:50%;border:1.5px solid #fff"></span></button>
+      <button class="nib" id="accountBtn" onclick="goToAccount()" title="My Account" aria-label="My Account" style="position:relative">👤<span id="accountDot" style="display:none;position:absolute;top:4px;right:4px;width:7px;height:7px;background:#2d6a4f;border-radius:50%;border:1.5px solid #fff"></span></button>
       <!-- Hover dropdown -->
       <div id="acctDropdown" style="display:none;position:absolute;top:100%;right:0;width:220px;background:#fff;border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,.15);border:1px solid #f0f0f0;z-index:9999;overflow:hidden;padding:8px 0">
         <div style="padding:12px 16px;border-bottom:1px solid #f5f5f5">
           <div style="font-size:13px;font-weight:800;color:#1a3a1e" id="dd-name">Welcome!</div>
           <div style="font-size:11px;color:#888;margin-top:2px" id="dd-sub">Login to manage your account</div>
         </div>
-        <div onclick="closeAcctDropdown();openAccount()" style="padding:11px 16px;font-size:13px;color:#333;cursor:pointer;display:flex;align-items:center;gap:10px" onmouseover="this.style.background='#f9f9f9'" onmouseout="this.style.background=''"><span>📦</span> My Orders</div>
+        <div onclick="closeAcctDropdown();goToAccount()" style="padding:11px 16px;font-size:13px;color:#333;cursor:pointer;display:flex;align-items:center;gap:10px" onmouseover="this.style.background='#f9f9f9'" onmouseout="this.style.background=''"><span>📦</span> My Orders</div>
         <div onclick="closeAcctDropdown();openWishlist()" style="padding:11px 16px;font-size:13px;color:#333;cursor:pointer;display:flex;align-items:center;gap:10px" onmouseover="this.style.background='#f9f9f9'" onmouseout="this.style.background=''"><span>🤍</span> Wishlist</div>
-        <div onclick="closeAcctDropdown();openAccount()" style="padding:11px 16px;font-size:13px;color:#333;cursor:pointer;display:flex;align-items:center;gap:10px" onmouseover="this.style.background='#f9f9f9'" onmouseout="this.style.background=''"><span>👤</span> Profile & Address</div>
+        <div onclick="closeAcctDropdown();goToAccount()" style="padding:11px 16px;font-size:13px;color:#333;cursor:pointer;display:flex;align-items:center;gap:10px" onmouseover="this.style.background='#f9f9f9'" onmouseout="this.style.background=''"><span>👤</span> Profile & Address</div>
         <div style="padding:8px 16px;border-top:1px solid #f5f5f5">
           <button id="dd-login-btn" onclick="closeAcctDropdown();openAuth()" style="width:100%;padding:9px;background:#1a3a1e;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer">Login / Sign Up</button>
           <button id="dd-logout-btn" onclick="closeAcctDropdown();logoutAccount()" style="display:none;width:100%;padding:9px;background:#fdecea;color:#c0392b;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;margin-top:6px">Logout</button>
@@ -2369,6 +2369,7 @@ async function saveOrderToDB(name, phone, email, addr, city, state, pin, final, 
 
 // ── Send Order Confirmation Email ────────────────────────────
 async function sendOrderEmail(opts) {
+  if (!opts.email || !opts.email.includes('@')) return; // skip if no valid email
   try {
     // Get email from auth profile or delivery form
     var emailTo = (opts.email || '').trim();
@@ -3437,7 +3438,7 @@ window.addEventListener('DOMContentLoaded', function() {
     </div>
     <!-- Quick links -->
     <div style="border-bottom:1px solid #f0f0f0">
-      <div onclick="closeAuth();openAccount()" style="padding:14px 20px;font-size:14px;color:#333;cursor:pointer;display:flex;align-items:center;gap:12px" onmouseover="this.style.background='#f9f9f9'" onmouseout="this.style.background=''">
+      <div onclick="closeAuth();goToAccount()" style="padding:14px 20px;font-size:14px;color:#333;cursor:pointer;display:flex;align-items:center;gap:12px" onmouseover="this.style.background='#f9f9f9'" onmouseout="this.style.background=''">
         <span style="font-size:16px">📦</span> Orders
       </div>
       <div onclick="closeAuth();openWishlist()" style="padding:14px 20px;font-size:14px;color:#333;cursor:pointer;display:flex;align-items:center;gap:12px" onmouseover="this.style.background='#f9f9f9'" onmouseout="this.style.background=''">
@@ -3794,6 +3795,10 @@ function closeAcctDropdown() {
 // ── Account Panel ───────────────────────────────────────────────
 var _acctTab = 'orders';
 var _acctData = null;
+
+function goToAccount() {
+  window.location.href = '/account';
+}
 
 function openAccount() {
   closeAcctDropdown();

@@ -326,7 +326,6 @@
 
 <script>
 // ── CONFIG ──
-var STORE_API = '/api/store-data';
 var ADMIN_API = '/api/admin-api';
 var WHATSAPP_NUMBER = '919899984895'; // fallback
 
@@ -357,11 +356,12 @@ function getTrackingUrl(courier, trackingNum) {
 
 // ── RENDER DELIVERY ESTIMATE ──
 function getDeliveryEstimate(createdAt) {
+  // Always calculate from order date (not current date)
   var d = createdAt ? new Date(createdAt) : new Date();
   var lo = new Date(d); lo.setDate(lo.getDate() + 5);
   var hi = new Date(d); hi.setDate(hi.getDate() + 7);
   var fmt = function(dt) { return dt.toLocaleDateString('en-IN', {day:'numeric', month:'short'}); };
-  return fmt(lo) + ' – ' + fmt(hi);
+  return fmt(lo) + ' – ' + fmt(hi) + ', ' + hi.getFullYear();
 }
 
 // ── RENDER ORDER ──
@@ -418,7 +418,7 @@ function renderOrder(order) {
     '<div class="sum-row total"><span>Total Paid</span><span>₹' + total.toLocaleString('en-IN') + '</span></div>';
 
   // Delivery info
-  var addr = [order.address, order.city, order.state, order.pincode].filter(Boolean).join(', ');
+  var addr = [order.delivery_address, order.city, order.state, order.pincode].filter(Boolean).join(', ');
   var delHtml =
     '<div class="del-info">' +
     '<div class="del-field"><label>Name</label><span>' + (order.customer_name||'—') + '</span></div>' +
@@ -460,7 +460,7 @@ function renderOrder(order) {
       trackHtml +
     '</div>' +
     '<div class="actions">' +
-      '<a href="/my-orders" onclick="openProfileOrders(event)" class="btn-primary">📦 View All Orders</a>' +
+      '<a href="/account" class="btn-primary">📦 View All Orders</a>' +
       '<a href="/" class="btn-secondary">🌿 Continue Shopping</a>' +
     '</div>';
 }
@@ -477,11 +477,6 @@ async function loadOrder() {
   }
 
   try {
-    // Fetch from admin-api using anon key (public order view by ID)
-    var query = orderId
-      ? 'id=eq.' + orderId + '&select=*,items:order_items(product_id,quantity,price_at_time,name,emoji,image_url,variant_value)'
-      : 'order_number=eq.' + encodeURIComponent(orderNum) + '&select=*,items:order_items(product_id,quantity,price_at_time,name,emoji,image_url,variant_value)';
-
     var res = await fetch(ADMIN_API, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -504,10 +499,6 @@ async function loadOrder() {
   }
 }
 
-function openProfileOrders(e) {
-  e.preventDefault();
-  window.location.href = '/?openorders=1';
-}
 
 loadOrder();
 </script>

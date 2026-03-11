@@ -133,7 +133,7 @@ body{font-family:'Lato',sans-serif;background:#f7f3ee;min-height:100vh;color:var
   .mob-tab .mt-icon{font-size:20px}
   .page{padding:16px 12px 80px}
 }
-@media(min-width:769px){.mob-tabs{display:none}}
+@media(min-width:769px){.mob-tabs{display:none!important}}
 </style>
 </head>
 <body>
@@ -155,10 +155,10 @@ body{font-family:'Lato',sans-serif;background:#f7f3ee;min-height:100vh;color:var
       <div class="sb-email" id="sb-email">—</div>
     </div>
     <div class="sb-nav">
-      <button class="sb-item active" onclick="switchTab('orders',this)"><span class="icon">📦</span> My Orders</button>
-      <button class="sb-item" onclick="switchTab('addresses',this)"><span class="icon">📍</span> Addresses</button>
-      <button class="sb-item" onclick="switchTab('profile',this)"><span class="icon">👤</span> Profile</button>
-      <button class="sb-item" onclick="switchTab('password',this)"><span class="icon">🔒</span> Change Password</button>
+      <button class="sb-item active" data-tab="orders" onclick="switchTab('orders')"><span class="icon">📦</span> My Orders</button>
+      <button class="sb-item" data-tab="addresses" onclick="switchTab('addresses')"><span class="icon">📍</span> Addresses</button>
+      <button class="sb-item" data-tab="profile" onclick="switchTab('profile')"><span class="icon">👤</span> Profile</button>
+      <button class="sb-item" data-tab="password" onclick="switchTab('password')"><span class="icon">🔒</span> Change Password</button>
       <div class="sb-divider"></div>
       <button class="sb-item logout" onclick="doLogout()"><span class="icon">🚪</span> Logout</button>
     </div>
@@ -172,10 +172,10 @@ body{font-family:'Lato',sans-serif;background:#f7f3ee;min-height:100vh;color:var
 
 <!-- Mobile bottom tabs -->
 <div class="mob-tabs" id="mob-tabs" style="display:none">
-  <button class="mob-tab active" onclick="switchTab('orders',this)"><span class="mt-icon">📦</span>Orders</button>
-  <button class="mob-tab" onclick="switchTab('addresses',this)"><span class="mt-icon">📍</span>Addresses</button>
-  <button class="mob-tab" onclick="switchTab('profile',this)"><span class="mt-icon">👤</span>Profile</button>
-  <button class="mob-tab" onclick="switchTab('password',this)"><span class="mt-icon">🔒</span>Password</button>
+  <button class="mob-tab active" data-tab="orders" onclick="switchTab('orders')"><span class="mt-icon">📦</span>Orders</button>
+  <button class="mob-tab" data-tab="addresses" onclick="switchTab('addresses')"><span class="mt-icon">📍</span>Addresses</button>
+  <button class="mob-tab" data-tab="profile" onclick="switchTab('profile')"><span class="mt-icon">👤</span>Profile</button>
+  <button class="mob-tab" data-tab="password" onclick="switchTab('password')"><span class="mt-icon">🔒</span>Password</button>
   <button class="mob-tab" onclick="doLogout()"><span class="mt-icon">🚪</span>Logout</button>
 </div>
 
@@ -200,20 +200,16 @@ async function callAuth(action, body, useToken) {
   if (!res.ok) throw new Error(data.error || 'Error');
   return data;
 }
-async function callAdmin(body) {
-  var res = await fetch(API_BASE + '/admin-api', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
-  var data = await res.json();
-  if (!res.ok) throw new Error(data.error || 'Error');
-  return data;
-}
+
 
 // ── Init ──
 async function init() {
   if (!_authToken) { showLoginWall(); return; }
-  // Fetch fresh profile
   try {
     var data = await callAuth('get_profile', {}, true);
     _authProfile = data.profile; _authUser = data.user;
+    // Store orders from profile call (already fetched!)
+    if (data.orders) _orders = data.orders;
     try { localStorage.setItem('pr_auth_profile', JSON.stringify(data.profile)); } catch(e){}
   } catch(e) {}
   if (!_authProfile) { showLoginWall(); return; }
@@ -251,11 +247,11 @@ function showAccount() {
 // ── Tab switching ──
 function switchTab(tab, btn) {
   _currentTab = tab;
-  // Desktop sidebar
+  // Remove active from ALL nav items (sidebar + mobile)
   document.querySelectorAll('.sb-item').forEach(b => b.classList.remove('active'));
-  // Mobile tabs
   document.querySelectorAll('.mob-tab').forEach(b => b.classList.remove('active'));
-  if (btn) btn.classList.add('active');
+  // Add active to matching tab in BOTH panels by data-tab attribute
+  document.querySelectorAll('[data-tab="' + tab + '"]').forEach(b => b.classList.add('active'));
 
   if (tab === 'orders') renderOrdersTab();
   else if (tab === 'addresses') renderAddressesTab();
@@ -270,17 +266,9 @@ async function renderOrdersTab() {
   setPanel('<div class="loading"><div class="spinner"></div></div>');
   try {
     if (!_orders) {
-      var custId = _authProfile && _authProfile.id;
-      if (!custId) throw new Error('Profile not loaded');
-      var res = await callAdmin({ method:'GET', table:'orders', query:'customer_id=eq.' + custId + '&select=id,order_number,order_status,payment_status,total_amount,created_at,tracking_number,courier&order=created_at.desc&limit=50' });
-      _orders = Array.isArray(res) ? res : [];
-      // Fetch items for each order
-      for (var i = 0; i < Math.min(_orders.length, 20); i++) {
-        try {
-          var items = await callAdmin({ method:'GET', table:'order_items', query:'order_id=eq.' + _orders[i].id + '&select=quantity,price_at_time,products(name,emoji)' });
-          _orders[i]._items = items || [];
-        } catch(e) { _orders[i]._items = []; }
-      }
+      // Reload from server if needed
+      var data = await callAuth('get_profile', {}, true);
+      _orders = data.orders || [];
     }
     setPanel(buildOrdersHtml(_orders));
   } catch(e) {
@@ -308,8 +296,8 @@ function buildOrdersHtml(orders) {
 
   return '<div class="card"><div class="card-title">📦 My Orders <span style="font-size:14px;font-weight:400;color:var(--tx3);font-family:Lato,sans-serif">(' + orders.length + ')</span></div>' +
     orders.map(function(o) {
-      var items = (o._items || []).slice(0,2).map(function(i){ return (i.products&&i.products.emoji||'🌿') + ' ' + (i.products&&i.products.name||'Product') + ' ×' + i.quantity; }).join(' · ');
-      if (o._items && o._items.length > 2) items += ' +' + (o._items.length-2) + ' more';
+      var items = (o.items || []).slice(0,2).map(function(i){ return (i.emoji||'🌿') + ' ' + (i.name||'Product') + ' ×' + (i.qty||i.quantity||1); }).join(' · ');
+      if (o.items && o.items.length > 2) items += ' +' + (o.items.length-2) + ' more';
       var badge = badges[o.order_status] || 'badge-pending';
       var date = o.created_at ? new Date(o.created_at).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : '';
       var trackUrl = o.tracking_number ? (COURIER_URLS[o.courier] ? COURIER_URLS[o.courier] + o.tracking_number : 'https://www.google.com/search?q=' + encodeURIComponent((o.courier||'') + ' tracking ' + o.tracking_number)) : '';
@@ -342,7 +330,7 @@ function renderAddressesTab() {
   if (p.address_line1) {
     html += '<div class="addr-card default">' +
       '<div class="addr-label">🏠 Default</div>' +
-      '<div class="addr-line">' + [p.first_name, p.last_name].filter(Boolean).join(' ') + '<br>' + p.address_line1 + ', ' + (p.city||'') + ', ' + (p.state||'') + ' — ' + (p.postal_code||'') + '</div>' +
+      '<div class="addr-line">' + [p.first_name, p.last_name].filter(Boolean).join(' ') + '<br>' + [p.address_line1, p.city, p.state, p.postal_code].filter(Boolean).join(', ') + '</div>' +
       '<div class="addr-actions"><button class="addr-btn" onclick="switchTab(\'profile\')" style="border-color:#c8e6c9;color:var(--g);background:#fff">✏️ Edit</button></div>' +
       '</div>';
   }
@@ -366,11 +354,14 @@ function renderAddressesTab() {
 }
 
 async function deleteSavedAddr(idx) {
-  var addrs = getSavedAddresses().filter(function(a){ return a.label !== 'Default'; });
-  addrs.splice(idx, 1);
+  var all = getSavedAddresses();
+  var nonDefault = all.filter(function(a){ return a.label !== 'Default'; });
+  nonDefault.splice(idx, 1);
+  var defaults = all.filter(function(a){ return a.label === 'Default'; });
+  var addrs = defaults.concat(nonDefault);
   try {
-    await callAuth('update_profile', { saved_addresses: JSON.stringify(addrs) }, true);
-    _authProfile.saved_addresses = JSON.stringify(addrs);
+    await callAuth('update_profile', { saved_addresses: JSON.stringify(nonDefault) }, true);
+    _authProfile.saved_addresses = JSON.stringify(nonDefault);
     try { localStorage.setItem('pr_auth_profile', JSON.stringify(_authProfile)); } catch(e){}
     renderAddressesTab();
     showToast('Address removed');
