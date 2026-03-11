@@ -47,9 +47,6 @@
     transition: color .2s;
   }
   .nav-back:hover { color: #fff; }
-  .nav-right { display: flex; align-items: center; gap: 12px; }
-  .nav-acct { color: rgba(255,255,255,.8); font-size: 13px; font-weight: 600; text-decoration: none; display: flex; align-items: center; gap: 6px; padding: 7px 14px; border: 1.5px solid rgba(255,255,255,.3); border-radius: 20px; transition: all .2s; }
-  .nav-acct:hover { background: rgba(255,255,255,.15); color: #fff; border-color: rgba(255,255,255,.6); }
 
   /* ── HERO CONFIRM ── */
   .confirm-hero {
@@ -283,10 +280,7 @@
       <div class="logo-tl">Himalayan Organic Store</div>
     </div>
   </a>
-  <div class="nav-right">
-    <a href="/account" class="nav-acct">👤 My Account</a>
-    <a href="/" class="nav-back">🌿 Continue Shopping</a>
-  </div>
+  <a href="/" class="nav-back">← Continue Shopping</a>
 </nav>
 
 <!-- HERO (shown after data loads) -->
@@ -465,10 +459,34 @@ function renderOrder(order) {
       '<div class="card-title">🚚 Tracking</div>' +
       trackHtml +
     '</div>' +
+    '<div id="reviewPrompt" class="review-prompt" style="margin-top:8px">' +
+      '<div style="font-family:Playfair Display,serif;font-size:18px;font-weight:900;color:#1a3a1e;margin-bottom:6px">How was your experience? 🌿</div>' +
+      '<div style="font-size:13px;color:#888;margin-bottom:4px">Rate your order — takes 2 seconds!</div>' +
+      '<div class="review-stars" id="reviewStars">' +
+        [1,2,3,4,5].map(function(n){ return '<span class="review-star" onclick="rateOrder(' + n + ')" title="' + n + ' star">⭐</span>'; }).join('') +
+      '</div>' +
+      '<div id="reviewThanks" style="display:none;color:#2e7d32;font-weight:700;font-size:14px;margin-top:8px">🙏 Thanks for your feedback!</div>' +
+    '</div>' +
     '<div class="actions">' +
       '<a href="/account" class="btn-primary">📦 View All Orders</a>' +
+      '<button onclick="window.print()" class="btn-print">🧾 Print Invoice</button>' +
       '<a href="/" class="btn-secondary">🌿 Continue Shopping</a>' +
     '</div>';
+}
+
+// ── REVIEW RATING ──
+function rateOrder(n) {
+  var stars = document.querySelectorAll('.review-star');
+  stars.forEach(function(s,i){ s.classList.toggle('sel', i < n); s.style.filter = i < n ? 'none' : 'grayscale(1)'; });
+  document.getElementById('reviewStars').style.pointerEvents = 'none';
+  document.getElementById('reviewThanks').style.display = 'block';
+  // Save rating (non-blocking)
+  try {
+    fetch('/api/admin-api', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ action:'save_row', table:'order_ratings', data:{ order_id: orderId, rating: n, created_at: new Date().toISOString() } })
+    });
+  } catch(e) {}
 }
 
 // ── FETCH ORDER DATA ──

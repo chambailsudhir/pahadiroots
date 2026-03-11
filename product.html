@@ -5,6 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title id="pg-title">Product — Pahadi Roots</title>
   <meta name="description" id="pg-desc" content="Authentic Himalayan organic products — Pahadi Roots">
+  <meta property="og:title" id="og-title" content="Pahadi Roots – Pure Himalayan Organic Products">
+  <meta property="og:description" id="og-desc" content="Authentic Himalayan organic products sourced directly from mountain farmers.">
+  <meta property="og:image" id="og-image" content="https://pahadiroots.com/images/og-cover.jpg">
+  <meta property="og:url" id="og-url" content="https://pahadiroots.com/product">
+  <meta property="og:type" content="product">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" id="tw-title" content="Pahadi Roots">
+  <meta name="twitter:image" id="tw-image" content="https://pahadiroots.com/images/og-cover.jpg">
   <link rel="icon" href="/images/favicon.ico" type="image/x-icon">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -37,6 +45,7 @@
     @media(max-width:768px){.product-wrap{grid-template-columns:1fr;gap:24px;padding:16px}}
 
     /* ── IMAGE SECTION ── */
+    .img-section{}
     .main-img-wrap{position:relative;border-radius:20px;overflow:hidden;background:var(--bg2);aspect-ratio:1;cursor:zoom-in}
     .main-img-wrap img{width:100%;height:100%;object-fit:cover;transition:transform .4s}
     .main-img-wrap:hover img{transform:scale(1.05)}
@@ -269,6 +278,16 @@ function renderProduct(p, images, related, data, stateMap) {
   // Update page title & meta
   document.getElementById('pg-title').textContent = (p.name || 'Product') + ' — Pahadi Roots';
   document.getElementById('pg-desc').setAttribute('content', p.short_description || p.name + ' — Authentic Himalayan product from Pahadi Roots');
+  // Dynamic OG tags for social sharing
+  var ogImg = p.image_url || 'https://pahadiroots.com/images/og-cover.jpg';
+  var ogUrl = 'https://pahadiroots.com/product?id=' + p.id;
+  var ogDesc = p.short_description || p.name + ' — Authentic Himalayan organic product from Pahadi Roots. Sourced directly from mountain farmers.';
+  document.getElementById('og-title').setAttribute('content', (p.name||'Product') + ' — Pahadi Roots');
+  document.getElementById('og-desc').setAttribute('content', ogDesc);
+  document.getElementById('og-image').setAttribute('content', ogImg);
+  document.getElementById('og-url').setAttribute('content', ogUrl);
+  document.getElementById('tw-title').setAttribute('content', (p.name||'Product') + ' — Pahadi Roots');
+  document.getElementById('tw-image').setAttribute('content', ogImg);
   document.getElementById('bc-name').textContent = p.name;
 
   var pct = p.mrp && p.price ? Math.round((1 - p.price / p.mrp) * 100) : 0;
@@ -292,7 +311,7 @@ function renderProduct(p, images, related, data, stateMap) {
   // Thumbnails
   var thumbHtml = allImgs.length > 1
     ? '<div class="thumb-row">' + allImgs.map(function(src, i) {
-        return '<div class="thumb' + (i===0?' active':'') + '" onclick="switchImg(this)" data-src="' + src + '"><img src="' + src + '" loading="lazy"></div>';
+        return '<div class="thumb' + (i===0?' active':'') + '" onclick="switchImg(\'' + src + '\',this)"><img src="' + src + '" loading="lazy"></div>';
       }).join('') + '</div>'
     : '';
 
@@ -347,7 +366,7 @@ function renderProduct(p, images, related, data, stateMap) {
           (displayMrp && displayMrp > displayPrice ? '<span class="price-was" id="dp-mrp">₹' + displayMrp + '</span><span class="price-save" id="dp-save">Save ₹' + (displayMrp - displayPrice) + '</span>' : '') +
         '</div>' +
         variantHtml +
-        '<div class="stock-row"><div class="stock-dot ' + stockClass + '" id="stock-dot"></div><span id="stock-label">' + stockLabel + '</span></div>' +
+        '<div class="stock-row"><div class="stock-dot ' + stockClass + '"></div><span>' + stockLabel + '</span></div>' +
         '<div class="qty-atc">' +
           '<div class="qty-ctrl">' +
             '<button class="qty-btn" onclick="changeQty(-1)">−</button>' +
@@ -356,6 +375,7 @@ function renderProduct(p, images, related, data, stateMap) {
           '</div>' +
           '<button class="atc-btn" id="atc-btn" onclick="addToCartProduct()" ' + (stock<=0?'disabled':'') + '>⚡ Buy Now</button>' +
           '<button class="wl-btn-lg' + (wishlist.includes(p.id)?' active':'') + '" onclick="toggleWL()" id="wl-btn">' + (wishlist.includes(p.id)?'❤️':'🤍') + '</button>' +
+          '<button class="share-btn" onclick="shareProduct()" title="Share this product">🔗</button>' +
         '</div>' +
         '<div class="delivery-row">🚚 Free delivery available · Pan India · Estimated 5-7 days</div>' +
         '<div class="highlights"><h4>Why Pahadi Roots?</h4><ul class="hl-list">' +
@@ -369,21 +389,20 @@ function renderProduct(p, images, related, data, stateMap) {
         '<div class="desc-tab active" onclick="switchTab(\'desc\',this)">Description</div>' +
         '<div class="desc-tab" onclick="switchTab(\'ship\',this)">Shipping</div>' +
         '<div class="desc-tab" onclick="switchTab(\'care\',this)">Storage & Care</div>' +
+        '<div class="desc-tab" onclick="switchTab(\'returns\',this)">Returns & Refunds</div>' +
       '</div>' +
       '<div id="tab-desc" class="desc-content active">' + (p.long_description || p.short_description || p.description || 'Authentic Himalayan product sourced directly from local farmers. No preservatives, no additives — pure and natural.') + '</div>' +
       '<div id="tab-ship" class="desc-content">We ship Pan India via trusted courier partners. Delivery in 5-7 business days. Free shipping on orders above ₹799. COD available on select pincodes.</div>' +
       '<div id="tab-care" class="desc-content">Store in a cool, dry place away from direct sunlight. Keep container tightly sealed after use. Best consumed within the expiry date printed on the pack.</div>' +
+      '<div id="tab-returns" class="desc-content"><strong>🔄 Return & Refund Policy</strong><br><br>We want you to love every product from Pahadi Roots. Here\'s our policy:<br><br><strong>✅ Eligible for return:</strong> Damaged, defective, or wrong item delivered — report within <strong>3 days</strong> of delivery with a photo/video.<br><br><strong>❌ Not eligible:</strong> Products opened & used (unless defective), items returned after 3 days, or without original packaging.<br><br><strong>How to claim:</strong> WhatsApp us at +91 98999 84895 with your order number and photos. We process refunds within 5-7 business days once approved.<br><br><strong>Refund method:</strong> UPI / original payment method.<br><br>For any issues, reach us at support@pahadiroots.com</div>' +
     '</div>' +
     relHtml +
-    '<footer class="mini-footer">© 2026 Pahadi Roots · <a href="/">Shop Now</a> · <a href="mailto:support@pahadiroots.com">support@pahadiroots.com</a></footer>';
+    '<footer class="mini-footer">© 2026 Pahadi Roots · <a href="/">Shop Now</a> · <a href="/terms">Terms & Returns</a> · <a href="mailto:support@pahadiroots.com">support@pahadiroots.com</a></footer>';
 }
 
 // ── Switch main image ──
-function switchImg(thumb) {
-  var src = thumb.dataset.src;
-  if (!src) return;
-  var mainImg = document.getElementById('main-img');
-  if (mainImg) mainImg.src = src;
+function switchImg(src, thumb) {
+  document.getElementById('main-img').src = src;
   document.querySelectorAll('.thumb').forEach(function(t) { t.classList.remove('active'); });
   thumb.classList.add('active');
 }
@@ -416,25 +435,9 @@ function selectVariant(varId) {
     mrpEl.textContent = '₹' + selectedVariant.original_price;
     if (saveEl) saveEl.textContent = 'Save ₹' + (selectedVariant.original_price - selectedVariant.price);
   }
-  // Update stock display for this variant
-  var vStock = selectedVariant.stock_quantity !== undefined ? selectedVariant.stock_quantity : 99;
-  var vStockLabel = vStock <= 0 ? 'Out of Stock' : vStock <= 5 ? 'Only ' + vStock + ' left!' : vStock <= 20 ? vStock + ' in stock' : 'In Stock';
-  var vStockClass = vStock > 20 ? '' : vStock > 5 ? 'low' : 'oos';
-  var stockLabelEl = document.getElementById('stock-label');
-  var stockDotEl   = document.getElementById('stock-dot');
-  if (stockLabelEl) stockLabelEl.textContent = vStockLabel;
-  if (stockDotEl)   stockDotEl.className = 'stock-dot ' + vStockClass;
-  // Update ATC button state
-  var atcBtn = document.getElementById('atc-btn');
-  if (atcBtn) { atcBtn.disabled = vStock <= 0; atcBtn.innerHTML = vStock <= 0 ? 'Out of Stock' : '⚡ Buy Now'; }
-  // Reset qty to 1 and button states
+  // Update qty to 1 on variant change
   qty = 1;
-  var qd = document.getElementById('qty-display');
-  if (qd) qd.textContent = '1';
-  var minusBtn = document.querySelector('.qty-ctrl .qty-btn:first-child');
-  var plusBtn  = document.querySelector('.qty-ctrl .qty-btn:last-child');
-  if (minusBtn) minusBtn.style.opacity = '0.3';
-  if (plusBtn)  plusBtn.style.opacity  = vStock <= 1 ? '0.3' : '1';
+  document.getElementById('qty-display').textContent = '1';
 }
 
 // ── Change quantity ──
@@ -450,6 +453,30 @@ function changeQty(d) {
 }
 
 // ── Add to cart ──
+function shareProduct() {
+  var url  = window.location.href;
+  var name = (PRODUCT && PRODUCT.name) ? PRODUCT.name : 'this product';
+  var price = (PRODUCT && PRODUCT.price) ? ' at ₹' + PRODUCT.price : '';
+  if (navigator.share) {
+    navigator.share({ title: name + ' — Pahadi Roots', text: '🌿 Check out ' + name + price + ' on Pahadi Roots!', url: url });
+  } else {
+    // Fallback — copy to clipboard
+    var wa = 'https://wa.me/?text=' + encodeURIComponent('🌿 Check out ' + name + price + ' on Pahadi Roots!
+' + url);
+    var opts = '<div style="display:flex;flex-direction:column;gap:12px;padding:4px">' +
+      '<a href="' + wa + '" target="_blank" style="background:#25d366;color:#fff;padding:12px 20px;border-radius:10px;text-align:center;font-weight:700;text-decoration:none">💬 Share on WhatsApp</a>' +
+      '<button onclick="navigator.clipboard.writeText('' + url.replace(/'/g,"\'") + '').then(function(){showToastP('🔗 Link copied!')});document.getElementById(\'share-modal\').remove()" style="background:var(--g);color:#fff;padding:12px 20px;border-radius:10px;font-weight:700;border:none;cursor:pointer;font-size:14px">📋 Copy Link</button>' +
+    '</div>';
+    var modal = document.createElement('div');
+    modal.id = 'share-modal';
+    modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
+    modal.innerHTML = '<div style="background:#fff;border-radius:20px;padding:28px;max-width:340px;width:100%"><h3 style="font-family:Playfair Display,serif;margin-bottom:4px">Share Product</h3><p style="color:#888;font-size:13px;margin-bottom:20px">' + name + '</p>' + opts + '<button onclick="document.getElementById(\'share-modal\').remove()" style="margin-top:12px;width:100%;padding:10px;border:none;background:#f5f5f5;border-radius:10px;cursor:pointer;font-weight:700">Cancel</button></div>';
+    document.body.appendChild(modal);
+    modal.addEventListener('click', function(e){ if(e.target===modal) modal.remove(); });
+  }
+}
+function showToastP(msg) { var t=document.getElementById('toast'); if(t){t.textContent=msg;t.style.opacity=1;setTimeout(function(){t.style.opacity=0;},2200);} }
+
 function addToCartProduct() {
   if (!PRODUCT) return;
   var price = selectedVariant ? selectedVariant.price : PRODUCT.price;
@@ -468,24 +495,6 @@ function addToCartProduct() {
   showToast('✅ ' + displayName + ' added! Cart: ' + cart.reduce(function(s,x){return s+(x.qty||0);},0) + ' items');
   document.getElementById('atc-btn').textContent = '✅ Added!';
   setTimeout(function() { document.getElementById('atc-btn').innerHTML = '⚡ Buy Now'; }, 1500);
-  // ✅ FIX: Update in-memory stock and refresh stock display on page
-  if (selectedVariant) {
-    selectedVariant.stock_quantity = Math.max(0, (selectedVariant.stock_quantity || 0) - qty);
-  } else if (PRODUCT) {
-    PRODUCT.stock_quantity = Math.max(0, (PRODUCT.stock_quantity || 0) - qty);
-  }
-  var currentStock = selectedVariant ? selectedVariant.stock_quantity : (PRODUCT ? PRODUCT.stock_quantity : 0);
-  var newStockLabel = currentStock <= 0 ? 'Out of Stock' : currentStock <= 5 ? 'Only ' + currentStock + ' left!' : currentStock <= 20 ? currentStock + ' in stock' : 'In Stock';
-  var newStockClass = currentStock > 20 ? '' : currentStock > 5 ? 'low' : 'oos';
-  var stockLabelEl = document.getElementById('stock-label');
-  var stockDotEl   = document.getElementById('stock-dot');
-  if (stockLabelEl) stockLabelEl.textContent = newStockLabel;
-  if (stockDotEl)   stockDotEl.className = 'stock-dot ' + newStockClass;
-  if (currentStock <= 0) {
-    var atcBtn2 = document.getElementById('atc-btn');
-    if (atcBtn2) { atcBtn2.disabled = true; atcBtn2.textContent = 'Out of Stock'; }
-  }
-
   // Reset qty to 1 after adding
   qty = 1;
   var qd = document.getElementById('qty-display');
@@ -508,7 +517,7 @@ function toggleWL() {
 
 // ── Go to product ──
 function goToProduct(slug) {
-  window.location.href = '/products/' + slug;
+  window.open('/products/' + slug, '_blank');
 }
 
 // ── Not found ──

@@ -22,25 +22,26 @@ body{font-family:'Lato',sans-serif;background:#f7f3ee;min-height:100vh;color:var
 .nav-right a:hover{background:var(--g);color:#fff}
 
 /* ── LAYOUT ── */
-.page-wrap{display:flex;min-height:calc(100vh - 60px)}
-.sidebar{width:260px;flex-shrink:0;background:var(--g);display:flex;flex-direction:column;position:sticky;top:60px;height:calc(100vh - 60px);overflow-y:auto}
-.sb-profile{background:rgba(0,0,0,.2);padding:28px 20px 24px;text-align:center;flex-shrink:0}
-.sb-avatar{width:64px;height:64px;background:rgba(255,255,255,.15);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:28px;font-weight:900;color:#fff;border:2px solid rgba(255,255,255,.3);margin:0 auto 12px}
-.sb-name{font-family:'Playfair Display',serif;font-size:17px;font-weight:900;color:#fff;margin-bottom:3px}
-.sb-email{font-size:11px;color:rgba(255,255,255,.55);word-break:break-all}
-.sb-nav{padding:8px 0;flex:1;display:flex;flex-direction:column}
-.sb-item{display:flex;align-items:center;gap:12px;padding:13px 20px;cursor:pointer;transition:all .2s;border:none;background:none;width:100%;text-align:left;font-family:'Lato',sans-serif;font-size:13.5px;font-weight:700;color:rgba(255,255,255,.7);border-left:3px solid transparent}
-.sb-item:hover{background:rgba(255,255,255,.1);color:#fff;padding-left:24px}
-.sb-item.active{background:rgba(255,255,255,.15);color:#fff;border-left-color:var(--gd2)}
+.page{max-width:960px;margin:0 auto;padding:28px 16px 60px;display:grid;grid-template-columns:260px 1fr;gap:24px;align-items:start}
+@media(max-width:768px){.page{grid-template-columns:1fr;padding:0 0 60px}}
+
+/* ── SIDEBAR ── */
+.sidebar{background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.06);position:sticky;top:76px}
+.sb-profile{background:linear-gradient(135deg,var(--g),var(--g2));padding:24px;text-align:center}
+.sb-avatar{width:64px;height:64px;background:rgba(255,255,255,.2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:28px;font-weight:900;color:#fff;border:3px solid rgba(255,255,255,.3);margin:0 auto 12px}
+.sb-name{font-family:'Playfair Display',serif;font-size:18px;font-weight:900;color:#fff;margin-bottom:3px}
+.sb-email{font-size:12px;color:rgba(255,255,255,.65)}
+.sb-nav{padding:8px 0}
+.sb-item{display:flex;align-items:center;gap:12px;padding:13px 20px;cursor:pointer;transition:all .2s;border:none;background:none;width:100%;text-align:left;font-family:'Lato',sans-serif;font-size:14px;font-weight:700;color:var(--tx2);border-left:3px solid transparent}
+.sb-item:hover{background:rgba(26,58,30,.05);color:var(--g)}
+.sb-item.active{background:rgba(26,58,30,.07);color:var(--g);border-left-color:var(--g)}
 .sb-item .icon{font-size:16px;width:20px;text-align:center}
-.sb-divider{height:1px;background:rgba(255,255,255,.1);margin:8px 16px}
-.sb-item.logout{color:rgba(255,160,160,.8);margin-top:auto}
-.sb-item.logout:hover{background:rgba(255,80,80,.15);color:#ffaaaa;padding-left:24px}
-.main-area{flex:1;padding:28px 28px 60px;background:#f3f4f0;overflow-y:auto}
-@media(max-width:768px){.sidebar{display:none}.main-area{padding:16px 12px 80px}}
+.sb-divider{height:1px;background:#f0f0f0;margin:8px 0}
+.sb-item.logout{color:#c0392b}
+.sb-item.logout:hover{background:#fdecea}
 
 /* ── MAIN PANEL ── */
-.main-area{display:flex;flex-direction:column;gap:20px}
+.main-panel{display:flex;flex-direction:column;gap:20px}
 
 /* ── CARDS ── */
 .card{background:#fff;border-radius:18px;padding:24px;box-shadow:0 2px 12px rgba(0,0,0,.06)}
@@ -130,6 +131,7 @@ body{font-family:'Lato',sans-serif;background:#f7f3ee;min-height:100vh;color:var
   .mob-tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 8px;border:none;background:none;cursor:pointer;font-family:'Lato',sans-serif;font-size:10px;font-weight:700;color:#aaa;gap:3px;transition:color .2s}
   .mob-tab.active{color:var(--g)}
   .mob-tab .mt-icon{font-size:20px}
+  .page{padding:16px 12px 80px}
 }
 @media(min-width:769px){.mob-tabs{display:none!important}}
 </style>
@@ -144,7 +146,7 @@ body{font-family:'Lato',sans-serif;background:#f7f3ee;min-height:100vh;color:var
   <div class="nav-right"><a href="/">🛍️ Continue Shopping</a></div>
 </nav>
 
-<div class="page-wrap" id="page">
+<div class="page" id="page">
   <!-- Sidebar (desktop) -->
   <aside class="sidebar" id="sidebar" style="display:none">
     <div class="sb-profile">
@@ -163,7 +165,7 @@ body{font-family:'Lato',sans-serif;background:#f7f3ee;min-height:100vh;color:var
   </aside>
 
   <!-- Main panel -->
-  <div class="main-area" id="main-panel">
+  <div class="main-panel" id="main-panel">
     <div class="loading"><div class="spinner"></div><p style="color:var(--tx3);font-size:14px">Loading your account...</p></div>
   </div>
 </div>
@@ -282,6 +284,36 @@ var COURIER_URLS = {
   'Xpressbees': 'https://www.xpressbees.com/track?awbnumber=',
 };
 
+async function cancelOrder(orderId, orderNum) {
+  if (!confirm('Cancel order ' + orderNum + '? This cannot be undone.')) return;
+  try {
+    var res = await fetch('/api/admin-api', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ action:'update_row', table:'orders', id: orderId, data:{ order_status:'cancelled' } })
+    });
+    if (res.ok) {
+      showToast('✅ Order ' + orderNum + ' cancelled');
+      _orders = null; // force reload
+      renderOrdersTab();
+    } else { showToast('❌ Cancel failed. Contact support.'); }
+  } catch(e) { showToast('❌ Network error'); }
+}
+
+async function cancelOrder(orderId, orderNum) {
+  if (!confirm('Cancel order ' + orderNum + '? This cannot be undone.')) return;
+  try {
+    var res = await fetch('/api/admin-api', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ action:'update_row', table:'orders', id: orderId, data:{ order_status:'cancelled' } })
+    });
+    if (res.ok) {
+      showToast('Order ' + orderNum + ' cancelled');
+      _orders = null;
+      renderOrdersTab();
+    } else { showToast('❌ Cancel failed. Contact support.'); }
+  } catch(e) { showToast('❌ Network error'); }
+}
+
 function buildOrdersHtml(orders) {
   var badges = { confirmed:'badge-confirmed', shipped:'badge-shipped', delivered:'badge-delivered', pending:'badge-pending', cancelled:'badge-cancelled', processing:'badge-processing' };
   if (!orders.length) return `
@@ -300,12 +332,30 @@ function buildOrdersHtml(orders) {
       var date = o.created_at ? new Date(o.created_at).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : '';
       var trackUrl = o.tracking_number ? (COURIER_URLS[o.courier] ? COURIER_URLS[o.courier] + o.tracking_number : 'https://www.google.com/search?q=' + encodeURIComponent((o.courier||'') + ' tracking ' + o.tracking_number)) : '';
       var viewUrl = '/order-confirmation?id=' + o.id + '&num=' + encodeURIComponent(o.order_number||'');
+      // Estimated delivery
+      var estDelivery = '';
+      if (o.order_status === 'delivered') {
+        estDelivery = '<span style="font-size:11px;color:#2e7d32;font-weight:700">✅ Delivered</span>';
+      } else if (o.order_status === 'shipped' && o.shipped_at) {
+        var shipDate = new Date(o.shipped_at); shipDate.setDate(shipDate.getDate() + 5);
+        estDelivery = '<span style="font-size:11px;color:var(--gd);font-weight:700">🚚 Est. delivery: ' + shipDate.toLocaleDateString('en-IN',{day:'numeric',month:'short'}) + '</span>';
+      } else if (o.order_status === 'confirmed' || o.order_status === 'processing') {
+        var orderDate = new Date(o.created_at||Date.now()); orderDate.setDate(orderDate.getDate() + 7);
+        estDelivery = '<span style="font-size:11px;color:var(--tx3);font-weight:600">📅 Est. delivery: ' + orderDate.toLocaleDateString('en-IN',{day:'numeric',month:'short'}) + '</span>';
+      }
+      // Cancel button (only for pending/confirmed)
+      var cancelBtn = (o.order_status === 'pending' || o.order_status === 'confirmed')
+        ? '<button onclick="cancelOrder('' + o.id + '','' + (o.order_number||o.id) + '')" style="border:none;background:none;color:#c0392b;font-size:11px;font-weight:700;cursor:pointer;padding:5px 10px;border-radius:20px;border:1px solid #fdecea">❌ Cancel</button>'
+        : '';
       return '<div class="order-card">' +
-        '<div class="oc-hdr"><span class="oc-num">' + (o.order_number||'#'+o.id.slice(0,8)) + '</span><span class="oc-badge ' + badge + '">' + (o.order_status||'pending') + '</span></div>' +
+        '<div class="oc-hdr"><span class="oc-num">' + (o.order_number||'#'+String(o.id).slice(0,8)) + '</span><span class="oc-badge ' + badge + '">' + (o.order_status||'pending') + '</span></div>' +
         (items ? '<div class="oc-items">' + items + '</div>' : '') +
+        (estDelivery ? '<div style="margin:6px 0">' + estDelivery + '</div>' : '') +
         '<div class="oc-actions">' +
           '<a href="' + viewUrl + '" class="view-chip">📄 View Order</a>' +
           (trackUrl ? '<a href="' + trackUrl + '" target="_blank" class="track-chip">🚚 Track</a>' : '') +
+          '<a href="/order-confirmation?id=' + o.id + '&num=' + encodeURIComponent(o.order_number||'') + '&print=1" target="_blank" class="view-chip" title="Download Invoice">🧾 Invoice</a>' +
+          cancelBtn +
         '</div>' +
         '<div class="oc-footer" style="margin-top:10px"><span class="oc-total">₹' + (o.total_amount||0).toLocaleString('en-IN') + '</span><span class="oc-date">' + date + '</span></div>' +
         '</div>';
@@ -398,9 +448,18 @@ function renderProfileTab() {
     </div>
 
     <div class="card">
-      <div class="card-title">🔗 Linked Accounts</div>
-      ${phone ? `<div class="linked-row"><span class="linked-icon">📱</span><span class="linked-info">+91 ${phone}</span><span class="linked-badge">✓ Linked</span></div>` : ''}
-      ${email ? `<div class="linked-row"><span class="linked-icon">📧</span><span class="linked-info">${email}</span><span class="linked-badge">✓ Linked</span></div>` : ''}
+      <div class="card-title">📱 Contact Info</div>
+      <div class="form-grid">
+        <div><div class="field-label">Phone Number</div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <span style="font-size:14px;font-weight:700;color:var(--tx2);padding:10px 12px;border-radius:10px;background:#f5f5f5">+91</span>
+            <input class="field-input" id="pf-phone" value="${phone}" placeholder="10-digit mobile number" maxlength="10" type="tel" style="flex:1">
+          </div>
+        </div>
+        <div><div class="field-label">Email</div><input class="field-input" value="${email}" disabled style="opacity:.6;cursor:not-allowed" title="Email cannot be changed"></div>
+      </div>
+      <button class="btn-primary" onclick="savePhoneInfo()" style="margin-top:4px">💾 Save Phone</button>
+      <div class="save-msg" id="phone-msg">✅ Phone saved!</div>
     </div>`;
   setPanel(html);
 }
@@ -414,6 +473,28 @@ async function saveProfileInfo() {
     showSaveMsg('pf-msg');
     document.getElementById('sb-name').textContent = [updates.first_name, updates.last_name].filter(Boolean).join(' ');
     document.getElementById('sb-avatar').textContent = (updates.first_name[0]||'?').toUpperCase();
+  } catch(e) { showToast('❌ Save failed'); }
+}
+
+async function savePhoneInfo() {
+  var phone = (document.getElementById('pf-phone')||{}).value.trim().replace(/\D/g,'');
+  if (phone.length !== 10) { showToast('📱 Enter valid 10-digit phone'); return; }
+  try {
+    await callAuth('update_profile', { phone: '+91' + phone }, true);
+    if (_authProfile) _authProfile.phone = '+91' + phone;
+    try { localStorage.setItem('pr_auth_profile', JSON.stringify(_authProfile)); } catch(e){}
+    showSaveMsg('phone-msg');
+  } catch(e) { showToast('❌ Save failed'); }
+}
+
+async function savePhoneInfo() {
+  var phone = (document.getElementById('pf-phone')||{}).value.trim().replace(/[^0-9]/g,'');
+  if (phone.length !== 10) { showToast('📱 Enter valid 10-digit phone'); return; }
+  try {
+    await callAuth('update_profile', { phone: '+91' + phone }, true);
+    if (_authProfile) _authProfile.phone = '+91' + phone;
+    try { localStorage.setItem('pr_auth_profile', JSON.stringify(_authProfile)); } catch(e){}
+    showSaveMsg('phone-msg');
   } catch(e) { showToast('❌ Save failed'); }
 }
 

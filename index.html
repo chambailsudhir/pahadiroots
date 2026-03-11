@@ -67,7 +67,7 @@
   },
   "contactPoint": {
     "@type": "ContactPoint",
-    "telephone": "+91-9899984895",
+    "telephone": "+91-XXXXXXXXXX",
     "contactType": "customer service",
     "availableLanguage": ["English", "Hindi"]
   },
@@ -117,6 +117,7 @@
 /* ════════════════════════════════════════════
    PAHADI ROOTS — CSS matching actual HTML classes
 ════════════════════════════════════════════ */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Lato:wght@300;400;700;900&display=swap');
 *{box-sizing:border-box;margin:0;padding:0}
 img{max-width:100%}
 :root{--g:#1a3a1e;--g2:#2d5233;--g3:#3d6b42;--gd:#c8920a;--gd2:#e8b84b;--gd3:#f5d98a;--tx:#1a1a1a;--tx2:#4a4a4a;--tx3:#7a7a7a;--bd:rgba(26,58,30,.12)}
@@ -1152,7 +1153,7 @@ if(window.location.search.includes('opencart=1')){
     <div><div class="fh">Company</div><ul class="ful"><li><a href="#story">Our Story</a></li><li><a href="#states">By Region</a></li><li><a href="#">Farmer Partners</a></li><li><a href="#">Lab Reports</a></li><li><a href="#">Blog</a></li><li><a href="#">Sustainability</a></li></ul></div>
     <div class="fct"><div class="fh">Get in Touch</div><p>🌐 <a href="https://pahadiroots.com">pahadiroots.com</a><br>📧 <a href="/cdn-cgi/l/email-protection#1d75787171725d6d7c757c79746f7272696e337e7270"><span class="__cf_email__" data-cfemail="f199949d9d9eb1819099909598839e9e8582df929e9c">[email&#160;protected]</span></a><br>📞 <a href="tel:+919899984895">+91 98999 84895</a><br><br>📍 Pahadi Roots<br>New Delhi, India</p></div>
   </div>
-  <div class="fbot"><span>© 2026 <span class="fd">pahadiroots.com</span> · Founded by Sudhir Chambail</span><span>🌿 Making India eat clean, one mountain at a time</span></div>
+  <div class="fbot"><span>© 2026 <span class="fd">pahadiroots.com</span> · Founded by Sudhir Chambail</span><span style="display:flex;gap:16px;align-items:center;flex-wrap:wrap;justify-content:center"><a href="/terms" style="color:rgba(255,255,255,.5);font-size:12px;text-decoration:underline">Terms &amp; Conditions</a><a href="/returns" style="color:rgba(255,255,255,.5);font-size:12px;text-decoration:underline">Returns Policy</a><a href="/privacy" style="color:rgba(255,255,255,.5);font-size:12px;text-decoration:underline">Privacy Policy</a></span></div>
 </footer>
 <!-- Search overlay -->
 <div class="srch-overlay" id="srchOverlay" onclick="handleSrchOvClick(event)">
@@ -2012,16 +2013,7 @@ function rmCart(id) { var sid=String(id); cart = cart.filter(function(x) { retur
 function chQty(id, d) {
   var sid = String(id);
   var i = cart.find(function(x) { return String(x.cartKey||x.id) === sid; });
-  if (i) {
-    if (d > 0) {
-      // Stock limit check on increase
-      var prod = PRODUCTS.find(function(p) { return p.id === i.id; });
-      var maxStock = prod ? (prod.stock || prod.stock_quantity || 999) : 999;
-      if (i.qty >= maxStock) { showToast('⚠️ Only ' + maxStock + ' in stock!'); return; }
-    }
-    i.qty += d;
-    if (i.qty < 1) { rmCart(id); return; }
-  }
+  if (i) { i.qty += d; if (i.qty < 1) { rmCart(id); return; } }
   sv(); uCart();
 }
 
@@ -2281,7 +2273,6 @@ async function checkoutRazorpay() {
   });
   if(err){ showToast('📍 Please fill in all delivery details'); document.getElementById('del-form').scrollIntoView({behavior:'smooth',block:'center'}); return; }
   if(phone.replace(/\D/g,'').length < 10){ showToast('📱 Enter valid 10-digit phone'); return; }
-  if(pin.replace(/\D/g,'').length !== 6){ showToast('📮 Enter a valid 6-digit pincode'); document.getElementById('del-pin').classList.add('req-err'); return; }
 
   var t = cart.reduce(function(a,i){return a+i.price*i.qty;},0);
   var discount   = calcDiscount(t);
@@ -2430,7 +2421,6 @@ async function checkout() {
   });
   if(err){ _orderProcessing = false; showToast('📍 Please fill in all delivery details'); document.getElementById('del-form').scrollIntoView({behavior:'smooth',block:'center'}); return; }
   if(phone.replace(/\D/g,'').length < 10){ _orderProcessing = false; showToast('📱 Enter a valid 10-digit phone number'); document.getElementById('del-phone').classList.add('req-err'); return; }
-  if(pin.replace(/\D/g,'').length !== 6){ _orderProcessing = false; showToast('📮 Enter a valid 6-digit pincode'); document.getElementById('del-pin').classList.add('req-err'); return; }
 
   var t = cart.reduce(function(a, i) { return a + i.price * i.qty; }, 0);
   var discount   = calcDiscount(t);
@@ -3013,12 +3003,17 @@ function initStickyAtcStub() {
 }
 
 // ── SUBSCRIBE (newsletter) ─────────────────────────────────────────
-function subscribe() {
+async function subscribe() {
   var email = (document.getElementById('nlEmail')||{value:''}).value.trim();
-  if (!email || !email.includes('@')) { showToast('Please enter a valid email'); return; }
+  if (!email || !email.includes('@')) { showToast('⚠️ Valid email daalo'); return; }
+  try {
+    await fetch('/api/admin-api', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({action:'save_row', table:'newsletter_subscribers', data:{email:email, subscribed_at:new Date().toISOString(), source:'homepage'}})
+    });
+  } catch(e) {}
   showToast('🌿 Subscribed! Welcome to the Pahadi family.');
-  var el = document.getElementById('nlEmail');
-  if (el) el.value = '';
+  var el = document.getElementById('nlEmail'); if (el) el.value = '';
 }
 
 // ── UTILITIES ─────────────────────────────────────────────────────
@@ -3890,7 +3885,7 @@ function renderOrders(orders) {
       // View order link
       var viewLink = o.id ? '<a href="/order-confirmation?id=' + o.id + '&num=' + encodeURIComponent(o.order_number||'') + '" style="font-size:11px;color:#2d6a4f;font-weight:700;text-decoration:none;margin-left:8px">View →</a>' : '';
       return '<div class="order-card">' +
-        '<div class="order-card-hdr"><span class="order-num">' + (o.order_number||'#'+String(o.id).slice(0,8)) + viewLink + '</span>' +
+        '<div class="order-card-hdr"><span class="order-num">' + (o.order_number||'#'+o.id.slice(0,8)) + viewLink + '</span>' +
         '<span class="order-status ' + sc + '">' + (o.order_status||'pending') + '</span></div>' +
         '<div class="order-items">' + (items || 'Items loading…') + '</div>' +
         trackHtml +
