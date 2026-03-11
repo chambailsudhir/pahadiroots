@@ -1,6 +1,7 @@
 {
   "rewrites": [
     { "source": "/products/:slug", "destination": "/product.html" },
-    { "source": "/order-confirmation", "destination": "/order-confirmation.html" }
+    { "source": "/order-confirmation", "destination": "/order-confirmation.html" },
+    { "source": "/account", "destination": "/account.html" }
   ]
 }

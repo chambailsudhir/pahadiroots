@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>My Account — Pahadi Roots</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Lato:wght@300;400;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--g:#1a3a1e;--g2:#2d5233;--g3:#3d6b42;--gd:#c8920a;--gd2:#e8b84b;--tx:#1a1a1a;--tx2:#4a4a4a;--tx3:#7a7a7a;--bd:#eeeeee}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Lato',sans-serif;background:#f7f3ee;min-height:100vh;color:var(--tx)}
+
+/* ── NAV ── */
+.nav{background:#fff;border-bottom:1px solid rgba(26,58,30,.1);padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 1px 8px rgba(0,0,0,.06)}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.logo-icon{font-size:22px}
+.logo-name{font-family:'Playfair Display',serif;font-size:18px;font-weight:900;color:var(--g)}
+.logo-tl{font-size:10px;color:var(--gd);font-weight:700;letter-spacing:.5px}
+.nav-right a{color:var(--g);font-size:13px;font-weight:700;text-decoration:none;border:1.5px solid var(--g);padding:7px 16px;border-radius:20px;transition:all .2s}
+.nav-right a:hover{background:var(--g);color:#fff}
+
+/* ── LAYOUT ── */
+.page{max-width:960px;margin:0 auto;padding:28px 16px 60px;display:grid;grid-template-columns:260px 1fr;gap:24px;align-items:start}
+@media(max-width:768px){.page{grid-template-columns:1fr;padding:0 0 60px}}
+
+/* ── SIDEBAR ── */
+.sidebar{background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.06);position:sticky;top:76px}
+.sb-profile{background:linear-gradient(135deg,var(--g),var(--g2));padding:24px;text-align:center}
+.sb-avatar{width:64px;height:64px;background:rgba(255,255,255,.2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:28px;font-weight:900;color:#fff;border:3px solid rgba(255,255,255,.3);margin:0 auto 12px}
+.sb-name{font-family:'Playfair Display',serif;font-size:18px;font-weight:900;color:#fff;margin-bottom:3px}
+.sb-email{font-size:12px;color:rgba(255,255,255,.65)}
+.sb-nav{padding:8px 0}
+.sb-item{display:flex;align-items:center;gap:12px;padding:13px 20px;cursor:pointer;transition:all .2s;border:none;background:none;width:100%;text-align:left;font-family:'Lato',sans-serif;font-size:14px;font-weight:700;color:var(--tx2);border-left:3px solid transparent}
+.sb-item:hover{background:rgba(26,58,30,.05);color:var(--g)}
+.sb-item.active{background:rgba(26,58,30,.07);color:var(--g);border-left-color:var(--g)}
+.sb-item .icon{font-size:16px;width:20px;text-align:center}
+.sb-divider{height:1px;background:#f0f0f0;margin:8px 0}
+.sb-item.logout{color:#c0392b}
+.sb-item.logout:hover{background:#fdecea}
+
+/* ── MAIN PANEL ── */
+.main-panel{display:flex;flex-direction:column;gap:20px}
+
+/* ── CARDS ── */
+.card{background:#fff;border-radius:18px;padding:24px;box-shadow:0 2px 12px rgba(0,0,0,.06)}
+.card-title{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--g);margin-bottom:20px;display:flex;align-items:center;gap:8px}
+
+/* ── SECTION LABEL ── */
+.sec-label{font-size:11px;font-weight:800;color:#bbb;text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px}
+
+/* ── ORDER CARDS ── */
+.order-card{border:1.5px solid var(--bd);border-radius:14px;padding:16px;margin-bottom:10px;transition:border-color .2s;cursor:default}
+.order-card:hover{border-color:var(--g)}
+.oc-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:8px}
+.oc-num{font-weight:900;font-size:14px;color:var(--g)}
+.oc-badge{padding:3px 12px;border-radius:20px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.5px}
+.badge-confirmed{background:#e8f5e9;color:#2d6a4f}
+.badge-shipped{background:#e3f2fd;color:#1565c0}
+.badge-delivered{background:#ede7f6;color:#6a1b9a}
+.badge-pending{background:#fff8e1;color:#e65100}
+.badge-cancelled{background:#fdecea;color:#c0392b}
+.badge-processing{background:#e8f5e9;color:#2d6a4f}
+.oc-items{font-size:13px;color:var(--tx3);margin-bottom:10px;line-height:1.5}
+.oc-footer{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+.oc-total{font-weight:900;font-size:15px;color:var(--g)}
+.oc-date{font-size:12px;color:var(--tx3)}
+.oc-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:10px}
+.track-chip{display:inline-flex;align-items:center;gap:4px;background:var(--g);color:#fff;padding:5px 14px;border-radius:20px;font-size:11px;font-weight:800;text-decoration:none;transition:background .2s}
+.track-chip:hover{background:var(--g2)}
+.view-chip{display:inline-flex;align-items:center;gap:4px;background:#f0f7f4;color:var(--g);border:1.5px solid #c8e6c9;padding:5px 14px;border-radius:20px;font-size:11px;font-weight:800;text-decoration:none;transition:all .2s}
+.view-chip:hover{background:var(--g);color:#fff}
+
+/* ── ADDRESS CARDS ── */
+.addr-cards{display:flex;flex-direction:column;gap:10px}
+.addr-card{border:1.5px solid var(--bd);border-radius:14px;padding:14px 16px;transition:all .2s}
+.addr-card.default{border-color:#c8e6c9;background:#f0f7f4}
+.addr-label{display:flex;align-items:center;gap:6px;font-weight:800;font-size:13px;color:var(--g);margin-bottom:4px}
+.addr-line{font-size:13px;color:var(--tx2);line-height:1.6}
+.addr-actions{display:flex;gap:8px;margin-top:10px}
+.addr-btn{padding:5px 12px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;border:1.5px solid;font-family:'Lato',sans-serif;transition:all .2s}
+.addr-btn-del{border-color:#fdecea;color:#c0392b;background:#fff}
+.addr-btn-del:hover{background:#fdecea}
+
+/* ── PROFILE FORM ── */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
+.form-full{grid-column:1/-1}
+.field-label{font-size:11px;font-weight:800;color:var(--tx3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
+.field-input{width:100%;padding:11px 14px;border:1.5px solid var(--bd);border-radius:10px;font-size:14px;font-family:'Lato',sans-serif;color:var(--tx);transition:border-color .2s;outline:none;background:#fff}
+.field-input:focus{border-color:var(--g)}
+.field-input:disabled{background:#f8f8f8;color:var(--tx3)}
+
+/* ── BUTTONS ── */
+.btn-primary{background:linear-gradient(135deg,var(--g),var(--g2));color:#fff;border:none;padding:12px 24px;border-radius:12px;font-size:14px;font-weight:800;cursor:pointer;font-family:'Lato',sans-serif;transition:all .2s;display:inline-flex;align-items:center;gap:6px}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(26,58,30,.25)}
+.btn-outline{background:#fff;color:var(--g);border:2px solid var(--g);padding:11px 24px;border-radius:12px;font-size:14px;font-weight:800;cursor:pointer;font-family:'Lato',sans-serif;transition:all .2s}
+.btn-outline:hover{background:var(--g);color:#fff}
+.btn-danger{background:#fff;color:#c0392b;border:2px solid #fdecea;padding:11px 24px;border-radius:12px;font-size:14px;font-weight:800;cursor:pointer;font-family:'Lato',sans-serif;transition:all .2s}
+.btn-danger:hover{background:#fdecea}
+.save-msg{font-size:12px;color:#2d6a4f;margin-top:8px;display:none}
+.err-msg{font-size:12px;color:#c0392b;margin-top:8px;display:none}
+
+/* ── LINKED ACCOUNTS ── */
+.linked-row{display:flex;align-items:center;gap:10px;background:#e8f5e9;border-radius:10px;padding:11px 14px;margin-bottom:8px}
+.linked-icon{font-size:16px}
+.linked-info{flex:1;font-size:13px;font-weight:700;color:var(--tx)}
+.linked-badge{font-size:11px;color:#2d6a4f;font-weight:700}
+
+/* ── EMPTY STATE ── */
+.empty-state{text-align:center;padding:48px 20px}
+.empty-icon{font-size:48px;margin-bottom:16px}
+.empty-title{font-family:'Playfair Display',serif;font-size:20px;color:var(--g);margin-bottom:8px}
+.empty-sub{font-size:14px;color:var(--tx3);margin-bottom:24px}
+
+/* ── LOGIN WALL ── */
+.login-wall{background:#fff;border-radius:18px;padding:48px 32px;text-align:center;box-shadow:0 2px 12px rgba(0,0,0,.06)}
+.lw-icon{font-size:56px;margin-bottom:16px}
+.lw-title{font-family:'Playfair Display',serif;font-size:26px;color:var(--g);margin-bottom:8px}
+.lw-sub{font-size:14px;color:var(--tx3);margin-bottom:28px;line-height:1.6}
+
+/* ── LOADING ── */
+.loading{text-align:center;padding:40px}
+.spinner{width:32px;height:32px;border:3px solid #eee;border-top-color:var(--g);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 12px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── MOBILE TABS (bottom bar on mobile) ── */
+@media(max-width:768px){
+  .sidebar{display:none}
+  .mob-tabs{display:flex;position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #eee;z-index:100;box-shadow:0 -4px 16px rgba(0,0,0,.08)}
+  .mob-tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 8px;border:none;background:none;cursor:pointer;font-family:'Lato',sans-serif;font-size:10px;font-weight:700;color:#aaa;gap:3px;transition:color .2s}
+  .mob-tab.active{color:var(--g)}
+  .mob-tab .mt-icon{font-size:20px}
+  .page{padding:16px 12px 80px}
+}
+@media(min-width:769px){.mob-tabs{display:none}}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="/" class="logo">
+    <div class="logo-icon">🌿</div>
+    <div><div class="logo-name">Pahadi Roots</div><div class="logo-tl">Himalayan Organic Store</div></div>
+  </a>
+  <div class="nav-right"><a href="/">🛍️ Continue Shopping</a></div>
+</nav>
+
+<div class="page" id="page">
+  <!-- Sidebar (desktop) -->
+  <aside class="sidebar" id="sidebar" style="display:none">
+    <div class="sb-profile">
+      <div class="sb-avatar" id="sb-avatar">?</div>
+      <div class="sb-name" id="sb-name">—</div>
+      <div class="sb-email" id="sb-email">—</div>
+    </div>
+    <div class="sb-nav">
+      <button class="sb-item active" onclick="switchTab('orders',this)"><span class="icon">📦</span> My Orders</button>
+      <button class="sb-item" onclick="switchTab('addresses',this)"><span class="icon">📍</span> Addresses</button>
+      <button class="sb-item" onclick="switchTab('profile',this)"><span class="icon">👤</span> Profile</button>
+      <button class="sb-item" onclick="switchTab('password',this)"><span class="icon">🔒</span> Change Password</button>
+      <div class="sb-divider"></div>
+      <button class="sb-item logout" onclick="doLogout()"><span class="icon">🚪</span> Logout</button>
+    </div>
+  </aside>
+
+  <!-- Main panel -->
+  <div class="main-panel" id="main-panel">
+    <div class="loading"><div class="spinner"></div><p style="color:var(--tx3);font-size:14px">Loading your account...</p></div>
+  </div>
+</div>
+
+<!-- Mobile bottom tabs -->
+<div class="mob-tabs" id="mob-tabs" style="display:none">
+  <button class="mob-tab active" onclick="switchTab('orders',this)"><span class="mt-icon">📦</span>Orders</button>
+  <button class="mob-tab" onclick="switchTab('addresses',this)"><span class="mt-icon">📍</span>Addresses</button>
+  <button class="mob-tab" onclick="switchTab('profile',this)"><span class="mt-icon">👤</span>Profile</button>
+  <button class="mob-tab" onclick="switchTab('password',this)"><span class="mt-icon">🔒</span>Password</button>
+  <button class="mob-tab" onclick="doLogout()"><span class="mt-icon">🚪</span>Logout</button>
+</div>
+
+<script>
+// ── Config ──
+var API_BASE = '/api';
+var _authToken = null, _authUser = null, _authProfile = null;
+var _currentTab = 'orders';
+var _orders = null;
+
+// ── Restore session ──
+try { _authToken = localStorage.getItem('pr_auth_token') || null; } catch(e){}
+try { _authUser = JSON.parse(localStorage.getItem('pr_auth_user') || 'null'); } catch(e){}
+try { _authProfile = JSON.parse(localStorage.getItem('pr_auth_profile') || 'null'); } catch(e){}
+
+// ── API helpers ──
+async function callAuth(action, body, useToken) {
+  var headers = { 'Content-Type': 'application/json' };
+  if (useToken && _authToken) headers['Authorization'] = 'Bearer ' + _authToken;
+  var res = await fetch(API_BASE + '/auth', { method:'POST', headers, body: JSON.stringify({ action, ...body }) });
+  var data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Error');
+  return data;
+}
+async function callAdmin(body) {
+  var res = await fetch(API_BASE + '/admin-api', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
+  var data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Error');
+  return data;
+}
+
+// ── Init ──
+async function init() {
+  if (!_authToken) { showLoginWall(); return; }
+  // Fetch fresh profile
+  try {
+    var data = await callAuth('get_profile', {}, true);
+    _authProfile = data.profile; _authUser = data.user;
+    try { localStorage.setItem('pr_auth_profile', JSON.stringify(data.profile)); } catch(e){}
+  } catch(e) {}
+  if (!_authProfile) { showLoginWall(); return; }
+  showAccount();
+  switchTab('orders');
+}
+
+function showLoginWall() {
+  document.getElementById('sidebar').style.display = 'none';
+  document.getElementById('mob-tabs').style.display = 'none';
+  document.getElementById('main-panel').innerHTML = `
+    <div class="login-wall">
+      <div class="lw-icon">🔐</div>
+      <div class="lw-title">Login Required</div>
+      <div class="lw-sub">Apna account dekhne ke liye pehle login karein.<br>Orders, addresses aur profile sab ek jagah milega.</div>
+      <a href="/?login=1" class="btn-primary" style="display:inline-flex;margin:0 auto">👤 Login / Sign Up</a>
+    </div>`;
+}
+
+function showAccount() {
+  var p = _authProfile || {};
+  var u = _authUser || {};
+  var firstName = p.first_name || (u.user_metadata && u.user_metadata.full_name && u.user_metadata.full_name.split(' ')[0]) || 'User';
+  var fullName = [p.first_name, p.last_name].filter(Boolean).join(' ') || firstName;
+  var email = u.email || p.email || '';
+  var initials = (firstName[0] || '?').toUpperCase();
+
+  document.getElementById('sb-avatar').textContent = initials;
+  document.getElementById('sb-name').textContent = fullName;
+  document.getElementById('sb-email').textContent = email;
+  document.getElementById('sidebar').style.display = 'block';
+  document.getElementById('mob-tabs').style.display = 'flex';
+}
+
+// ── Tab switching ──
+function switchTab(tab, btn) {
+  _currentTab = tab;
+  // Desktop sidebar
+  document.querySelectorAll('.sb-item').forEach(b => b.classList.remove('active'));
+  // Mobile tabs
+  document.querySelectorAll('.mob-tab').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+
+  if (tab === 'orders') renderOrdersTab();
+  else if (tab === 'addresses') renderAddressesTab();
+  else if (tab === 'profile') renderProfileTab();
+  else if (tab === 'password') renderPasswordTab();
+}
+
+// ══════════════════════════════════════════════
+// ORDERS TAB
+// ══════════════════════════════════════════════
+async function renderOrdersTab() {
+  setPanel('<div class="loading"><div class="spinner"></div></div>');
+  try {
+    if (!_orders) {
+      var custId = _authProfile && _authProfile.id;
+      if (!custId) throw new Error('Profile not loaded');
+      var res = await callAdmin({ method:'GET', table:'orders', query:'customer_id=eq.' + custId + '&select=id,order_number,order_status,payment_status,total_amount,created_at,tracking_number,courier&order=created_at.desc&limit=50' });
+      _orders = Array.isArray(res) ? res : [];
+      // Fetch items for each order
+      for (var i = 0; i < Math.min(_orders.length, 20); i++) {
+        try {
+          var items = await callAdmin({ method:'GET', table:'order_items', query:'order_id=eq.' + _orders[i].id + '&select=quantity,price_at_time,products(name,emoji)' });
+          _orders[i]._items = items || [];
+        } catch(e) { _orders[i]._items = []; }
+      }
+    }
+    setPanel(buildOrdersHtml(_orders));
+  } catch(e) {
+    setPanel('<div class="card"><p style="color:var(--tx3)">Orders load nahi ho sake. Dobara try karein.</p></div>');
+  }
+}
+
+var COURIER_URLS = {
+  'Delhivery': 'https://www.delhivery.com/track/package/',
+  'BlueDart': 'https://www.bluedart.com/tracking?trackFor=0&trackNum=',
+  'DTDC': 'https://tracking.dtdc.com/ctbs-tracking/customerInterface.tr?submitName=showCustLoginPage&cType=self&trackType=cnNo&strCNno=',
+  'Ekart': 'https://ekartlogistics.com/shipmenttrack/',
+  'Xpressbees': 'https://www.xpressbees.com/track?awbnumber=',
+};
+
+function buildOrdersHtml(orders) {
+  var badges = { confirmed:'badge-confirmed', shipped:'badge-shipped', delivered:'badge-delivered', pending:'badge-pending', cancelled:'badge-cancelled', processing:'badge-processing' };
+  if (!orders.length) return `
+    <div class="empty-state">
+      <div class="empty-icon">📦</div>
+      <div class="empty-title">No orders yet</div>
+      <div class="empty-sub">Aapne abhi tak koi order nahi kiya.<br>Apni pasandida Himalayan products explore karein!</div>
+      <a href="/" class="btn-primary" style="display:inline-flex">🛍️ Shop Now</a>
+    </div>`;
+
+  return '<div class="card"><div class="card-title">📦 My Orders <span style="font-size:14px;font-weight:400;color:var(--tx3);font-family:Lato,sans-serif">(' + orders.length + ')</span></div>' +
+    orders.map(function(o) {
+      var items = (o._items || []).slice(0,2).map(function(i){ return (i.products&&i.products.emoji||'🌿') + ' ' + (i.products&&i.products.name||'Product') + ' ×' + i.quantity; }).join(' · ');
+      if (o._items && o._items.length > 2) items += ' +' + (o._items.length-2) + ' more';
+      var badge = badges[o.order_status] || 'badge-pending';
+      var date = o.created_at ? new Date(o.created_at).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : '';
+      var trackUrl = o.tracking_number ? (COURIER_URLS[o.courier] ? COURIER_URLS[o.courier] + o.tracking_number : 'https://www.google.com/search?q=' + encodeURIComponent((o.courier||'') + ' tracking ' + o.tracking_number)) : '';
+      var viewUrl = '/order-confirmation?id=' + o.id + '&num=' + encodeURIComponent(o.order_number||'');
+      return '<div class="order-card">' +
+        '<div class="oc-hdr"><span class="oc-num">' + (o.order_number||'#'+o.id.slice(0,8)) + '</span><span class="oc-badge ' + badge + '">' + (o.order_status||'pending') + '</span></div>' +
+        (items ? '<div class="oc-items">' + items + '</div>' : '') +
+        '<div class="oc-actions">' +
+          '<a href="' + viewUrl + '" class="view-chip">📄 View Order</a>' +
+          (trackUrl ? '<a href="' + trackUrl + '" target="_blank" class="track-chip">🚚 Track</a>' : '') +
+        '</div>' +
+        '<div class="oc-footer" style="margin-top:10px"><span class="oc-total">₹' + (o.total_amount||0).toLocaleString('en-IN') + '</span><span class="oc-date">' + date + '</span></div>' +
+        '</div>';
+    }).join('') + '</div>';
+}
+
+// ══════════════════════════════════════════════
+// ADDRESSES TAB
+// ══════════════════════════════════════════════
+function getSavedAddresses() {
+  try { return JSON.parse((_authProfile && _authProfile.saved_addresses) || localStorage.getItem('pr_saved_addresses') || '[]'); } catch(e) { return []; }
+}
+
+function renderAddressesTab() {
+  var p = _authProfile || {};
+  var addrs = getSavedAddresses();
+  var html = '<div class="card"><div class="card-title">📍 Delivery Addresses</div>';
+
+  // Default address from profile
+  if (p.address_line1) {
+    html += '<div class="addr-card default">' +
+      '<div class="addr-label">🏠 Default</div>' +
+      '<div class="addr-line">' + [p.first_name, p.last_name].filter(Boolean).join(' ') + '<br>' + p.address_line1 + ', ' + (p.city||'') + ', ' + (p.state||'') + ' — ' + (p.postal_code||'') + '</div>' +
+      '<div class="addr-actions"><button class="addr-btn" onclick="switchTab(\'profile\')" style="border-color:#c8e6c9;color:var(--g);background:#fff">✏️ Edit</button></div>' +
+      '</div>';
+  }
+
+  // Extra saved addresses
+  addrs.filter(function(a){ return a.label !== 'Default'; }).forEach(function(a, i) {
+    var icon = a.label === 'Parents' ? '👨‍👩‍👦' : a.label === 'Office' ? '🏢' : '📍';
+    html += '<div class="addr-card">' +
+      '<div class="addr-label">' + icon + ' ' + (a.label||'Address') + '</div>' +
+      '<div class="addr-line">' + (a.name||'') + (a.name?'<br>':'') + (a.addr||'') + ', ' + (a.city||'') + ' — ' + (a.pin||'') + '</div>' +
+      '<div class="addr-actions"><button class="addr-btn addr-btn-del" onclick="deleteSavedAddr(' + i + ')">🗑 Remove</button></div>' +
+      '</div>';
+  });
+
+  if (!p.address_line1 && !addrs.length) {
+    html += '<div class="empty-state"><div class="empty-icon">📍</div><div class="empty-title">No addresses saved</div><div class="empty-sub">Profile mein apna address add karein.</div><button class="btn-primary" onclick="switchTab(\'profile\')">+ Add Address</button></div>';
+  }
+
+  html += '</div>';
+  setPanel(html);
+}
+
+async function deleteSavedAddr(idx) {
+  var addrs = getSavedAddresses().filter(function(a){ return a.label !== 'Default'; });
+  addrs.splice(idx, 1);
+  try {
+    await callAuth('update_profile', { saved_addresses: JSON.stringify(addrs) }, true);
+    _authProfile.saved_addresses = JSON.stringify(addrs);
+    try { localStorage.setItem('pr_auth_profile', JSON.stringify(_authProfile)); } catch(e){}
+    renderAddressesTab();
+    showToast('Address removed');
+  } catch(e) { showToast('❌ Remove failed'); }
+}
+
+// ══════════════════════════════════════════════
+// PROFILE TAB
+// ══════════════════════════════════════════════
+function renderProfileTab() {
+  var p = _authProfile || {};
+  var u = _authUser || {};
+  var phone = (u.phone || '').replace(/^\+91/, '');
+  var email = u.email || p.email || '';
+  var html = `
+    <div class="card">
+      <div class="card-title">👤 Personal Info</div>
+      <div class="form-grid">
+        <div><div class="field-label">First Name</div><input class="field-input" id="pf-fname" value="${p.first_name||''}" placeholder="First name"></div>
+        <div><div class="field-label">Last Name</div><input class="field-input" id="pf-lname" value="${p.last_name||''}" placeholder="Last name"></div>
+      </div>
+      <button class="btn-primary" onclick="saveProfileInfo()">💾 Save Name</button>
+      <div class="save-msg" id="pf-msg">✅ Saved!</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📍 Default Address</div>
+      <div class="form-grid">
+        <div class="form-full"><div class="field-label">Address</div><input class="field-input" id="pf-addr" value="${p.address_line1||''}" placeholder="House/Street/Colony"></div>
+        <div><div class="field-label">City</div><input class="field-input" id="pf-city" value="${p.city||''}" placeholder="City"></div>
+        <div><div class="field-label">State</div><input class="field-input" id="pf-state" value="${p.state||''}" placeholder="State"></div>
+        <div><div class="field-label">Pincode</div><input class="field-input" id="pf-pin" value="${p.postal_code||''}" placeholder="110001"></div>
+      </div>
+      <button class="btn-primary" onclick="saveAddressInfo()">💾 Save Address</button>
+      <div class="save-msg" id="addr-msg">✅ Address saved!</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🔗 Linked Accounts</div>
+      ${phone ? `<div class="linked-row"><span class="linked-icon">📱</span><span class="linked-info">+91 ${phone}</span><span class="linked-badge">✓ Linked</span></div>` : ''}
+      ${email ? `<div class="linked-row"><span class="linked-icon">📧</span><span class="linked-info">${email}</span><span class="linked-badge">✓ Linked</span></div>` : ''}
+    </div>`;
+  setPanel(html);
+}
+
+async function saveProfileInfo() {
+  try {
+    var updates = { first_name: document.getElementById('pf-fname').value.trim(), last_name: document.getElementById('pf-lname').value.trim() };
+    await callAuth('update_profile', updates, true);
+    Object.assign(_authProfile, updates);
+    try { localStorage.setItem('pr_auth_profile', JSON.stringify(_authProfile)); } catch(e){}
+    showSaveMsg('pf-msg');
+    document.getElementById('sb-name').textContent = [updates.first_name, updates.last_name].filter(Boolean).join(' ');
+    document.getElementById('sb-avatar').textContent = (updates.first_name[0]||'?').toUpperCase();
+  } catch(e) { showToast('❌ Save failed'); }
+}
+
+async function saveAddressInfo() {
+  try {
+    var updates = { address_line1: document.getElementById('pf-addr').value.trim(), city: document.getElementById('pf-city').value.trim(), state: document.getElementById('pf-state').value.trim(), postal_code: document.getElementById('pf-pin').value.trim() };
+    await callAuth('update_profile', updates, true);
+    Object.assign(_authProfile, updates);
+    try { localStorage.setItem('pr_auth_profile', JSON.stringify(_authProfile)); } catch(e){}
+    showSaveMsg('addr-msg');
+  } catch(e) { showToast('❌ Save failed'); }
+}
+
+// ══════════════════════════════════════════════
+// PASSWORD TAB
+// ══════════════════════════════════════════════
+function renderPasswordTab() {
+  setPanel(`
+    <div class="card">
+      <div class="card-title">🔒 Change Password</div>
+      <div class="form-grid">
+        <div class="form-full"><div class="field-label">New Password</div><input class="field-input" id="cp-new" type="password" placeholder="Minimum 6 characters"></div>
+        <div class="form-full"><div class="field-label">Confirm Password</div><input class="field-input" id="cp-confirm" type="password" placeholder="Repeat new password"></div>
+      </div>
+      <button class="btn-primary" onclick="doChangePassword()">🔒 Update Password</button>
+      <div class="save-msg" id="cp-ok">✅ Password updated!</div>
+      <div class="err-msg" id="cp-err"></div>
+    </div>`);
+}
+
+async function doChangePassword() {
+  var np = (document.getElementById('cp-new')||{}).value||'';
+  var cp = (document.getElementById('cp-confirm')||{}).value||'';
+  var ok = document.getElementById('cp-ok');
+  var err = document.getElementById('cp-err');
+  if (ok) ok.style.display='none';
+  if (err) err.style.display='none';
+  if (np.length < 6) { if(err){err.textContent='❌ Min 6 characters chahiye';err.style.display='block';} return; }
+  if (np !== cp) { if(err){err.textContent='❌ Passwords match nahi kar rahe';err.style.display='block';} return; }
+  try {
+    await callAuth('change_password', { new_password: np }, true);
+    if(ok) ok.style.display='block';
+    document.getElementById('cp-new').value='';
+    document.getElementById('cp-confirm').value='';
+  } catch(e) {
+    if(err){err.textContent='❌ '+(e.message||'Update failed');err.style.display='block';}
+  }
+}
+
+// ── Logout ──
+async function doLogout() {
+  try { await callAuth('logout', {}, true); } catch(e){}
+  try { localStorage.removeItem('pr_auth_token'); localStorage.removeItem('pr_auth_user'); localStorage.removeItem('pr_auth_profile'); localStorage.removeItem('pr_auth_refresh'); } catch(e){}
+  window.location.href = '/';
+}
+
+// ── Helpers ──
+function setPanel(html) { document.getElementById('main-panel').innerHTML = html; }
+function showSaveMsg(id) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  el.style.display = 'block';
+  setTimeout(function(){ el.style.display='none'; }, 2500);
+}
+function showToast(msg) {
+  var t = document.createElement('div');
+  t.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#1a3a1e;color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;font-weight:700;z-index:9999;white-space:nowrap;box-shadow:0 4px 16px rgba(0,0,0,.2)';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(function(){ t.remove(); }, 2500);
+}
+
+// ── Start ──
+init();
+</script>
+</body>
+</html>

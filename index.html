@@ -2287,7 +2287,7 @@ async function checkoutRazorpay() {
     currency: 'INR',
     name: 'Pahadi Roots',
     description: 'Himalayan Organic Products',
-    image: 'https://pahadiroots.com/images/logo.png',
+    image: 'https://pahadiroots.com/favicon.ico',
     prefill: {
       name: name.trim(),
       contact: phone.trim(),
@@ -2323,6 +2323,8 @@ async function checkoutRazorpay() {
       var ca = document.getElementById('coupApplied'); if(ca) ca.style.display='none';
       _orderProcessing = false;
       window.open('https://wa.me/' + WHATSAPP_NUMBER + '?text='+encodeURIComponent(msg),'_blank');
+      // Send confirmation email (non-blocking)
+      sendOrderEmail({ email: email, orderNumber: orderNumber, orderId: orderId, name: name, items: cartSnapshot, total: final, discount: discount, shipping: shipCharge, address: addr, city: city, state: state, pin: pin, payMethod: 'razorpay_online' });
       // Redirect to order confirmation page
       var confUrl = '/order-confirmation?id=' + (orderId||'') + '&num=' + encodeURIComponent(orderNumber||'') + '&total=' + final + '&payment=' + encodeURIComponent(response.razorpay_payment_id||'');
       setTimeout(function(){ window.location.href = confUrl; }, 600);
@@ -2362,6 +2364,37 @@ async function saveOrderToDB(name, phone, email, addr, city, state, pin, final, 
     console.warn('Order save failed:', e.message);
     return null;
   }
+}
+
+
+// ── Send Order Confirmation Email ────────────────────────────
+async function sendOrderEmail(opts) {
+  try {
+    // Get email from auth profile or delivery form
+    var emailTo = (opts.email || '').trim();
+    if (!emailTo && _authUser && _authUser.email) emailTo = _authUser.email;
+    if (!emailTo || !emailTo.includes('@')) return; // no email, skip silently
+    await fetch('/api/send-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type: 'order_confirmation',
+        to: emailTo,
+        orderNumber: opts.orderNumber || '',
+        orderId: opts.orderId || '',
+        name: opts.name || '',
+        items: opts.items || [],
+        total: opts.total || 0,
+        discount: opts.discount || 0,
+        shipping: opts.shipping || 0,
+        address: opts.address || '',
+        city: opts.city || '',
+        state: opts.state || '',
+        pin: opts.pin || '',
+        payMethod: opts.payMethod || ''
+      })
+    });
+  } catch(e) { console.warn('Email send failed (non-critical):', e.message); }
 }
 
 async function checkout() {
@@ -2436,9 +2469,12 @@ async function checkout() {
 
   // Save to DB and redirect to confirmation page
   saveOrderToDB(name, phone, email, addr, city, state, pin, final, discount, shipCharge, 'whatsapp_cod', null, cartSnapshot)
-    .then(function(orderId) {
-      // Also get order_number via a second call isn't needed - use orderId
-      var confUrl = '/order-confirmation?id=' + (orderId||'') + '&total=' + final;
+    .then(function(result) {
+      var orderId = (result && result.orderId) || '';
+      var orderNumber = (result && result.orderNumber) || '';
+      // Send confirmation email (non-blocking)
+      sendOrderEmail({ email: email, orderNumber: orderNumber, orderId: orderId, name: name, items: cartSnapshot, total: final, discount: discount, shipping: shipCharge, address: addr, city: city, state: state, pin: pin, payMethod: 'whatsapp_cod' });
+      var confUrl = '/order-confirmation?id=' + orderId + '&num=' + encodeURIComponent(orderNumber) + '&total=' + final;
       setTimeout(function(){ window.location.href = confUrl; }, 600);
     })
     .catch(function(e) {
