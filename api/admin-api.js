@@ -275,15 +275,28 @@ export default async function handler(req, res) {
     const { order_id } = reqBody;
     if (!order_id) return err(400, 'order_id required');
     try {
+      // Fetch order with customer info joined
       const orderRes = await fetch(
-        `${SUPABASE_URL}/rest/v1/orders?id=eq.${order_id}&select=id,order_number,order_status,payment_status,total_amount,subtotal,discount_amount,shipping_charge,customer_name,customer_phone,delivery_address,city,state,pincode,tracking_number,courier,shipped_at,delivered_at,created_at,payment_method`,
+        `${SUPABASE_URL}/rest/v1/orders?id=eq.${order_id}&select=id,order_number,order_status,payment_status,total_amount,subtotal,discount_amount,shipping_charge,tracking_number,courier,shipped_at,delivered_at,created_at,payment_method,customers(first_name,last_name,phone,address_line1,city,state,postal_code)`,
         { headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY } }
       );
       const orders = await orderRes.json();
       if (!orders || !orders.length) return err(404, 'Order not found');
-      const order = orders[0];
+      const raw = orders[0];
+      // Flatten customer fields
+      const cust = raw.customers || {};
+      const order = {
+        ...raw,
+        customer_name: [cust.first_name, cust.last_name].filter(Boolean).join(' ') || '—',
+        customer_phone: (cust.phone || '').replace(/^\+91/, '').replace(/\D/g,'').slice(-10),
+        delivery_address: cust.address_line1 || '—',
+        city: cust.city || '—',
+        state: cust.state || '—',
+        pincode: cust.postal_code || '—',
+      };
+      // Fetch order items with product info
       const itemsRes = await fetch(
-        `${SUPABASE_URL}/rest/v1/order_items?order_id=eq.${order_id}&select=product_id,quantity,price_at_time,products(name,emoji,image_url)`,
+        `${SUPABASE_URL}/rest/v1/order_items?order_id=eq.${order_id}&select=quantity,price_at_time,products(name,emoji,image_url)`,
         { headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY } }
       );
       const rawItems = await itemsRes.json();
