@@ -67,7 +67,7 @@
   },
   "contactPoint": {
     "@type": "ContactPoint",
-    "telephone": "+91-XXXXXXXXXX",
+    "telephone": "+91-9899984895",
     "contactType": "customer service",
     "availableLanguage": ["English", "Hindi"]
   },
@@ -117,7 +117,6 @@
 /* ════════════════════════════════════════════
    PAHADI ROOTS — CSS matching actual HTML classes
 ════════════════════════════════════════════ */
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Lato:wght@300;400;700;900&display=swap');
 *{box-sizing:border-box;margin:0;padding:0}
 img{max-width:100%}
 :root{--g:#1a3a1e;--g2:#2d5233;--g3:#3d6b42;--gd:#c8920a;--gd2:#e8b84b;--gd3:#f5d98a;--tx:#1a1a1a;--tx2:#4a4a4a;--tx3:#7a7a7a;--bd:rgba(26,58,30,.12)}
@@ -2013,7 +2012,16 @@ function rmCart(id) { var sid=String(id); cart = cart.filter(function(x) { retur
 function chQty(id, d) {
   var sid = String(id);
   var i = cart.find(function(x) { return String(x.cartKey||x.id) === sid; });
-  if (i) { i.qty += d; if (i.qty < 1) { rmCart(id); return; } }
+  if (i) {
+    if (d > 0) {
+      // Stock limit check on increase
+      var prod = PRODUCTS.find(function(p) { return p.id === i.id; });
+      var maxStock = prod ? (prod.stock || prod.stock_quantity || 999) : 999;
+      if (i.qty >= maxStock) { showToast('⚠️ Only ' + maxStock + ' in stock!'); return; }
+    }
+    i.qty += d;
+    if (i.qty < 1) { rmCart(id); return; }
+  }
   sv(); uCart();
 }
 
@@ -2273,6 +2281,7 @@ async function checkoutRazorpay() {
   });
   if(err){ showToast('📍 Please fill in all delivery details'); document.getElementById('del-form').scrollIntoView({behavior:'smooth',block:'center'}); return; }
   if(phone.replace(/\D/g,'').length < 10){ showToast('📱 Enter valid 10-digit phone'); return; }
+  if(pin.replace(/\D/g,'').length !== 6){ showToast('📮 Enter a valid 6-digit pincode'); document.getElementById('del-pin').classList.add('req-err'); return; }
 
   var t = cart.reduce(function(a,i){return a+i.price*i.qty;},0);
   var discount   = calcDiscount(t);
@@ -2421,6 +2430,7 @@ async function checkout() {
   });
   if(err){ _orderProcessing = false; showToast('📍 Please fill in all delivery details'); document.getElementById('del-form').scrollIntoView({behavior:'smooth',block:'center'}); return; }
   if(phone.replace(/\D/g,'').length < 10){ _orderProcessing = false; showToast('📱 Enter a valid 10-digit phone number'); document.getElementById('del-phone').classList.add('req-err'); return; }
+  if(pin.replace(/\D/g,'').length !== 6){ _orderProcessing = false; showToast('📮 Enter a valid 6-digit pincode'); document.getElementById('del-pin').classList.add('req-err'); return; }
 
   var t = cart.reduce(function(a, i) { return a + i.price * i.qty; }, 0);
   var discount   = calcDiscount(t);
@@ -3880,7 +3890,7 @@ function renderOrders(orders) {
       // View order link
       var viewLink = o.id ? '<a href="/order-confirmation?id=' + o.id + '&num=' + encodeURIComponent(o.order_number||'') + '" style="font-size:11px;color:#2d6a4f;font-weight:700;text-decoration:none;margin-left:8px">View →</a>' : '';
       return '<div class="order-card">' +
-        '<div class="order-card-hdr"><span class="order-num">' + (o.order_number||'#'+o.id.slice(0,8)) + viewLink + '</span>' +
+        '<div class="order-card-hdr"><span class="order-num">' + (o.order_number||'#'+String(o.id).slice(0,8)) + viewLink + '</span>' +
         '<span class="order-status ' + sc + '">' + (o.order_status||'pending') + '</span></div>' +
         '<div class="order-items">' + (items || 'Items loading…') + '</div>' +
         trackHtml +
