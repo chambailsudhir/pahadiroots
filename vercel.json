@@ -6,6 +6,7 @@
     { "source": "/returns", "destination": "/terms.html" },
     { "source": "/shipping", "destination": "/terms.html" },
     { "source": "/product", "destination": "/product.html" },
+    { "source": "/products/:slug*", "destination": "/product.html" },
     { "source": "/account", "destination": "/account.html" },
     { "source": "/order-confirmation", "destination": "/order-confirmation.html" }
   ]

@@ -193,6 +193,7 @@ var selectedVariant = null;
 var qty = 1;
 var cart = [];
 var wishlist = [];
+var WHATSAPP_NUMBER = '919899984895'; // overridden from site_settings in loadProduct()
 
 // ── Cart count from localStorage ──
 function updateNavCart() {
@@ -236,8 +237,15 @@ async function loadProduct() {
     return;
   }
 
+  // 12 second timeout — agar API respond nahi kare
+  var controller = new AbortController();
+  var _timer = setTimeout(function() { controller.abort(); }, 12000);
+
   try {
-    var res = await fetch('/api/store-data');
+    var res = await fetch('/api/store-data', { signal: controller.signal });
+    clearTimeout(_timer);
+
+    if (!res.ok) throw new Error('Server error ' + res.status);
     var data = await res.json();
     ALL_PRODUCTS = data.products || [];
 
@@ -266,9 +274,19 @@ async function loadProduct() {
     var stateMap = {};
     (data.states || []).forEach(function(s) { stateMap[s.id] = s.name; });
 
+    // Load site_settings
+    if (data.site_settings) {
+      if (data.site_settings.whatsapp_number) WHATSAPP_NUMBER = data.site_settings.whatsapp_number;
+    }
+
     renderProduct(prod, prodImages, related, data, stateMap);
   } catch(e) {
-    showNotFound('Failed to load product: ' + e.message);
+    clearTimeout(_timer);
+    if (e.name === 'AbortError') {
+      showNotFound('Request timed out — please check your connection and refresh');
+    } else {
+      showNotFound('Failed to load product. Please refresh the page.');
+    }
   }
 }
 
@@ -394,7 +412,7 @@ function renderProduct(p, images, related, data, stateMap) {
       '<div id="tab-desc" class="desc-content active">' + (p.long_description || p.short_description || p.description || 'Authentic Himalayan product sourced directly from local farmers. No preservatives, no additives — pure and natural.') + '</div>' +
       '<div id="tab-ship" class="desc-content">We ship Pan India via trusted courier partners. Delivery in 5-7 business days. Free shipping on orders above ₹799. COD available on select pincodes.</div>' +
       '<div id="tab-care" class="desc-content">Store in a cool, dry place away from direct sunlight. Keep container tightly sealed after use. Best consumed within the expiry date printed on the pack.</div>' +
-      '<div id="tab-returns" class="desc-content"><strong>🔄 Return & Refund Policy</strong><br><br>We want you to love every product from Pahadi Roots. Here\'s our policy:<br><br><strong>✅ Eligible for return:</strong> Damaged, defective, or wrong item delivered — report within <strong>3 days</strong> of delivery with a photo/video.<br><br><strong>❌ Not eligible:</strong> Products opened & used (unless defective), items returned after 3 days, or without original packaging.<br><br><strong>How to claim:</strong> WhatsApp us at +91 98999 84895 with your order number and photos. We process refunds within 5-7 business days once approved.<br><br><strong>Refund method:</strong> UPI / original payment method.<br><br>For any issues, reach us at support@pahadiroots.com</div>' +
+      '<div id="tab-returns" class="desc-content"><strong>🔄 Return & Refund Policy</strong><br><br>We want you to love every product from Pahadi Roots. Here\'s our policy:<br><br><strong>✅ Eligible for return:</strong> Damaged, defective, or wrong item delivered — report within <strong>3 days</strong> of delivery with a photo/video.<br><br><strong>❌ Not eligible:</strong> Products opened & used (unless defective), items returned after 3 days, or without original packaging.<br><br><strong>How to claim:</strong> WhatsApp us at +91 ' + WHATSAPP_NUMBER.replace('91','').replace(/(\d{5})(\d{5})/,'$1 $2') + ' with your order number and photos. We process refunds within 5-7 business days once approved.<br><br><strong>Refund method:</strong> UPI / original payment method.<br><br>For any issues, reach us at support@pahadiroots.com</div>' +
     '</div>' +
     relHtml +
     '<footer class="mini-footer">© 2026 Pahadi Roots · <a href="/">Shop Now</a> · <a href="/terms">Terms & Returns</a> · <a href="mailto:support@pahadiroots.com">support@pahadiroots.com</a></footer>';

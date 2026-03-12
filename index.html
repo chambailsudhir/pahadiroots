@@ -421,8 +421,7 @@ section.sec{padding:52px 40px}
 .po-note{font-size:10px;color:var(--tx3);margin-top:6px}
 .pay-secure{text-align:center;margin-top:16px;font-size:12px;color:var(--tx3)}
 
-/* FOOTER */
-/* ── FOOTER ── */
+/* ── PREMIUM FOOTER ── */
 footer{background:#0b160d;padding:0}
 .f-newsletter{background:linear-gradient(135deg,#1a3a1e,#2d5233);padding:36px 40px;border-bottom:1px solid rgba(255,255,255,.06)}
 .f-nl-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap}
@@ -433,20 +432,20 @@ footer{background:#0b160d;padding:0}
 .f-nl-inp::placeholder{color:rgba(255,255,255,.35)}
 .f-nl-btn{padding:13px 22px;background:var(--gd);color:#1a0800;font-weight:800;font-size:13px;border:none;cursor:pointer;font-family:'Lato',sans-serif;transition:background .2s;white-space:nowrap}
 .f-nl-btn:hover{background:var(--gd2)}
-.f-main{max-width:1200px;margin:0 auto;padding:44px 40px 32px;display:grid;grid-template-columns:2fr 1fr 1fr 1.2fr;gap:40px;border-bottom:1px solid rgba(255,255,255,.06)}
+.f-main{max-width:1200px;margin:0 auto;padding:44px 40px 32px;display:grid;grid-template-columns:2fr 1fr 1fr 1.3fr;gap:40px;border-bottom:1px solid rgba(255,255,255,.06)}
 .f-brand-desc{font-size:12.5px;color:rgba(255,255,255,.42);line-height:1.8;margin:12px 0 20px}
 .f-soc-row{display:flex;gap:8px;flex-wrap:wrap}
-.f-soc{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;transition:all .2s;color:rgba(255,255,255,.6);font-size:14px;text-decoration:none}
-.f-soc:hover{background:var(--g2);border-color:rgba(255,255,255,.25);color:#fff}
-.f-fssai{margin-top:20px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:10px 14px;display:inline-flex;align-items:center;gap:10px}
+.f-soc{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;transition:all .2s;color:rgba(255,255,255,.6);text-decoration:none}
+.f-soc:hover{background:var(--g2);border-color:rgba(255,255,255,.3);color:#fff}
+.f-fssai{margin-top:20px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:10px 14px;display:inline-flex;align-items:center;gap:10px}
 .f-fssai-badge{background:#fff;border-radius:6px;padding:4px 8px;font-size:11px;font-weight:900;color:#1a6b1a;letter-spacing:.5px}
 .f-fssai-num{font-size:10.5px;color:rgba(255,255,255,.4);margin-top:2px}
 .fh{font-size:10.5px;font-weight:800;letter-spacing:1.8px;color:var(--gd2);margin-bottom:14px;text-transform:uppercase}
 .ful{list-style:none;display:flex;flex-direction:column;gap:9px}
 .ful li a{font-size:13px;color:rgba(255,255,255,.48);transition:all .2s;display:flex;align-items:center;gap:6px}
 .ful li a:hover{color:#fff;padding-left:4px}
-.f-contact-item{display:flex;align-items:flex-start;gap:10px;margin-bottom:12px}
-.f-contact-icon{font-size:15px;margin-top:1px;flex-shrink:0}
+.f-contact-item{display:flex;align-items:flex-start;gap:10px;margin-bottom:11px}
+.f-contact-icon{font-size:15px;flex-shrink:0;margin-top:1px}
 .f-contact-text{font-size:12.5px;color:rgba(255,255,255,.48);line-height:1.65}
 .f-contact-text a{color:rgba(255,255,255,.48);transition:color .2s}
 .f-contact-text a:hover{color:#fff}
@@ -458,8 +457,8 @@ footer{background:#0b160d;padding:0}
 .f-bot{max-width:1200px;margin:0 auto;padding:18px 40px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
 .f-bot-left{font-size:12px;color:rgba(255,255,255,.28)}
 .f-bot-links{display:flex;gap:20px;flex-wrap:wrap}
-.f-bot-links a{font-size:11.5px;color:rgba(255,255,255,.28);transition:color .2s}
-.f-bot-links a:hover{color:rgba(255,255,255,.7)}
+.f-bot-links a{font-size:11.5px;color:rgba(255,255,255,.35);transition:color .2s;text-decoration:none}
+.f-bot-links a:hover{color:rgba(255,255,255,.8)}
 .f-bot-tag{font-size:11.5px;color:rgba(255,255,255,.22);font-style:italic}
 .fd{color:var(--gd);font-weight:700}
 @media(max-width:900px){.f-main{grid-template-columns:1fr 1fr;gap:28px}.f-nl-inner{flex-direction:column;align-items:flex-start}.f-nl-form{min-width:100%;width:100%}}
@@ -696,7 +695,7 @@ footer{background:#0b160d;padding:0}
   .stab-thumb{height:56px}
   .trust{grid-template-columns:1fr 1fr}
   .nlf{flex-direction:column}
-  .fbot{flex-direction:column;gap:8px;text-align:center}
+  .f-bot{flex-direction:column;gap:8px;text-align:center}
   .hstats{gap:0}
   .hstat{padding:0 12px}
 }
@@ -891,12 +890,12 @@ if(window.location.search.includes('opencart=1')){
 <section class="sec coll-bg" id="shop">
   <div class="ct rv"><div class="chip">Browse Collections</div><h2 class="sh2">What the Mountains Offer</h2><p class="ssub">Every category tells a story of altitude, tradition, and purity.</p></div>
   <div class="cgrid" id="cgrid">
-    <a href="#" class="cc rv" style="transition-delay:.08s"><span class="cemo">🍯</span><div class="cname">Wild Honey</div><div class="cnum">10+ Varieties</div></a>
-    <a href="#" class="cc rv" style="transition-delay:.13s"><span class="cemo">🥛</span><div class="cname">A2 Ghee</div><div class="cnum">Bilona Method</div></a>
-    <a href="#" class="cc rv" style="transition-delay:.18s"><span class="cemo">🌿</span><div class="cname">Herbs & Spices</div><div class="cnum">40+ Varieties</div></a>
-    <a href="#" class="cc rv" style="transition-delay:.23s"><span class="cemo">🍵</span><div class="cname">Himalayan Teas</div><div class="cnum">Rare Blends</div></a>
-    <a href="#" class="cc rv" style="transition-delay:.28s"><span class="cemo">🌾</span><div class="cname">Ancient Grains</div><div class="cnum">Millet · Buckwheat</div></a>
-    <a href="#" class="cc rv" style="transition-delay:.33s"><span class="cemo">🌰</span><div class="cname">Dry Fruits</div><div class="cnum">Sun-dried & Pure</div></a>
+    <a href="#products" class="cc rv" style="transition-delay:.08s" onclick="setTimeout(function(){setFilter('honey',document.querySelector('[onclick*=honey]'))},50)"><span class="cemo">🍯</span><div class="cname">Wild Honey</div><div class="cnum">10+ Varieties</div></a>
+    <a href="#products" class="cc rv" style="transition-delay:.13s" onclick="setTimeout(function(){setFilter('ghee',document.querySelector('[onclick*=ghee]'))},50)"><span class="cemo">🥛</span><div class="cname">A2 Ghee</div><div class="cnum">Bilona Method</div></a>
+    <a href="#products" class="cc rv" style="transition-delay:.18s" onclick="setTimeout(function(){setFilter('spices',document.querySelector('[onclick*=spices]'))},50)"><span class="cemo">🌿</span><div class="cname">Herbs & Spices</div><div class="cnum">40+ Varieties</div></a>
+    <a href="#products" class="cc rv" style="transition-delay:.23s" onclick="setTimeout(function(){setFilter('tea',document.querySelector('[onclick*=tea]'))},50)"><span class="cemo">🍵</span><div class="cname">Himalayan Teas</div><div class="cnum">Rare Blends</div></a>
+    <a href="#products" class="cc rv" style="transition-delay:.28s" onclick="setTimeout(function(){setFilter('all',document.querySelector('[onclick*=all]'))},50)"><span class="cemo">🌾</span><div class="cname">Ancient Grains</div><div class="cnum">Millet · Buckwheat</div></a>
+    <a href="#products" class="cc rv" style="transition-delay:.33s" onclick="setTimeout(function(){setFilter('all',document.querySelector('[onclick*=all]'))},50)"><span class="cemo">🌰</span><div class="cname">Dry Fruits</div><div class="cnum">Sun-dried & Pure</div></a>
   </div>
 </section>
 <section class="sec" id="products" style="background:#fff;padding:28px 40px 36px">
@@ -1099,12 +1098,7 @@ if(window.location.search.includes('opencart=1')){
   </div>
   </div>
 </section>
-<section class="nl-sec">
-  <div class="chip" style="color:var(--gd2)">Stay Connected</div>
-  <h2 class="sh2">Join the Roots Community</h2>
-  <p class="ssub">Seasonal harvests, farmer stories & exclusive early access — right to your inbox.</p>
-  <div class="nlf"><input type="email" class="nli" id="nlEmail" placeholder="Your email address"><button class="btn-g" onclick="subscribe()">Subscribe</button></div>
-</section>
+
 <section class="pay-sec" id="pay-sec">
   <div class="ct rv"><div class="chip">Secure Checkout</div><h2 class="sh2">Pay Your Way</h2><p class="ssub" style="max-width:480px;margin:0 auto 40px">Every payment is 100% secure &amp; encrypted. Choose whatever works best for you.</p></div>
   <div class="pay-opts-wrap rv">
@@ -1165,20 +1159,214 @@ if(window.location.search.includes('opencart=1')){
   <div class="rv-strip" id="rvStrip"></div>
 </section>
 <footer id="contact">
-  <div class="fgrid">
-    <div>
-      <div class="logo" style="margin-bottom:14px">
-        <div class="logo-icon">🌿</div>
-        <div class="logo-words"><div style="font-family:'Playfair Display',serif;font-size:19px;font-weight:700;color:#fff">Pahadi Roots</div><div class="logo-tl">Est. in the Himalayas</div></div>
-      </div>
-      <p class="fdesc">Born in the mountains, delivered to your doorstep. Pure Himalayan organic products, sourced with love from farming communities across 10 Himalayan states.</p>
-      <div class="srow"><a href="#" class="soc">📘</a><a href="#" class="soc">📸</a><a href="#" class="soc">🐦</a><a href="#" class="soc">▶️</a></div>
-    </div>
-    <div><div class="fh">Shop</div><ul class="ful"><li><a href="#">Wild Honey</a></li><li><a href="#">A2 Ghee</a></li><li><a href="#">Herbs & Spices</a></li><li><a href="#">Himalayan Teas</a></li><li><a href="#">Ancient Grains</a></li><li><a href="#">Dry Fruits</a></li></ul></div>
-    <div><div class="fh">Company</div><ul class="ful"><li><a href="#story">Our Story</a></li><li><a href="#states">By Region</a></li><li><a href="#">Farmer Partners</a></li><li><a href="#">Lab Reports</a></li><li><a href="#">Blog</a></li><li><a href="#">Sustainability</a></li></ul></div>
-    <div class="fct"><div class="fh">Get in Touch</div><p>🌐 <a href="https://pahadiroots.com">pahadiroots.com</a><br>📧 <a href="/cdn-cgi/l/email-protection#1d75787171725d6d7c757c79746f7272696e337e7270"><span class="__cf_email__" data-cfemail="f199949d9d9eb1819099909598839e9e8582df929e9c">[email&#160;protected]</span></a><br>📞 <a href="tel:+919899984895">+91 98999 84895</a><br><br>📍 Pahadi Roots<br>New Delhi, India</p></div>
+
+  <!-- Mountain Village SVG Scene -->
+  <div style="line-height:0;background:#0b160d">
+    <svg viewBox="0 0 1440 160" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" style="width:100%;height:160px;display:block">
+      <!-- Night sky -->
+      <rect width="1440" height="160" fill="#0b160d"/>
+      <!-- Stars -->
+      <circle cx="80" cy="18" r="1.2" fill="#fff" opacity="0.5"/>
+      <circle cx="200" cy="10" r="1" fill="#e8b84b" opacity="0.6"/>
+      <circle cx="380" cy="22" r="1.5" fill="#fff" opacity="0.4"/>
+      <circle cx="520" cy="8" r="1" fill="#fff" opacity="0.5"/>
+      <circle cx="660" cy="16" r="1.2" fill="#e8b84b" opacity="0.5"/>
+      <circle cx="790" cy="6" r="1" fill="#fff" opacity="0.4"/>
+      <circle cx="950" cy="20" r="1.5" fill="#fff" opacity="0.45"/>
+      <circle cx="1100" cy="10" r="1" fill="#e8b84b" opacity="0.5"/>
+      <circle cx="1250" cy="18" r="1.2" fill="#fff" opacity="0.4"/>
+      <circle cx="1390" cy="12" r="1" fill="#fff" opacity="0.5"/>
+      <circle cx="440" cy="14" r="1" fill="#fff" opacity="0.35"/>
+      <circle cx="870" cy="12" r="1" fill="#fff" opacity="0.35"/>
+      <!-- Crescent moon -->
+      <circle cx="1370" cy="32" r="16" fill="#fffde7" opacity="0.1"/>
+      <circle cx="1376" cy="29" r="14" fill="#0b160d"/>
+      <!-- Far mountains (lightest — snow peaks) -->
+      <polygon points="0,130 80,42 160,95 260,18 380,82 480,30 580,88 680,22 780,78 880,28 980,80 1080,30 1180,85 1280,38 1380,72 1440,55 1440,160 0,160" fill="#1e3d24"/>
+      <!-- Snow caps on tallest peaks -->
+      <polygon points="254,18 260,18 278,38 242,38" fill="#3d6b47" opacity="0.7"/>
+      <polygon points="674,22 680,22 698,44 662,44" fill="#3d6b47" opacity="0.6"/>
+      <polygon points="874,28 880,28 898,50 862,50" fill="#3d6b47" opacity="0.6"/>
+      <!-- Mid mountains -->
+      <polygon points="0,148 60,92 140,126 240,68 360,112 460,72 560,118 660,56 760,108 860,70 960,112 1060,66 1160,110 1260,70 1360,108 1440,82 1440,160 0,160" fill="#152b18"/>
+      <!-- Pine trees — LEFT -->
+      <g fill="#0d2010">
+        <polygon points="22,158 38,116 54,158"/>
+        <polygon points="16,158 38,102 60,158"/>
+        <polygon points="55,158 70,120 85,158"/>
+        <polygon points="49,158 70,106 91,158"/>
+        <polygon points="90,158 105,124 120,158"/>
+        <polygon points="125,158 140,118 155,158"/>
+        <polygon points="119,158 140,104 161,158"/>
+        <rect x="34" y="154" width="8" height="7" fill="#060f07"/>
+        <rect x="66" y="154" width="8" height="7" fill="#060f07"/>
+        <rect x="136" y="154" width="8" height="7" fill="#060f07"/>
+      </g>
+      <!-- Pine trees — RIGHT -->
+      <g fill="#0d2010">
+        <polygon points="1284,158 1300,116 1316,158"/>
+        <polygon points="1278,158 1300,102 1322,158"/>
+        <polygon points="1318,158 1334,120 1350,158"/>
+        <polygon points="1312,158 1334,106 1356,158"/>
+        <polygon points="1355,158 1372,118 1389,158"/>
+        <polygon points="1393,158 1410,122 1427,158"/>
+        <polygon points="1386,158 1410,106 1434,158"/>
+        <rect x="1296" y="154" width="8" height="7" fill="#060f07"/>
+        <rect x="1330" y="154" width="8" height="7" fill="#060f07"/>
+        <rect x="1406" y="154" width="8" height="7" fill="#060f07"/>
+      </g>
+      <!-- Village hut LEFT -->
+      <g fill="#0d2010">
+        <rect x="218" y="128" width="62" height="36"/>
+        <polygon points="204,132 249,96 294,132"/>
+        <rect x="240" y="142" width="16" height="22"/>
+        <rect x="220" y="133" width="13" height="11" fill="#c8920a" opacity="0.4"/>
+        <rect x="258" y="133" width="13" height="11" fill="#c8920a" opacity="0.4"/>
+      </g>
+      <ellipse cx="253" cy="91" rx="3" ry="6" fill="#1e3d24" opacity="0.6"/>
+      <ellipse cx="255" cy="81" rx="2" ry="4" fill="#1e3d24" opacity="0.35"/>
+      <!-- Village hut RIGHT -->
+      <g fill="#0d2010">
+        <rect x="1158" y="125" width="66" height="38"/>
+        <polygon points="1145,129 1191,92 1237,129"/>
+        <rect x="1183" y="140" width="17" height="24"/>
+        <rect x="1161" y="130" width="14" height="11" fill="#c8920a" opacity="0.4"/>
+        <rect x="1200" y="130" width="14" height="11" fill="#c8920a" opacity="0.4"/>
+      </g>
+      <ellipse cx="1196" cy="87" rx="3" ry="6" fill="#1e3d24" opacity="0.6"/>
+      <ellipse cx="1198" cy="77" rx="2" ry="4" fill="#1e3d24" opacity="0.35"/>
+      <!-- Center hut -->
+      <g fill="#0d2010">
+        <rect x="690" y="136" width="42" height="26"/>
+        <polygon points="679,139 711,114 743,139"/>
+        <rect x="703" y="148" width="12" height="14"/>
+        <rect x="693" y="140" width="10" height="9" fill="#c8920a" opacity="0.3"/>
+      </g>
+      <!-- Ground -->
+      <rect x="0" y="155" width="1440" height="5" fill="#060f07"/>
+    </svg>
   </div>
-  <div class="fbot"><span>© 2026 <span class="fd">pahadiroots.com</span> · Founded by Sudhir Chambail</span><span>🌿 Making India eat clean, one mountain at a time</span></div>
+
+  <!-- Newsletter Strip -->
+  <div class="f-newsletter">
+    <div class="f-nl-inner">
+      <div class="f-nl-text">
+        <h4>🌿 Join the Pahadi Family</h4>
+        <p>Exclusive deals, new arrivals &amp; Himalayan stories — straight to your inbox</p>
+      </div>
+      <div class="f-nl-form">
+        <input type="email" class="f-nl-inp" id="nlEmail" placeholder="Enter your email address" autocomplete="email">
+        <button class="f-nl-btn" onclick="subscribe()">Subscribe</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Grid -->
+  <div class="f-main">
+
+    <!-- Brand col -->
+    <div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
+        <span style="font-size:26px">🌿</span>
+        <div>
+          <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:900;color:#fff;line-height:1.1">Pahadi Roots</div>
+          <div style="font-size:10px;color:var(--gd);font-weight:700;letter-spacing:1px">HIMALAYAN ORGANIC STORE</div>
+        </div>
+      </div>
+      <p class="f-brand-desc">Born in the mountains, delivered to your doorstep. Pure Himalayan organic products, sourced with love from farming communities across 10 Himalayan states.</p>
+      <div class="f-soc-row">
+        <a href="https://www.instagram.com/pahadiroots" target="_blank" rel="noopener" class="f-soc" title="Instagram">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+        </a>
+        <a href="https://www.facebook.com/pahadiroots" target="_blank" rel="noopener" class="f-soc" title="Facebook">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+        </a>
+        <a href="https://twitter.com/pahadiroots" target="_blank" rel="noopener" class="f-soc" title="X">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.748l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        </a>
+        <a href="https://www.youtube.com/@pahadiroots" target="_blank" rel="noopener" class="f-soc" title="YouTube">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M23.495 6.205a3.007 3.007 0 0 0-2.088-2.088c-1.87-.501-9.396-.501-9.396-.501s-7.507-.01-9.396.501A3.007 3.007 0 0 0 .527 6.205a31.247 31.247 0 0 0-.522 5.805 31.247 31.247 0 0 0 .522 5.783 3.007 3.007 0 0 0 2.088 2.088c1.868.502 9.396.502 9.396.502s7.506 0 9.396-.502a3.007 3.007 0 0 0 2.088-2.088 31.247 31.247 0 0 0 .5-5.783 31.247 31.247 0 0 0-.5-5.805zM9.609 15.601V8.408l6.264 3.602z"/></svg>
+        </a>
+        <a href="https://www.linkedin.com/company/pahadiroots" target="_blank" rel="noopener" class="f-soc" title="LinkedIn">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+        </a>
+      </div>
+      <div class="f-fssai">
+        <div class="f-fssai-badge">FSSAI</div>
+        <div>
+          <div style="font-size:11px;color:rgba(255,255,255,.6);font-weight:700">Licensed</div>
+          <div class="f-fssai-num">Lic. No. — update karein</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Selects -->
+    <div>
+      <div class="fh">Quick Selects</div>
+      <ul class="ful">
+        <li><a href="/#products">🍯 Wild Honey</a></li>
+        <li><a href="/#products">🧈 A2 Bilona Ghee</a></li>
+        <li><a href="/#products">🌸 Kashmiri Saffron</a></li>
+        <li><a href="/#products">🪨 Ladakhi Shilajit</a></li>
+        <li><a href="/#products">🍃 Himalayan Teas</a></li>
+        <li><a href="/#products">🌾 Ancient Grains</a></li>
+      </ul>
+    </div>
+
+    <!-- Company -->
+    <div>
+      <div class="fh">Company</div>
+      <ul class="ful">
+        <li><a href="/#story">Our Story</a></li>
+        <li><a href="/#states">By Region</a></li>
+        <li><a href="/terms#returns">Returns &amp; Refunds</a></li>
+        <li><a href="/terms#shipping">Shipping Policy</a></li>
+        <li><a href="/terms#privacy">Privacy Policy</a></li>
+        <li><a href="/terms">Terms &amp; Conditions</a></li>
+      </ul>
+    </div>
+
+    <!-- Connect With Us -->
+    <div>
+      <div class="fh">Connect With Us</div>
+      <div class="f-contact-item">
+        <span class="f-contact-icon">🌐</span>
+        <div class="f-contact-text"><a href="https://pahadiroots.com">pahadiroots.com</a></div>
+      </div>
+      <div class="f-contact-item">
+        <span class="f-contact-icon">📧</span>
+        <div class="f-contact-text"><a href="mailto:support@pahadiroots.com">support@pahadiroots.com</a></div>
+      </div>
+      <div class="f-contact-item">
+        <span class="f-contact-icon">📞</span>
+        <div class="f-contact-text"><a href="tel:+919899984895">+91 98999 84895</a></div>
+      </div>
+      <div class="f-contact-item">
+        <span class="f-contact-icon">📍</span>
+        <div class="f-contact-text">Pahadi Roots<br>New Delhi, India</div>
+      </div>
+      <div class="f-grievance">
+        <div class="f-grievance-label">Grievance Officer</div>
+        <div class="f-grievance-name">Sudhir Chambail</div>
+        <div class="f-grievance-email">support@pahadiroots.com</div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="f-divider">
+
+  <!-- Bottom bar -->
+  <div class="f-bot">
+    <div class="f-bot-left">© 2026 <span class="fd">Pahadi Roots</span> · Founded by Sudhir Chambail · New Delhi, India</div>
+    <div class="f-bot-links">
+      <a href="/terms#returns">Returns Policy</a>
+      <a href="/terms#privacy">Privacy Policy</a>
+      <a href="/terms#shipping">Shipping</a>
+      <a href="/terms">Terms &amp; Conditions</a>
+    </div>
+    <div class="f-bot-tag">🌿 Making India eat clean</div>
+  </div>
+
 </footer>
 <!-- Search overlay -->
 <div class="srch-overlay" id="srchOverlay" onclick="handleSrchOvClick(event)">
@@ -1432,14 +1620,23 @@ function getAuthHeaders() {
 async function callAuth(action, body = {}, useAuthHeader = false) {
   var headers = { 'Content-Type': 'application/json' };
   if (useAuthHeader && _authToken) headers['Authorization'] = 'Bearer ' + _authToken;
-  var res = await fetch(getStoreApiBase() + '/auth', {
-    method: 'POST',
-    headers,
-    body: JSON.stringify({ action, ...body }),
-  });
-  var data = await res.json();
-  if (!res.ok) throw new Error(data.error || 'Auth error');
-  return data;
+  var controller = new AbortController();
+  var _t = setTimeout(function() { controller.abort(); }, 12000);
+  try {
+    var res = await fetch(getStoreApiBase() + '/auth', {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ action, ...body }),
+      signal: controller.signal,
+    });
+    clearTimeout(_t);
+    var data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Auth error');
+    return data;
+  } catch(e) {
+    clearTimeout(_t);
+    throw e;
+  }
 }
 function saveAuthSession(data) {
   _authToken   = data.access_token;
@@ -1686,7 +1883,7 @@ async function loadData() {
     loadFIFromData(data);
 
   } catch(e) {
-    console.info('Using local fallback data:', e.message);
+    
   }
 }
 
@@ -1997,7 +2194,7 @@ function initProductHoverImages() {
 
 
 function goToProductPage(slug) {
-  window.open('/products/' + slug, '_blank');
+  window.location.href = '/products/' + slug;
 }
 
 function updateCardPrice(prodId, sel) {
@@ -2571,9 +2768,13 @@ function updateShipAmountDisplays() {
   });
   // Update announcement bar
   var ann = document.getElementById('annShipAmt');
-  if (ann) ann.parentElement.innerHTML = freeAll
-    ? '🌿 Free Shipping on all orders! &nbsp;|&nbsp; <a href="#pay-sec">UPI · Cards · COD</a> &nbsp;|&nbsp; 10 Himalayan States Covered'
-    : '🌿 Free Shipping above ₹<span id="annShipAmt">' + amt + '</span> &nbsp;|&nbsp; <a href="#pay-sec">UPI · Cards · COD</a> &nbsp;|&nbsp; 10 Himalayan States Covered';
+  if (ann) {
+    if (freeAll) {
+      ann.parentElement.innerHTML = '🌿 Free Shipping on all orders! &nbsp;|&nbsp; <a href="#pay-sec">UPI · Cards · COD</a> &nbsp;|&nbsp; 10 Himalayan States Covered';
+    } else {
+      ann.textContent = amt;
+    }
+  }
   // Update ticker items
   document.querySelectorAll('.ticker-item').forEach(function(el) {
     if (el.textContent.indexOf('Free shipping') !== -1) {
@@ -3284,9 +3485,8 @@ window.addEventListener('DOMContentLoaded', function() {
 .auth-sub{text-align:center;font-size:13px;color:#888;margin-bottom:20px}
 .auth-tabs{display:flex;background:#f5f5f5;border-radius:10px;padding:4px;margin-bottom:20px;gap:4px}
 .auth-tab{flex:1;padding:8px;border:none;border-radius:7px;background:none;cursor:pointer;font-size:13px;font-weight:600;color:#666;transition:all .2s}
-.auth-tab.active{background:#fff;color:#1a5c2a;box-shadow:0 1px 4px rgba(0,0,0,.1)}
-.auth-panel{display:none}.auth-panel.active{display:block}
-.auth-label{font-size:12px;font-weight:700;color:#444;margin-bottom:5px;display:block;text-transform:uppercase;letter-spacing:.5px}
+.auth-tab.auth-tab.active{background:#fff;color:#1a5c2a;box-shadow:0 1px 4px rgba(0,0,0,.1)}
+.auth-panel{display:none}.auth-panel.active{display:block}font-size:12px;font-weight:700;color:#444;margin-bottom:5px;display:block;text-transform:uppercase;letter-spacing:.5px}
 .auth-input{width:100%;padding:11px 14px;border:1.5px solid #ddd;border-radius:10px;font-size:14px;outline:none;transition:border-color .2s;box-sizing:border-box;font-family:inherit}
 .auth-input:focus{border-color:#2d6a4f}
 .auth-input.err{border-color:#e05252}
