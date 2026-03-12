@@ -195,26 +195,90 @@ try { _authProfile = JSON.parse(localStorage.getItem('pr_auth_profile') || 'null
 async function callAuth(action, body, useToken) {
   var headers = { 'Content-Type': 'application/json' };
   if (useToken && _authToken) headers['Authorization'] = 'Bearer ' + _authToken;
-  var res = await fetch(API_BASE + '/auth', { method:'POST', headers, body: JSON.stringify({ action, ...body }) });
-  var data = await res.json();
-  if (!res.ok) throw new Error(data.error || 'Error');
-  return data;
+  var controller = new AbortController();
+  var _t = setTimeout(function() { controller.abort(); }, 10000);
+  try {
+    var res = await fetch(API_BASE + '/auth', {
+      method: 'POST', headers,
+      body: JSON.stringify({ action, ...body }),
+      signal: controller.signal
+    });
+    clearTimeout(_t);
+    var data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Error');
+    return data;
+  } catch(e) {
+    clearTimeout(_t);
+    throw e;
+  }
 }
 
 
 // ── Init ──
 async function init() {
   if (!_authToken) { showLoginWall(); return; }
+
+  // Set a hard timeout — agar 12 sec mein response nahi aaya toh login wall dikhao
+  var _initDone = false;
+  var _timeout = setTimeout(function() {
+    if (!_initDone) {
+      console.warn('Account init timed out');
+      // Try refresh token before giving up
+      var rt = null;
+      try { rt = localStorage.getItem('pr_auth_refresh'); } catch(e){}
+      if (rt) {
+        tryRefreshThenInit(rt);
+      } else {
+        showLoginWall();
+      }
+    }
+  }, 10000);
+
   try {
     var data = await callAuth('get_profile', {}, true);
-    _authProfile = data.profile; _authUser = data.user;
-    // Store orders from profile call (already fetched!)
+    _initDone = true;
+    clearTimeout(_timeout);
+    _authProfile = data.profile;
+    _authUser = data.user;
     if (data.orders) _orders = data.orders;
     try { localStorage.setItem('pr_auth_profile', JSON.stringify(data.profile)); } catch(e){}
-  } catch(e) {}
-  if (!_authProfile) { showLoginWall(); return; }
-  showAccount();
-  switchTab('orders');
+    if (!_authProfile) { showLoginWall(); return; }
+    showAccount();
+    switchTab('orders');
+  } catch(e) {
+    _initDone = true;
+    clearTimeout(_timeout);
+    // Token expired — try refresh
+    var rt = null;
+    try { rt = localStorage.getItem('pr_auth_refresh'); } catch(e2){}
+    if (rt) {
+      await tryRefreshThenInit(rt);
+    } else {
+      showLoginWall();
+    }
+  }
+}
+
+async function tryRefreshThenInit(refreshToken) {
+  try {
+    var r = await callAuth('refresh_token', { refresh_token: refreshToken }, false);
+    if (r.access_token) {
+      _authToken = r.access_token;
+      try { localStorage.setItem('pr_auth_token', r.access_token); } catch(e){}
+      if (r.refresh_token) { try { localStorage.setItem('pr_auth_refresh', r.refresh_token); } catch(e){} }
+      var data = await callAuth('get_profile', {}, true);
+      _authProfile = data.profile; _authUser = data.user;
+      if (data.orders) _orders = data.orders;
+      try { localStorage.setItem('pr_auth_profile', JSON.stringify(data.profile)); } catch(e){}
+      if (!_authProfile) { showLoginWall(); return; }
+      showAccount();
+      switchTab('orders');
+    } else {
+      showLoginWall();
+    }
+  } catch(e) {
+    showLoginWall();
+  }
 }
 
 function showLoginWall() {
@@ -570,5 +634,97 @@ function showToast(msg) {
 // ── Start ──
 init();
 </script>
+
+<!-- ── Mountain Village Footer ── -->
+<footer style="background:#0b160d;padding:0;margin-top:auto">
+  <!-- Mountain SVG Scene -->
+  <div style="position:relative;overflow:hidden;line-height:0">
+    <svg viewBox="0 0 1440 220" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMax slice" style="width:100%;display:block;opacity:0.18">
+      <!-- Sky gradient fill -->
+      <defs>
+        <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#4a8c5c" stop-opacity="0.2"/>
+          <stop offset="100%" stop-color="#1a3a1e" stop-opacity="0.9"/>
+        </linearGradient>
+      </defs>
+      <rect width="1440" height="220" fill="url(#skyGrad)"/>
+      <!-- Far mountains (lightest) -->
+      <polygon points="0,180 120,60 220,140 340,30 480,120 580,50 700,130 820,40 940,110 1060,45 1160,115 1280,55 1440,100 1440,220 0,220" fill="#2d5233" opacity="0.5"/>
+      <!-- Mid mountains -->
+      <polygon points="0,200 80,110 180,170 300,80 420,150 520,90 640,160 760,70 880,140 1000,85 1100,145 1220,90 1320,150 1440,110 1440,220 0,220" fill="#1e3d24" opacity="0.7"/>
+      <!-- Pine trees left -->
+      <g fill="#1a3520" opacity="0.9">
+        <polygon points="60,200 75,140 90,200"/>
+        <polygon points="55,200 75,130 95,200"/>
+        <polygon points="90,200 105,155 120,200"/>
+        <polygon points="140,200 158,138 176,200"/>
+        <polygon points="135,200 158,125 181,200"/>
+        <rect x="72" y="195" width="6" height="10" fill="#0d1a0f"/>
+        <rect x="155" y="193" width="6" height="12" fill="#0d1a0f"/>
+      </g>
+      <!-- Pine trees right -->
+      <g fill="#1a3520" opacity="0.9">
+        <polygon points="1280,200 1295,145 1310,200"/>
+        <polygon points="1275,200 1295,132 1315,200"/>
+        <polygon points="1310,200 1328,150 1346,200"/>
+        <polygon points="1340,200 1360,138 1380,200"/>
+        <polygon points="1335,200 1360,125 1385,200"/>
+        <rect x="1292" y="194" width="6" height="10" fill="#0d1a0f"/>
+        <rect x="1357" y="193" width="6" height="12" fill="#0d1a0f"/>
+      </g>
+      <!-- Village hut left -->
+      <g fill="#152b18" opacity="0.85">
+        <rect x="230" y="175" width="55" height="35"/>
+        <polygon points="218,178 257,148 296,178"/>
+        <rect x="247" y="188" width="14" height="22"/>
+        <rect x="234" y="178" width="10" height="10"/>
+        <rect x="268" y="178" width="10" height="10"/>
+      </g>
+      <!-- Village hut right -->
+      <g fill="#152b18" opacity="0.85">
+        <rect x="1160" y="172" width="60" height="38"/>
+        <polygon points="1148,175 1190,142 1232,175"/>
+        <rect x="1182" y="186" width="15" height="24"/>
+        <rect x="1162" y="176" width="11" height="11"/>
+        <rect x="1197" y="176" width="11" height="11"/>
+      </g>
+      <!-- Center distant village -->
+      <g fill="#1a3a1e" opacity="0.6">
+        <rect x="680" y="185" width="35" height="22"/>
+        <polygon points="672,188 697,168 722,188"/>
+        <rect x="690" y="193" width="10" height="14"/>
+      </g>
+      <!-- Foreground hills -->
+      <path d="M0,215 Q180,185 360,210 Q540,230 720,200 Q900,175 1080,205 Q1260,228 1440,210 L1440,220 L0,220Z" fill="#0d1a0f" opacity="1"/>
+      <!-- Stars -->
+      <circle cx="200" cy="30" r="1.5" fill="#fff" opacity="0.4"/>
+      <circle cx="450" cy="18" r="1" fill="#fff" opacity="0.3"/>
+      <circle cx="700" cy="25" r="1.5" fill="#fff" opacity="0.35"/>
+      <circle cx="950" cy="15" r="1" fill="#fff" opacity="0.3"/>
+      <circle cx="1200" cy="28" r="1.5" fill="#fff" opacity="0.4"/>
+      <circle cx="350" cy="10" r="1" fill="#fff" opacity="0.25"/>
+      <circle cx="1050" cy="20" r="1" fill="#fff" opacity="0.3"/>
+    </svg>
+  </div>
+
+  <!-- Footer content -->
+  <div style="background:#0d1a0f;padding:28px 40px 20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;max-width:1200px;margin:0 auto">
+    <div style="display:flex;align-items:center;gap:10px">
+      <span style="font-size:22px">🌿</span>
+      <div>
+        <div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:900;color:#fff">Pahadi Roots</div>
+        <div style="font-size:10px;color:#c8920a;font-weight:700;letter-spacing:1px">HIMALAYAN ORGANIC STORE</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:20px;flex-wrap:wrap">
+      <a href="/terms#returns" style="font-size:12px;color:rgba(255,255,255,.4);text-decoration:none;transition:color .2s" onmouseover="this.style.color='rgba(255,255,255,.8)'" onmouseout="this.style.color='rgba(255,255,255,.4)'">Returns Policy</a>
+      <a href="/terms#privacy" style="font-size:12px;color:rgba(255,255,255,.4);text-decoration:none" onmouseover="this.style.color='rgba(255,255,255,.8)'" onmouseout="this.style.color='rgba(255,255,255,.4)'">Privacy Policy</a>
+      <a href="/terms" style="font-size:12px;color:rgba(255,255,255,.4);text-decoration:none" onmouseover="this.style.color='rgba(255,255,255,.8)'" onmouseout="this.style.color='rgba(255,255,255,.4)'">Terms &amp; Conditions</a>
+      <a href="/" style="font-size:12px;color:rgba(255,255,255,.4);text-decoration:none" onmouseover="this.style.color='rgba(255,255,255,.8)'" onmouseout="this.style.color='rgba(255,255,255,.4)'">← Back to Store</a>
+    </div>
+    <div style="font-size:11.5px;color:rgba(255,255,255,.22);font-style:italic">© 2026 Pahadi Roots · New Delhi, India</div>
+  </div>
+</footer>
+
 </body>
 </html>
