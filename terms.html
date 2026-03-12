@@ -474,10 +474,61 @@
 
       <h3>9. Policy Updates</h3>
       <p>We may update this Privacy Policy from time to time. Updated versions will be posted on this page. We may notify you of significant changes via email.</p>
-
       <h3>10. Contact for Privacy Concerns</h3>
       <p><strong>Pahadi Roots</strong> · New Delhi, India<br>
       📧 <a href="mailto:support@pahadiroots.com">support@pahadiroots.com</a><br>
       💬 WhatsApp: <a href="https://wa.me/919899984895">+91 98999 84895</a></p>
     </div>
-  <
+
+    <div class="contact-card">
+      <h3>Privacy Questions?</h3>
+      <p>We respond within 24 hours on all working days</p>
+      <div class="contact-links">
+        <a href="https://wa.me/919899984895" class="contact-link">💬 WhatsApp Us</a>
+        <a href="mailto:support@pahadiroots.com" class="contact-link">📧 support@pahadiroots.com</a>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <p>© 2026 Pahadi Roots · New Delhi, India · <a href="/">Back to Store</a> · <a href="mailto:support@pahadiroots.com">support@pahadiroots.com</a></p>
+</footer>
+
+<script>
+function showTab(tab) {
+  document.querySelectorAll('.tab-content').forEach(function(el) {
+    el.classList.remove('active');
+  });
+  document.querySelectorAll('.tab').forEach(function(el) {
+    el.classList.remove('active');
+  });
+  var content = document.getElementById('tab-' + tab);
+  if (content) content.classList.add('active');
+  document.querySelectorAll('.tab').forEach(function(el) {
+    if (el.getAttribute('onclick') === "showTab('" + tab + "')") {
+      el.classList.add('active');
+    }
+  });
+  if (history.replaceState) {
+    history.replaceState(null, '', '#' + tab);
+  }
+}
+
+(function() {
+  var hash = window.location.hash.replace('#', '');
+  var valid = ['returns', 'shipping', 'terms', 'privacy'];
+  if (hash && valid.indexOf(hash) !== -1) {
+    showTab(hash);
+    return;
+  }
+  var params = new URLSearchParams(window.location.search);
+  var tabParam = params.get('tab');
+  if (tabParam && valid.indexOf(tabParam) !== -1) {
+    showTab(tabParam);
+  }
+})();
+</script>
+</body>
+</html>
