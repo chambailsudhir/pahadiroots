@@ -309,7 +309,9 @@ function renderProduct(p, images, related, data, stateMap) {
   document.getElementById('bc-name').textContent = p.name;
 
   var pct = p.mrp && p.price ? Math.round((1 - p.price / p.mrp) * 100) : 0;
-  var stock = p.stock_quantity !== undefined ? p.stock_quantity : 99;
+  // If product has variants, use first variant stock; else product stock
+  var initStock = (VARIANTS && VARIANTS.length > 0) ? (VARIANTS[0].stock_quantity || 0) : (p.stock_quantity !== undefined ? p.stock_quantity : 99);
+  var stock = initStock;
   var stockClass = stock > 20 ? '' : stock > 5 ? 'low' : 'oos';
   var stockLabel = stock <= 0 ? 'Out of Stock' : stock <= 5 ? 'Only ' + stock + ' left!' : stock <= 20 ? stock + ' in stock' : 'In Stock';
 
@@ -453,6 +455,18 @@ function selectVariant(varId) {
     mrpEl.textContent = '₹' + selectedVariant.original_price;
     if (saveEl) saveEl.textContent = 'Save ₹' + (selectedVariant.original_price - selectedVariant.price);
   }
+  // Update stock label
+  var sv = selectedVariant;
+  var svStock = sv ? (sv.stock_quantity !== undefined ? sv.stock_quantity : 99) : 99;
+  var svClass = svStock > 20 ? '' : svStock > 5 ? 'low' : 'oos';
+  var svLabel = svStock <= 0 ? 'Out of Stock' : svStock <= 5 ? 'Only ' + svStock + ' left!' : svStock <= 20 ? svStock + ' in stock' : 'In Stock';
+  var stockDot = document.querySelector('.stock-dot');
+  var stockSpan = document.querySelector('.stock-row span');
+  if (stockDot) { stockDot.className = 'stock-dot ' + svClass; }
+  if (stockSpan) stockSpan.textContent = svLabel;
+  // Disable/enable buy button
+  var atcBtn = document.getElementById('atc-btn');
+  if (atcBtn) atcBtn.disabled = svStock <= 0;
   // Update qty to 1 on variant change
   qty = 1;
   document.getElementById('qty-display').textContent = '1';
