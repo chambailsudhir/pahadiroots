@@ -4493,6 +4493,11 @@ document.addEventListener('DOMContentLoaded', function() {
       setTimeout(function() { openAccount(); }, 500);
     }
   }
+  // Open auth modal if redirected from account page or other pages with ?login=1
+  if (window.location.search.includes('login=1')) {
+    history.replaceState(null, '', '/');
+    setTimeout(function() { openAuth(); }, 400);
+  }
   // Update WA float button href dynamically
   var waBtn = document.getElementById('waFloatBtn');
   if (waBtn) waBtn.href = 'https://wa.me/' + WHATSAPP_NUMBER;
