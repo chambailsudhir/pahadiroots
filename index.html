@@ -422,23 +422,48 @@ section.sec{padding:52px 40px}
 .pay-secure{text-align:center;margin-top:16px;font-size:12px;color:var(--tx3)}
 
 /* FOOTER */
-footer{background:#0d1a0f;padding:44px 40px 24px}
-.fgrid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:32px;max-width:1200px;margin:0 auto;padding-bottom:28px;border-bottom:1px solid rgba(255,255,255,.08)}
-.fdesc{font-size:12.5px;color:rgba(255,255,255,.5);line-height:1.7;margin:10px 0 16px}
-.srow{display:flex;gap:10px}
-.soc{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-size:15px;transition:background .2s}
-.soc:hover{background:rgba(255,255,255,.15)}
-.fh{font-size:11px;font-weight:800;letter-spacing:1.5px;color:var(--gd2);margin-bottom:12px}
-.ful{list-style:none;display:flex;flex-direction:column;gap:7px}
-.ful li a{font-size:12.5px;color:rgba(255,255,255,.5);transition:color .2s}
-.ful li a:hover{color:rgba(255,255,255,.85)}
-.fct{font-size:12.5px;color:rgba(255,255,255,.5);line-height:1.9}
-.fct a{color:rgba(255,255,255,.5)}
-.fct a:hover{color:rgba(255,255,255,.85)}
-.fbot{max-width:1200px;margin:20px auto 0;display:flex;justify-content:space-between;align-items:center;font-size:12px;color:rgba(255,255,255,.3)}
+/* ── FOOTER ── */
+footer{background:#0b160d;padding:0}
+.f-newsletter{background:linear-gradient(135deg,#1a3a1e,#2d5233);padding:36px 40px;border-bottom:1px solid rgba(255,255,255,.06)}
+.f-nl-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap}
+.f-nl-text h4{font-family:'Playfair Display',serif;font-size:20px;font-weight:900;color:#fff;margin-bottom:4px}
+.f-nl-text p{font-size:13px;color:rgba(255,255,255,.55)}
+.f-nl-form{display:flex;gap:0;border-radius:10px;overflow:hidden;border:1.5px solid rgba(255,255,255,.18);min-width:320px}
+.f-nl-inp{flex:1;padding:13px 18px;background:rgba(255,255,255,.07);border:none;color:#fff;font-size:13.5px;font-family:'Lato',sans-serif;outline:none}
+.f-nl-inp::placeholder{color:rgba(255,255,255,.35)}
+.f-nl-btn{padding:13px 22px;background:var(--gd);color:#1a0800;font-weight:800;font-size:13px;border:none;cursor:pointer;font-family:'Lato',sans-serif;transition:background .2s;white-space:nowrap}
+.f-nl-btn:hover{background:var(--gd2)}
+.f-main{max-width:1200px;margin:0 auto;padding:44px 40px 32px;display:grid;grid-template-columns:2fr 1fr 1fr 1.2fr;gap:40px;border-bottom:1px solid rgba(255,255,255,.06)}
+.f-brand-desc{font-size:12.5px;color:rgba(255,255,255,.42);line-height:1.8;margin:12px 0 20px}
+.f-soc-row{display:flex;gap:8px;flex-wrap:wrap}
+.f-soc{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;transition:all .2s;color:rgba(255,255,255,.6);font-size:14px;text-decoration:none}
+.f-soc:hover{background:var(--g2);border-color:rgba(255,255,255,.25);color:#fff}
+.f-fssai{margin-top:20px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:10px 14px;display:inline-flex;align-items:center;gap:10px}
+.f-fssai-badge{background:#fff;border-radius:6px;padding:4px 8px;font-size:11px;font-weight:900;color:#1a6b1a;letter-spacing:.5px}
+.f-fssai-num{font-size:10.5px;color:rgba(255,255,255,.4);margin-top:2px}
+.fh{font-size:10.5px;font-weight:800;letter-spacing:1.8px;color:var(--gd2);margin-bottom:14px;text-transform:uppercase}
+.ful{list-style:none;display:flex;flex-direction:column;gap:9px}
+.ful li a{font-size:13px;color:rgba(255,255,255,.48);transition:all .2s;display:flex;align-items:center;gap:6px}
+.ful li a:hover{color:#fff;padding-left:4px}
+.f-contact-item{display:flex;align-items:flex-start;gap:10px;margin-bottom:12px}
+.f-contact-icon{font-size:15px;margin-top:1px;flex-shrink:0}
+.f-contact-text{font-size:12.5px;color:rgba(255,255,255,.48);line-height:1.65}
+.f-contact-text a{color:rgba(255,255,255,.48);transition:color .2s}
+.f-contact-text a:hover{color:#fff}
+.f-grievance{margin-top:14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px 14px}
+.f-grievance-label{font-size:9.5px;font-weight:800;letter-spacing:1px;color:var(--gd2);text-transform:uppercase;margin-bottom:4px}
+.f-grievance-name{font-size:12.5px;color:rgba(255,255,255,.7);font-weight:700}
+.f-grievance-email{font-size:11.5px;color:rgba(255,255,255,.4)}
+.f-divider{max-width:1200px;margin:0 40px;border:none;border-top:1px solid rgba(255,255,255,.05)}
+.f-bot{max-width:1200px;margin:0 auto;padding:18px 40px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+.f-bot-left{font-size:12px;color:rgba(255,255,255,.28)}
+.f-bot-links{display:flex;gap:20px;flex-wrap:wrap}
+.f-bot-links a{font-size:11.5px;color:rgba(255,255,255,.28);transition:color .2s}
+.f-bot-links a:hover{color:rgba(255,255,255,.7)}
+.f-bot-tag{font-size:11.5px;color:rgba(255,255,255,.22);font-style:italic}
 .fd{color:var(--gd);font-weight:700}
-@media(max-width:760px){.fgrid{grid-template-columns:1fr 1fr}}
-@media(max-width:480px){.fgrid{grid-template-columns:1fr}}
+@media(max-width:900px){.f-main{grid-template-columns:1fr 1fr;gap:28px}.f-nl-inner{flex-direction:column;align-items:flex-start}.f-nl-form{min-width:100%;width:100%}}
+@media(max-width:560px){.f-main{grid-template-columns:1fr;padding:32px 20px 24px}.f-newsletter{padding:28px 20px}.f-bot{padding:16px 20px;flex-direction:column;text-align:center}.f-divider{margin:0 20px}}
 
 /* SEARCH */
 .srch-overlay{position:fixed;inset:0;z-index:1200;background:rgba(0,0,0,.65);display:none;align-items:flex-start;justify-content:center;padding-top:80px;backdrop-filter:blur(4px)}
@@ -1153,7 +1178,7 @@ if(window.location.search.includes('opencart=1')){
     <div><div class="fh">Company</div><ul class="ful"><li><a href="#story">Our Story</a></li><li><a href="#states">By Region</a></li><li><a href="#">Farmer Partners</a></li><li><a href="#">Lab Reports</a></li><li><a href="#">Blog</a></li><li><a href="#">Sustainability</a></li></ul></div>
     <div class="fct"><div class="fh">Get in Touch</div><p>🌐 <a href="https://pahadiroots.com">pahadiroots.com</a><br>📧 <a href="/cdn-cgi/l/email-protection#1d75787171725d6d7c757c79746f7272696e337e7270"><span class="__cf_email__" data-cfemail="f199949d9d9eb1819099909598839e9e8582df929e9c">[email&#160;protected]</span></a><br>📞 <a href="tel:+919899984895">+91 98999 84895</a><br><br>📍 Pahadi Roots<br>New Delhi, India</p></div>
   </div>
-  <div class="fbot"><span>© 2026 <span class="fd">pahadiroots.com</span> · Founded by Sudhir Chambail</span><span style="display:flex;gap:16px;align-items:center;flex-wrap:wrap;justify-content:center"><a href="/terms" style="color:rgba(255,255,255,.5);font-size:12px;text-decoration:underline">Terms &amp; Conditions</a><a href="/returns" style="color:rgba(255,255,255,.5);font-size:12px;text-decoration:underline">Returns Policy</a><a href="/privacy" style="color:rgba(255,255,255,.5);font-size:12px;text-decoration:underline">Privacy Policy</a></span></div>
+  <div class="fbot"><span>© 2026 <span class="fd">pahadiroots.com</span> · Founded by Sudhir Chambail</span><span>🌿 Making India eat clean, one mountain at a time</span></div>
 </footer>
 <!-- Search overlay -->
 <div class="srch-overlay" id="srchOverlay" onclick="handleSrchOvClick(event)">
@@ -3003,17 +3028,12 @@ function initStickyAtcStub() {
 }
 
 // ── SUBSCRIBE (newsletter) ─────────────────────────────────────────
-async function subscribe() {
+function subscribe() {
   var email = (document.getElementById('nlEmail')||{value:''}).value.trim();
-  if (!email || !email.includes('@')) { showToast('⚠️ Valid email daalo'); return; }
-  try {
-    await fetch('/api/admin-api', {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({action:'save_row', table:'newsletter_subscribers', data:{email:email, subscribed_at:new Date().toISOString(), source:'homepage'}})
-    });
-  } catch(e) {}
+  if (!email || !email.includes('@')) { showToast('Please enter a valid email'); return; }
   showToast('🌿 Subscribed! Welcome to the Pahadi family.');
-  var el = document.getElementById('nlEmail'); if (el) el.value = '';
+  var el = document.getElementById('nlEmail');
+  if (el) el.value = '';
 }
 
 // ── UTILITIES ─────────────────────────────────────────────────────
