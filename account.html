@@ -409,7 +409,7 @@ function buildOrdersHtml(orders) {
       }
       // Cancel button (only for pending/confirmed)
       var cancelBtn = (o.order_status === 'pending' || o.order_status === 'confirmed')
-        ? '<button onclick="cancelOrder('' + o.id + '','' + (o.order_number||o.id) + '')" style="border:none;background:none;color:#c0392b;font-size:11px;font-weight:700;cursor:pointer;padding:5px 10px;border-radius:20px;border:1px solid #fdecea">❌ Cancel</button>'
+        ? '<button onclick="cancelOrder(\'' + o.id + '\',\'' + (o.order_number||o.id) + '\')" style="border:none;background:none;color:#c0392b;font-size:11px;font-weight:700;cursor:pointer;padding:5px 10px;border-radius:20px;border:1px solid #fdecea">❌ Cancel</button>'
         : '';
       return '<div class="order-card">' +
         '<div class="oc-hdr"><span class="oc-num">' + (o.order_number||'#'+String(o.id).slice(0,8)) + '</span><span class="oc-badge ' + badge + '">' + (o.order_status||'pending') + '</span></div>' +
