@@ -225,9 +225,9 @@ export default async function handler(req, res) {
         }
       }
 
-      // 5. Stock deduction — only for Razorpay (already 'confirmed' on INSERT)
-      // COD orders start as 'pending' — DB trigger handles deduction when admin confirms
-      if (payMethod === 'razorpay_online' && items && items.length) {
+      // 5. Stock deduction — for ALL orders (Razorpay + COD)
+      // App-code handles this — no DB trigger dependency
+      if (items && items.length) {
         for (const item of items) {
           try {
             if (!item.id) continue;
@@ -237,6 +237,12 @@ export default async function handler(req, res) {
               const deduct   = item.qty || 1;
               const newStock = Math.max(0, (prod.stock_quantity || 0) - deduct);
               await sbFetch('PATCH', 'products', `id=eq.${prod.id}`, { stock_quantity: newStock });
+              await sbFetch('POST', 'inventory_logs', '', {
+                product_id: prod.id,
+                change: -deduct,
+                reason: `order_placed_${payMethod}`,
+                order_id: orderId || null,
+              }).catch(() => {});
             }
           } catch(e) { console.warn('stock deduct failed:', item.id, e.message); }
         }
