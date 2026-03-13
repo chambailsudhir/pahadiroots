@@ -1494,7 +1494,23 @@ const FALLBACK_PRODUCTS = [
 let STATES = [], PRODUCTS = [], PRODUCT_VARIANTS = [];
 let cart = [];
 try { cart = JSON.parse(localStorage.getItem('pr_cart')||'[]'); } catch(e){ cart=[]; }
-const sv = () => localStorage.setItem('pr_cart', JSON.stringify(cart));
+const sv = () => {
+  localStorage.setItem('pr_cart', JSON.stringify(cart));
+  // Save to DB for abandoned cart recovery (only if logged in)
+  try {
+    var tok = localStorage.getItem('pr_auth_token');
+    var usr = JSON.parse(localStorage.getItem('pr_auth_user') || 'null');
+    if (tok && usr && cart.length > 0) {
+      var total = cart.reduce(function(s,i){ return s + (i.price||0)*(i.qty||1); }, 0);
+      var cartData = cart.map(function(i){ return { id:i.id, name:i.name, price:i.price, qty:i.qty||1, emoji:i.emoji||'🌿', variant:i.variant||'' }; });
+      fetch('/api/abandoned-cart', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'save', token: tok, cart_items: cartData, cart_total: total })
+      }).catch(function(){});
+    }
+  } catch(e) {}
+};
 
 // ── WISHLIST STATE ─────────────────────────────────────────────────
 let wishlist = [];
@@ -2457,6 +2473,8 @@ async function checkoutRazorpay() {
         var el = document.getElementById(id); if(el) el.value='';
       });
       activeCoupon = null;
+      // Mark abandoned cart as converted
+      try { var _ct = localStorage.getItem('pr_auth_token'); if(_ct) fetch('/api/abandoned-cart',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'converted',token:_ct})}).catch(function(){}); } catch(e) {}
       var cf = document.getElementById('coupForm'); if(cf) cf.style.display='block';
       var ca = document.getElementById('coupApplied'); if(ca) ca.style.display='none';
       _orderProcessing = false;
@@ -2600,6 +2618,8 @@ async function checkout() {
     var el = document.getElementById(id); if(el) el.value = '';
   });
   activeCoupon = null;
+      // Mark abandoned cart as converted
+      try { var _ct = localStorage.getItem('pr_auth_token'); if(_ct) fetch('/api/abandoned-cart',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'converted',token:_ct})}).catch(function(){}); } catch(e) {}
   var cf = document.getElementById('coupForm'); if(cf) cf.style.display='block';
   var ca = document.getElementById('coupApplied'); if(ca) ca.style.display='none';
   var ci = document.getElementById('coupInp'); if(ci) ci.value='';
