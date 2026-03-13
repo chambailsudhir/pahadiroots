@@ -784,10 +784,7 @@ footer{background:#0b160d;padding:0}
 
 <body>
 <script>
-// Hide main content instantly if opencart=1 to prevent flash
-if(window.location.search.includes('opencart=1')){
-  document.write('<style>.hero,.pgrid,.section,.trust,.ticker,.ann{visibility:hidden!important}</style>');
-}
+// Cart opens as overlay - no need to hide main content
 </script>
 <div class="ann">🌿 Free Shipping above ₹<span id="annShipAmt">799</span> &nbsp;|&nbsp; <a href="#pay-sec">UPI · Cards · COD</a> &nbsp;|&nbsp; 10 Himalayan States Covered</div>
 <!-- Announcement Ticker -->
@@ -1701,25 +1698,8 @@ function getStoreApiBase() {
 async function loadData() {
   // Step 1: render states fallback only — skip fake products to avoid price flash
   STATES   = FALLBACK_STATES.map(s => Object.assign({}, s));
-  renderStates(); observeRv();
+  renderStates(); uCart(); observeRv();
   initAllStateSlides(); initProductHoverImages();
-
-  // Step 1b: Load settings FIRST so shipping is correct before cart renders
-  try {
-    var settingsRes = await fetch('/api/store-data', { signal: AbortSignal.timeout(4000) });
-    if (settingsRes.ok) {
-      var settingsData = await settingsRes.json();
-      if (settingsData.settings) {
-        if (settingsData.settings.free_shipping_min    !== undefined && settingsData.settings.free_shipping_min    !== null) FREE_SHIP_THRESHOLD = parseInt(settingsData.settings.free_shipping_min,    10);
-        if (settingsData.settings.flat_shipping_charge !== undefined && settingsData.settings.flat_shipping_charge !== null) FLAT_SHIP_CHARGE    = parseInt(settingsData.settings.flat_shipping_charge, 10);
-        if (settingsData.settings.whatsapp_number) WHATSAPP_NUMBER = settingsData.settings.whatsapp_number;
-        updateShipAmountDisplays();
-      }
-    }
-  } catch(e) { /* use defaults if settings fail */ }
-
-  uCart(); // Now render cart with correct shipping
-
   // Open cart instantly if redirected from product page
   if (window.location.search.includes('opencart=1')) {
     history.replaceState(null, '', '/');
@@ -2294,7 +2274,9 @@ function uCart() {
   if (cc) cc.textContent = cnt;
   // ── Dynamic shipping ──
   var threshold   = (!isNaN(FREE_SHIP_THRESHOLD)) ? FREE_SHIP_THRESHOLD : 799;
-  var shipCharge  = (final > 0 && threshold > 0 && final < threshold) ? ((!isNaN(FLAT_SHIP_CHARGE)) ? FLAT_SHIP_CHARGE : 99) : 0;
+  // If settings not yet loaded from DB, default to free shipping to avoid flash
+  var settingsLoaded = (FREE_SHIP_THRESHOLD !== 799 || FLAT_SHIP_CHARGE !== 99);
+  var shipCharge  = settingsLoaded ? ((final > 0 && threshold > 0 && final < threshold) ? ((!isNaN(FLAT_SHIP_CHARGE)) ? FLAT_SHIP_CHARGE : 99) : 0) : 0;
   var grandTotal  = final + shipCharge;
   var cv = document.getElementById('ctval');
   if (cv) cv.textContent = '₹' + final.toLocaleString('en-IN');
