@@ -1,1 +1,29 @@
+# File path: .github/workflows/abandoned-cart-cron.yml
+# Runs every 30 minutes — checks for abandoned carts and sends email reminders
 
+name: Abandoned Cart Recovery
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'  # Every 30 minutes
+  workflow_dispatch:          # Manual trigger for testing
+
+jobs:
+  send-reminders:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Abandoned Cart API
+        run: |
+          response=$(curl -s -o /dev/null -w "%{http_code}" \
+            -X POST \
+            -H "Content-Type: application/json" \
+            -H "x-cron-secret: ${{ secrets.CRON_SECRET }}" \
+            -d '{"action":"cron","secret":"${{ secrets.CRON_SECRET }}"}' \
+            https://pahadiroots.com/api/abandoned-cart)
+          
+          echo "Response code: $response"
+          if [ "$response" != "200" ]; then
+            echo "❌ API call failed with status $response"
+            exit 1
+          fi
+          echo "✅ Abandoned cart check complete"
