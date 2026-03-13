@@ -1746,8 +1746,8 @@ async function loadData() {
     }
     // ── Load shipping + WhatsApp from settings ──
     if (data.settings) {
-      if (data.settings.free_shipping_min    !== undefined && data.settings.free_shipping_min    !== '') FREE_SHIP_THRESHOLD = parseInt(data.settings.free_shipping_min,    10);
-      if (data.settings.flat_shipping_charge !== undefined && data.settings.flat_shipping_charge !== '') FLAT_SHIP_CHARGE    = parseInt(data.settings.flat_shipping_charge, 10);
+      if (data.settings.free_shipping_min    !== undefined && data.settings.free_shipping_min    !== null) FREE_SHIP_THRESHOLD = parseInt(data.settings.free_shipping_min,    10);
+      if (data.settings.flat_shipping_charge !== undefined && data.settings.flat_shipping_charge !== null) FLAT_SHIP_CHARGE    = parseInt(data.settings.flat_shipping_charge, 10);
       if (data.settings.whatsapp_number)      WHATSAPP_NUMBER     = data.settings.whatsapp_number;
       updateShipAmountDisplays();
     }
