@@ -1749,6 +1749,7 @@ async function loadData() {
       if (data.settings.flat_shipping_charge !== undefined && data.settings.flat_shipping_charge !== null) FLAT_SHIP_CHARGE    = parseInt(data.settings.flat_shipping_charge, 10);
       if (data.settings.whatsapp_number)      WHATSAPP_NUMBER     = data.settings.whatsapp_number;
       updateShipAmountDisplays();
+      uCart(); // Recalculate cart total with correct shipping settings from DB
     }
     var updated  = false;
 
