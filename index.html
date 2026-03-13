@@ -1699,10 +1699,9 @@ function getStoreApiBase() {
 
 // ── DATA LOADING ───────────────────────────────────────────────────
 async function loadData() {
-  // Step 1: render fallback instantly
+  // Step 1: render states fallback only — skip fake products to avoid price flash
   STATES   = FALLBACK_STATES.map(s => Object.assign({}, s));
-  PRODUCTS = FALLBACK_PRODUCTS.map(p => Object.assign({}, p));
-  renderProds(); renderStates(); uCart(); observeRv();
+  renderStates(); uCart(); observeRv();
   initAllStateSlides(); initProductHoverImages();
   // Open cart instantly if redirected from product page
   if (window.location.search.includes('opencart=1')) {
@@ -2469,6 +2468,14 @@ function showNewAddressForm() {
 function closeCart() {
   var cp = document.getElementById('cartPage');
   if (cp) { cp.classList.remove('open'); document.body.style.overflow = ''; }
+  // Restore hero/main visibility (hidden when page loaded with ?opencart=1)
+  document.querySelectorAll('.hero,.pgrid,.section,.trust,.ticker,.ann').forEach(function(el){
+    el.style.visibility = '';
+  });
+  // Clean URL
+  if (window.location.search.includes('opencart=1')) {
+    history.replaceState(null, '', '/');
+  }
 }
 
 
