@@ -1701,8 +1701,25 @@ function getStoreApiBase() {
 async function loadData() {
   // Step 1: render states fallback only — skip fake products to avoid price flash
   STATES   = FALLBACK_STATES.map(s => Object.assign({}, s));
-  renderStates(); uCart(); observeRv();
+  renderStates(); observeRv();
   initAllStateSlides(); initProductHoverImages();
+
+  // Step 1b: Load settings FIRST so shipping is correct before cart renders
+  try {
+    var settingsRes = await fetch('/api/store-data', { signal: AbortSignal.timeout(4000) });
+    if (settingsRes.ok) {
+      var settingsData = await settingsRes.json();
+      if (settingsData.settings) {
+        if (settingsData.settings.free_shipping_min    !== undefined && settingsData.settings.free_shipping_min    !== null) FREE_SHIP_THRESHOLD = parseInt(settingsData.settings.free_shipping_min,    10);
+        if (settingsData.settings.flat_shipping_charge !== undefined && settingsData.settings.flat_shipping_charge !== null) FLAT_SHIP_CHARGE    = parseInt(settingsData.settings.flat_shipping_charge, 10);
+        if (settingsData.settings.whatsapp_number) WHATSAPP_NUMBER = settingsData.settings.whatsapp_number;
+        updateShipAmountDisplays();
+      }
+    }
+  } catch(e) { /* use defaults if settings fail */ }
+
+  uCart(); // Now render cart with correct shipping
+
   // Open cart instantly if redirected from product page
   if (window.location.search.includes('opencart=1')) {
     history.replaceState(null, '', '/');
