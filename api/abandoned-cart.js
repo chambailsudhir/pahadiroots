@@ -63,7 +63,15 @@ async function sendAbandonedCartEmail(email, cartItems, cartTotal, reminderCount
 
   const itemsHtml = cartItems.map(i => `
     <tr>
-      <td style="padding:10px 12px;border-bottom:1px solid #f0e8d4;font-size:14px">${i.emoji || '🌿'} ${i.name}${i.variant ? ' <span style="color:#888;font-size:12px">('+i.variant+')</span>' : ''}</td>
+      <td style="padding:10px 12px;border-bottom:1px solid #f0e8d4;font-size:14px">
+        <div style="display:flex;align-items:center;gap:10px">
+          ${i.image ? `<img src="${i.image}" alt="${i.name}" style="width:48px;height:48px;object-fit:cover;border-radius:8px;border:1px solid #f0e8d4">` : `<span style="font-size:28px">${i.emoji || '🌿'}</span>`}
+          <div>
+            <div style="font-weight:600;color:#1a3a1e">${i.name}</div>
+            ${i.variant ? `<div style="font-size:12px;color:#888">${i.variant}</div>` : ''}
+          </div>
+        </div>
+      </td>
       <td style="padding:10px 12px;border-bottom:1px solid #f0e8d4;text-align:center;color:#666">×${i.qty}</td>
       <td style="padding:10px 12px;border-bottom:1px solid #f0e8d4;text-align:right;font-weight:700;color:#1a3a1e">₹${(i.price * i.qty).toLocaleString('en-IN')}</td>
     </tr>`).join('');
