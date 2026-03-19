@@ -1,6 +1,7 @@
 // ═══════════════════════════════════════════════════════════════
 // Pahadi Roots — Abandoned Cart Recovery API
 // File: api/abandoned-cart.js
+// Reminders: 2hr, 24hr, 48hr
 // ═══════════════════════════════════════════════════════════════
 
 export const config = { api: { bodyParser: { sizeLimit: '1mb' } } };
@@ -9,6 +10,9 @@ const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_KEY;
 const RESEND_KEY   = process.env.RESEND_API_KEY;
 const CRON_SECRET  = process.env.CRON_SECRET;
+
+// Reminder schedule: after how many hours to send each reminder
+const REMINDER_SCHEDULE = [2, 24, 48]; // hours after cart created_at
 
 async function sbFetch(method, table, query = '', body = null) {
   let url = `${SUPABASE_URL}/rest/v1/${table}`;
@@ -28,7 +32,6 @@ async function sbFetch(method, table, query = '', body = null) {
   return text ? JSON.parse(text) : null;
 }
 
-// Get user info from token
 async function getUserFromToken(token) {
   const r = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
     headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${token}` }
@@ -37,7 +40,25 @@ async function getUserFromToken(token) {
   return await r.json();
 }
 
-async function sendAbandonedCartEmail(email, cartItems, cartTotal) {
+function getEmailSubject(reminderCount) {
+  if (reminderCount === 0) return '🏔️ Your Pahadi Roots cart is waiting — complete your order!';
+  if (reminderCount === 1) return '🌿 Still thinking? Your Pahadi Roots cart is saved!';
+  return '⚡ Last reminder — Your Pahadi Roots cart expires soon!';
+}
+
+function getEmailHeadline(reminderCount) {
+  if (reminderCount === 0) return 'Your cart is waiting! 🛒';
+  if (reminderCount === 1) return 'Still thinking about it? 🤔';
+  return 'Last chance! Don\'t miss out 🏔️';
+}
+
+function getEmailMessage(reminderCount) {
+  if (reminderCount === 0) return 'You left some pure Himalayan goodness behind. Your cart has been saved — complete your order before items sell out!';
+  if (reminderCount === 1) return 'Your Himalayan treasures are still waiting for you. Many of our products are limited stock — grab yours before they\'re gone!';
+  return 'This is your final reminder. Complete your order today and bring the pure taste of the Himalayas home!';
+}
+
+async function sendAbandonedCartEmail(email, cartItems, cartTotal, reminderCount) {
   if (!RESEND_KEY || !email) return;
 
   const itemsHtml = cartItems.map(i => `
@@ -46,6 +67,12 @@ async function sendAbandonedCartEmail(email, cartItems, cartTotal) {
       <td style="padding:10px 12px;border-bottom:1px solid #f0e8d4;text-align:center;color:#666">×${i.qty}</td>
       <td style="padding:10px 12px;border-bottom:1px solid #f0e8d4;text-align:right;font-weight:700;color:#1a3a1e">₹${(i.price * i.qty).toLocaleString('en-IN')}</td>
     </tr>`).join('');
+
+  const urgencyBanner = reminderCount === 2
+    ? `<div style="background:#e53;color:#fff;text-align:center;padding:10px;font-weight:800;font-size:13px;letter-spacing:.5px">⚠️ FINAL REMINDER — LIMITED STOCK!</div>`
+    : reminderCount === 1
+    ? `<div style="background:#e8b84b;color:#1a3a1e;text-align:center;padding:10px;font-weight:800;font-size:13px;letter-spacing:.5px">⏰ Items selling fast — don't wait!</div>`
+    : '';
 
   const html = `<!DOCTYPE html>
 <html>
@@ -60,14 +87,14 @@ async function sendAbandonedCartEmail(email, cartItems, cartTotal) {
     <div style="font-size:11px;color:rgba(255,255,255,.6);letter-spacing:2px;margin-top:4px">HIMALAYAN ORGANIC STORE</div>
   </div>
 
+  ${urgencyBanner}
+
   <!-- Body -->
   <div style="background:#fff;padding:36px;border-radius:0 0 16px 16px;box-shadow:0 4px 24px rgba(0,0,0,.08)">
-    <h2 style="font-family:Georgia,serif;color:#1a3a1e;margin:0 0 12px;font-size:22px">Your cart is waiting! 🛒</h2>
-    <p style="color:#555;font-size:14px;line-height:1.7;margin:0 0 28px">
-      You left some pure Himalayan goodness behind. Your cart has been saved — complete your order before items sell out!
-    </p>
+    <h2 style="font-family:Georgia,serif;color:#1a3a1e;margin:0 0 12px;font-size:22px">${getEmailHeadline(reminderCount)}</h2>
+    <p style="color:#555;font-size:14px;line-height:1.7;margin:0 0 28px">${getEmailMessage(reminderCount)}</p>
 
-    <!-- Cart Items Table -->
+    <!-- Cart Items -->
     <div style="background:#fdf8f0;border-radius:12px;overflow:hidden;margin-bottom:28px;border:1px solid #f0e8d4">
       <table style="width:100%;border-collapse:collapse">
         <thead>
@@ -124,7 +151,7 @@ async function sendAbandonedCartEmail(email, cartItems, cartTotal) {
     body: JSON.stringify({
       from: 'Pahadi Roots <noreply@pahadiroots.com>',
       to: [email],
-      subject: '🏔️ Your Pahadi Roots cart is waiting — complete your order!',
+      subject: getEmailSubject(reminderCount),
       html,
     }),
   });
@@ -141,7 +168,6 @@ export default async function handler(req, res) {
   const { action } = body;
 
   // ── ACTION: save ─────────────────────────────────────────────
-  // Called from frontend whenever cart changes (user is logged in)
   if (action === 'save') {
     const { token, cart_items, cart_total } = body;
     if (!token || !cart_items?.length) return res.status(200).json({ ok: true });
@@ -150,7 +176,6 @@ export default async function handler(req, res) {
       const user = await getUserFromToken(token);
       if (!user?.email) return res.status(200).json({ ok: true });
 
-      // Upsert — one record per auth_user_id (update if exists)
       const existing = await sbFetch('GET', 'abandoned_carts',
         `auth_user_id=eq.${user.id}&converted=eq.false&select=id`);
 
@@ -158,11 +183,12 @@ export default async function handler(req, res) {
         await sbFetch('PATCH', 'abandoned_carts', `id=eq.${existing[0].id}`, {
           cart_items,
           cart_total,
-          reminder_sent: false, // Reset so they get reminded again if they re-abandon
+          reminder_count: 0,
+          reminder_sent: false,
+          last_reminder_at: null,
           updated_at: new Date().toISOString(),
         });
       } else {
-        // Get customer profile for phone
         const customers = await sbFetch('GET', 'customers',
           `auth_user_id=eq.${user.id}&select=id,phone`);
         const customer = customers?.[0];
@@ -174,17 +200,17 @@ export default async function handler(req, res) {
           phone: customer?.phone || null,
           cart_items,
           cart_total,
+          reminder_count: 0,
         });
       }
       return res.status(200).json({ ok: true });
     } catch(e) {
-      console.error('Save abandoned cart error:', e.message);
-      return res.status(200).json({ ok: true }); // Never fail silently on frontend
+      console.error('Save error:', e.message);
+      return res.status(200).json({ ok: true });
     }
   }
 
   // ── ACTION: converted ─────────────────────────────────────────
-  // Called when order is successfully placed
   if (action === 'converted') {
     const { token } = body;
     if (!token) return res.status(200).json({ ok: true });
@@ -204,7 +230,7 @@ export default async function handler(req, res) {
     }
   }
 
-  // ── ACTION: cron (called by GitHub Actions) ───────────────────
+  // ── ACTION: cron ──────────────────────────────────────────────
   if (action === 'cron') {
     const secret = req.headers['x-cron-secret'] || body.secret;
     if (!CRON_SECRET || secret !== CRON_SECRET) {
@@ -212,27 +238,50 @@ export default async function handler(req, res) {
     }
 
     try {
-      const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString();
-      const carts = await sbFetch('GET', 'abandoned_carts',
-        `reminder_sent=eq.false&converted=eq.false&created_at=lt.${twoHoursAgo}&email=not.is.null&select=*`);
+      const now = new Date();
+      let totalSent = 0;
+      let totalProcessed = 0;
 
-      if (!carts?.length) return res.status(200).json({ processed: 0 });
+      // Process each reminder in the schedule
+      for (let i = 0; i < REMINDER_SCHEDULE.length; i++) {
+        const hoursNeeded = REMINDER_SCHEDULE[i];
+        const triggerTime = new Date(now - hoursNeeded * 60 * 60 * 1000).toISOString();
 
-      let sent = 0;
-      for (const cart of carts) {
-        try {
-          await sendAbandonedCartEmail(cart.email, cart.cart_items, cart.cart_total);
-          await sbFetch('PATCH', 'abandoned_carts', `id=eq.${cart.id}`, {
-            reminder_sent: true,
-            reminder_sent_at: new Date().toISOString(),
-          });
-          sent++;
-        } catch(e) {
-          console.warn(`Cart ${cart.id} email failed:`, e.message);
+        // For reminder i+1, cart must be older than hoursNeeded
+        // AND reminder_count must equal i (means previous reminders done)
+        // AND not converted
+        // AND last_reminder_at is null OR was sent before the previous schedule window
+        const carts = await sbFetch('GET', 'abandoned_carts',
+          `converted=eq.false&reminder_count=eq.${i}&created_at=lt.${triggerTime}&email=not.is.null&select=*`
+        );
+
+        if (!carts?.length) continue;
+
+        totalProcessed += carts.length;
+
+        for (const cart of carts) {
+          try {
+            await sendAbandonedCartEmail(cart.email, cart.cart_items, cart.cart_total, i);
+            await sbFetch('PATCH', 'abandoned_carts', `id=eq.${cart.id}`, {
+              reminder_count: i + 1,
+              reminder_sent: true,
+              reminder_sent_at: now.toISOString(),
+              last_reminder_at: now.toISOString(),
+            });
+            totalSent++;
+          } catch(e) {
+            console.warn(`Cart ${cart.id} reminder ${i+1} failed:`, e.message);
+          }
         }
       }
-      return res.status(200).json({ processed: carts.length, sent });
+
+      return res.status(200).json({
+        processed: totalProcessed,
+        sent: totalSent,
+        message: `Sent ${totalSent} reminders`
+      });
     } catch(e) {
+      console.error('Cron error:', e);
       return res.status(500).json({ error: e.message });
     }
   }
