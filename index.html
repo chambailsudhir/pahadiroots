@@ -4444,3 +4444,23 @@ document.addEventListener('DOMContentLoaded', function() {
   if (waBtn) waBtn.href = 'https://wa.me/' + WHATSAPP_NUMBER;
   // One-time wishlist hint
   if (!localStorage.getItem('pr_wl_hint_shown'
+  ));
+  if (!localStorage.getItem('pr_wl_hint_shown')) {
+    localStorage.setItem('pr_wl_hint_shown', '1');
+    setTimeout(function() { showToast('❤️ Tap the heart to save favourites!'); }, 3000);
+  }
+});
+</script>
+</body>
+</html>
+```
+
+4. Commit
+
+**Aur `sv()` fix ke liye** same editor mein `Ctrl+F` → search:
+```
+image:i.image||''
+```
+Replace:
+```
+image:(function(){ var prod = PRODUCTS.find(function(p){ return p.id === i.id; }); return (prod && prod.image_url) ? prod.image_url : (i.image || ''); })()
