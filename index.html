@@ -1502,7 +1502,7 @@ const sv = () => {
     var usr = JSON.parse(localStorage.getItem('pr_auth_user') || 'null');
     if (tok && usr && cart.length > 0) {
       var total = cart.reduce(function(s,i){ return s + (i.price||0)*(i.qty||1); }, 0);
-      var cartData = cart.map(function(i){ return { id:i.id, name:i.name, price:i.price, qty:i.qty||1, emoji:i.emoji||'🌿', variant:i.variant||'' }; });
+      var cartData = cart.map(function(i){ return { id:i.id, name:i.name, price:i.price, qty:i.qty||1, emoji:i.emoji||'🌿', variant:i.variant||'', image:i.image||'' }; });
       fetch('/api/abandoned-cart', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
