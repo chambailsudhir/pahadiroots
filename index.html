@@ -1245,7 +1245,7 @@ footer{background:#0b160d url("data:image/svg+xml,%3Csvg viewBox='0 0 1440 480' 
       </div>
       <div class="f-contact-item">
         <span class="f-contact-icon">📧</span>
-        <div class="f-contact-text"><a href="mailto:support@pahadiroots.com">support@pahadiroots.com</a></div>
+        <div class="f-contact-text"><a href="/cdn-cgi/l/email-protection#5f2c2a2f2f302d2b1f2f3e373e3b362d30302b2c713c3032"><span class="__cf_email__" data-cfemail="14676164647b66605464757c75707d667b7b60673a777b79">[email&#160;protected]</span></a></div>
       </div>
       <div class="f-contact-item">
         <span class="f-contact-icon">📞</span>
@@ -1415,7 +1415,7 @@ footer{background:#0b160d url("data:image/svg+xml,%3Csvg viewBox='0 0 1440 480' 
 </div>
 <!-- invisible overlay compat (kept for wishlist etc) -->
 <div class="cov" id="cov" onclick="closeCart()" style="display:none"></div>
-<div class="toast" id="toast"></div><script>
+<div class="toast" id="toast"></div><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 // ═══════════════════════════════════════════════════════════════════════
 // PAHADI ROOTS — COMPLETE STORE JAVASCRIPT
 // All data defined first, then functions, then boot
@@ -1502,7 +1502,11 @@ const sv = () => {
     var usr = JSON.parse(localStorage.getItem('pr_auth_user') || 'null');
     if (tok && usr && cart.length > 0) {
       var total = cart.reduce(function(s,i){ return s + (i.price||0)*(i.qty||1); }, 0);
-      var cartData = cart.map(function(i){ return { id:i.id, name:i.name, price:i.price, qty:i.qty||1, emoji:i.emoji||'🌿', variant:i.variant||'', image:i.image||'' }; });
+      var cartData = cart.map(function(i){
+        var prod = PRODUCTS.find(function(p){ return p.id === i.id; });
+        var freshImage = (prod && prod.image_url) ? prod.image_url : (i.image || '');
+        return { id:i.id, name:i.name, price:i.price, qty:i.qty||1, emoji:i.emoji||'🌿', variant:i.variant||'', image:freshImage };
+      });
       fetch('/api/abandoned-cart', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -4439,15 +4443,4 @@ document.addEventListener('DOMContentLoaded', function() {
   var waBtn = document.getElementById('waFloatBtn');
   if (waBtn) waBtn.href = 'https://wa.me/' + WHATSAPP_NUMBER;
   // One-time wishlist hint
-  if (!localStorage.getItem('pr_wl_hint_shown')) {
-    setTimeout(function() {
-      showToast('❤️ Kisi bhi product pe heart tap karke Wishlist mein save karo!');
-      localStorage.setItem('pr_wl_hint_shown', '1');
-    }, 4000);
-  }
-});
-</script>
-
-<!-- sticky-atc removed -->
-</body>
-</html>
+  if (!localStorage.getItem('pr_wl_hint_shown'
