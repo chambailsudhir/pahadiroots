@@ -225,7 +225,7 @@ function initHeroSlideshow(productImageUrls) {
   _heroSlideUrls = urls;
   // Build slides
   container.innerHTML = urls.map(function(url, i) {
-    return '<img class="hero-slide-img' + (i===0?' active':'') + '" src="' + url + '" loading="' + (i===0?'eager':'lazy') + '" onerror="this.style.display='none'">';
+    return '<img class="hero-slide-img' + (i===0?' active':'') + '" src="' + url + '" loading="' + (i===0?'eager':'lazy') + '" onerror="this.style.opacity=0">';
   }).join('');
   if (urls.length > 1) {
     if (_heroSlideTimer) clearInterval(_heroSlideTimer);
