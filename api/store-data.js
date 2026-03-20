@@ -41,7 +41,7 @@ export default async function handler(req, res) {
 
   try {
     // Fetch states, products, site_settings, and image tables in parallel
-    const [states, products, siteSettings, coupons, stateImages, productImages, founderImages, productVariants] = await Promise.all([
+    const [states, products, siteSettings, coupons, stateImages, productImages, founderImages, productVariants, teamMembers] = await Promise.all([
       sbGet('states', 'is_active=eq.true&order=name.asc').catch(() => []),
       sbGet('products', 'status=eq.active&is_deleted=eq.false&order=name.asc').catch(() => []),
       sbGet('site_settings', 'select=key,value').catch(() => []),
@@ -50,6 +50,7 @@ export default async function handler(req, res) {
       sbGet('product_images', 'order=product_id.asc,sort_order.asc').catch(() => []),
       sbGet('founder_images', 'order=sort_order.asc').catch(() => []),
       sbGet('product_variants', 'is_active=eq.true&order=product_id.asc,sort_order.asc').catch(() => []),
+      sbGet('team_members', 'is_active=eq.true&order=sort_order.asc').catch(() => []),
     ]);
 
     // Convert site_settings array to object
@@ -65,6 +66,7 @@ export default async function handler(req, res) {
       product_images:   productImages  || [],
       founder_images:   founderImages  || [],
       product_variants: productVariants || [],
+      team_members:     teamMembers    || [],
     });
 
   } catch (e) {
