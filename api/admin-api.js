@@ -32,6 +32,7 @@ const ALLOWED_TABLES = new Set([
 
 const WRITE_METHODS = new Set(['POST', 'PATCH', 'DELETE']);
 
+// ── General rate limit — all requests (200 per 30s per IP) ──
 const rateLimitMap = new Map();
 const RATE_LIMIT   = 200;
 const RATE_WINDOW  = 30000;
@@ -44,6 +45,36 @@ function isRateLimited(ip) {
   entry.count++;
   rateLimitMap.set(ip, entry);
   return false;
+}
+
+// ── Login brute-force protection — 10 failed attempts → 15-min lockout ──
+const loginFailMap  = new Map();
+const MAX_FAILURES  = 10;
+const LOCKOUT_MS    = 15 * 60 * 1000; // 15 minutes
+
+function isLoginLocked(ip) {
+  const entry = loginFailMap.get(ip);
+  if (!entry) return false;
+  if (entry.lockedUntil && Date.now() < entry.lockedUntil) return true;
+  if (entry.lockedUntil && Date.now() >= entry.lockedUntil) {
+    loginFailMap.delete(ip); // lockout window expired — fully reset
+  }
+  return false;
+}
+
+function recordLoginFailure(ip) {
+  const now   = Date.now();
+  const entry = loginFailMap.get(ip) || { failures: 0, lockedUntil: 0 };
+  entry.failures++;
+  if (entry.failures >= MAX_FAILURES) {
+    entry.lockedUntil = now + LOCKOUT_MS;
+    entry.failures    = 0; // reset counter after locking
+  }
+  loginFailMap.set(ip, entry);
+}
+
+function clearLoginFailures(ip) {
+  loginFailMap.delete(ip);
 }
 
 async function sbFetch(method, table, query = '', body = null) {
@@ -82,9 +113,12 @@ async function logAdminAction(table, method, recordId = null) {
 // ═══════════════════════════════════════════════════════════════
 export default async function handler(req, res) {
 
+  const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || 'https://pahadiroots.com';
+
   // ── CORS headers helper ──
   function setCORS() {
-    res.setHeader('Access-Control-Allow-Origin',  '*');
+    res.setHeader('Access-Control-Allow-Origin',  ALLOWED_ORIGIN);
+    res.setHeader('Vary',                         'Origin');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, x-admin-password');
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
     res.setHeader('Content-Type',                 'application/json');
@@ -121,8 +155,19 @@ export default async function handler(req, res) {
 
   const pw = req.headers['x-admin-password'] || '';
   const isPublicAction = reqBody.action === 'save_order' || reqBody.action === 'public_get_order';
-  if (!isPublicAction && (!pw || pw.length !== ADMIN_PW.length || pw !== ADMIN_PW)) {
-    return err(401, 'Unauthorized');
+
+  if (!isPublicAction) {
+    // Check login lockout first
+    if (isLoginLocked(ip)) {
+      return err(429, 'Too many failed attempts — try again in 15 minutes');
+    }
+    // Validate password
+    if (!pw || pw.length !== ADMIN_PW.length || pw !== ADMIN_PW) {
+      recordLoginFailure(ip);
+      return err(401, 'Unauthorized');
+    }
+    // Correct password — clear any failure history
+    clearLoginFailures(ip);
   }
 
   const { method, table, query, body } = reqBody;
