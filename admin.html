@@ -1715,48 +1715,29 @@ async function loadTeam() {
 
 function openTeamM(m) {
   m = m || {};
-  const html = `
-    <div class="m-ov" id="team-modal" onclick="if(event.target===this)closeTeamM()">
-      <div class="m-box" style="max-width:480px">
-        <div class="m-hd">
-          <h3>${esc(m.name||'Team Member')}</h3>
-          <button class="m-cls" onclick="closeTeamM()">✕</button>
-        </div>
-        <div style="padding:20px">
-          <input type="hidden" id="tm-id" value="${m.id||''}">
-          <div style="margin-bottom:14px">
-            <label class="lbl">Name</label>
-            <input class="inp" id="tm-name" value="${esc(m.name||'')}" placeholder="Full name">
-          </div>
-          <div style="margin-bottom:14px">
-            <label class="lbl">Role</label>
-            <input class="inp" id="tm-role" value="${esc(m.role||'')}" placeholder="e.g. Co-Founder, Operations">
-          </div>
-          <div style="margin-bottom:14px">
-            <label class="lbl">Short Bio (optional)</label>
-            <textarea class="inp" id="tm-bio" rows="3" placeholder="2-3 lines about this person">${esc(m.bio||'')}</textarea>
-          </div>
-          <div style="margin-bottom:14px">
-            <label class="lbl">Photo</label>
-            ${m.image_url ? `<div style="margin-bottom:8px"><img src="${m.image_url}" style="height:80px;width:80px;object-fit:cover;border-radius:8px;object-position:top"></div>` : ''}
-            <input type="file" id="tm-file" accept="image/*" class="fi" onchange="previewTeamPhoto(this)">
-            <div id="tm-photo-preview" style="margin-top:8px"></div>
-            <div id="tm-upload-status" style="font-size:12px;color:var(--tx3);margin-top:6px"></div>
-          </div>
-          <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:20px">
-            <button class="btn btn-s" onclick="closeTeamM()">Cancel</button>
-            <button class="btn btn-p" onclick="saveTeamMember()">💾 Save</button>
-          </div>
-          <div id="tm-save-status" style="font-size:12px;color:var(--tx3);margin-top:8px;text-align:center"></div>
-        </div>
-      </div>
-    </div>`;
-  document.body.insertAdjacentHTML('beforeend', html);
+  document.getElementById('team-m-title').textContent = esc(m.name || 'Team Member');
+  document.getElementById('tm-id').value = m.id || '';
+  document.getElementById('tm-name').value = m.name || '';
+  document.getElementById('tm-role').value = m.role || '';
+  document.getElementById('tm-bio').value = m.bio || '';
+  document.getElementById('tm-file').value = '';
+  document.getElementById('tm-photo-preview').innerHTML = '';
+  document.getElementById('tm-upload-status').textContent = '';
+  document.getElementById('tm-save-status').textContent = '';
+  // Show current photo
+  const curPhoto = document.getElementById('tm-current-photo');
+  curPhoto.innerHTML = m.image_url
+    ? `<img src="${m.image_url}" style="height:100px;width:100px;object-fit:cover;object-position:top;border-radius:8px;border:2px solid var(--bd)">`
+    : '<div style="color:var(--tx3);font-size:12px">No photo yet</div>';
+  openM('team-modal');
 }
 
 function closeTeamM() {
-  const modal = document.getElementById('team-modal');
-  if (modal) modal.remove();
+  closeM('team-modal');
+  document.getElementById('tm-file').value = '';
+  document.getElementById('tm-photo-preview').innerHTML = '';
+  document.getElementById('tm-upload-status').textContent = '';
+  document.getElementById('tm-save-status').textContent = '';
 }
 
 function previewTeamPhoto(input) {
@@ -1770,38 +1751,50 @@ function previewTeamPhoto(input) {
   }
 }
 
+async function uploadTeamPhoto() {
+  const id = document.getElementById('tm-id').value;
+  const fileInput = document.getElementById('tm-file');
+  const uploadEl = document.getElementById('tm-upload-status');
+  if (!fileInput.files || !fileInput.files[0]) { toast('Please select a photo first', 'er'); return; }
+  const btn = document.querySelector('[onclick="uploadTeamPhoto()"]');
+  if (btn) { btn.disabled = true; btn.textContent = 'Uploading…'; }
+  uploadEl.textContent = 'Uploading photo…';
+  try {
+    const url = await uploadToStorage(fileInput.files[0], `team/member-${id}-${Date.now()}`);
+    await PATCH('team_members', `id=eq.${id}`, { image_url: url });
+    uploadEl.textContent = '✓ Photo uploaded & saved';
+    uploadEl.style.color = 'var(--grn)';
+    // Update current photo display
+    document.getElementById('tm-current-photo').innerHTML = `<img src="${url}" style="height:100px;width:100px;object-fit:cover;object-position:top;border-radius:8px;border:2px solid var(--bd)">`;
+    document.getElementById('tm-file').value = '';
+    document.getElementById('tm-photo-preview').innerHTML = '';
+    toast('Photo uploaded ✓', 'ok');
+    await loadTeam();
+  } catch(e) {
+    uploadEl.textContent = 'Upload failed: ' + e.message;
+    uploadEl.style.color = 'var(--red)';
+    toast('Upload failed: ' + e.message, 'er');
+  }
+  if (btn) { btn.disabled = false; btn.textContent = '📤 Upload Photo'; }
+}
+
 async function saveTeamMember() {
   const id = document.getElementById('tm-id').value;
   const name = document.getElementById('tm-name').value.trim();
   const role = document.getElementById('tm-role').value.trim();
   const bio = document.getElementById('tm-bio').value.trim();
-  const fileInput = document.getElementById('tm-file');
   const statusEl = document.getElementById('tm-save-status');
-  const uploadEl = document.getElementById('tm-upload-status');
   if (!name) { toast('Name required', 'er'); return; }
   statusEl.textContent = 'Saving…';
-  let imageUrl = null;
-  if (fileInput.files && fileInput.files[0]) {
-    uploadEl.textContent = 'Uploading photo…';
-    try {
-      const url = await uploadToStorage(fileInput.files[0], `team/member-${id}-${Date.now()}`);
-      imageUrl = url;
-      uploadEl.textContent = '✓ Photo uploaded';
-    } catch(e) {
-      uploadEl.textContent = 'Upload failed: ' + e.message;
-      statusEl.textContent = '';
-      return;
-    }
-  }
   try {
-    const body = { name, role, bio };
-    if (imageUrl) body.image_url = imageUrl;
-    await PATCH('team_members', `id=eq.${id}`, body);
+    await PATCH('team_members', `id=eq.${id}`, { name, role, bio });
     toast('Team member updated ✓', 'ok');
-    closeTeamM();
+    statusEl.textContent = '✓ Saved';
+    statusEl.style.color = 'var(--grn)';
     await loadTeam();
   } catch(e) {
     statusEl.textContent = 'Save failed: ' + e.message;
+    statusEl.style.color = 'var(--red)';
   }
 }
 
@@ -2177,6 +2170,54 @@ async function uploadProdImage() {
 
 
 </script>
+
+<!-- TEAM MEMBER MODAL -->
+<div class="ov" id="team-modal" style="z-index:10000">
+  <div class="modal" style="max-width:500px">
+    <div class="m-hdr">
+      <h3 id="team-m-title">Edit Team Member</h3>
+      <button class="m-cls" onclick="closeTeamM()">✕</button>
+    </div>
+    <div style="padding:20px;display:flex;flex-direction:column;gap:14px">
+      <input type="hidden" id="tm-id">
+
+      <!-- INFO SECTION -->
+      <div class="fg" style="margin:0">
+        <label class="lbl">Name *</label>
+        <input class="fi" id="tm-name" placeholder="Full name">
+      </div>
+      <div class="fg" style="margin:0">
+        <label class="lbl">Role</label>
+        <input class="fi" id="tm-role" placeholder="e.g. Co-Founder, Operations">
+      </div>
+      <div class="fg" style="margin:0">
+        <label class="lbl">Short Bio (optional)</label>
+        <textarea class="fi" id="tm-bio" rows="3" placeholder="2-3 lines about this person"></textarea>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div></div>
+        <button class="btn btn-p btn-sm" onclick="saveTeamMember()">💾 Save Info</button>
+      </div>
+      <div id="tm-save-status" style="font-size:12px;min-height:16px"></div>
+
+      <hr style="border:none;border-top:1px solid var(--bd);margin:0">
+
+      <!-- PHOTO SECTION -->
+      <div>
+        <div style="font-size:11px;font-weight:700;color:var(--tx3);letter-spacing:.5px;margin-bottom:8px">PHOTO</div>
+        <div id="tm-current-photo" style="margin-bottom:10px"></div>
+        <div style="background:var(--bg3);border:1px dashed var(--bd);border-radius:8px;padding:12px">
+          <div style="font-size:11px;font-weight:700;color:var(--tx2);margin-bottom:8px">📷 UPLOAD PHOTO</div>
+          <div id="tm-photo-preview" style="margin-bottom:8px"></div>
+          <input type="file" id="tm-file" accept="image/*" class="fi" onchange="previewTeamPhoto(this)" style="margin-bottom:8px">
+          <button class="btn btn-g" onclick="uploadTeamPhoto()" style="width:100%;justify-content:center">📤 Upload Photo</button>
+          <div id="tm-upload-status" style="font-size:12px;color:var(--tx3);margin-top:6px"></div>
+        </div>
+      </div>
+    </div>
+    <div class="m-foot"><button class="btn btn-s" onclick="closeTeamM()">Close</button></div>
+  </div>
+</div>
 
 <!-- STATE MODAL -->
 <div class="ov" id="state-modal" style="z-index:10000">
