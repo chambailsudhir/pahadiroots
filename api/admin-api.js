@@ -27,7 +27,7 @@ const ALLOWED_TABLES = new Set([
   'admin_logs', 'order_detailed', 'order_summary', 'site_settings',
   'revenue_summary', 'states', 'sales_summary', 'stock_overview', 'daily_revenue',
   'state_images', 'product_images', 'founder_images',
-  'product_variants',
+  'product_variants', 'team_members',
 ]);
 
 const WRITE_METHODS = new Set(['POST', 'PATCH', 'DELETE']);
@@ -225,8 +225,10 @@ export default async function handler(req, res) {
         }
       }
 
-      // 5. Stock deduction — for ALL orders (Razorpay + COD)
-      // App-code handles this — no DB trigger dependency
+      // 5. Stock deduction — for ALL orders (both Razorpay and COD)
+      // We handle this in app-code for reliability — DO NOT rely on DB triggers
+      // For COD: deduct immediately on order placement (stock is reserved)
+      // Admin can manually restore stock if COD is cancelled/rejected
       if (items && items.length) {
         for (const item of items) {
           try {
@@ -237,6 +239,7 @@ export default async function handler(req, res) {
               const deduct   = item.qty || 1;
               const newStock = Math.max(0, (prod.stock_quantity || 0) - deduct);
               await sbFetch('PATCH', 'products', `id=eq.${prod.id}`, { stock_quantity: newStock });
+              // Log inventory change
               await sbFetch('POST', 'inventory_logs', '', {
                 product_id: prod.id,
                 change: -deduct,
