@@ -387,8 +387,6 @@ async function loadData() {
       // No re-render needed — variants shown on product detail page
     }
 
-    // ── Founder slideshow ──
-    loadFIFromData(data);
 
   } catch(e) {
     
@@ -1781,100 +1779,6 @@ function observeRv() {
   }
 }
 
-// ── FOUNDER SLIDESHOW ──────────────────────────────────────────────
-var _founderSlides = [];
-var _founderIdx = 0;
-var _founderTimer = null;
-
-function loadFI() {
-  // Called on initial page load before main data arrives — does its own fetch
-  fetch(getStoreApiBase() + '/store-data')
-  .then(function(r){ return r.json(); })
-  .then(function(data){ loadFIFromData(data); })
-  .catch(function(){});
-}
-
-function loadFIFromData(data) {
-  // Called by loadData() with already-fetched data — no extra network call
-  try {
-    var urls = [];
-    if (Array.isArray(data.founder_images) && data.founder_images.length) {
-      urls = data.founder_images
-        .slice().sort(function(a,b){ return (a.sort_order||0)-(b.sort_order||0); })
-        .map(function(r){ return r.image_url; }).filter(Boolean);
-    }
-    // Fallback: site_settings
-    if (!urls.length && data.settings) {
-      if (data.settings.founder_image_url) urls.push(data.settings.founder_image_url);
-      for (var i = 2; i <= 10; i++) {
-        var k = 'founder_image_url_' + i;
-        if (data.settings[k]) urls.push(data.settings[k]);
-      }
-    }
-    if (urls.length) initFounderSlideshow(urls);
-  } catch(e) {}
-}
-
-function initFounderSlideshow(urls) {
-  if (!urls || !urls.length) return;
-  _founderSlides = urls;
-  var ss = document.getElementById('founderSlideshow');
-  var dots = document.getElementById('founderDots');
-  if (!ss) return;
-
-  // Get the existing text panel (always keep it)
-  var textPanel = ss.querySelector('.founder-text-panel');
-  var textPanelHTML = textPanel ? textPanel.outerHTML : '';
-
-  // Rebuild: one slide per URL, each slide = text panel + photo panel
-  ss.innerHTML = '';
-  urls.forEach(function(url, i) {
-    var slide = document.createElement('div');
-    slide.className = 'founder-slide' + (i === 0 ? ' active' : '');
-    slide.id = 'founderSlide' + i;
-    slide.innerHTML =
-      textPanelHTML +
-      '<div class="founder-photo-panel">' +
-        '<img src="' + url + '" alt="Sudhir Chambail" loading="' + (i===0?'eager':'lazy') + '" onerror="this.style.display=\'none\'">' +
-        '<div class="fp-fallback">🏔️</div>' +
-        '<div class="founder-since-badge">🏔️ SINCE 2019</div>' +
-      '</div>';
-    ss.appendChild(slide);
-  });
-
-  // Dots
-  if (dots) {
-    dots.innerHTML = '';
-    if (urls.length > 1) {
-      urls.forEach(function(_, i) {
-        var d = document.createElement('span');
-        d.className = 'founder-dot' + (i===0?' active':'');
-        d.onclick = (function(idx){ return function(){ goFounderSlide(idx); }; })(i);
-        dots.appendChild(d);
-      });
-    }
-  }
-
-  if (urls.length > 1) startFounderSlideshow();
-}
-
-function goFounderSlide(idx) {
-  var slides = document.querySelectorAll('.founder-slide');
-  var dots = document.querySelectorAll('.founder-dot');
-  slides.forEach(function(s){ s.classList.remove('active'); });
-  dots.forEach(function(d){ d.classList.remove('active'); });
-  if (slides[idx]) slides[idx].classList.add('active');
-  if (dots[idx]) dots[idx].classList.add('active');
-  _founderIdx = idx;
-}
-
-function startFounderSlideshow() {
-  if (_founderTimer) clearInterval(_founderTimer);
-  _founderTimer = setInterval(function() {
-    var next = (_founderIdx + 1) % _founderSlides.length;
-    goFounderSlide(next);
-  }, 3000);
-}
 
 function injectProductSchema() {
   if (!PRODUCTS.length) return;
