@@ -2,41 +2,83 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
 
+  <!-- ═══════════════════════════════════════════════════════════════
+       PAHADI ROOTS — SITEMAP
+       Static pages listed here.
+       Product URLs use slug-based routing: /products/{slug}
+       Add each product slug below when you add products in admin.
+       ═══════════════════════════════════════════════════════════════ -->
+
   <!-- Homepage -->
   <url>
     <loc>https://pahadiroots.com/</loc>
-    <lastmod>2026-03-01</lastmod>
+    <lastmod>2026-03-20</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
 
-  <!-- State / Region pages (anchor links) -->
+  <!-- Static pages -->
   <url>
-    <loc>https://pahadiroots.com/#states</loc>
-    <lastmod>2026-03-01</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-  </url>
-
-  <url>
-    <loc>https://pahadiroots.com/#products</loc>
-    <lastmod>2026-03-01</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-
-  <url>
-    <loc>https://pahadiroots.com/#story</loc>
-    <lastmod>2026-03-01</lastmod>
+    <loc>https://pahadiroots.com/our-story</loc>
+    <lastmod>2026-03-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://pahadiroots.com/#contact</loc>
-    <lastmod>2026-03-01</lastmod>
+    <loc>https://pahadiroots.com/terms</loc>
+    <lastmod>2026-03-20</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.5</priority>
+  </url>
+
+  <!-- ─────────────────────────────────────────────────────────────
+       PRODUCT PAGES
+       Pattern: https://pahadiroots.com/products/{slug}
+       Add a <url> block for every product you publish.
+       Slug must match the "slug" field in your admin / database.
+       ───────────────────────────────────────────────────────────── -->
+
+  <url>
+    <loc>https://pahadiroots.com/products/himalayan-wild-honey</loc>
+    <lastmod>2026-03-20</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <url>
+    <loc>https://pahadiroots.com/products/bilona-a2-cow-ghee</loc>
+    <lastmod>2026-03-20</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <url>
+    <loc>https://pahadiroots.com/products/kashmir-mongra-saffron</loc>
+    <lastmod>2026-03-20</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <url>
+    <loc>https://pahadiroots.com/products/ladakh-apricot-kernel-oil</loc>
+    <lastmod>2026-03-20</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://pahadiroots.com/products/sikkim-organic-cardamom</loc>
+    <lastmod>2026-03-20</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://pahadiroots.com/products/assam-first-flush-black-tea</loc>
+    <lastmod>2026-03-20</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
   </url>
 
 </urlset>
