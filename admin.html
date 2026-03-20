@@ -178,6 +178,7 @@ textarea.fi{resize:vertical;min-height:80px}
   <button class="nv" onclick="nav('admin_logs')"><span class="nv-ico">🔒</span>Admin Logs</button>
   <div class="sb-sec">Media</div>
   <button class="nv" onclick="nav('states')"><span class="nv-ico">🗺️</span>States</button>
+  <button class="nv" onclick="nav('team')"><span class="nv-ico">👥</span>Team</button>
   <button class="nv" onclick="nav('media')"><span class="nv-ico">🖼️</span>Media</button>
   <div class="sb-sec">System</div>
   <button class="nv" onclick="nav('db_setup')"><span class="nv-ico">🗄️</span>DB Setup</button>
@@ -397,29 +398,19 @@ textarea.fi{resize:vertical;min-height:80px}
   </div>
 </div>
 
-<!-- MEDIA / FOUNDER IMAGE -->
-<div class="pg" id="pg-media">
-  <div class="ph"><div><h1>🖼️ Media & Site Settings</h1></div></div>
-  <div class="sc" style="max-width:640px">
-    <h4 style="margin-bottom:4px">👤 Founder / Story Section Images</h4>
-    <p style="color:var(--tx3);font-size:13px;margin-bottom:16px">Rotating slideshow in the "Our Story" section on homepage</p>
-    <!-- CURRENT IMAGES IN DB -->
-    <div style="margin-bottom:14px">
-      <div style="font-size:11px;font-weight:700;color:var(--tx3);letter-spacing:.5px;margin-bottom:8px">CURRENT SLIDESHOW <span id="founder-img-count" style="font-weight:400;letter-spacing:0;color:var(--tx3)"></span></div>
-      <div id="founder-previews" style="display:flex;flex-wrap:wrap;gap:8px;min-height:50px;padding:10px;background:var(--bg);border-radius:8px;border:1px solid var(--bd)">
-        <span style="color:var(--tx3);font-size:12px;align-self:center">Loading…</span>
-      </div>
-    </div>
-    <!-- UPLOAD NEW IMAGES -->
-    <div style="background:var(--bg3);border:1px dashed var(--bd);border-radius:10px;padding:14px">
-      <div style="font-size:11px;font-weight:700;color:var(--tx2);letter-spacing:.5px;margin-bottom:8px">➕ ADD MORE IMAGES</div>
-      <div id="founder-pending-previews" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px"></div>
-      <input type="file" id="founder-file" accept="image/*" class="fi" multiple onchange="previewFounders(this)" style="margin-bottom:8px">
-      <div style="font-size:11px;color:var(--tx3);margin-bottom:10px">📸 Select 1 or more images → click Upload. Adds to existing — use × above to remove individual images.</div>
-      <button class="btn btn-g" onclick="uploadFounderImages()" style="width:100%;justify-content:center;padding:9px">📤 Upload & Add to Slideshow</button>
-      <div id="founder-status" style="font-size:12px;color:var(--tx3);margin-top:8px"></div>
-    </div>
+<!-- TEAM MEMBERS -->
+<div class="pg" id="pg-team">
+  <div class="ph">
+    <div><h1>👥 Team Members</h1><p>Manage founder and co-founder profiles shown on the About page</p></div>
   </div>
+  <div id="team-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-top:4px">
+    <div style="text-align:center;color:var(--tx3);padding:40px;grid-column:1/-1">Loading…</div>
+  </div>
+</div>
+
+<!-- MEDIA -->
+<div class="pg" id="pg-media">
+  <div class="ph"><div><h1>🖼️ Media</h1><p>Media uploads are managed per section — use Team for team photos, States for state images, Products for product images.</p></div></div>
 </div>
 
 <!-- DB SETUP — all SQL from audit docs -->
@@ -746,7 +737,7 @@ function nav(pg){
   document.getElementById('pg-'+pg)?.classList.add('active');
   document.querySelectorAll('.nv').forEach(b=>{if(b.getAttribute('onclick')?.includes("'"+pg+"'"))b.classList.add('active');});
   document.getElementById('page-title').textContent=pg.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
-  ({dashboard:loadDash,products:()=>loadProducts(1),categories:loadCats,orders:()=>loadOrders(1),customers:()=>loadCustomers(1),coupons:loadCoupons,subscribers:()=>loadSubs(1),reviews:loadReviews,analytics:loadAnalytics,settings:loadSettings,inventory_logs:()=>loadInvLogs(1),order_logs:()=>loadOrdLogs(1),admin_logs:()=>loadAdminLogs(1),db_setup:()=>{},states:loadStates,media:loadMedia})[pg]?.();
+  ({dashboard:loadDash,products:()=>loadProducts(1),categories:loadCats,orders:()=>loadOrders(1),customers:()=>loadCustomers(1),coupons:loadCoupons,subscribers:()=>loadSubs(1),reviews:loadReviews,analytics:loadAnalytics,settings:loadSettings,inventory_logs:()=>loadInvLogs(1),order_logs:()=>loadOrdLogs(1),admin_logs:()=>loadAdminLogs(1),db_setup:()=>{},states:loadStates,media:loadMedia,team:loadTeam})[pg]?.();
 }
 
 // ── DASHBOARD — uses revenue_summary view ──
@@ -1691,6 +1682,129 @@ async function loadStates() {
   }
 }
 
+
+// ── TEAM MANAGEMENT ──────────────────────────────────────────
+async function loadTeam() {
+  const grid = document.getElementById('team-grid');
+  if (!grid) return;
+  grid.innerHTML = '<div style="text-align:center;color:var(--tx3);padding:40px;grid-column:1/-1">Loading…</div>';
+  try {
+    const data = await GET('team_members', 'order=sort_order.asc&is_active=eq.true');
+    if (!data || !data.length) {
+      grid.innerHTML = '<div style="text-align:center;color:var(--tx3);padding:40px;grid-column:1/-1">No team members found.</div>';
+      return;
+    }
+    grid.innerHTML = data.map(m => `
+      <div class="sc" style="margin:0;padding:0;overflow:hidden;border-radius:14px">
+        <div style="position:relative;height:180px;background:var(--bg2)">
+          ${m.image_url
+            ? `<img src="${m.image_url}" style="width:100%;height:100%;object-fit:cover;object-position:top" onerror="this.style.display='none'">`
+            : '<div style="height:100%;display:flex;align-items:center;justify-content:center;font-size:56px">👤</div>'}
+          <span class="badge bg" style="position:absolute;top:8px;right:8px">${m.is_founder ? 'Founder' : 'Co-Founder'}</span>
+        </div>
+        <div style="padding:14px">
+          <div style="font-weight:700;font-size:15px;margin-bottom:2px">${esc(m.name||'—')}</div>
+          <div style="font-size:12px;color:var(--tx3);margin-bottom:12px">${esc(m.role||'—')}</div>
+          <button class="btn btn-s btn-sm" style="width:100%;justify-content:center" onclick='openTeamM(${JSON.stringify(m).replace(/'/g,"&#39;")})'>✏️ Edit & Upload Photo</button>
+        </div>
+      </div>`).join('');
+  } catch(e) {
+    grid.innerHTML = `<div style="color:var(--red);padding:20px;grid-column:1/-1">Error: ${e.message}</div>`;
+  }
+}
+
+function openTeamM(m) {
+  m = m || {};
+  const html = `
+    <div class="m-ov" id="team-modal" onclick="if(event.target===this)closeTeamM()">
+      <div class="m-box" style="max-width:480px">
+        <div class="m-hd">
+          <h3>${esc(m.name||'Team Member')}</h3>
+          <button class="m-cls" onclick="closeTeamM()">✕</button>
+        </div>
+        <div style="padding:20px">
+          <input type="hidden" id="tm-id" value="${m.id||''}">
+          <div style="margin-bottom:14px">
+            <label class="lbl">Name</label>
+            <input class="inp" id="tm-name" value="${esc(m.name||'')}" placeholder="Full name">
+          </div>
+          <div style="margin-bottom:14px">
+            <label class="lbl">Role</label>
+            <input class="inp" id="tm-role" value="${esc(m.role||'')}" placeholder="e.g. Co-Founder, Operations">
+          </div>
+          <div style="margin-bottom:14px">
+            <label class="lbl">Short Bio (optional)</label>
+            <textarea class="inp" id="tm-bio" rows="3" placeholder="2-3 lines about this person">${esc(m.bio||'')}</textarea>
+          </div>
+          <div style="margin-bottom:14px">
+            <label class="lbl">Photo</label>
+            ${m.image_url ? `<div style="margin-bottom:8px"><img src="${m.image_url}" style="height:80px;width:80px;object-fit:cover;border-radius:8px;object-position:top"></div>` : ''}
+            <input type="file" id="tm-file" accept="image/*" class="fi" onchange="previewTeamPhoto(this)">
+            <div id="tm-photo-preview" style="margin-top:8px"></div>
+            <div id="tm-upload-status" style="font-size:12px;color:var(--tx3);margin-top:6px"></div>
+          </div>
+          <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:20px">
+            <button class="btn btn-s" onclick="closeTeamM()">Cancel</button>
+            <button class="btn btn-p" onclick="saveTeamMember()">💾 Save</button>
+          </div>
+          <div id="tm-save-status" style="font-size:12px;color:var(--tx3);margin-top:8px;text-align:center"></div>
+        </div>
+      </div>
+    </div>`;
+  document.body.insertAdjacentHTML('beforeend', html);
+}
+
+function closeTeamM() {
+  const modal = document.getElementById('team-modal');
+  if (modal) modal.remove();
+}
+
+function previewTeamPhoto(input) {
+  const preview = document.getElementById('tm-photo-preview');
+  if (input.files && input.files[0]) {
+    const reader = new FileReader();
+    reader.onload = e => {
+      preview.innerHTML = `<img src="${e.target.result}" style="height:80px;width:80px;object-fit:cover;border-radius:8px;object-position:top">`;
+    };
+    reader.readAsDataURL(input.files[0]);
+  }
+}
+
+async function saveTeamMember() {
+  const id = document.getElementById('tm-id').value;
+  const name = document.getElementById('tm-name').value.trim();
+  const role = document.getElementById('tm-role').value.trim();
+  const bio = document.getElementById('tm-bio').value.trim();
+  const fileInput = document.getElementById('tm-file');
+  const statusEl = document.getElementById('tm-save-status');
+  const uploadEl = document.getElementById('tm-upload-status');
+  if (!name) { toast('Name required', 'er'); return; }
+  statusEl.textContent = 'Saving…';
+  let imageUrl = null;
+  if (fileInput.files && fileInput.files[0]) {
+    uploadEl.textContent = 'Uploading photo…';
+    try {
+      const url = await uploadToStorage(fileInput.files[0], `team/member-${id}-${Date.now()}`);
+      imageUrl = url;
+      uploadEl.textContent = '✓ Photo uploaded';
+    } catch(e) {
+      uploadEl.textContent = 'Upload failed: ' + e.message;
+      statusEl.textContent = '';
+      return;
+    }
+  }
+  try {
+    const body = { name, role, bio };
+    if (imageUrl) body.image_url = imageUrl;
+    await PATCH('team_members', `id=eq.${id}`, body);
+    toast('Team member updated ✓', 'ok');
+    closeTeamM();
+    await loadTeam();
+  } catch(e) {
+    statusEl.textContent = 'Save failed: ' + e.message;
+  }
+}
+
 async function deleteState(id) {
   if (!confirm('Delete this state? This will also remove all its images.')) return;
   try {
@@ -1919,99 +2033,12 @@ async function saveState() {
 
 
 
-// ══════════════════════════════════════════════════════════
-// MEDIA — FOUNDER IMAGES (uses founder_images DB table)
-// ══════════════════════════════════════════════════════════
+// ── MEDIA ────────────────────────────────────────────────────
 async function loadMedia() {
-  const container = document.getElementById('founder-previews');
-  const countEl = document.getElementById('founder-img-count');
-  if (container) container.innerHTML = '<span style="color:var(--tx3);font-size:12px;align-self:center">Loading…</span>';
-  try {
-    const rows = await GET('founder_images', 'order=sort_order.asc&limit=20').catch(() => []);
-    if (container && rows && rows.length) {
-      if (countEl) countEl.textContent = `(${rows.length} image${rows.length>1?'s':''} — rotating every 3s)`;
-      container.innerHTML = rows.map((r, i) =>
-        `<div style="position:relative;display:inline-block;flex-shrink:0">
-          <img src="${r.image_url}" style="width:${i===0?'130':'70'}px;height:${i===0?'150':'70'}px;object-fit:cover;border-radius:${i===0?'10':'7'}px;border:2px solid ${i===0?'var(--gd)':'var(--bd)'}" onerror="this.style.opacity='.3'" title="Image ${i+1}">
-          <div style="position:absolute;top:3px;left:3px;background:rgba(0,0,0,.7);color:#fff;font-size:9px;font-weight:700;padding:2px 5px;border-radius:3px">${i===0?'Main':`#${i+1}`}</div>
-          <button onclick="deleteFounderImg('${r.id}',this.parentNode)" style="position:absolute;top:3px;right:3px;background:rgba(220,50,50,.9);color:#fff;border:none;border-radius:3px;width:18px;height:18px;font-size:12px;cursor:pointer;line-height:1;padding:0;font-weight:700">×</button>
-        </div>`
-      ).join('');
-    } else if (container) {
-      if (countEl) countEl.textContent = '(no images yet)';
-      container.innerHTML = '<span style="color:var(--tx3);font-size:12px;align-self:center;padding:8px 0">No images yet — add below ↓</span>';
-    }
-  } catch(e) {
-    if (container) container.innerHTML = '<span style="color:var(--red);font-size:12px">Could not load images</span>';
-    console.warn('Media load:', e);
-  }
+  // Media uploads managed per section (Team, States, Products)
 }
 
-function previewFounders(input) {
-  const files = Array.from(input.files);
-  if (!files.length) return;
-  // Show new-file previews in the PENDING section, not in CURRENT SLIDESHOW
-  const pending = document.getElementById('founder-pending-previews');
-  if (!pending) return;
-  pending.innerHTML = '';
-  files.forEach((file, i) => {
-    const reader = new FileReader();
-    reader.onload = e => {
-      const wrap = document.createElement('div');
-      wrap.style.cssText = 'position:relative;display:inline-block';
-      const img = document.createElement('img');
-      img.src = e.target.result;
-      img.style.cssText = 'width:72px;height:72px;object-fit:cover;border-radius:8px;border:2px solid var(--org);display:block';
-      img.title = `New image ${i+1}`;
-      const lbl = document.createElement('div');
-      lbl.style.cssText = 'position:absolute;top:3px;left:3px;background:rgba(180,100,0,.9);color:#fff;font-size:8px;font-weight:700;padding:1px 4px;border-radius:3px';
-      lbl.textContent = `+${i+1}`;
-      wrap.appendChild(img); wrap.appendChild(lbl);
-      pending.appendChild(wrap);
-    };
-    reader.readAsDataURL(file);
-  });
-}
-function previewFounder(input) { previewFounders(input); }
 
-async function uploadFounderImages() {
-  const files = Array.from(document.getElementById('founder-file').files);
-  const status = document.getElementById('founder-status');
-  if (!files.length) { toast('Please select at least one photo', 'er'); return; }
-  status.textContent = '⏳ Uploading ' + files.length + ' image(s)…';
-  const btn = document.querySelector('[onclick="uploadFounderImages()"]');
-  if (btn) { btn.disabled = true; btn.textContent = 'Uploading…'; }
-  try {
-    const urls = [];
-    for (let i = 0; i < files.length; i++) {
-      status.textContent = `⏳ Uploading ${i+1}/${files.length}…`;
-      const url = await uploadToStorage(files[i], `founder/founder-${Date.now()}-${i}`);
-      urls.push(url);
-    }
-    // Delete all existing founder images and re-insert
-    status.textContent = '⏳ Saving to DB…';
-    // APPEND new images — do NOT delete existing
-    const existFI = await GET('founder_images', 'order=sort_order.desc&limit=1&select=sort_order').catch(() => []);
-    let nextFIOrder = existFI?.[0]?.sort_order !== undefined ? existFI[0].sort_order + 1 : 0;
-    for (let i = 0; i < urls.length; i++) {
-      await POST('founder_images', { image_url: urls[i], sort_order: nextFIOrder + i });
-    }
-    // Get total count now in DB
-    const allRows = await GET('founder_images', 'select=id&order=sort_order.asc').catch(() => []);
-    status.textContent = `✅ ${urls.length} image(s) added! Total in slideshow: ${allRows.length}`;
-    status.style.color = 'var(--grn)';
-    toast(`Added ${urls.length} image(s) — slideshow now has ${allRows.length} total ✓`, 'ok');
-    document.getElementById('founder-file').value = '';
-    document.getElementById('founder-pending-previews').innerHTML = '';
-    await loadMedia();
-  } catch(e) {
-    status.textContent = '❌ ' + e.message;
-    status.style.color = 'var(--red)';
-    toast('Upload failed: ' + e.message, 'er');
-  }
-  if (btn) { btn.disabled = false; btn.textContent = '📤 Upload All & Save to Site'; }
-}
-async function uploadFounderImage() { return uploadFounderImages(); }
 
 async function deleteFounderImg(rowId, wrap) {
   try {
