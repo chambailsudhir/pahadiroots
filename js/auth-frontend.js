@@ -622,6 +622,7 @@ async function logoutAccount() {
   updateAccountBtn();
   closeAccount();
   showToast('👋 Logged out successfully');
+  setTimeout(function() { window.location.reload(); }, 800);
 }
 
 // ── Forgot / Reset Password ─────────────────────────────────────
