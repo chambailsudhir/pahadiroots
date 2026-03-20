@@ -207,6 +207,38 @@ function getStoreApiBase() {
 }
 
 // ── DATA LOADING ───────────────────────────────────────────────────
+
+// ── HERO PRODUCT SLIDESHOW ──────────────────────────────────────
+var _heroSlideIdx = 0;
+var _heroSlideTimer = null;
+var _heroSlideUrls = [
+  'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1600&q=80'
+];
+
+function initHeroSlideshow(productImageUrls) {
+  var container = document.getElementById('heroSlides');
+  if (!container) return;
+  // Mix product images with fallback mountain photo
+  var urls = productImageUrls && productImageUrls.length
+    ? productImageUrls.slice(0, 6)
+    : _heroSlideUrls;
+  _heroSlideUrls = urls;
+  // Build slides
+  container.innerHTML = urls.map(function(url, i) {
+    return '<img class="hero-slide-img' + (i===0?' active':'') + '" src="' + url + '" loading="' + (i===0?'eager':'lazy') + '" onerror="this.style.display='none'">';
+  }).join('');
+  if (urls.length > 1) {
+    if (_heroSlideTimer) clearInterval(_heroSlideTimer);
+    _heroSlideTimer = setInterval(function() {
+      var imgs = document.querySelectorAll('.hero-slide-img');
+      if (!imgs.length) return;
+      imgs[_heroSlideIdx].classList.remove('active');
+      _heroSlideIdx = (_heroSlideIdx + 1) % imgs.length;
+      imgs[_heroSlideIdx].classList.add('active');
+    }, 4000);
+  }
+}
+
 async function loadData() {
   // Step 1: render states fallback only — skip fake products to avoid price flash
   STATES   = FALLBACK_STATES.map(s => Object.assign({}, s));
@@ -343,6 +375,15 @@ async function loadData() {
         }
       });
       updated = true;
+    }
+
+    // ── Hero slideshow — use product images ──
+    if (Array.isArray(data.product_images) && data.product_images.length) {
+      var heroImgs = data.product_images
+        .filter(function(r){ return r.image_url; })
+        .map(function(r){ return r.image_url; })
+        .slice(0, 6);
+      if (heroImgs.length) initHeroSlideshow(heroImgs);
     }
 
     // ── Apply product_images from store-data response ──
@@ -1852,6 +1893,7 @@ function initPremium() {
 }
 
 window.addEventListener('DOMContentLoaded', function() {
+  initHeroSlideshow([]);
   loadData();
   initPremium();
 });
