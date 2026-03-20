@@ -704,8 +704,4 @@ footer{background:#0b160d url("data:image/svg+xml,%3Csvg viewBox='0 0 1440 480' 
 .acct-btn-r{background:#fdecea;color:#c0392b}
 .acct-loading{text-align:center;padding:30px;color:#888;font-size:14px}
 @media(max-width:480px){.auth-box{width:100vw;right:-100vw}.acct-panel{width:100vw}}
-/* ── HERO PRODUCT IMAGE ── */
-.hero-product-img{position:absolute;right:0;bottom:0;top:0;width:45%;display:flex;align-items:flex-end;justify-content:center;pointer-events:none;z-index:2;overflow:hidden}
-.hero-product-img img{max-height:90%;max-width:100%;object-fit:contain;object-position:bottom right;filter:drop-shadow(0 20px 40px rgba(0,0,0,.5));animation:heroFloat 6s ease-in-out infinite}
-@keyframes heroFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
-@media(max-width:768px){.hero-product-img{display:none}}
+
