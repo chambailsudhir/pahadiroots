@@ -245,10 +245,11 @@ textarea.fi{resize:vertical;min-height:80px}
       <select class="tbl-sel" onchange="loadProducts(1)" id="prod-cat-f"><option value="">All Categories</option></select>
       <select class="tbl-sel" onchange="loadProducts(1)" id="prod-status-f"><option value="">All Status</option><option>active</option><option>inactive</option><option>draft</option></select>
       <button class="btn btn-p" onclick="openProdM()">+ Add Product</button>
+      <button class="btn btn-s" onclick="openBulkGST()" title="Bulk assign GST rates">🏷️ Bulk GST</button>
     </div>
   </div>
   <div class="tbl-wrap">
-    <table><thead><tr><th>Product</th><th>Category</th><th>Price</th><th>Initial Stock</th><th>Current Stock</th><th>Sold</th><th>Status</th><th>Actions</th></tr></thead>
+    <table><thead><tr><th>Product</th><th>Category</th><th>Price</th><th>GST</th><th>Initial Stock</th><th>Current Stock</th><th>Sold</th><th>Status</th><th>Actions</th></tr></thead>
     <tbody id="prod-tbody"><tr><td colspan="6" class="loading">Loading…</td></tr></tbody></table>
     <div class="pag" id="prod-pag"></div>
   </div>
@@ -526,7 +527,6 @@ CREATE INDEX IF NOT EXISTS idx_products_is_deleted ON products(is_deleted);</div
         <div class="fg"><label>State <span class="req">*</span></label><select class="fi" id="p-state"></select></div>
         <div class="fg"><label>Status</label><select class="fi" id="p-status"><option value="active">Active</option><option value="inactive">Inactive</option><option value="draft">Draft</option></select></div>
         <div class="fg"><label>Unit Label</label><input class="fi" id="p-unit" placeholder="250g"></div>
-        <div class="fg"><label>GST Rate <span style="color:var(--tx3);font-size:11px">(% — inclusive in MRP)</span></label><select class="fi" id="p-gst"><option value="0">0% — Exempt</option><option value="5">5% — Food items</option><option value="12">12%</option><option value="18">18%</option></select></div>
         <div class="fg"><label>GST Rate <span style="color:var(--tx3);font-size:11px">(% — inclusive in price)</span></label><select class="fi" id="p-gst"><option value="0">0% (Exempt)</option><option value="5" selected>5% (Food items)</option><option value="12">12%</option><option value="18">18%</option></select></div>
       </div>
       <div class="gr gr3">
@@ -866,6 +866,7 @@ async function loadProducts(page=1){
         <td><div class="td-main">${p.emoji||''} ${p.name}</div><div class="td-sub mono">${p.sku||''}</div></td>
         <td>${cm[p.category_id]||'—'}</td>
         <td>₹${p.price||0}${p.mrp&&p.mrp>p.price?' <span style="color:var(--tx3);text-decoration:line-through;font-size:11px">₹'+p.mrp+'</span>':''}</td>
+        <td><span style="background:rgba(200,146,10,.15);color:#c8920a;font-size:11px;font-weight:700;padding:2px 7px;border-radius:8px">${p.gst_rate||5}%</span> <button onclick="quickSetGST('${p.id}',${p.gst_rate||5})" style="background:none;border:none;cursor:pointer;font-size:11px;color:var(--tx3);padding:0 2px" title="Change GST">✏️</button></td>
         <td style="color:var(--tx2)">${p.initial_stock||0}</td>
         <td class="${(p.stock_quantity||0)<=10?'stok-lo':'stok'}">${p.stock_quantity||0}</td>
         <td style="color:${(p.initial_stock||0)-(p.stock_quantity||0)>0?'var(--grn)':'var(--tx3)'}">${Math.max(0,(p.initial_stock||0)-(p.stock_quantity||0))}</td>
@@ -874,7 +875,7 @@ async function loadProducts(page=1){
           <button class="btn btn-s btn-sm" onclick="editProd('${p.id}')">Edit</button>
           <button class="btn btn-d btn-sm" onclick="softDelProd('${p.id}','${esc(p.name)}')">Del</button>
         </td>
-      </tr>`).join(''):'<tr><td colspan="8" class="empty">No products</td></tr>';
+      </tr>`).join(''):'<tr><td colspan="9" class="empty">No products</td></tr>';
     renderPag('prod-pag',page,S.prods.length,n=>loadProducts(n));
   }catch(e){toast('Products: '+e.message,'er');}
 }
@@ -901,7 +902,6 @@ function openProdM(p){p=p||{};
   document.getElementById('p-new').checked=!!(p.badges?.includes('new'));
   document.getElementById('p-status').value=p.status||'active';
   document.getElementById('p-gst').value=String(p.gst_rate||5);
-  document.getElementById('p-gst').value=p.gst_rate||5;
   fillSel('p-cat',S.cats,'id','name',p.category_id);
   fillSel('p-state',S.states||[],'id','name',p.state_id);
   // Load variants if editing existing product
@@ -923,6 +923,106 @@ function editProd(id){
   // Fetch full product for edit
   GET('products',`id=eq.${id}&select=*&limit=1`).then(d=>openProdM(d?.[0]||{})).catch(()=>toast('Could not load product','er'));
 }
+// ── QUICK GST CHANGE ──────────────────────────────────────────
+function quickSetGST(id, current) {
+  var rates = [0, 5, 12, 18];
+  var opts = rates.map(r => `<option value="${r}" ${r==current?'selected':''}>${r}% ${r===0?'(Exempt)':r===5?'(Food)':r===12?'(Standard)':'(High)'}</option>`).join('');
+  var html = `<div style="padding:24px;max-width:320px;margin:0 auto">
+    <h3 style="margin:0 0 16px;font-size:16px">Change GST Rate</h3>
+    <select id="qgst-sel" class="fi" style="width:100%;margin-bottom:16px">${opts}</select>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-p" style="flex:1" onclick="applyQuickGST('${id}')">Save</button>
+      <button class="btn btn-s" style="flex:1" onclick="closeM('qgst-modal')">Cancel</button>
+    </div>
+  </div>`;
+  openModal('qgst-modal', 'Change GST Rate', html);
+}
+
+async function applyQuickGST(id) {
+  var rate = parseFloat(document.getElementById('qgst-sel').value);
+  try {
+    await PATCH('products', `id=eq.${id}`, { gst_rate: rate });
+    toast('GST updated ✓', 'ok');
+    closeM('qgst-modal');
+    await loadProducts(S._prodPage || 1);
+  } catch(e) { toast('Error: ' + e.message, 'er'); }
+}
+
+// ── BULK GST MODAL ────────────────────────────────────────────
+function openBulkGST() {
+  // Indian GST rates for common food/supplement categories
+  var suggestions = [
+    { category: 'Honey',       rate: 5,  note: 'Natural honey — 5%' },
+    { category: 'Tea',         rate: 5,  note: 'Tea/coffee — 5%' },
+    { category: 'Rice',        rate: 5,  note: 'Rice/grains — 5%' },
+    { category: 'Spices',      rate: 5,  note: 'Spices — 5%' },
+    { category: 'Pulses',      rate: 5,  note: 'Pulses/legumes — 5%' },
+    { category: 'Juice',       rate: 12, note: 'Fruit juices — 12%' },
+    { category: 'Oil',         rate: 5,  note: 'Edible oils — 5%' },
+    { category: 'Shilajit',    rate: 18, note: 'Health supplements — 18%' },
+  ];
+
+  var rows = (S.prods || []).map(p => {
+    var suggested = suggestions.find(s => 
+      p.name.toLowerCase().includes(s.category.toLowerCase()) ||
+      (S.cats.find(c => c.id === p.category_id)?.name || '').toLowerCase().includes(s.category.toLowerCase())
+    );
+    var sugRate = suggested ? suggested.rate : (p.gst_rate || 5);
+    return `<tr>
+      <td style="padding:8px 6px;font-weight:600;font-size:13px">${p.emoji||'🌿'} ${p.name}</td>
+      <td style="padding:8px 6px;font-size:12px;color:var(--tx3)">${S.cats.find(c=>c.id===p.category_id)?.name||'—'}</td>
+      <td style="padding:8px 6px">
+        <select class="fi bulk-gst-sel" data-id="${p.id}" style="padding:4px 8px;font-size:12px;width:130px">
+          <option value="0" ${sugRate==0?'selected':''}>0% Exempt</option>
+          <option value="5" ${sugRate==5?'selected':''}>5% Food</option>
+          <option value="12" ${sugRate==12?'selected':''}>12% Standard</option>
+          <option value="18" ${sugRate==18?'selected':''}>18% High</option>
+        </select>
+      </td>
+      <td style="padding:8px 6px;font-size:11px;color:var(--tx3)">${suggested?'Auto: '+suggested.note:''}</td>
+    </tr>`;
+  }).join('');
+
+  var html = `<div style="padding:20px">
+    <p style="font-size:13px;color:var(--tx3);margin:0 0 16px">GST rates auto-suggested based on product category. Review and save.</p>
+    <div style="overflow-y:auto;max-height:400px;margin-bottom:16px">
+      <table style="width:100%;border-collapse:collapse">
+        <thead><tr style="font-size:11px;color:var(--tx3);text-transform:uppercase;letter-spacing:.5px">
+          <th style="padding:6px;text-align:left">Product</th>
+          <th style="padding:6px;text-align:left">Category</th>
+          <th style="padding:6px;text-align:left">GST Rate</th>
+          <th style="padding:6px;text-align:left">Note</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-p" style="flex:1" onclick="saveBulkGST()">💾 Save All GST Rates</button>
+      <button class="btn btn-s" onclick="closeM('bulk-gst-modal')">Cancel</button>
+    </div>
+  </div>`;
+  openModal('bulk-gst-modal', '🏷️ Bulk GST Assignment', html);
+}
+
+async function saveBulkGST() {
+  var sels = document.querySelectorAll('.bulk-gst-sel');
+  var updates = Array.from(sels).map(s => ({ id: s.dataset.id, rate: parseFloat(s.value) }));
+  var btn = document.querySelector('#bulk-gst-modal .btn-p');
+  if (btn) { btn.disabled = true; btn.textContent = 'Saving…'; }
+  try {
+    for (var u of updates) {
+      await PATCH('products', `id=eq.${u.id}`, { gst_rate: u.rate });
+    }
+    toast('All GST rates saved ✓', 'ok');
+    closeM('bulk-gst-modal');
+    await loadProducts(S._prodPage || 1);
+  } catch(e) {
+    toast('Error: ' + e.message, 'er');
+    if (btn) { btn.disabled = false; btn.textContent = '💾 Save All GST Rates'; }
+  }
+}
+
+
 async function saveProd(){
   const id=document.getElementById('p-id').value;
   const name=document.getElementById('p-name').value.trim(),price=parseFloat(v('p-price'));
@@ -1627,6 +1727,20 @@ function renderPag(id, page, count, cb){
 
 function openM(id){ document.getElementById(id).style.display='flex'; }
 function closeM(id){ document.getElementById(id).style.display='none'; }
+function openModal(id, title, html) {
+  var existing = document.getElementById(id);
+  if (!existing) {
+    var el = document.createElement('div');
+    el.id = id;
+    el.className = 'modal';
+    el.style.display = 'none';
+    el.innerHTML = '<div class="m-box" style="max-width:640px;width:95%;max-height:85vh;overflow-y:auto"><div class="m-hdr"><h3>' + title + '</h3><button class="m-cls" onclick="closeM(\'' + id + '\')">✕</button></div><div id="' + id + '-body"></div></div>';
+    document.body.appendChild(el);
+  }
+  var bodyEl = document.getElementById(id + '-body');
+  if (bodyEl) bodyEl.innerHTML = html;
+  document.getElementById(id).style.display = 'flex';
+}
 
 function v(id){ return (document.getElementById(id)||{}).value||''; }
 
