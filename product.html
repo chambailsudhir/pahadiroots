@@ -8,11 +8,12 @@
   <meta property="og:title" id="og-title" content="Pahadi Roots – Pure Himalayan Organic Products">
   <meta property="og:description" id="og-desc" content="Authentic Himalayan organic products sourced directly from mountain farmers.">
   <meta property="og:image" id="og-image" content="https://pahadiroots.com/images/og-cover.jpg">
-  <meta property="og:url" id="og-url" content="https://pahadiroots.com/product">
+  <meta property="og:url" id="og-url" content="https://pahadiroots.com/products/">
   <meta property="og:type" content="product">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" id="tw-title" content="Pahadi Roots">
   <meta name="twitter:image" id="tw-image" content="https://pahadiroots.com/images/og-cover.jpg">
+  <link rel="canonical" id="pg-canonical" href="https://pahadiroots.com/products/">
   <link rel="icon" href="/images/favicon.ico" type="image/x-icon">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -24,8 +25,21 @@
     "@type": "Product",
     "name": "Pahadi Roots Product",
     "description": "Authentic Himalayan organic product sourced directly from mountain farmers.",
+    "image": "https://pahadiroots.com/images/og-cover.jpg",
     "brand": { "@type": "Brand", "name": "Pahadi Roots" },
-    "url": "https://pahadiroots.com/products/"
+    "url": "https://pahadiroots.com/products/",
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.8",
+      "reviewCount": "39"
+    },
+    "offers": {
+      "@type": "Offer",
+      "priceCurrency": "INR",
+      "price": "1",
+      "availability": "https://schema.org/InStock",
+      "seller": { "@type": "Organization", "name": "Pahadi Roots" }
+    }
   }
   </script>
   <style>
@@ -318,6 +332,9 @@ function renderProduct(p, images, related, data, stateMap) {
   document.getElementById('tw-title').setAttribute('content', (p.name||'Product') + ' — Pahadi Roots');
   document.getElementById('tw-image').setAttribute('content', ogImg);
   document.getElementById('bc-name').textContent = p.name;
+  // Update canonical URL to exact product URL
+  var canonical = document.getElementById('pg-canonical');
+  if (canonical) canonical.setAttribute('href', ogUrl);
 
   // ── JSON-LD Product Schema (Google Rich Snippets) ──
   var priceVal = p.price || (VARIANTS && VARIANTS[0] ? VARIANTS[0].price : null);
