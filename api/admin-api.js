@@ -304,6 +304,30 @@ export default async function handler(req, res) {
         changed_at: new Date().toISOString()
       }).catch(()=>{});
 
+      // 7. Notify admin — fire and forget
+      const adminEmail = process.env.ADMIN_NOTIFY_EMAIL || 'support@pahadiroots.com';
+      const baseUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://pahadiroots.com';
+      fetch(`${baseUrl}/api/send-email`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'admin_new_order',
+          to: adminEmail,
+          orderNumber: orderNumber || '',
+          orderId: orderId || '',
+          name: name || '',
+          items: (items || []).map(i => ({ name: i.name||'Product', emoji: i.emoji||'🌿', qty: i.qty||1, price: i.price||0 })),
+          total: final || 0,
+          discount: discount || 0,
+          shipping: shipCharge || 0,
+          address: addr || '',
+          city: city || '',
+          state: state || '',
+          pin: pin || '',
+          payMethod: payMethod || ''
+        })
+      }).catch(() => {}); // non-blocking — order is saved regardless
+
       return ok({ success: true, orderId, orderNumber });
     } catch(e) {
       console.error('save_order error:', e);
