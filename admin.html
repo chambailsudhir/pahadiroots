@@ -1191,16 +1191,23 @@ async function saveOrdStatus(){
 
     // ── Send status email to customer (if email exists) ──
     const custEmail = (S._custCache[S.currentOrder.customer_id]||{}).email || '';
-    if (custEmail && custEmail.includes('@') && (status === 'shipped' || status === 'cancelled')) {
+    const emailStatuses = ['confirmed','packed','shipped','delivered','cancelled'];
+    if (custEmail && custEmail.includes('@') && emailStatuses.includes(status)) {
+      let emailType = 'order_confirmation';
+      if (status === 'shipped')   emailType = 'order_shipped';
+      else if (status === 'cancelled') emailType = 'order_cancelled';
+      else if (status === 'packed' || status === 'confirmed' || status === 'delivered') emailType = 'order_status_update';
+
       fetch('/api/send-email', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          type: status === 'shipped' ? 'order_shipped' : 'order_cancelled',
+          type: emailType,
           to: custEmail,
           orderNumber: S.currentOrder.order_number || '',
           orderId: S.currentOrder.id || '',
           name: (S._custCache[S.currentOrder.customer_id]||{}).first_name || '',
+          status: status,
           trackingNumber: tracking || S.currentOrder.tracking_number || '',
           courier: courier || S.currentOrder.courier || '',
           total: S.currentOrder.total_amount || 0
