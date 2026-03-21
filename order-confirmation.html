@@ -510,9 +510,9 @@ async function loadOrder() {
     return;
   }
 
-  // 8 second timeout — skeleton nahi rukne dega
+  // 5 second timeout — skeleton nahi rukne dega
   var controller = new AbortController();
-  var _timer = setTimeout(function() { controller.abort(); }, 8000);
+  var _timer = setTimeout(function() { controller.abort(); }, 5000);
 
   try {
     var res = await fetch(ADMIN_API, {
