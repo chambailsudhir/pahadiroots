@@ -3,15 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title id="pg-title">Product — Pahadi Roots</title>
-  <meta name="description" id="pg-desc" content="Authentic Himalayan organic products — Pahadi Roots">
-  <meta property="og:title" id="og-title" content="Pahadi Roots – Pure Himalayan Organic Products">
+  <title id="pg-title">Product — 5 Pahadi Roots</title>
+  <meta name="description" id="pg-desc" content="Authentic Himalayan organic products — 5 Pahadi Roots">
+  <meta property="og:title" id="og-title" content="5 Pahadi Roots – Pure Himalayan Organic Products">
   <meta property="og:description" id="og-desc" content="Authentic Himalayan organic products sourced directly from mountain farmers.">
   <meta property="og:image" id="og-image" content="https://pahadiroots.com/images/og-cover.jpg">
   <meta property="og:url" id="og-url" content="https://pahadiroots.com/products/">
   <meta property="og:type" content="product">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" id="tw-title" content="Pahadi Roots">
+  <meta name="twitter:title" id="tw-title" content="5 Pahadi Roots">
   <meta name="twitter:image" id="tw-image" content="https://pahadiroots.com/images/og-cover.jpg">
   <link rel="canonical" id="pg-canonical" href="https://pahadiroots.com/products/">
   <link rel="icon" href="/images/favicon.ico" type="image/x-icon">
@@ -23,10 +23,10 @@
   {
     "@context": "https://schema.org/",
     "@type": "Product",
-    "name": "Pahadi Roots Product",
+    "name": "5 Pahadi Roots Product",
     "description": "Authentic Himalayan organic product sourced directly from mountain farmers.",
     "image": "https://pahadiroots.com/images/og-cover.jpg",
-    "brand": { "@type": "Brand", "name": "Pahadi Roots" },
+    "brand": { "@type": "Brand", "name": "5 Pahadi Roots" },
     "url": "https://pahadiroots.com/products/",
     "aggregateRating": {
       "@type": "AggregateRating",
@@ -38,7 +38,7 @@
       "priceCurrency": "INR",
       "price": "1",
       "availability": "https://schema.org/InStock",
-      "seller": { "@type": "Organization", "name": "Pahadi Roots" }
+      "seller": { "@type": "Organization", "name": "5 Pahadi Roots" }
     }
   }
   </script>
@@ -183,7 +183,7 @@
   <a href="/" class="logo">
     <div class="logo-icon">🌿</div>
     <div style="display:flex;flex-direction:column">
-      <span class="logo-name">Pahadi Roots</span>
+      <span class="logo-name">5 Pahadi Roots</span>
       <span class="logo-tl">Himalayan Organic Store</span>
     </div>
   </a>
@@ -319,17 +319,17 @@ async function loadProduct() {
 function renderProduct(p, images, related, data, stateMap) {
   stateMap = stateMap || {};
   // Update page title & meta
-  document.getElementById('pg-title').textContent = (p.name || 'Product') + ' — Pahadi Roots';
-  document.getElementById('pg-desc').setAttribute('content', p.short_description || p.name + ' — Authentic Himalayan product from Pahadi Roots');
+  document.getElementById('pg-title').textContent = (p.name || 'Product') + ' — 5 Pahadi Roots';
+  document.getElementById('pg-desc').setAttribute('content', p.short_description || p.name + ' — Authentic Himalayan product from 5 Pahadi Roots');
   // Dynamic OG tags for social sharing
   var ogImg = p.image_url || 'https://pahadiroots.com/images/og-cover.jpg';
   var ogUrl = 'https://pahadiroots.com/products/' + (p.slug || p.id);
-  var ogDesc = p.short_description || p.name + ' — Authentic Himalayan organic product from Pahadi Roots. Sourced directly from mountain farmers.';
-  document.getElementById('og-title').setAttribute('content', (p.name||'Product') + ' — Pahadi Roots');
+  var ogDesc = p.short_description || p.name + ' — Authentic Himalayan organic product from 5 Pahadi Roots. Sourced directly from mountain farmers.';
+  document.getElementById('og-title').setAttribute('content', (p.name||'Product') + ' — 5 Pahadi Roots');
   document.getElementById('og-desc').setAttribute('content', ogDesc);
   document.getElementById('og-image').setAttribute('content', ogImg);
   document.getElementById('og-url').setAttribute('content', ogUrl);
-  document.getElementById('tw-title').setAttribute('content', (p.name||'Product') + ' — Pahadi Roots');
+  document.getElementById('tw-title').setAttribute('content', (p.name||'Product') + ' — 5 Pahadi Roots');
   document.getElementById('tw-image').setAttribute('content', ogImg);
   document.getElementById('bc-name').textContent = p.name;
   // Update canonical URL to exact product URL
@@ -347,7 +347,7 @@ function renderProduct(p, images, related, data, stateMap) {
     'description': p.short_description || p.description || '',
     'image': ogImg,
     'url': ogUrl,
-    'brand': { '@type': 'Brand', 'name': 'Pahadi Roots' },
+    'brand': { '@type': 'Brand', 'name': '5 Pahadi Roots' },
     'aggregateRating': {
       '@type': 'AggregateRating',
       'ratingValue': '4.8',
@@ -355,12 +355,54 @@ function renderProduct(p, images, related, data, stateMap) {
     }
   };
   if (priceVal) {
+    // priceValidUntil — 1 year from now
+    var nextYear = new Date();
+    nextYear.setFullYear(nextYear.getFullYear() + 1);
+    var priceValidUntil = nextYear.toISOString().split('T')[0];
+
     schemaObj['offers'] = {
       '@type': 'Offer',
       'priceCurrency': 'INR',
       'price': String(priceVal),
+      'priceValidUntil': priceValidUntil,
       'availability': stockStatus,
-      'seller': { '@type': 'Organization', 'name': 'Pahadi Roots' }
+      'seller': { '@type': 'Organization', 'name': '5 Pahadi Roots' },
+      'shippingDetails': {
+        '@type': 'OfferShippingDetails',
+        'shippingRate': {
+          '@type': 'MonetaryAmount',
+          'value': '99',
+          'currency': 'INR'
+        },
+        'shippingDestination': {
+          '@type': 'DefinedRegion',
+          'addressCountry': 'IN'
+        },
+        'deliveryTime': {
+          '@type': 'ShippingDeliveryTime',
+          'handlingTime': {
+            '@type': 'QuantitativeValue',
+            'minValue': 1,
+            'maxValue': 4,
+            'unitCode': 'DAY'
+          },
+          'transitTime': {
+            '@type': 'QuantitativeValue',
+            'minValue': 3,
+            'maxValue': 14,
+            'unitCode': 'DAY'
+          }
+        }
+      },
+      'hasMerchantReturnPolicy': {
+        '@type': 'MerchantReturnPolicy',
+        'applicableCountry': 'IN',
+        'returnPolicyCategory': 'https://schema.org/MerchantReturnFiniteReturnWindow',
+        'merchantReturnDays': 2,
+        'returnMethod': 'https://schema.org/ReturnByMail',
+        'returnFees': 'https://schema.org/FreeReturn',
+        'refundType': 'https://schema.org/FullRefund'
+      }
     };
   }
   var schemaTag = document.getElementById('product-jsonld');
@@ -462,7 +504,7 @@ function renderProduct(p, images, related, data, stateMap) {
           '<button class="share-btn" onclick="shareProduct()" title="Share this product">🔗</button>' +
         '</div>' +
         '<div class="delivery-row">🚚 Free delivery available · Pan India · Estimated 5-7 days</div>' +
-        '<div class="highlights"><h4>Why Pahadi Roots?</h4><ul class="hl-list">' +
+        '<div class="highlights"><h4>Why 5 Pahadi Roots?</h4><ul class="hl-list">' +
           hlItems.map(function(h) { return '<li>' + h + '</li>'; }).join('') +
         '</ul></div>' +
       '</div>' +
@@ -554,9 +596,9 @@ function shareProduct() {
   var pname = (PRODUCT && PRODUCT.name) ? PRODUCT.name : 'this product';
   var pprice = (PRODUCT && PRODUCT.price) ? ' at ₹' + PRODUCT.price : '';
   if (navigator.share) {
-    navigator.share({ title: pname + ' — Pahadi Roots', text: '🌿 Check out ' + pname + pprice + ' on Pahadi Roots!', url: url });
+    navigator.share({ title: pname + ' — Pahadi Roots', text: '🌿 Check out ' + pname + pprice + ' on 5 Pahadi Roots!', url: url });
   } else {
-    var waText = encodeURIComponent('🌿 Check out ' + pname + pprice + ' on Pahadi Roots!\n' + url);
+    var waText = encodeURIComponent('🌿 Check out ' + pname + pprice + ' on 5 Pahadi Roots!\n' + url);
     var wa = 'https://wa.me/?text=' + waText;
     var modal = document.createElement('div');
     modal.id = 'share-modal';
