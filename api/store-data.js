@@ -43,7 +43,7 @@ export default async function handler(req, res) {
     // Fetch states, products, site_settings, and image tables in parallel
     const [states, products, siteSettings, coupons, stateImages, productImages, founderImages, productVariants, teamMembers] = await Promise.all([
       sbGet('states', 'is_active=eq.true&order=name.asc').catch(() => []),
-      sbGet('products', 'status=eq.active&is_deleted=eq.false&order=name.asc').catch(() => []),
+      sbGet('products', 'status=eq.active&is_deleted=eq.false&order=name.asc&select=*,gst_rate').catch(() => []),
       sbGet('site_settings', 'select=key,value').catch(() => []),
       sbGet('coupons', 'is_active=eq.true&select=code,type,value,min_order,max_uses,uses_count,expires_at,first_order_only,max_discount').catch(() => []),
       sbGet('state_images',   'order=state_id.asc,sort_order.asc').catch(() => []),

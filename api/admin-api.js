@@ -195,7 +195,7 @@ export default async function handler(req, res) {
   // ── Public Order Save (no password required) ──
   if (reqBody.action === 'save_order') {
     try {
-      const { name, phone, email, addr, city, state, pin, final, discount, shipCharge, payMethod, paymentId, items, auth_user_id } = reqBody;
+      const { name, phone, email, addr, city, state, pin, final, discount, shipCharge, payMethod, paymentId, items, auth_user_id, gstAmount } = reqBody;
       if (!name || !phone || !final) return err(400, 'Missing required order fields');
 
       // 1. Upsert customer
@@ -233,7 +233,7 @@ export default async function handler(req, res) {
         total_amount: final,
         subtotal: final + (discount||0),
         coupon_discount: discount||0,
-        tax: 0,
+        tax: gstAmount || 0, // GST inclusive — stored for invoice
         shipping_charge: shipCharge || 0,
         order_status: payMethod === 'razorpay_online' ? 'confirmed' : 'pending',
         payment_status: payMethod === 'razorpay_online' ? 'paid' : 'pending',

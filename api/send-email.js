@@ -21,7 +21,7 @@ export default async function handler(req, res) {
   catch(e) { return res.status(400).json({ error: 'Invalid JSON' }); }
 
   const { type, to, orderNumber, orderId, name, items, total, discount, shipping,
-          address, city, state, pin, payMethod, whatsappNumber, trackingNumber, courier } = body;
+          address, city, state, pin, payMethod, whatsappNumber, trackingNumber, courier, gstAmount } = body;
 
   const ADMIN_EMAIL  = process.env.ADMIN_NOTIFY_EMAIL || 'support@pahadiroots.com';
   const WA_NUMBER    = whatsappNumber || process.env.WHATSAPP_NUMBER || '919899984895';
@@ -77,6 +77,8 @@ export default async function handler(req, res) {
     if (!to || !to.includes('@')) return res.status(400).json({ error: 'Valid customer email required' });
     sendTo = [to];
     const estDate = getDeliveryEstimate();
+    const gstRow = (gstAmount > 0)
+      ? `<tr><td style="padding:6px 0;color:#888;font-size:12px">↳ GST included</td><td style="text-align:right;color:#888;font-size:12px">₹${gstAmount}</td></tr>` : '';
     const discountRow = (discount > 0)
       ? `<tr><td style="padding:6px 0;color:#2d6a4f;font-weight:700">🎉 Discount</td><td style="text-align:right;color:#2d6a4f;font-weight:700">−₹${discount}</td></tr>` : '';
     const shipRow = (shipping > 0)
@@ -102,7 +104,7 @@ export default async function handler(req, res) {
         <h3 style="font-size:12px;font-weight:800;color:#aaa;text-transform:uppercase;letter-spacing:1px;margin:0 0 16px">Your Items</h3>
         <table style="width:100%;border-collapse:collapse">
           ${itemsTable(items)}
-          ${discountRow}${shipRow}
+          ${gstRow}${discountRow}${shipRow}
           <tr style="border-top:2px solid #eee">
             <td style="padding:12px 0 0;font-weight:900;font-size:15px;color:#1a1a1a">Total</td>
             <td style="padding:12px 0 0;text-align:right;font-weight:900;font-size:17px;color:#1a3a1e">₹${(total||0).toLocaleString('en-IN')}</td>
