@@ -208,35 +208,15 @@ function getStoreApiBase() {
 
 // ── DATA LOADING ───────────────────────────────────────────────────
 
-// ── HERO PRODUCT SLIDESHOW ──────────────────────────────────────
-var _heroSlideIdx = 0;
-var _heroSlideTimer = null;
-var _heroSlideUrls = [
-  'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1600&q=80'
-];
-
+// ── HERO BACKGROUND — static single image (no slideshow) ──
 function initHeroSlideshow(productImageUrls) {
   var container = document.getElementById('heroSlides');
   if (!container) return;
-  // Mix product images with fallback mountain photo
-  var urls = productImageUrls && productImageUrls.length
-    ? productImageUrls.slice(0, 6)
-    : _heroSlideUrls;
-  _heroSlideUrls = urls;
-  // Build slides
-  container.innerHTML = urls.map(function(url, i) {
-    return '<img class="hero-slide-img' + (i===0?' active':'') + '" src="' + url + '" loading="' + (i===0?'eager':'lazy') + '" onerror="this.style.opacity=0">';
-  }).join('');
-  if (urls.length > 1) {
-    if (_heroSlideTimer) clearInterval(_heroSlideTimer);
-    _heroSlideTimer = setInterval(function() {
-      var imgs = document.querySelectorAll('.hero-slide-img');
-      if (!imgs.length) return;
-      imgs[_heroSlideIdx].classList.remove('active');
-      _heroSlideIdx = (_heroSlideIdx + 1) % imgs.length;
-      imgs[_heroSlideIdx].classList.add('active');
-    }, 4000);
-  }
+  // Use first product image as static background — no distracting slideshow
+  var url = (productImageUrls && productImageUrls.length)
+    ? productImageUrls[0]
+    : 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1600&q=80';
+  container.innerHTML = '<img class="hero-slide-img active" src="' + url + '" loading="eager" onerror="this.style.opacity=0">';
 }
 
 async function loadData() {
