@@ -325,6 +325,16 @@
   </div>
 </div>
 
+<!-- UPSELL SECTION -->
+<div id="upsellSection" class="main" style="display:none;margin-top:0;padding-top:0">
+  <div class="card" style="background:#f8f9f5;border:none;padding:20px 16px">
+    <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:#1a3a1e;margin-bottom:4px">You Might Also Love 🌿</div>
+    <div style="font-size:12px;color:#888;margin-bottom:14px">Handpicked from the Himalayas</div>
+    <div class="upsell-grid" id="upsellGrid"></div>
+  </div>
+</div>
+
+
 <script>
 // ── CONFIG ──
 var ADMIN_API = '/api/admin-api';
@@ -526,6 +536,32 @@ async function loadOrder() {
 
 
 loadOrder();
+// ── Load upsell products ──
+async function loadUpsellProducts() {
+  try {
+    var res = await fetch('/api/store-data');
+    if (!res.ok) return;
+    var data = await res.json();
+    var products = (data.products || []).filter(function(p){ return p.status === 'active' && !p.is_deleted; });
+    if (!products.length) return;
+    products = products.sort(function(){ return Math.random() - 0.5; }).slice(0, 6);
+    var grid = document.getElementById('upsellGrid');
+    if (!grid) return;
+    grid.innerHTML = products.map(function(p) {
+      var slug = p.slug || p.name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
+      return '<div class="upsell-card" onclick="window.location.href=\'/products/' + slug + \'">' +
+        (p.image_url ? '<img src="' + p.image_url + '" alt="' + p.name + '" style="width:100%;height:90px;object-fit:cover;border-radius:8px;margin-bottom:8px">' :
+          '<div class="upsell-emoji">' + (p.emoji || '🌿') + '</div>') +
+        '<div class="upsell-name">' + p.name + '</div>' +
+        '<div class="upsell-price">₹' + p.price + '</div>' +
+        '<button class="upsell-add" onclick="event.stopPropagation();window.location.href=\'/products/' + slug + \''">View →</button>' +
+        '</div>';
+    }).join('');
+    document.getElementById('upsellSection').style.display = 'block';
+  } catch(e) {}
+}
+loadUpsellProducts();
+
 </script>
 </body>
 </html>
