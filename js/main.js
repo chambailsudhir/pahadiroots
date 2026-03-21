@@ -87,7 +87,7 @@ const sv = () => {
       var cartData = cart.map(function(i){
         var prod = PRODUCTS.find(function(p){ return p.id === i.id; });
         var freshImage = (prod && prod.image_url) ? prod.image_url : (i.image || '');
-        return { id:i.id, name:i.name, price:i.price, qty:i.qty||1, emoji:i.emoji||'🌿', variant:i.variant||'', image:freshImage };
+        return { id:i.id, name:i.name, price:i.price, qty:i.qty||1, emoji:i.emoji||'🌿', variant:i.variant||'', image:freshImage, gst_rate:i.gst_rate || (freshProd ? freshProd.gst_rate : 5) || 5 };
       });
       fetch('/api/abandoned-cart', {
         method: 'POST',
@@ -775,7 +775,7 @@ function addToCart(id) {
   }
   var displayName = p.name + (variantLabel ? ' (' + variantLabel + ')' : '');
   if (ex) ex.qty++;
-  else cart.push({cartKey:cartKey, id:p.id, variantId:variantId||null, name:displayName, emoji:p.emoji, image:p.image_url||'', price:price, qty:1});
+  else cart.push({cartKey:cartKey, id:p.id, variantId:variantId||null, name:displayName, emoji:p.emoji, image:p.image_url||'', price:price, gst_rate:p.gst_rate||5, qty:1});
   sv(); uCart(); openCart();
   showToast('✅ ' + displayName + ' added!');
 }
@@ -785,6 +785,24 @@ function chQty(id, d) {
   var i = cart.find(function(x) { return String(x.cartKey||x.id) === sid; });
   if (i) { i.qty += d; if (i.qty < 1) { rmCart(id); return; } }
   sv(); uCart();
+}
+
+// ── GST Calculation (GST inclusive) ──
+function calcGST(cartItems) {
+  // GST is already included in price — extract it
+  // Formula: GST amount = price - (price / (1 + gst_rate/100))
+  var gstByRate = {};
+  var totalGST = 0;
+  (cartItems || []).forEach(function(item) {
+    var rate = item.gst_rate || 5;
+    var priceExGST = item.price / (1 + rate / 100);
+    var gstAmt = (item.price - priceExGST) * item.qty;
+    if (gstAmt > 0) {
+      gstByRate[rate] = (gstByRate[rate] || 0) + gstAmt;
+      totalGST += gstAmt;
+    }
+  });
+  return { total: Math.round(totalGST), byRate: gstByRate };
 }
 
 function calcDiscount(subtotal) {
@@ -841,6 +859,30 @@ function uCart() {
   }
   var cv2 = document.getElementById('ctvalTotal');
   if (cv2) cv2.textContent = '₹' + grandTotal.toLocaleString('en-IN');
+
+  // ── GST breakdown in cart ──
+  var gstInfo = calcGST(cart);
+  var gstRow = document.getElementById('gstRow');
+  var gstAmt = document.getElementById('gstAmt');
+  var gstLbl = document.getElementById('gstLabel');
+  if (gstRow && gstAmt && gstInfo.total > 0) {
+    // Build label: "GST included (5%: ₹14, 12%: ₹24)"
+    var rates = Object.keys(gstInfo.byRate);
+    var lbl = 'GST included';
+    if (rates.length === 1) {
+      lbl = 'GST @' + rates[0] + '% (included)';
+    } else if (rates.length > 1) {
+      lbl = 'GST (included): ' + rates.map(function(r) {
+        return r + '%=₹' + Math.round(gstInfo.byRate[r]);
+      }).join(', ');
+    }
+    if (gstLbl) gstLbl.textContent = lbl;
+    gstAmt.textContent = '₹' + gstInfo.total.toLocaleString('en-IN');
+    gstRow.style.display = '';
+  } else if (gstRow) {
+    gstRow.style.display = 'none';
+  }
+
   updateShipProgress(final);
   renderUpsell();
 
@@ -1060,6 +1102,7 @@ async function checkoutRazorpay() {
   var threshold  = (!isNaN(FREE_SHIP_THRESHOLD)) ? FREE_SHIP_THRESHOLD : 799;
   var shipCharge = (subtotal > 0 && threshold > 0 && subtotal < threshold) ? ((!isNaN(FLAT_SHIP_CHARGE)) ? FLAT_SHIP_CHARGE : 99) : 0;
   var final      = subtotal + shipCharge;
+  var gstAmount  = calcGST(cart).total; // GST already included in price
 
   var options = {
     key: 'rzp_live_SNFVJBHdd3dYRQ',
@@ -1080,7 +1123,7 @@ async function checkoutRazorpay() {
     handler: async function(response) {
       showToast('✅ Payment successful! Saving order...');
       var cartSnapshot = cart.slice(); // snapshot before clearing
-      var orderResult = await saveOrderToDB(name, phone, email, addr, city, state, pin, final, discount, shipCharge, 'razorpay_online', response.razorpay_payment_id, cartSnapshot);
+      var orderResult = await saveOrderToDB(name, phone, email, addr, city, state, pin, final, discount, shipCharge, 'razorpay_online', response.razorpay_payment_id, cartSnapshot, gstAmount);
       var orderId = (orderResult && orderResult.orderId) || '';
       var orderNumber = (orderResult && orderResult.orderNumber) || '';
       // Send WhatsApp confirmation
@@ -1106,7 +1149,7 @@ async function checkoutRazorpay() {
       _orderProcessing = false;
       window.open('https://wa.me/' + WHATSAPP_NUMBER + '?text='+encodeURIComponent(msg),'_blank');
       // Send confirmation email (non-blocking)
-      sendOrderEmail({ email: email, orderNumber: orderNumber, orderId: orderId, name: name, items: cartSnapshot, total: final, discount: discount, shipping: shipCharge, address: addr, city: city, state: state, pin: pin, payMethod: 'razorpay_online' });
+      sendOrderEmail({ email: email, orderNumber: orderNumber, orderId: orderId, name: name, items: cartSnapshot, total: final, discount: discount, shipping: shipCharge, gstAmount: gstAmount||0, address: addr, city: city, state: state, pin: pin, payMethod: 'razorpay_online' });
       // Redirect to order confirmation page
       var confUrl = '/order-confirmation?id=' + (orderId||'') + '&num=' + encodeURIComponent(orderNumber||'') + '&total=' + final + '&payment=' + encodeURIComponent(response.razorpay_payment_id||'');
       setTimeout(function(){ window.location.href = confUrl; }, 600);
@@ -1123,7 +1166,7 @@ async function checkoutRazorpay() {
 }
 
 // ── SAVE ORDER TO DB (shared by both payment methods) ───────────────
-async function saveOrderToDB(name, phone, email, addr, city, state, pin, final, discount, shipCharge, payMethod, paymentId, cartSnapshot) {
+async function saveOrderToDB(name, phone, email, addr, city, state, pin, final, discount, shipCharge, payMethod, paymentId, cartSnapshot, gstAmount) {
   try {
     var itemsToSave = (cartSnapshot || cart);
     var endpoint = '/api/admin-api';
@@ -1134,6 +1177,7 @@ async function saveOrderToDB(name, phone, email, addr, city, state, pin, final, 
         action: 'save_order',
         name, phone, email, addr, city, state, pin,
         final, discount, shipCharge: shipCharge || 0, payMethod, paymentId,
+        gstAmount: gstAmount || 0,
         couponCode: activeCoupon ? activeCoupon.code : null,
         auth_user_id: (_authUser && _authUser.id) ? _authUser.id : null,
         items: itemsToSave.map(function(i){ return {id:i.id||null, variantId:i.variantId||null, qty:i.qty, price:i.price, name:i.name||''}; })
@@ -1170,6 +1214,7 @@ async function sendOrderEmail(opts) {
         total: opts.total || 0,
         discount: opts.discount || 0,
         shipping: opts.shipping || 0,
+        gstAmount: opts.gstAmount || 0,
         address: opts.address || '',
         city: opts.city || '',
         state: opts.state || '',
@@ -1253,12 +1298,12 @@ async function checkout() {
   showToast('✅ Order placed! Redirecting...');
 
   // Save to DB and redirect to confirmation page
-  saveOrderToDB(name, phone, email, addr, city, state, pin, final, discount, shipCharge, 'whatsapp_cod', null, cartSnapshot)
+  saveOrderToDB(name, phone, email, addr, city, state, pin, final, discount, shipCharge, 'whatsapp_cod', null, cartSnapshot, gstAmount)
     .then(function(result) {
       var orderId = (result && result.orderId) || '';
       var orderNumber = (result && result.orderNumber) || '';
       // Send confirmation email (non-blocking)
-      sendOrderEmail({ email: email, orderNumber: orderNumber, orderId: orderId, name: name, items: cartSnapshot, total: final, discount: discount, shipping: shipCharge, address: addr, city: city, state: state, pin: pin, payMethod: 'whatsapp_cod' });
+      sendOrderEmail({ email: email, orderNumber: orderNumber, orderId: orderId, name: name, items: cartSnapshot, total: final, discount: discount, shipping: shipCharge, gstAmount: gstAmount||0, address: addr, city: city, state: state, pin: pin, payMethod: 'whatsapp_cod' });
       var confUrl = '/order-confirmation?id=' + orderId + '&num=' + encodeURIComponent(orderNumber) + '&total=' + final;
       setTimeout(function(){ window.location.href = confUrl; }, 600);
     })
@@ -1538,7 +1583,7 @@ function addToCartQty(id, qty) {
   if (!p) return;
   for (var i = 0; i < qty; i++) {
     var ex = cart.find(function(x) { return x.id === id; });
-    if (ex) ex.qty++; else cart.push({id:p.id, name:p.name, emoji:p.emoji, image:p.image_url||'', price:p.price, qty:1});
+    if (ex) ex.qty++; else cart.push({id:p.id, name:p.name, emoji:p.emoji, image:p.image_url||'', price:p.price, gst_rate:p.gst_rate||5, qty:1, cartKey:String(p.id)});
   }
   sv(); uCart(); openCart();
   showToast('✅ ' + p.name + ' × ' + qty + ' added!');
