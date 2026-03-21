@@ -209,14 +209,15 @@ function getStoreApiBase() {
 // ── DATA LOADING ───────────────────────────────────────────────────
 
 // ── HERO BACKGROUND — static single image (no slideshow) ──
+var _heroFallback = 'https://images.unsplash.com/photo-1587049352846-4a222e784d38?w=1600&q=80';
+
 function initHeroSlideshow(productImageUrls) {
   var container = document.getElementById('heroSlides');
   if (!container) return;
-  // Use first product image as static background — no distracting slideshow
   var url = (productImageUrls && productImageUrls.length)
     ? productImageUrls[0]
-    : 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1600&q=80';
-  container.innerHTML = '<img class="hero-slide-img active" src="' + url + '" loading="eager" onerror="this.style.opacity=0">';
+    : _heroFallback;
+  container.innerHTML = '<img class="hero-slide-img active" src="' + url + '" loading="eager" onerror="this.src=\'' + _heroFallback + '\'">';
 }
 
 async function loadData() {
