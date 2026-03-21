@@ -422,9 +422,11 @@ function renderOrder(order) {
   }).join('') || '<div style="color:#888;font-size:13px;padding:8px 0">Items loading…</div>';
 
   // Summary
+  var tax = order.tax || 0;
   var sumHtml =
-    '<div class="sum-row"><span class="lbl">Subtotal</span><span class="val">₹' + sub.toLocaleString('en-IN') + '</span></div>' +
+    '<div class="sum-row"><span class="lbl">Subtotal (incl. GST)</span><span class="val">₹' + sub.toLocaleString('en-IN') + '</span></div>' +
     (disc > 0 ? '<div class="sum-row"><span class="lbl" style="color:#2d6a4f">Discount</span><span class="val" style="color:#2d6a4f">−₹' + disc.toLocaleString('en-IN') + '</span></div>' : '') +
+    (tax > 0 ? '<div class="sum-row"><span class="lbl" style="color:var(--tx3);font-size:13px">↳ GST included</span><span class="val" style="color:var(--tx3);font-size:13px">₹' + tax.toLocaleString('en-IN') + '</span></div>' : '') +
     '<div class="sum-row"><span class="lbl">Shipping</span><span class="val ' + (ship===0?'free-ship':'') + '">' + (ship===0?'🎉 FREE':'₹'+ship) + '</span></div>' +
     '<div class="sum-row total"><span>Total Paid</span><span>₹' + total.toLocaleString('en-IN') + '</span></div>';
 

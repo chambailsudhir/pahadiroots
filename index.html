@@ -732,7 +732,8 @@
         <div class="cart-savings" id="cartSavings"><span>🎉</span><span>You're saving ₹<span id="savingAmt"></span>!</span></div>
         <!-- Totals -->
         <div class="csum-rows">
-          <div class="csum-row"><span>Subtotal</span><span id="ctval">₹0</span></div>
+          <div class="csum-row"><span>Subtotal (incl. GST)</span><span id="ctval">₹0</span></div>
+          <div class="csum-row" id="gstRow" style="display:none"><span id="gstLabel">GST included</span><span id="gstAmt" style="color:var(--tx3);font-size:12px">₹0</span></div>
           <div class="csum-row"><span>Shipping</span><span class="csum-free" id="shipLabel">Free on ₹<span class="dynShipAmt">799</span>+</span></div>
           <div class="csum-divider"></div>
           <div class="csum-row csum-total"><span>Total</span><span id="ctvalTotal">₹0</span></div>
