@@ -503,7 +503,6 @@ function rateOrder(n) {
 // ── FETCH ORDER DATA ──
 async function loadOrder() {
   if (!orderId && !orderNum) {
-    // No ID - show basic confirmation with URL params
     document.getElementById('loadingState').style.display = 'none';
     document.getElementById('confirmHero').style.display  = 'block';
     document.getElementById('heroOrderNum').textContent   = total ? 'Total Paid: ₹' + total : '✅ Order Placed';
@@ -511,12 +510,18 @@ async function loadOrder() {
     return;
   }
 
+  // 8 second timeout — skeleton nahi rukne dega
+  var controller = new AbortController();
+  var _timer = setTimeout(function() { controller.abort(); }, 8000);
+
   try {
     var res = await fetch(ADMIN_API, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'public_get_order', order_id: orderId, orderNumber: orderNum })
+      body: JSON.stringify({ action: 'public_get_order', order_id: orderId, orderNumber: orderNum }),
+      signal: controller.signal
     });
+    clearTimeout(_timer);
 
     var data = await res.json();
     if (!res.ok || !data.order) throw new Error(data.error || 'Order not found');
@@ -526,7 +531,7 @@ async function loadOrder() {
     document.getElementById('orderContent').innerHTML = renderOrder(data.order);
 
   } catch(e) {
-    console.warn('Order load failed:', e.message);
+    clearTimeout(_timer);
     document.getElementById('loadingState').style.display = 'none';
     document.getElementById('confirmHero').style.display  = 'block';
     document.getElementById('heroOrderNum').textContent   = orderNum ? '📋 ' + orderNum : (total ? 'Total: ₹' + total : '✅ Order Placed');

@@ -1188,6 +1188,26 @@ async function saveOrdStatus(){
     if(status==='delivered' && !S.currentOrder.delivered_at) patchBody.delivered_at=new Date().toISOString();
     await PATCH('orders',`id=eq.${S.currentOrder.id}`,patchBody);
     try{await POST('order_status_history',{order_id:S.currentOrder.id,old_status:S.currentOrder.order_status,new_status:status,changed_at:new Date().toISOString()});}catch(e){}
+
+    // ── Send status email to customer (if email exists) ──
+    const custEmail = (S._custCache[S.currentOrder.customer_id]||{}).email || '';
+    if (custEmail && custEmail.includes('@') && (status === 'shipped' || status === 'cancelled')) {
+      fetch('/api/send-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: status === 'shipped' ? 'order_shipped' : 'order_cancelled',
+          to: custEmail,
+          orderNumber: S.currentOrder.order_number || '',
+          orderId: S.currentOrder.id || '',
+          name: (S._custCache[S.currentOrder.customer_id]||{}).first_name || '',
+          trackingNumber: tracking || S.currentOrder.tracking_number || '',
+          courier: courier || S.currentOrder.courier || '',
+          total: S.currentOrder.total_amount || 0
+        })
+      }).catch(()=>{}); // fire and forget
+    }
+
     toast('Order updated ✓','ok');closeM('order-modal');await loadOrders(1);
   }catch(e){
     if(e.message.includes('Cannot confirm order without items')){
