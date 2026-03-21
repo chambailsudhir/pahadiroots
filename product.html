@@ -360,7 +360,7 @@ function renderProduct(p, images, related, data, stateMap) {
   document.getElementById('pg-desc').setAttribute('content', p.short_description || p.name + ' — Authentic Himalayan product from 5 Pahadi Roots');
   // Dynamic OG tags for social sharing
   var ogImg = p.image_url || 'https://pahadiroots.com/images/og-cover.jpg';
-  var ogUrl = 'https://pahadiroots.com/products/' + (p.slug || p.id);
+  var ogUrl = 'https://pahadiroots.com/products/' + (p.slug && !/^\d+$/.test(p.slug) ? p.slug : (p.name ? p.name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'') : p.id));
   var ogDesc = p.short_description || p.name + ' — Authentic Himalayan organic product from 5 Pahadi Roots. Sourced directly from mountain farmers.';
   document.getElementById('og-title').setAttribute('content', (p.name||'Product') + ' — 5 Pahadi Roots');
   document.getElementById('og-desc').setAttribute('content', ogDesc);
@@ -504,7 +504,7 @@ function renderProduct(p, images, related, data, stateMap) {
     '<h2 class="section-title">You May Also Like</h2>' +
     '<div class="related-grid">' +
     related.map(function(r) {
-      return '<div class="rel-card" onclick="goToProduct(\'' + (r.slug || r.id) + '\')" style="cursor:pointer">' +
+      return '<div class="rel-card" onclick="goToProduct(\'' + (r.slug && !/^\\d+$/.test(r.slug) ? r.slug : (r.name ? r.name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^\-|-$)/g,'') : r.id)) + '\')" style="cursor:pointer">' +
         '<div class="rel-img">' + (r.image_url ? '<img src="' + r.image_url + '" alt="' + r.name + '" loading="lazy">' : '<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:40px">' + (r.emoji||'🌿') + '</div>') + '</div>' +
         '<div class="rel-body"><div class="rel-name">' + r.name + '</div><div class="rel-price">₹' + r.price + '</div></div>' +
         '</div>';
@@ -708,7 +708,13 @@ function toggleWL() {
 
 // ── Go to product ──
 function goToProduct(slug) {
-  window.location.href = '/products/' + slug;
+  var s = String(slug || '');
+  // Never use numeric ID — generate from name if needed
+  if (!s || /^\d+$/.test(s)) {
+    var prod = ALL_PRODUCTS.find(function(p){ return String(p.id) === s; });
+    if (prod) s = prod.slug && !/^\d+$/.test(prod.slug) ? prod.slug : (prod.name ? prod.name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'') : s);
+  }
+  window.location.href = '/products/' + s;
 }
 
 // ── Not found ──
