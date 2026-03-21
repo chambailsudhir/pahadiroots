@@ -554,12 +554,13 @@ async function loadUpsellProducts() {
     if (!grid) return;
     grid.innerHTML = products.map(function(p) {
       var slug = p.slug || p.name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
-      return '<div class="upsell-card" onclick="window.location.href=\'/products/' + slug + \'">' +
+      var url = '/products/' + slug;
+      return '<div class="upsell-card" onclick="window.location.href=\'' + url + '\'">' +
         (p.image_url ? '<img src="' + p.image_url + '" alt="' + p.name + '" style="width:100%;height:90px;object-fit:cover;border-radius:8px;margin-bottom:8px">' :
-          '<div class="upsell-emoji">' + (p.emoji || '🌿') + '</div>') +
+          '<div class="upsell-emoji">' + (p.emoji || '\U0001F33F') + '</div>') +
         '<div class="upsell-name">' + p.name + '</div>' +
-        '<div class="upsell-price">₹' + p.price + '</div>' +
-        '<button class="upsell-add" onclick="event.stopPropagation();window.location.href=\'/products/' + slug + \''">View →</button>' +
+        '<div class="upsell-price">\u20B9' + p.price + '</div>' +
+        '<button class="upsell-add" onclick="event.stopPropagation();window.location.href=\'' + url + '\'">View \u2192</button>' +
         '</div>';
     }).join('');
     document.getElementById('upsellSection').style.display = 'block';
