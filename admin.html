@@ -527,11 +527,68 @@ CREATE INDEX IF NOT EXISTS idx_products_is_deleted ON products(is_deleted);</div
         <div class="fg"><label>State <span class="req">*</span></label><select class="fi" id="p-state"></select></div>
         <div class="fg"><label>Status</label><select class="fi" id="p-status"><option value="active">Active</option><option value="inactive">Inactive</option><option value="draft">Draft</option></select></div>
         <div class="fg"><label>Unit Label</label><input class="fi" id="p-unit" placeholder="250g"></div>
-        <div class="fg"><label>GST Rate <span style="color:var(--tx3);font-size:11px">(% — inclusive in price)</span></label><select class="fi" id="p-gst"><option value="0">0% (Exempt)</option><option value="5" selected>5% (Food items)</option><option value="12">12%</option><option value="18">18%</option></select></div>
+        <div class="fg"><label>GST Rate <span style="color:var(--tx3);font-size:11px">(% — inclusive in price)</span></label><select class="fi" id="p-gst" onchange="calcPriceGST()"><option value="0">0% (Exempt)</option><option value="5" selected>5% (Food items)</option><option value="12">12%</option><option value="18">18%</option></select></div>
       </div>
-      <div class="gr gr3">
-        <div class="fg"><label>Price (₹) <span class="req">*</span></label><input type="number" class="fi" id="p-price"></div>
-        <div class="fg"><label>MRP (₹)</label><input type="number" class="fi" id="p-mrp"></div>
+      <!-- ── PRICING + GST PANEL ── -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:14px">
+        <!-- Left: price inputs -->
+        <div>
+          <div class="fg">
+            <label>Base Price ₹ <span style="color:var(--tx3);font-size:10px">(excl. GST)</span>
+              <span style="float:right;font-size:10px;color:var(--g2);cursor:pointer" onclick="document.getElementById('p-base').focus()">edit</span>
+            </label>
+            <input type="number" class="fi" id="p-base" placeholder="Auto from MRP" oninput="priceFromBase()" style="border-color:rgba(200,146,10,.4)">
+          </div>
+          <div class="fg">
+            <label>Selling Price ₹ <span class="req">*</span> <span style="color:var(--tx3);font-size:10px">(incl. GST = customer pays)</span></label>
+            <input type="number" class="fi" id="p-price" oninput="priceFromMRP()" onchange="priceFromMRP()">
+          </div>
+          <div class="fg">
+            <label>MRP ₹ <span style="color:var(--tx3);font-size:10px">(strikethrough price)</span></label>
+            <input type="number" class="fi" id="p-mrp">
+          </div>
+        </div>
+
+        <!-- Right: live GST breakdown card -->
+        <div id="gst-calc-box" style="background:rgba(200,146,10,.07);border:1px solid rgba(200,146,10,.22);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:10px">
+          <div style="font-size:11px;font-weight:700;color:#c8920a;letter-spacing:.5px;text-transform:uppercase">Live GST Breakdown</div>
+
+          <div style="display:flex;justify-content:space-between;align-items:center;background:var(--bg2);border-radius:8px;padding:10px 12px">
+            <div>
+              <div style="font-size:10px;color:var(--tx3)">Base (excl. GST)</div>
+              <div style="font-size:18px;font-weight:800;color:var(--tx)" id="gst-base">₹—</div>
+            </div>
+            <div style="color:var(--tx3);font-size:18px">+</div>
+            <div style="text-align:center">
+              <div style="font-size:10px;color:var(--tx3)" id="gst-rate-lbl">GST @5%</div>
+              <div style="font-size:18px;font-weight:800;color:#c8920a" id="gst-tax">₹—</div>
+            </div>
+            <div style="color:var(--tx3);font-size:18px">=</div>
+            <div style="text-align:right">
+              <div style="font-size:10px;color:var(--tx3)">Selling price</div>
+              <div style="font-size:18px;font-weight:800;color:var(--g)" id="gst-total">₹—</div>
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <div style="background:var(--bg2);border-radius:8px;padding:8px 10px;text-align:center">
+              <div style="font-size:10px;color:var(--tx3)">CGST</div>
+              <div style="font-size:13px;font-weight:700;color:var(--tx)" id="gst-cgst">₹—</div>
+            </div>
+            <div style="background:var(--bg2);border-radius:8px;padding:8px 10px;text-align:center">
+              <div style="font-size:10px;color:var(--tx3)">SGST</div>
+              <div style="font-size:13px;font-weight:700;color:var(--tx)" id="gst-sgst">₹—</div>
+            </div>
+          </div>
+
+          <div style="font-size:11px;color:var(--tx3);line-height:1.5;border-top:1px solid rgba(200,146,10,.15);padding-top:8px">
+            <span id="gst-hint">Enter selling price to see breakdown</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stock row -->
+      <div class="gr gr3" style="margin-bottom:14px">
         <div class="fg"><label>Stock Qty <span style="color:var(--tx3);font-size:11px">(current)</span></label><input type="number" class="fi" id="p-stock"></div>
         <div class="fg"><label>Initial Stock <span style="color:var(--tx3);font-size:11px">(total set)</span></label><input type="number" class="fi" id="p-initial-stock" placeholder="Same as stock qty"></div>
       </div>
@@ -902,6 +959,15 @@ function openProdM(p){p=p||{};
   document.getElementById('p-new').checked=!!(p.badges?.includes('new'));
   document.getElementById('p-status').value=p.status||'active';
   document.getElementById('p-gst').value=String(p.gst_rate||5);
+  // Populate base price
+  if (p.price) {
+    var rate = p.gst_rate || 5;
+    var base = p.price / (1 + rate/100);
+    document.getElementById('p-base').value = base.toFixed(2);
+  } else {
+    document.getElementById('p-base').value = '';
+  }
+  setTimeout(calcPriceGST, 50);
   fillSel('p-cat',S.cats,'id','name',p.category_id);
   fillSel('p-state',S.states||[],'id','name',p.state_id);
   // Load variants if editing existing product
@@ -1020,6 +1086,66 @@ async function saveBulkGST() {
     toast('Error: ' + e.message, 'er');
     if (btn) { btn.disabled = false; btn.textContent = '💾 Save All GST Rates'; }
   }
+}
+
+
+// ── GST LIVE CALCULATOR (Product Form) ──────────────────────────
+// ── Bidirectional GST Calculator ──────────────────────────────
+var _gstLock = false; // prevent infinite loop
+
+function _updateGSTPanel(price, rate) {
+  if (!price || price <= 0) {
+    ['gst-base','gst-tax','gst-total','gst-cgst','gst-sgst'].forEach(function(id) {
+      var el = document.getElementById(id); if(el) el.textContent = '₹—';
+    });
+    var hint = document.getElementById('gst-hint');
+    if(hint) hint.textContent = 'Enter selling price to see breakdown';
+    return;
+  }
+  var base  = price / (1 + rate / 100);
+  var tax   = price - base;
+  var half  = tax / 2;
+  var el;
+  el = document.getElementById('gst-base');    if(el) el.textContent = '₹' + base.toFixed(2);
+  el = document.getElementById('gst-tax');     if(el) el.textContent = '₹' + tax.toFixed(2);
+  el = document.getElementById('gst-total');   if(el) el.textContent = '₹' + price.toFixed(2);
+  el = document.getElementById('gst-cgst');    if(el) el.textContent = '₹' + half.toFixed(2);
+  el = document.getElementById('gst-sgst');    if(el) el.textContent = '₹' + half.toFixed(2);
+  el = document.getElementById('gst-rate-lbl');if(el) el.textContent = 'GST @' + rate + '%';
+  el = document.getElementById('gst-hint');
+  if(el) {
+    if(rate === 0) el.textContent = 'Product is GST exempt. No tax.';
+    else el.textContent = 'Customer pays ₹' + price.toFixed(2) + ' — includes ₹' + tax.toFixed(2) + ' GST';
+  }
+}
+
+function priceFromMRP() {
+  // Selling price changed → update base
+  if (_gstLock) return; _gstLock = true;
+  var price = parseFloat(document.getElementById('p-price')?.value) || 0;
+  var rate  = parseFloat(document.getElementById('p-gst')?.value)   || 0;
+  var base  = rate > 0 ? price / (1 + rate/100) : price;
+  var baseEl = document.getElementById('p-base');
+  if (baseEl) baseEl.value = base > 0 ? base.toFixed(2) : '';
+  _updateGSTPanel(price, rate);
+  _gstLock = false;
+}
+
+function priceFromBase() {
+  // Base price changed → update selling price
+  if (_gstLock) return; _gstLock = true;
+  var base  = parseFloat(document.getElementById('p-base')?.value) || 0;
+  var rate  = parseFloat(document.getElementById('p-gst')?.value)  || 0;
+  var price = base * (1 + rate/100);
+  var priceEl = document.getElementById('p-price');
+  if (priceEl) { priceEl.value = price > 0 ? price.toFixed(2) : ''; }
+  _updateGSTPanel(price, rate);
+  _gstLock = false;
+}
+
+function calcPriceGST() {
+  // Called on GST rate change — recalc from selling price
+  priceFromMRP();
 }
 
 
