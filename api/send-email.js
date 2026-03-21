@@ -196,6 +196,34 @@ export default async function handler(req, res) {
         <a href="https://pahadiroots.com" style="display:inline-block;background:#1a3a1e;color:#fff;padding:12px 28px;border-radius:12px;text-decoration:none;font-weight:800;font-size:14px;margin-top:8px">← Continue Shopping</a>
       </div>`);
 
+  // ══════════════════════════════════════════════════════════
+  // 5. ORDER STATUS UPDATE — packed / confirmed / delivered
+  // ══════════════════════════════════════════════════════════
+  } else if (type === 'order_status_update') {
+    if (!to || !to.includes('@')) return res.status(400).json({ error: 'Valid customer email required' });
+    sendTo = [to];
+    const statusInfo = {
+      confirmed:  { icon: '✅', title: 'Order Confirmed!',     msg: 'Your order has been confirmed and will be processed soon.' },
+      packed:     { icon: '📦', title: 'Order Packed!',        msg: 'Your order has been packed and is ready for dispatch.' },
+      delivered:  { icon: '🎉', title: 'Order Delivered!',     msg: 'Your order has been delivered. Enjoy your Himalayan goodness!' },
+      processing: { icon: '⚙️', title: 'Order Processing',    msg: 'Your order is being processed.' },
+    };
+    const info = statusInfo[body.status] || { icon: '📋', title: 'Order Update', msg: 'Your order status has been updated.' };
+
+    subject = `${info.icon} ${info.title} — ${orderNumber}`;
+    html = emailWrapper(`
+      <div style="background:#fff;padding:28px 32px;text-align:center;border-left:1px solid #eee;border-right:1px solid #eee">
+        <div style="font-size:44px;margin-bottom:10px">${info.icon}</div>
+        <h1 style="font-family:Georgia,serif;font-size:24px;color:#1a3a1e;margin:0 0 8px">${info.title}</h1>
+        <p style="color:#666;font-size:14px;margin:0 0 16px">${info.msg}</p>
+        <div style="display:inline-block;background:#f0f7f4;border:1.5px solid #c8e6c9;border-radius:20px;padding:8px 20px;margin-bottom:20px">
+          <span style="font-size:13px;font-weight:700;color:#1a3a1e">📋 ${orderNumber || ''}</span>
+        </div>
+        <br>
+        <a href="${ORDER_URL}" style="display:inline-block;background:linear-gradient(135deg,#1a3a1e,#2d5233);color:#fff;padding:13px 30px;border-radius:12px;text-decoration:none;font-weight:800;font-size:14px">📦 View Order Details</a>
+        <p style="color:#aaa;font-size:12px;margin-top:16px">Questions? <a href="https://wa.me/${WA_NUMBER}" style="color:#1a3a1e">WhatsApp ${WA_DISPLAY}</a></p>
+      </div>`);
+
   } else {
     return res.status(400).json({ error: `Unknown email type: ${type}` });
   }
