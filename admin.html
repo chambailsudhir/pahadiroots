@@ -850,7 +850,7 @@ async function loadProducts(page=1){
     const cat=document.getElementById('prod-cat-f')?.value||'';
     const status=document.getElementById('prod-status-f')?.value||'';
     // 2.2 Only required columns
-    let q='select=id,name,sku,price,mrp,stock_quantity,initial_stock,status,category_id,emoji,is_deleted&is_deleted=eq.false&order=name.asc';
+    let q='select=id,name,sku,price,mrp,stock_quantity,initial_stock,status,category_id,emoji,is_deleted,gst_rate&is_deleted=eq.false&order=name.asc';
     if(cat) q+=`&category_id=eq.${cat}`;
     if(status) q+=`&status=eq.${status}`;
     const data=await pagedGET('products',q,page);
@@ -866,7 +866,7 @@ async function loadProducts(page=1){
         <td><div class="td-main">${p.emoji||''} ${p.name}</div><div class="td-sub mono">${p.sku||''}</div></td>
         <td>${cm[p.category_id]||'—'}</td>
         <td>₹${p.price||0}${p.mrp&&p.mrp>p.price?' <span style="color:var(--tx3);text-decoration:line-through;font-size:11px">₹'+p.mrp+'</span>':''}</td>
-        <td><span style="background:rgba(200,146,10,.15);color:#c8920a;font-size:11px;font-weight:700;padding:2px 7px;border-radius:8px">${p.gst_rate||5}%</span> <button onclick="quickSetGST('${p.id}',${p.gst_rate||5})" style="background:none;border:none;cursor:pointer;font-size:11px;color:var(--tx3);padding:0 2px" title="Change GST">✏️</button></td>
+        <td><span style="background:rgba(200,146,10,.15);color:#c8920a;font-size:11px;font-weight:700;padding:2px 7px;border-radius:8px">${p.gst_rate||5}%</span></td>
         <td style="color:var(--tx2)">${p.initial_stock||0}</td>
         <td class="${(p.stock_quantity||0)<=10?'stok-lo':'stok'}">${p.stock_quantity||0}</td>
         <td style="color:${(p.initial_stock||0)-(p.stock_quantity||0)>0?'var(--grn)':'var(--tx3)'}">${Math.max(0,(p.initial_stock||0)-(p.stock_quantity||0))}</td>
