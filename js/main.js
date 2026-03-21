@@ -58,17 +58,17 @@ const FALLBACK_STATES = [
 ];
 
 const FALLBACK_PRODUCTS = [
-  {id:1,name:"Himalayan Wild Honey",emoji:"🍯",description:"Raw forest honey from Himachal Pradesh — dark, medicinal & intensely floral.",price:549,original_price:699,unit:"/500g",badge_type:"bs",badge_label:"Bestseller",card_bg:"#fdf3e3",state_id:"hp",region:"Kullu Valley, Himachal Pradesh",stock:35,
+  {id:1,name:"Himalayan Wild Honey",slug:"himalayan-wild-honey",emoji:"🍯",description:"Raw forest honey from Himachal Pradesh — dark, medicinal & intensely floral.",price:549,original_price:699,unit:"/500g",badge_type:"bs",badge_label:"Bestseller",card_bg:"#fdf3e3",state_id:"hp",region:"Kullu Valley, Himachal Pradesh",stock:35,
    image_url:"https://images.unsplash.com/photo-1587049352846-4a222e784d38?w=400&h=400&fit=crop&q=80"},
-  {id:2,name:"Bilona A2 Cow Ghee",emoji:"🥛",description:"Traditional hand-churned bilona ghee from indigenous cows. Golden, grainy & deeply aromatic.",price:849,original_price:1100,unit:"/500g",badge_type:"og",badge_label:"Organic",card_bg:"#f5f5e6",state_id:"uk",region:"Tehri Garhwal, Uttarakhand",stock:18,
+  {id:2,name:"Bilona A2 Cow Ghee",slug:"bilona-a2-cow-ghee",emoji:"🥛",description:"Traditional hand-churned bilona ghee from indigenous cows. Golden, grainy & deeply aromatic.",price:849,original_price:1100,unit:"/500g",badge_type:"og",badge_label:"Organic",card_bg:"#f5f5e6",state_id:"uk",region:"Tehri Garhwal, Uttarakhand",stock:18,
    image_url:"https://images.unsplash.com/photo-1631897642056-97a7abebacb2?w=400&h=400&fit=crop&q=80"},
-  {id:3,name:"Kashmir Mongra Saffron",emoji:"🌸",description:"Grade-A Pampore saffron threads — hand-harvested. Pure gold in every strand.",price:399,original_price:550,unit:"/0.5g",badge_type:"pm",badge_label:"Premium",card_bg:"#fff0f5",state_id:"jk",region:"Pampore, Kashmir",stock:4,
+  {id:3,name:"Kashmir Mongra Saffron",slug:"kashmir-mongra-saffron",emoji:"🌸",description:"Grade-A Pampore saffron threads — hand-harvested. Pure gold in every strand.",price:399,original_price:550,unit:"/0.5g",badge_type:"pm",badge_label:"Premium",card_bg:"#fff0f5",state_id:"jk",region:"Pampore, Kashmir",stock:4,
    image_url:"https://images.unsplash.com/photo-1615485925600-97237c4fc1ec?w=400&h=400&fit=crop&q=80"},
-  {id:4,name:"Ladakh Apricot Kernel Oil",emoji:"🌼",description:"Cold-pressed from sun-dried Ladakhi apricots. A centuries-old Himalayan beauty & cooking secret.",price:449,original_price:599,unit:"/100ml",badge_type:"nw",badge_label:"New Arrival",card_bg:"#fff8e1",state_id:"la",region:"Nubra Valley, Ladakh",stock:22,
+  {id:4,name:"Ladakh Apricot Kernel Oil",slug:"ladakh-apricot-kernel-oil",emoji:"🌼",description:"Cold-pressed from sun-dried Ladakhi apricots. A centuries-old Himalayan beauty & cooking secret.",price:449,original_price:599,unit:"/100ml",badge_type:"nw",badge_label:"New Arrival",card_bg:"#fff8e1",state_id:"la",region:"Nubra Valley, Ladakh",stock:22,
    image_url:"https://images.unsplash.com/photo-1526399232581-2ab803f91e84?w=400&h=400&fit=crop&q=80"},
-  {id:5,name:"Sikkim Organic Cardamom",emoji:"🌿",description:"Large green pods from Sikkim's UNESCO-certified organic farms — bold, camphor-sweet & aromatic.",price:299,original_price:399,unit:"/100g",badge_type:"bs",badge_label:"Bestseller",card_bg:"#e8f5e8",state_id:"sk",region:"Gangtok Hills, Sikkim",stock:60,
+  {id:5,name:"Sikkim Organic Cardamom",slug:"sikkim-organic-cardamom",emoji:"🌿",description:"Large green pods from Sikkim's UNESCO-certified organic farms — bold, camphor-sweet & aromatic.",price:299,original_price:399,unit:"/100g",badge_type:"bs",badge_label:"Bestseller",card_bg:"#e8f5e8",state_id:"sk",region:"Gangtok Hills, Sikkim",stock:60,
    image_url:"https://images.unsplash.com/photo-1585386959984-a4155224a1ad?w=400&h=400&fit=crop&q=80"},
-  {id:6,name:"Assam First Flush Black Tea",emoji:"🍵",description:"Single-estate Assam tea plucked at first flush — full-bodied, malty & bright in the cup.",price:349,original_price:480,unit:"/250g",badge_type:"nw",badge_label:"New",card_bg:"#f5ecd8",state_id:"as",region:"Jorhat Estate, Assam",stock:45,
+  {id:6,name:"Assam First Flush Black Tea",slug:"assam-first-flush-black-tea",emoji:"🍵",description:"Single-estate Assam tea plucked at first flush — full-bodied, malty & bright in the cup.",price:349,original_price:480,unit:"/250g",badge_type:"nw",badge_label:"New",card_bg:"#f5ecd8",state_id:"as",region:"Jorhat Estate, Assam",stock:45,
    image_url:"https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=400&h=400&fit=crop&q=80"},
 ];
 
@@ -461,7 +461,7 @@ function mkProd(p) {
     '</div>';
   var discBadge = pct ? '<span style="position:absolute;top:8px;right:36px;background:#e53;color:#fff;font-size:9px;font-weight:800;padding:2px 7px;border-radius:10px;z-index:2">-' + pct + '%</span>' : '';
   var notifyBtn = stock <= 0 ? '<button class="notify-btn" onclick="event.stopPropagation();openNotify(' + p.id + ')">🔔 Notify Me</button>' : '';
-  return '<div class="pcard" style="position:relative" onclick="goToProductPage(\'' + (p.slug || p.id) + '\')">' +
+  return '<div class="pcard" style="position:relative" onclick="goToProductPage(\'' + getProductSlug(p) + '\')">' +
     '<span class="pbadge b' + bc + '">' + (p.badge_label||'') + '</span>' +
     '<button class="wl-btn' + (inWL?' active':'') + '" data-id="' + p.id + '" onclick="event.stopPropagation();toggleWishlist(' + p.id + ')" title="Wishlist mein save karo">' + (inWL ? '❤️ Saved' : '🤍 Save') + '</button>' +
     img + discBadge +
@@ -740,8 +740,28 @@ function initProductHoverImages() {
 }
 
 
+// ── Get clean slug for any product — never returns numeric ID ──
+function getProductSlug(p) {
+  if (!p) return '';
+  // Use slug if set and not numeric
+  if (p.slug && !/^\d+$/.test(p.slug)) return p.slug;
+  // Generate from name as fallback
+  if (p.name) return p.name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
+  // Last resort — numeric id (should never happen if products have names)
+  return String(p.id || '');
+}
+
 function goToProductPage(slug) {
-  window.location.href = '/products/' + slug;
+  // Never use numeric ID in URL — generate slug from name if needed
+  var s = String(slug || '');
+  if (!s || /^\d+$/.test(s)) {
+    // Numeric ID passed — find product and use its slug or generate from name
+    var prod = PRODUCTS.find(function(p){ return String(p.id) === s; });
+    if (prod) {
+      s = getProductSlug(prod);
+    }
+  }
+  window.location.href = '/products/' + s;
 }
 
 function updateCardPrice(prodId, sel) {
@@ -1421,7 +1441,7 @@ function onSearch(q) {
   if (!hits.length) { if(res) res.innerHTML = '<div class="srch-empty">No products found for "' + q + '"</div>'; return; }
   if (!res) return;
   res.innerHTML = hits.map(function(p) {
-    return '<div class="srch-item" onclick="closeSearch();goToProductPage(\'' + (p.slug||p.id) + '\')" style="cursor:pointer">' +
+    return '<div class="srch-item" onclick="closeSearch();goToProductPage(\'' + getProductSlug(p) + '\')" style="cursor:pointer">' +
       '<div class="srch-thumb">' + (p.image_url ? '<img src="' + p.image_url + '" alt="' + p.name + '" loading="lazy">' : (p.emoji||'🌿')) + '</div>' +
       '<div><div class="srch-iname">' + p.name + '</div>' +
       '<div class="srch-iregion">📍 ' + (p.region||'') + '</div>' +
@@ -1468,7 +1488,7 @@ function renderWishlist() {
     return;
   }
   body.innerHTML = '<div class="wl-grid">' + items.map(function(p) {
-    return '<div class="wl-card" onclick="closeWishlist();goToProductPage(\'' + (p.slug||p.id) + '\')" style="cursor:pointer">' +
+    return '<div class="wl-card" onclick="closeWishlist();goToProductPage(\'' + getProductSlug(p) + '\')" style="cursor:pointer">' +
       '<button class="wl-irm" onclick="event.stopPropagation();toggleWishlist(' + p.id + ');renderWishlist()">✕</button>' +
       '<div class="wl-img">' + (p.image_url ? '<img src="' + p.image_url + '" alt="' + p.name + '" loading="lazy">' : (p.emoji||'🌿')) + '</div>' +
       '<div class="wl-info"><div class="wl-iname">' + p.name + '</div><div class="wl-iprice">₹' + p.price + '</div>' +
@@ -1573,7 +1593,7 @@ function renderRecentlyViewed() {
   if (!items.length) { sec.style.display = 'none'; return; }
   sec.style.display = 'block';
   strip.innerHTML = items.map(function(p) {
-    return '<div class="rv-mini" onclick="goToProductPage(\'' + (p.slug||p.id) + '\')" style="cursor:pointer">' +
+    return '<div class="rv-mini" onclick="goToProductPage(\'' + getProductSlug(p) + '\')" style="cursor:pointer">' +
       '<div class="rv-mini-img">' + (p.image_url ? '<img src="' + p.image_url + '" alt="' + p.name + '" loading="lazy">' : (p.emoji||'🌿')) + '</div>' +
       '<div class="rv-mini-info"><div class="rv-mini-name">' + p.name + '</div><div class="rv-mini-price">₹' + p.price + '</div></div>' +
     '</div>';
