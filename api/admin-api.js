@@ -340,32 +340,52 @@ export default async function handler(req, res) {
     const order_id = reqBody.order_id ? parseInt(reqBody.order_id, 10) : null;
     if (!order_id || isNaN(order_id)) return err(400, 'order_id required');
     try {
-      // Query 1: Fetch order
+      // Query 1: Fetch order — minimal safe fields only
       const orderRes = await fetch(
-        `${SUPABASE_URL}/rest/v1/orders?id=eq.${order_id}&select=id,order_number,order_status,payment_status,total_amount,subtotal,coupon_discount,shipping_charge,tracking_number,courier,shipped_at,delivered_at,created_at,payment_method,customer_id`,
+        `${SUPABASE_URL}/rest/v1/orders?id=eq.${order_id}&select=id,order_number,order_status,payment_status,total_amount,subtotal,shipping_charge,tracking_number,courier,shipped_at,delivered_at,created_at,payment_method,customer_id`,
         { headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY } }
       );
+      if (!orderRes.ok) {
+        const errText = await orderRes.text().catch(() => 'unknown');
+        console.error('Order fetch failed:', orderRes.status, errText);
+        return err(orderRes.status, 'Order fetch failed: ' + errText);
+      }
       const orders = await orderRes.json();
       if (!orders || !orders.length) return err(404, 'Order not found');
       const raw = orders[0];
 
-      // Query 2: Fetch customer separately (safer than FK join)
+      // Try to get discount — separate query to avoid column-not-found errors
+      let discountAmount = 0;
+      try {
+        const discRes = await fetch(
+          `${SUPABASE_URL}/rest/v1/orders?id=eq.${order_id}&select=coupon_discount`,
+          { headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY } }
+        );
+        if (discRes.ok) {
+          const discData = await discRes.json();
+          discountAmount = discData?.[0]?.coupon_discount || 0;
+        }
+      } catch(e2) { /* coupon_discount column may not exist — OK */ }
+
+      // Query 2: Fetch customer separately
       let cust = {};
       if (raw.customer_id) {
-        const custRes = await fetch(
-          `${SUPABASE_URL}/rest/v1/customers?id=eq.${raw.customer_id}&select=first_name,last_name,phone,address_line1,city,state,postal_code`,
-          { headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY } }
-        ).catch(() => null);
-        if (custRes && custRes.ok) {
-          const custData = await custRes.json();
-          cust = (custData && custData[0]) || {};
-        }
+        try {
+          const custRes = await fetch(
+            `${SUPABASE_URL}/rest/v1/customers?id=eq.${raw.customer_id}&select=first_name,last_name,phone,address_line1,city,state,postal_code`,
+            { headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY } }
+          );
+          if (custRes.ok) {
+            const custData = await custRes.json();
+            cust = (custData && custData[0]) || {};
+          }
+        } catch(e2) { /* customer fetch failed — show order without address */ }
       }
 
       // Build order object
       const order = {
         ...raw,
-        discount_amount: raw.coupon_discount || raw.discount_amount || 0,
+        discount_amount: discountAmount,
         customer_name: [cust.first_name, cust.last_name].filter(Boolean).join(' ') || '—',
         customer_phone: (cust.phone || '').replace(/^\+91/, '').replace(/\D/g,'').slice(-10),
         delivery_address: cust.address_line1 || '—',
@@ -374,21 +394,27 @@ export default async function handler(req, res) {
         pincode: cust.postal_code || '—',
       };
 
-      // Query 3: Fetch order items with product info
-      const itemsRes = await fetch(
-        `${SUPABASE_URL}/rest/v1/order_items?order_id=eq.${order_id}&select=quantity,price_at_time,products(name,emoji,image_url)`,
-        { headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY } }
-      );
-      const rawItems = await itemsRes.json();
-      order.items = (rawItems || []).map(i => ({
-        name: i.products?.name || 'Product',
-        emoji: i.products?.emoji || '🌿',
-        image_url: i.products?.image_url || null,
-        qty: i.quantity,
-        price: i.price_at_time
-      }));
+      // Query 3: Fetch order items
+      try {
+        const itemsRes = await fetch(
+          `${SUPABASE_URL}/rest/v1/order_items?order_id=eq.${order_id}&select=quantity,price_at_time,products(name,emoji,image_url)`,
+          { headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY } }
+        );
+        if (itemsRes.ok) {
+          const rawItems = await itemsRes.json();
+          order.items = (rawItems || []).map(i => ({
+            name: i.products?.name || 'Product',
+            emoji: i.products?.emoji || '🌿',
+            image_url: i.products?.image_url || null,
+            qty: i.quantity,
+            price: i.price_at_time
+          }));
+        }
+      } catch(e2) { order.items = []; }
+
       return ok({ order });
     } catch(e) {
+      console.error('public_get_order error:', e.message);
       return err(500, e.message || 'Failed to fetch order');
     }
   }
