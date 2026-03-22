@@ -58,17 +58,17 @@ const FALLBACK_STATES = [
 ];
 
 const FALLBACK_PRODUCTS = [
-  {id:1,name:"Himalayan Wild Honey",slug:"himalayan-wild-honey",emoji:"🍯",description:"Raw forest honey from Himachal Pradesh — dark, medicinal & intensely floral.",price:549,original_price:699,unit:"/500g",badge_type:"bs",badge_label:"Bestseller",card_bg:"#fdf3e3",state_id:"hp",region:"Kullu Valley, Himachal Pradesh",stock:35,
+  {id:1,name:"Himalayan Wild Honey",slug:"himalayan-wild-honey",emoji:"🍯",description:"Raw forest honey from Himachal Pradesh — dark, medicinal & intensely floral.",price:549,original_price:699,unit:"/500g",badge_type:"bs",badge_label:"Bestseller",card_bg:"#fdf3e3",state_id:"hp",region:"Kullu Valley, Himachal Pradesh",stock:35,gst_rate:5,
    image_url:"https://images.unsplash.com/photo-1587049352846-4a222e784d38?w=400&h=400&fit=crop&q=80"},
-  {id:2,name:"Bilona A2 Cow Ghee",slug:"bilona-a2-cow-ghee",emoji:"🥛",description:"Traditional hand-churned bilona ghee from indigenous cows. Golden, grainy & deeply aromatic.",price:849,original_price:1100,unit:"/500g",badge_type:"og",badge_label:"Organic",card_bg:"#f5f5e6",state_id:"uk",region:"Tehri Garhwal, Uttarakhand",stock:18,
+  {id:2,name:"Bilona A2 Cow Ghee",slug:"bilona-a2-cow-ghee",emoji:"🥛",description:"Traditional hand-churned bilona ghee from indigenous cows. Golden, grainy & deeply aromatic.",price:849,original_price:1100,unit:"/500g",badge_type:"og",badge_label:"Organic",card_bg:"#f5f5e6",state_id:"uk",region:"Tehri Garhwal, Uttarakhand",stock:18,gst_rate:5,
    image_url:"https://images.unsplash.com/photo-1631897642056-97a7abebacb2?w=400&h=400&fit=crop&q=80"},
-  {id:3,name:"Kashmir Mongra Saffron",slug:"kashmir-mongra-saffron",emoji:"🌸",description:"Grade-A Pampore saffron threads — hand-harvested. Pure gold in every strand.",price:399,original_price:550,unit:"/0.5g",badge_type:"pm",badge_label:"Premium",card_bg:"#fff0f5",state_id:"jk",region:"Pampore, Kashmir",stock:4,
+  {id:3,name:"Kashmir Mongra Saffron",slug:"kashmir-mongra-saffron",emoji:"🌸",description:"Grade-A Pampore saffron threads — hand-harvested. Pure gold in every strand.",price:399,original_price:550,unit:"/0.5g",badge_type:"pm",badge_label:"Premium",card_bg:"#fff0f5",state_id:"jk",region:"Pampore, Kashmir",stock:4,gst_rate:5,
    image_url:"https://images.unsplash.com/photo-1615485925600-97237c4fc1ec?w=400&h=400&fit=crop&q=80"},
-  {id:4,name:"Ladakh Apricot Kernel Oil",slug:"ladakh-apricot-kernel-oil",emoji:"🌼",description:"Cold-pressed from sun-dried Ladakhi apricots. A centuries-old Himalayan beauty & cooking secret.",price:449,original_price:599,unit:"/100ml",badge_type:"nw",badge_label:"New Arrival",card_bg:"#fff8e1",state_id:"la",region:"Nubra Valley, Ladakh",stock:22,
+  {id:4,name:"Ladakh Apricot Kernel Oil",slug:"ladakh-apricot-kernel-oil",emoji:"🌼",description:"Cold-pressed from sun-dried Ladakhi apricots. A centuries-old Himalayan beauty & cooking secret.",price:449,original_price:599,unit:"/100ml",badge_type:"nw",badge_label:"New Arrival",card_bg:"#fff8e1",state_id:"la",region:"Nubra Valley, Ladakh",stock:22,gst_rate:5,
    image_url:"https://images.unsplash.com/photo-1526399232581-2ab803f91e84?w=400&h=400&fit=crop&q=80"},
-  {id:5,name:"Sikkim Organic Cardamom",slug:"sikkim-organic-cardamom",emoji:"🌿",description:"Large green pods from Sikkim's UNESCO-certified organic farms — bold, camphor-sweet & aromatic.",price:299,original_price:399,unit:"/100g",badge_type:"bs",badge_label:"Bestseller",card_bg:"#e8f5e8",state_id:"sk",region:"Gangtok Hills, Sikkim",stock:60,
+  {id:5,name:"Sikkim Organic Cardamom",slug:"sikkim-organic-cardamom",emoji:"🌿",description:"Large green pods from Sikkim's UNESCO-certified organic farms — bold, camphor-sweet & aromatic.",price:299,original_price:399,unit:"/100g",badge_type:"bs",badge_label:"Bestseller",card_bg:"#e8f5e8",state_id:"sk",region:"Gangtok Hills, Sikkim",stock:60,gst_rate:5,
    image_url:"https://images.unsplash.com/photo-1585386959984-a4155224a1ad?w=400&h=400&fit=crop&q=80"},
-  {id:6,name:"Assam First Flush Black Tea",slug:"assam-first-flush-black-tea",emoji:"🍵",description:"Single-estate Assam tea plucked at first flush — full-bodied, malty & bright in the cup.",price:349,original_price:480,unit:"/250g",badge_type:"nw",badge_label:"New",card_bg:"#f5ecd8",state_id:"as",region:"Jorhat Estate, Assam",stock:45,
+  {id:6,name:"Assam First Flush Black Tea",slug:"assam-first-flush-black-tea",emoji:"🍵",description:"Single-estate Assam tea plucked at first flush — full-bodied, malty & bright in the cup.",price:349,original_price:480,unit:"/250g",badge_type:"nw",badge_label:"New",card_bg:"#f5ecd8",state_id:"as",region:"Jorhat Estate, Assam",stock:45,gst_rate:5,
    image_url:"https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=400&h=400&fit=crop&q=80"},
 ];
 
@@ -1255,6 +1255,7 @@ async function checkout() {
   var threshold  = (!isNaN(FREE_SHIP_THRESHOLD)) ? FREE_SHIP_THRESHOLD : 799;
   var shipCharge = (subtotal > 0 && threshold > 0 && subtotal < threshold) ? ((!isNaN(FLAT_SHIP_CHARGE)) ? FLAT_SHIP_CHARGE : 99) : 0;
   var final      = subtotal + shipCharge;
+  var gstAmount  = calcGST(cartSnapshot || cart).total; // GST inclusive — for invoice
   var couponLine = activeCoupon ? '\n🎟️ Coupon ' + activeCoupon.code + ': -₹' + discount : '';
   var shipLine   = shipCharge > 0 ? '\n🚚 Shipping: ₹' + shipCharge : '\n🚚 Shipping: FREE';
 
