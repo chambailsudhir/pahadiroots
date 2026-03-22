@@ -544,8 +544,9 @@ CREATE INDEX IF NOT EXISTS idx_products_is_deleted ON products(is_deleted);</div
             <input type="number" class="fi" id="p-price" oninput="priceFromMRP()" onchange="priceFromMRP()">
           </div>
           <div class="fg">
-            <label>MRP ₹ <span style="color:var(--tx3);font-size:10px">(strikethrough price)</span></label>
-            <input type="number" class="fi" id="p-mrp">
+            <label>MRP ₹ <span style="color:var(--tx3);font-size:10px">(strikethrough — must be ≥ selling price)</span></label>
+            <input type="number" class="fi" id="p-mrp" oninput="validateMRP()">
+            <div id="mrp-warn" style="display:none;font-size:11px;color:#e74c3c;margin-top:4px">⚠️ MRP cannot be less than selling price</div>
           </div>
         </div>
 
@@ -611,11 +612,65 @@ CREATE INDEX IF NOT EXISTS idx_products_is_deleted ON products(is_deleted);</div
 
       <!-- ── VARIANTS ──────────────────────────────────────── -->
       <div class="fg" id="variants-section" style="display:none">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
           <label style="margin:0">📦 Variants</label>
-          <button type="button" class="btn btn-s" onclick="addVariantRow()" style="padding:4px 10px;font-size:12px">+ Add Variant</button>
+          <div style="display:flex;gap:6px">
+            <button type="button" class="btn btn-s" onclick="autoGenerateVariants()" style="padding:4px 10px;font-size:12px;background:rgba(200,146,10,.12);border-color:rgba(200,146,10,.4);color:#c8920a" title="Auto-generate weight variants">⚡ Auto-generate</button>
+            <button type="button" class="btn btn-s" onclick="addVariantRow()" style="padding:4px 10px;font-size:12px">+ Add Variant</button>
+          </div>
         </div>
-        <div id="variants-list" style="display:flex;flex-direction:column;gap:8px"></div>
+        <!-- Auto-generate panel -->
+        <div id="auto-variant-panel" style="display:none;background:rgba(200,146,10,.06);border:1px solid rgba(200,146,10,.2);border-radius:10px;padding:12px;margin-bottom:10px">
+          <div style="font-size:11px;font-weight:700;color:#c8920a;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">⚡ Auto-generate variants</div>
+          <div style="font-size:12px;color:var(--tx3);margin-bottom:10px">Base unit se sare variants auto-calculate honge — weight proportional price ke saath</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+            <div>
+              <label style="font-size:11px;color:var(--tx3);display:block;margin-bottom:4px">Base unit weight</label>
+              <select class="fi" id="av-base-unit" style="font-size:12px">
+                <option value="100g">100g</option>
+                <option value="250g" selected>250g</option>
+                <option value="500g">500g</option>
+                <option value="1kg">1kg</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size:11px;color:var(--tx3);display:block;margin-bottom:4px">Base price (from main product)</label>
+              <input type="number" class="fi" id="av-base-price" style="font-size:12px" placeholder="Auto from selling price" readonly style="background:var(--bg3);opacity:.7">
+            </div>
+          </div>
+          <div style="font-size:11px;color:var(--tx3);margin-bottom:8px">Select which variants to generate:</div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px" id="av-options">
+            <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer;background:var(--bg2);padding:6px 8px;border-radius:6px;border:1px solid var(--bd)">
+              <input type="checkbox" value="100g" data-mult="0.4"> 100g
+            </label>
+            <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer;background:var(--bg2);padding:6px 8px;border-radius:6px;border:1px solid var(--bd)">
+              <input type="checkbox" value="250g" data-mult="1" checked> 250g
+            </label>
+            <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer;background:var(--bg2);padding:6px 8px;border-radius:6px;border:1px solid var(--bd)">
+              <input type="checkbox" value="500g" data-mult="2" checked> 500g
+            </label>
+            <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer;background:var(--bg2);padding:6px 8px;border-radius:6px;border:1px solid var(--bd)">
+              <input type="checkbox" value="1kg" data-mult="4" checked> 1kg
+            </label>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button type="button" class="btn btn-p" onclick="generateVariants()" style="font-size:12px;padding:6px 14px">✓ Generate</button>
+            <button type="button" class="btn btn-s" onclick="document.getElementById('auto-variant-panel').style.display='none'" style="font-size:12px;padding:6px 14px">Cancel</button>
+          </div>
+        </div>
+        <!-- Variant rows header -->
+        <div id="variants-list-wrap" style="display:none">
+          <div style="display:grid;grid-template-columns:120px 1fr 90px 70px 70px 80px 32px;gap:6px;padding:0 8px;margin-bottom:4px">
+            <div style="font-size:10px;color:var(--tx3);font-weight:700;text-transform:uppercase;letter-spacing:.5px">Type</div>
+            <div style="font-size:10px;color:var(--tx3);font-weight:700;text-transform:uppercase;letter-spacing:.5px">Value</div>
+            <div style="font-size:10px;color:var(--tx3);font-weight:700;text-transform:uppercase;letter-spacing:.5px">Price ₹</div>
+            <div style="font-size:10px;color:var(--tx3);font-weight:700;text-transform:uppercase;letter-spacing:.5px">Stock</div>
+            <div style="font-size:10px;color:var(--tx3);font-weight:700;text-transform:uppercase;letter-spacing:.5px">Base ₹</div>
+            <div style="font-size:10px;color:var(--tx3);font-weight:700;text-transform:uppercase;letter-spacing:.5px">Status</div>
+            <div></div>
+          </div>
+        </div>
+        <div id="variants-list" style="display:flex;flex-direction:column;gap:6px"></div>
       </div>
     </div>
     <div class="m-foot">
@@ -979,6 +1034,8 @@ function openProdM(p){p=p||{};
     GET('product_variants', `product_id=eq.${p.id}&order=sort_order.asc`).then(vars => {
       varList.innerHTML = '';
       (vars||[]).forEach(v => addVariantRow(v));
+      var wrap = document.getElementById('variants-list-wrap');
+      if (wrap) wrap.style.display = (vars && vars.length) ? '' : 'none';
     }).catch(()=>{});
   } else {
     varSec.style.display = 'block';
@@ -1120,15 +1177,42 @@ function _updateGSTPanel(price, rate) {
 }
 
 function priceFromMRP() {
-  // Selling price changed → update base
+  // Selling price changed → update base + warn if MRP < selling price
   if (_gstLock) return; _gstLock = true;
   var price = parseFloat(document.getElementById('p-price')?.value) || 0;
   var rate  = parseFloat(document.getElementById('p-gst')?.value)   || 0;
   var base  = rate > 0 ? price / (1 + rate/100) : price;
   var baseEl = document.getElementById('p-base');
   if (baseEl) baseEl.value = base > 0 ? base.toFixed(2) : '';
+  // Auto-suggest MRP if empty
+  var mrpEl = document.getElementById('p-mrp');
+  if (mrpEl) {
+    var mrp = parseFloat(mrpEl.value) || 0;
+    if (!mrp && price > 0) {
+      mrpEl.value = price.toFixed(0); // default MRP = selling price
+      mrpEl.style.borderColor = '';
+    } else if (mrp > 0 && mrp < price) {
+      mrpEl.style.borderColor = '#e74c3c'; // red warning
+    } else {
+      mrpEl.style.borderColor = '';
+    }
+  }
   _updateGSTPanel(price, rate);
   _gstLock = false;
+}
+
+function validateMRP() {
+  var mrp   = parseFloat(document.getElementById('p-mrp')?.value) || 0;
+  var price = parseFloat(document.getElementById('p-price')?.value) || 0;
+  var warn  = document.getElementById('mrp-warn');
+  var mrpEl = document.getElementById('p-mrp');
+  if (mrp > 0 && price > 0 && mrp < price) {
+    if(warn) warn.style.display = '';
+    if(mrpEl) mrpEl.style.borderColor = '#e74c3c';
+  } else {
+    if(warn) warn.style.display = 'none';
+    if(mrpEl) mrpEl.style.borderColor = '';
+  }
 }
 
 function priceFromBase() {
@@ -1153,6 +1237,14 @@ async function saveProd(){
   const id=document.getElementById('p-id').value;
   const name=document.getElementById('p-name').value.trim(),price=parseFloat(v('p-price'));
   if(!name||!price){toast('Name & price required','er');return;}
+  var mrpVal = parseFloat(v('p-mrp'))||0;
+  if(mrpVal > 0 && mrpVal < price) {
+    toast('MRP (₹'+mrpVal+') cannot be less than Selling Price (₹'+price.toFixed(2)+'). Fix before saving.','er');
+    document.getElementById('p-mrp').style.borderColor='#e74c3c';
+    document.getElementById('p-mrp').focus();
+    return;
+  }
+  document.getElementById('p-mrp').style.borderColor='';
   const badges=[];
   if(document.getElementById('p-best').checked)badges.push('bestseller');
   if(document.getElementById('p-org').checked)badges.push('organic');
@@ -1178,31 +1270,102 @@ function autoProductSlug(){
   }
 }
 
+function updateVariantsWrap() {
+  var rows = document.querySelectorAll('.variant-row');
+  var wrap = document.getElementById('variants-list-wrap');
+  if (wrap) wrap.style.display = rows.length ? '' : 'none';
+}
+
 function addVariantRow(v) {
   v = v || {};
-  const list = document.getElementById('variants-list');
-  const row = document.createElement('div');
+  var list = document.getElementById('variants-list');
+  var row = document.createElement('div');
   row.className = 'variant-row';
   row.dataset.variantId = v.id || '';
-  row.style.cssText = 'display:grid;grid-template-columns:1fr 1fr 80px 80px 70px 32px;gap:6px;align-items:center;background:var(--bg2);padding:8px;border-radius:8px';
+  var gst   = parseFloat(document.getElementById('p-gst')?.value) || 5;
+  var stock = parseInt(document.getElementById('p-stock')?.value) || 0;
+  var basePrice = v.price ? (v.price / (1 + gst/100)).toFixed(2) : '';
+  row.style.cssText = 'display:grid;grid-template-columns:120px 1fr 90px 70px 70px 80px 32px;gap:6px;align-items:center;background:var(--bg2);padding:8px 10px;border-radius:8px;border:1px solid var(--bd)';
   row.innerHTML = `
-    <select class="fi v-type" style="padding:6px 8px;font-size:12px">
-      <option value="weight" ${v.variant_type==='weight'?'selected':''}>Weight</option>
+    <select class="fi v-type" style="padding:5px 8px;font-size:12px">
+      <option value="weight" ${v.variant_type==='weight'||!v.variant_type?'selected':''}>Weight</option>
       <option value="volume" ${v.variant_type==='volume'?'selected':''}>Volume</option>
       <option value="pack_size" ${v.variant_type==='pack_size'?'selected':''}>Pack Size</option>
       <option value="grade" ${v.variant_type==='grade'?'selected':''}>Grade</option>
     </select>
-    <input class="fi v-value" placeholder="e.g. 250g" value="${v.variant_value||''}" style="padding:6px 8px;font-size:12px">
-    <input class="fi v-price" type="number" placeholder="Price" value="${v.price||''}" style="padding:6px 8px;font-size:12px">
-    <input class="fi v-stock" type="number" placeholder="Stock" value="${v.stock_quantity||0}" style="padding:6px 8px;font-size:12px">
-    <select class="fi v-active" style="padding:6px 8px;font-size:12px">
-      <option value="true" ${v.is_active!==false?'selected':''}>Active</option>
-      <option value="false" ${v.is_active===false?'selected':''}>Off</option>
+    <input class="fi v-value" placeholder="e.g. 250g" value="${v.variant_value||''}" style="padding:5px 8px;font-size:12px">
+    <input class="fi v-price" type="number" placeholder="Selling ₹" value="${v.price||''}" oninput="updateVBase(this,${gst})" style="padding:5px 8px;font-size:12px">
+    <input class="fi v-stock" type="number" placeholder="Stock" value="${v.stock_quantity !== undefined ? v.stock_quantity : stock}" style="padding:5px 8px;font-size:12px">
+    <input class="fi v-base" type="number" placeholder="Base ₹" value="${basePrice}" readonly title="Base price excl. GST @${gst}%" style="padding:5px 8px;font-size:11px;opacity:.55;cursor:default">
+    <select class="fi v-active" style="padding:5px 8px;font-size:12px">
+      <option value="true" ${v.is_active!==false?'selected':''}>✓ Active</option>
+      <option value="false" ${v.is_active===false?'selected':''}>✗ Hidden</option>
     </select>
-    <button type="button" onclick="this.closest('.variant-row').remove()" style="background:#e74c3c;color:#fff;border:none;border-radius:6px;cursor:pointer;padding:4px 8px;font-size:14px">✕</button>
+    <button type="button" onclick="this.closest('.variant-row').remove();updateVariantsWrap()" style="background:#e74c3c;color:#fff;border:none;border-radius:6px;cursor:pointer;padding:5px 8px;font-size:13px" title="Remove">✕</button>
   `;
   list.appendChild(row);
+  updateVariantsWrap();
 }
+
+function updateVBase(priceInput, gst) {
+  var price = parseFloat(priceInput.value) || 0;
+  var row = priceInput.closest('.variant-row');
+  var baseEl = row ? row.querySelector('.v-base') : null;
+  if (baseEl) baseEl.value = price > 0 ? (price / (1 + gst/100)).toFixed(2) : '';
+}
+
+function autoGenerateVariants() {
+  var panel = document.getElementById('auto-variant-panel');
+  if (!panel) return;
+  var mainPrice = parseFloat(document.getElementById('p-price')?.value) || 0;
+  var basePriceEl = document.getElementById('av-base-price');
+  if (basePriceEl) basePriceEl.value = mainPrice || '';
+  // Auto-select base unit from main product unit label
+  var unitLabel = (document.getElementById('p-unit')?.value || '').toLowerCase();
+  var baseUnitEl = document.getElementById('av-base-unit');
+  if (baseUnitEl) {
+    if (unitLabel.includes('1kg') || unitLabel.includes('1000g')) baseUnitEl.value = '1kg';
+    else if (unitLabel.includes('500g')) baseUnitEl.value = '500g';
+    else if (unitLabel.includes('100g')) baseUnitEl.value = '100g';
+    else baseUnitEl.value = '250g';
+  }
+  panel.style.display = panel.style.display === 'none' ? '' : 'none';
+}
+
+function parseGrams(unit) {
+  var s = unit.toLowerCase().trim();
+  if (s.includes('kg')) return parseFloat(s) * 1000;
+  if (s.includes('ml')) return parseFloat(s);
+  if (s.includes('l') && !s.includes('ml')) return parseFloat(s) * 1000;
+  if (s.includes('g')) return parseFloat(s);
+  return 250;
+}
+
+function generateVariants() {
+  var baseUnit  = document.getElementById('av-base-unit')?.value || '250g';
+  var basePrice = parseFloat(document.getElementById('av-base-price')?.value) || 0;
+  var gst       = parseFloat(document.getElementById('p-gst')?.value) || 5;
+  var stock     = parseInt(document.getElementById('p-stock')?.value) || 0;
+  if (!basePrice) { toast('Enter selling price in main product first', 'er'); return; }
+  var baseGrams = parseGrams(baseUnit);
+  var checks    = document.querySelectorAll('#av-options input[type=checkbox]:checked');
+  if (!checks.length) { toast('Select at least one variant', 'er'); return; }
+  // Keep existing saved variants, only add new ones
+  var existing = Array.from(document.querySelectorAll('.variant-row .v-value')).map(function(el){ return el.value.toLowerCase(); });
+  var added = 0;
+  checks.forEach(function(cb) {
+    var unit = cb.value;
+    if (existing.includes(unit.toLowerCase())) return; // skip if already exists
+    var unitGrams = parseGrams(unit);
+    var ratio = unitGrams / baseGrams;
+    var price = Math.round(basePrice * ratio);
+    addVariantRow({ variant_type:'weight', variant_value:unit, price:price, stock_quantity:stock, is_active:true });
+    added++;
+  });
+  document.getElementById('auto-variant-panel').style.display = 'none';
+  toast(added + ' variant' + (added!==1?'s':'') + ' generated! Review & save.', 'ok');
+}
+
 
 async function saveVariants(prodId) {
   const rows = document.querySelectorAll('.variant-row');
