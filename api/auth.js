@@ -480,5 +480,49 @@ export default async function handler(req, res) {
     }
   }
 
+  // ── create_return — customer self-service return request ────
+  if (action === 'create_return') {
+    const token = (req.headers['authorization'] || '').replace('Bearer ', '');
+    if (!token) return err(401, 'Not logged in');
+    const { order_id, order_number, customer_name, reason, description, refund_amount } = body;
+    if (!order_id || !reason) return err(400, 'order_id and reason required');
+    try {
+      // Verify the order belongs to this customer
+      const user = await sbAuth('/user', null, token);
+      const profile = await syncCustomerProfile(user);
+      if (!profile) return err(401, 'Profile not found');
+
+      const orders = await sbAdmin('GET',
+        `/rest/v1/orders?id=eq.${order_id}&customer_id=eq.${profile.id}&select=id,order_status,order_number,total_amount`
+      );
+      if (!orders || !orders.length) return err(403, 'Order not found or does not belong to you');
+      const order = orders[0];
+      if (order.order_status !== 'delivered') return err(400, 'Only delivered orders can be returned');
+
+      // Check if return already exists
+      const existing = await sbAdmin('GET',
+        `/rest/v1/returns?order_id=eq.${order_id}&select=id,status`
+      ).catch(() => []);
+      if (existing && existing.length > 0) return err(400, 'Return request already exists for this order');
+
+      // Create return record
+      const returnRecord = await sbAdmin('POST', '/rest/v1/returns', {
+        order_id:      Number(order_id),
+        order_number:  order_number || order.order_number,
+        customer_name: customer_name || null,
+        reason,
+        description:   description || null,
+        refund_amount: refund_amount ? parseFloat(refund_amount) : null,
+        status:        'requested',   // Customer-initiated → starts at requested
+        restock:       true,
+        created_at:    new Date().toISOString(),
+        updated_at:    new Date().toISOString(),
+      });
+      return ok({ success: true, return: returnRecord });
+    } catch(e) {
+      return err(e.status || 500, e.message || 'Return request failed');
+    }
+  }
+
   return err(400, `Unknown action: ${action}`);
 }
