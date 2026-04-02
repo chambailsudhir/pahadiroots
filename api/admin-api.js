@@ -227,11 +227,19 @@ export default async function handler(req, res) {
       }
       if (!custId) return err(500, 'Could not create customer');
 
+      // Bug #2 fix: prevent duplicate orders for the same Razorpay payment_id
+      if (paymentId) {
+        const dupCheck = await sbFetch('GET', 'orders', `payment_id=eq.${paymentId}&select=id,order_number`).catch(() => []);
+        if (dupCheck && dupCheck.length > 0) {
+          return ok({ success: true, orderId: dupCheck[0].id, orderNumber: dupCheck[0].order_number });
+        }
+      }
+
       // 2. Create order
       const orderBody = {
         customer_id: custId,
         total_amount: final,
-        subtotal: final + (discount||0),
+        subtotal: (final - (shipCharge||0)) + (discount||0),
         coupon_discount: discount||0,
         tax: gstAmount || 0, // GST inclusive — stored for invoice
         shipping_charge: shipCharge || 0,
@@ -360,7 +368,7 @@ export default async function handler(req, res) {
       let discountAmount = 0;
       try {
         const discRes = await fetch(
-          `${SUPABASE_URL}/rest/v1/orders?id=eq.${order_id}&select=coupon_discount`,
+          `${SUPABASE_URL}/rest/v1/orders?id=eq.${raw.id}&select=coupon_discount`,
           { headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY } }
         );
         if (discRes.ok) {

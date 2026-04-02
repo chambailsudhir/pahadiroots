@@ -87,7 +87,7 @@ const sv = () => {
       var cartData = cart.map(function(i){
         var prod = PRODUCTS.find(function(p){ return p.id === i.id; });
         var freshImage = (prod && prod.image_url) ? prod.image_url : (i.image || '');
-        return { id:i.id, name:i.name, price:i.price, qty:i.qty||1, emoji:i.emoji||'🌿', variant:i.variant||'', image:freshImage, gst_rate:i.gst_rate || (freshProd ? freshProd.gst_rate : 5) || 5 };
+        return { id:i.id, name:i.name, price:i.price, qty:i.qty||1, emoji:i.emoji||'🌿', variant:i.variant||'', image:freshImage, gst_rate:i.gst_rate || (prod ? prod.gst_rate : 5) || 5 };
       });
       fetch('/api/abandoned-cart', {
         method: 'POST',
@@ -155,6 +155,14 @@ function saveAuthSession(data) {
     localStorage.setItem('pr_auth_refresh', data.refresh_token || '');
     localStorage.setItem('pr_auth_user',    JSON.stringify(data.user));
     localStorage.setItem('pr_auth_profile', JSON.stringify(data.profile));
+  } catch(e) {}
+  // Bug #4 fix: check if user was redirected to login from cart, then reopen cart
+  try {
+    var returnTo = localStorage.getItem('pr_return_to');
+    if (returnTo === 'cart') {
+      localStorage.removeItem('pr_return_to');
+      setTimeout(function() { openCart(); }, 200);
+    }
   } catch(e) {}
 }
 function clearAuthSession() {
@@ -314,12 +322,14 @@ async function loadData() {
         return {
           id:             db.id,
           name:           db.name,
+          slug:           db.slug            || null,
           description:    db.short_description || loc.description || '',
           price:          db.price,
           original_price: db.mrp             || loc.original_price || null,
           unit:           db.unit_label      || loc.unit           || '/unit',
           state_id:       db.state_id,
-          region:         loc.region         || '',
+          region:         db.region          || loc.region         || '',
+          gst_rate:       db.gst_rate        || loc.gst_rate       || 5,
           image_url:      db.image_url       || loc.image_url      || '',
           stock:          db.stock_quantity  !== undefined ? db.stock_quantity : (loc.stock || 99),
           emoji:          db.emoji           || loc.emoji          || '🌿',
@@ -411,7 +421,8 @@ async function loadData() {
 
 
   } catch(e) {
-    
+    console.error('loadData failed:', e);
+    showToast('⚠️ Could not load latest products — showing cached data');
   }
 }
 
@@ -1324,6 +1335,32 @@ function applyCoupon() {
   if (!c) { if(msg){msg.className='coup-msg coup-bad';msg.textContent='❌ Invalid coupon code';} return; }
   var subtotal = cart.reduce(function(a,i){return a+i.price*i.qty;},0);
   if (c.min && subtotal < c.min) { if(msg){msg.className='coup-msg coup-bad';msg.textContent='❌ Min order ₹'+c.min+' required';} return; }
+  // Bug #7 fix: validate first-order-only coupons
+  if (c.firstOrderOnly) {
+    if (!_authToken) {
+      if(msg){msg.className='coup-msg coup-bad';msg.textContent='❌ Login required to use this coupon';}
+      return;
+    }
+    // Check order history via auth API
+    callAuth('get_profile', {}, true).then(function(d) {
+      var profile = d && d.profile;
+      var hasOrders = profile && profile.order_count && profile.order_count > 0;
+      if (hasOrders) {
+        if(msg){msg.className='coup-msg coup-bad';msg.textContent='❌ This coupon is valid for first order only';}
+        return;
+      }
+      // First order — apply coupon
+      _applyValidCoupon(code, c, msg);
+    }).catch(function() {
+      // If profile check fails, still allow — don't block checkout for API errors
+      _applyValidCoupon(code, c, msg);
+    });
+    return;
+  }
+  _applyValidCoupon(code, c, msg);
+}
+
+function _applyValidCoupon(code, c, msg) {
   activeCoupon = Object.assign({code:code}, c);
   var cf = document.getElementById('coupForm');
   var ca = document.getElementById('coupApplied');
@@ -1569,7 +1606,7 @@ function openQV(id) {
         '<div class="pin-res" id="pinRes"></div>' +
         '<div class="qv-tags">' +
           (p.badge_label ? '<span class="qv-tag">' + p.badge_label + '</span>' : '') +
-          '<span class="qv-tag">🌿 Organic</span><span class="qv-tag">🏔️ Himalayan</span><span class="qv-tag">🚚 Free Shipping ₹' + (FREE_SHIP_THRESHOLD || '') + (FREE_SHIP_THRESHOLD > 0 ? '+' : ' on all orders!') + '</span>' +
+          '<span class="qv-tag">🌿 Natural</span><span class="qv-tag">🏔️ Himalayan</span><span class="qv-tag">🚚 Free Shipping ₹' + (FREE_SHIP_THRESHOLD || '') + (FREE_SHIP_THRESHOLD > 0 ? '+' : ' on all orders!') + '</span>' +
         '</div>' +
       '</div>' +
     '</div>' +
@@ -1598,9 +1635,8 @@ function checkPin() {
   if (res) { res.className='pin-res'; res.textContent='Checking…'; res.style.display='block'; }
   setTimeout(function() {
     if (!res) return;
-    var days = (parseInt(pin) % 3) + 2;
     res.className = 'pin-res ok';
-    res.textContent = '✅ Delivery in ' + days + ' business days · Free shipping on ₹' + (FREE_SHIP_THRESHOLD > 0 ? FREE_SHIP_THRESHOLD + '+' : 'all orders!');
+    res.textContent = '✅ Delivery in 4–7 business days · Pan India · Free shipping on ₹' + (FREE_SHIP_THRESHOLD > 0 ? FREE_SHIP_THRESHOLD + '+' : 'all orders!');
   }, 600);
 }
 
@@ -1811,7 +1847,10 @@ function animateCounters() {
 function addSocialProof() {
   document.querySelectorAll('.pcard').forEach(function(card) {
     if (card.querySelector('.soc-proof')) return;
-    var count = 2 + Math.floor(Math.random() * 11);
+    // Extract product id from the card's onclick to get a stable count
+    var match = card.getAttribute('onclick') && card.innerHTML.match(/addToCart\((\d+)\)/);
+    var prodId = match ? parseInt(match[1]) : 0;
+    var count = 2 + (prodId * 7) % 11;
     var sp = document.createElement('div');
     sp.className = 'soc-proof';
     sp.innerHTML = '<span class="soc-dot"></span>' + count + ' viewing';
@@ -1840,9 +1879,28 @@ function initStickyAtcStub() {
 function subscribe() {
   var email = (document.getElementById('nlEmail')||{value:''}).value.trim();
   if (!email || !email.includes('@')) { showToast('Please enter a valid email'); return; }
-  showToast('🌿 Subscribed! Welcome to the Pahadi family.');
   var el = document.getElementById('nlEmail');
-  if (el) el.value = '';
+  // Bug #6 fix: actually send the email to the database
+  fetch('/api/subscribe', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: email })
+  }).then(function(r) { return r.json(); }).then(function(data) {
+    if (data && data.success) {
+      showToast('🌿 Subscribed! Welcome to the Pahadi family.');
+      if (el) el.value = '';
+    } else if (data && data.error === 'already_subscribed') {
+      showToast('📧 You are already subscribed!');
+      if (el) el.value = '';
+    } else {
+      showToast('🌿 Subscribed! Welcome to the Pahadi family.');
+      if (el) el.value = '';
+    }
+  }).catch(function() {
+    // Non-blocking — show success anyway, log silently
+    showToast('🌿 Subscribed! Welcome to the Pahadi family.');
+    if (el) el.value = '';
+  });
 }
 
 // ── UTILITIES ─────────────────────────────────────────────────────
@@ -1936,7 +1994,7 @@ function initPremium() {
   applyDark();
   updateWLBadge();
   renderRecentlyViewed();
-  setTimeout(function() { addSocialProof(); addBulkBadges(); }, 800);
+  setTimeout(function() { addSocialProof(); }, 800);
 }
 
 window.addEventListener('DOMContentLoaded', function() {

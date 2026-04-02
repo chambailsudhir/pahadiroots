@@ -74,18 +74,38 @@ async function saveOrderFromWebhook(payment) {
   const email   = payment.email  || notes.email  || null;
   const address = notes.address  || '';
 
-  // Parse address — format: "addr, city, state - pin"
+  // Parse address — format: "street, city, state - pin"
+  // Bug #11 fix: parse from the RIGHT so multi-comma streets like
+  // "Flat 4, Block B, MG Road, Delhi - 110001" are handled correctly.
   let addr = '', city = '', state = '', pin = '';
   try {
-    const addrMatch = address.match(/^(.+),\s*(.+),\s*(.+)\s*-\s*(\d{6})/);
-    if (addrMatch) {
-      addr  = addrMatch[1].trim();
-      city  = addrMatch[2].trim();
-      state = addrMatch[3].trim();
-      pin   = addrMatch[4].trim();
-    } else {
-      addr = address;
+    // Step 1: split on " - " (space-dash-space) to extract pincode from the right
+    const dashIdx = address.lastIndexOf(' - ');
+    let remainder = address;
+    if (dashIdx !== -1) {
+      const pinCandidate = address.slice(dashIdx + 3).trim();
+      if (/^\d{6}$/.test(pinCandidate)) {
+        pin = pinCandidate;
+        remainder = address.slice(0, dashIdx).trim();
+      }
     }
+    // Step 2: split remainder on last comma to get state
+    const lastComma = remainder.lastIndexOf(',');
+    if (lastComma !== -1) {
+      state = remainder.slice(lastComma + 1).trim();
+      remainder = remainder.slice(0, lastComma).trim();
+    }
+    // Step 3: split again on last comma to get city
+    const secLastComma = remainder.lastIndexOf(',');
+    if (secLastComma !== -1) {
+      city = remainder.slice(secLastComma + 1).trim();
+      addr = remainder.slice(0, secLastComma).trim();
+    } else {
+      // Only one segment left — treat as street
+      addr = remainder;
+    }
+    // Fallback: if nothing matched, store full address as street
+    if (!addr && !city && !state) addr = address;
   } catch(e) {}
 
   // 1. Upsert customer
