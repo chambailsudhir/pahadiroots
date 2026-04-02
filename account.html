@@ -51,11 +51,11 @@ body{font-family:'Lato',sans-serif;background:#f7f3ee;min-height:100vh;color:var
 .sec-label{font-size:11px;font-weight:800;color:#bbb;text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px}
 
 /* ── ORDER CARDS ── */
-.order-card{border:1.5px solid var(--bd);border-radius:14px;padding:16px;margin-bottom:10px;transition:border-color .2s;cursor:default}
-.order-card:hover{border-color:var(--g)}
-.oc-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:8px}
-.oc-num{font-weight:900;font-size:14px;color:var(--g)}
-.oc-badge{padding:3px 12px;border-radius:20px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.5px}
+.order-card{border:1.5px solid var(--bd);border-radius:16px;padding:22px 24px;margin-bottom:16px;transition:border-color .2s,box-shadow .2s;cursor:default}
+.order-card:hover{border-color:var(--g);box-shadow:0 4px 16px rgba(26,58,30,0.08)}
+.oc-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px}
+.oc-num{font-weight:900;font-size:17px;color:var(--g)}
+.oc-badge{padding:5px 16px;border-radius:20px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.5px}
 .badge-confirmed{background:#e8f5e9;color:#2d6a4f}
 .badge-shipped{background:#e3f2fd;color:#1565c0}
 .badge-delivered{background:#ede7f6;color:#6a1b9a}
@@ -68,11 +68,11 @@ body{font-family:'Lato',sans-serif;background:#f7f3ee;min-height:100vh;color:var
 .badge-return_received{background:#f3e5f5;color:#7b1fa2}
 .badge-refunded{background:#e8f5e9;color:#2d6a4f}
 .badge-return_rejected{background:#fdecea;color:#c0392b}
-.oc-items{font-size:13px;color:var(--tx3);margin-bottom:10px;line-height:1.5}
+.oc-items{font-size:14px;color:var(--tx3);margin-bottom:12px;line-height:1.6}
 .oc-footer{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
-.oc-total{font-weight:900;font-size:15px;color:var(--g)}
-.oc-date{font-size:12px;color:var(--tx3)}
-.oc-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:10px}
+.oc-total{font-weight:900;font-size:18px;color:var(--g)}
+.oc-date{font-size:13px;color:var(--tx3)}
+.oc-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:14px}
 .track-chip{display:inline-flex;align-items:center;gap:4px;background:var(--g);color:#fff;padding:5px 14px;border-radius:20px;font-size:11px;font-weight:800;text-decoration:none;transition:background .2s}
 .track-chip:hover{background:var(--g2)}
 .view-chip{display:inline-flex;align-items:center;gap:4px;background:#f0f7f4;color:var(--g);border:1.5px solid #c8e6c9;padding:5px 14px;border-radius:20px;font-size:11px;font-weight:800;text-decoration:none;transition:all .2s}
@@ -465,7 +465,7 @@ function buildOrdersHtml(orders) {
         returnBtn = '<button onclick="openReturnStatusModal(\'' + o.id + '\',\'' + encodeURIComponent(JSON.stringify(o)) + '\')" style="display:inline-flex;align-items:center;gap:4px;background:' + rc.bg + ';color:' + rc.color + ';border:1.5px solid ' + rc.bd + ';padding:6px 16px;border-radius:20px;font-size:12px;font-weight:800;cursor:pointer;font-family:Lato,sans-serif">' + rc.label + '</button>';
       }
       return '<div class="order-card" id="order-card-' + o.id + '">' +
-        '<div class="oc-hdr"><span class="oc-num" style="font-size:15px">' + (o.order_number||'#'+String(o.id).slice(0,8)) + '</span><span class="oc-badge ' + badge + '">' + (statusLabels[displayStatus]||displayStatus||'pending') + '</span></div>' +
+        '<div class="oc-hdr"><span class="oc-num">' + (o.order_number||'#'+String(o.id).slice(0,8)) + '</span><span class="oc-badge ' + badge + '">' + (statusLabels[displayStatus]||displayStatus||'pending') + '</span></div>' +
         (items ? '<div class="oc-items" style="font-size:14px">' + items + '</div>' : '') +
         (estDelivery ? '<div style="margin:6px 0">' + estDelivery + '</div>' : '') +
         '<div class="oc-actions">' +
@@ -475,7 +475,7 @@ function buildOrdersHtml(orders) {
           cancelBtn +
           returnBtn +
         '</div>' +
-        '<div class="oc-footer" style="margin-top:12px"><span class="oc-total" style="font-size:16px">₹' + (o.total_amount||0).toLocaleString('en-IN') + '</span><span class="oc-date" style="font-size:13px">' + date + '</span></div>' +
+        '<div class="oc-footer" style="margin-top:18px"><span class="oc-total" style="font-size:16px">₹' + (o.total_amount||0).toLocaleString('en-IN') + '</span><span class="oc-date" style="font-size:13px">' + date + '</span></div>' +
         '</div>';
     }).join('') + '</div>';
 }
@@ -713,14 +713,14 @@ function openReturnModal(orderId, orderJson) {
   // Product items with images
   var itemsHtml = items.map(function(item, idx) {
     var imgHtml = item.image_url
-      ? '<img src="' + item.image_url + '" style="width:52px;height:52px;object-fit:cover;border-radius:8px;border:1px solid #eee;flex-shrink:0" onerror="this.style.display=\'none\'">'
-      : '<div style="width:52px;height:52px;border-radius:8px;background:#f5f0e8;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">' + (item.emoji||'🌿') + '</div>';
-    return '<label style="display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;cursor:pointer;border:1.5px solid #eee;margin-bottom:8px;transition:border-color .15s" id="ret-item-wrap-' + idx + '">' +
+      ? '<img src="' + item.image_url + '" style="width:70px;height:70px;object-fit:cover;border-radius:10px;border:1px solid #eee;flex-shrink:0" onerror="this.style.display=\'none\'">'
+      : '<div style="width:70px;height:70px;border-radius:10px;background:#f5f0e8;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0">' + (item.emoji||'🌿') + '</div>';
+    return '<label style="display:flex;align-items:center;gap:16px;padding:14px 16px;border-radius:12px;cursor:pointer;border:1.5px solid #eee;margin-bottom:10px;transition:border-color .15s" id="ret-item-wrap-' + idx + '">' +
       '<input type="checkbox" id="ret-item-' + idx + '" value="' + idx + '" checked style="width:17px;height:17px;accent-color:#1a3a1e;cursor:pointer;flex-shrink:0" onchange="updateReturnTotal()">' +
       imgHtml +
       '<div style="flex:1;min-width:0">' +
-        '<div style="font-size:13px;font-weight:700;color:#1a1a1a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + (item.name||'Product') + '</div>' +
-        '<div style="font-size:11px;color:#7a7a7a;margin-top:2px">Qty: ' + (item.qty||1) + ' · ₹' + Math.round((item.price||0) * (item.qty||1)).toLocaleString('en-IN') + '</div>' +
+        '<div style="font-size:15px;font-weight:700;color:#1a1a1a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + (item.name||'Product') + '</div>' +
+        '<div style="font-size:13px;color:#7a7a7a;margin-top:4px">Qty: ' + (item.qty||1) + ' · ₹' + Math.round((item.price||0) * (item.qty||1)).toLocaleString('en-IN') + '</div>' +
       '</div>' +
     '</label>';
   }).join('') || '<div style="font-size:13px;color:#7a7a7a;padding:8px">Order items</div>';
@@ -730,34 +730,34 @@ function openReturnModal(orderId, orderJson) {
   modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9000;display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(3px)';
 
   modal.innerHTML =
-    '<div style="background:#fff;border-radius:16px;width:100%;max-width:560px;max-height:94vh;overflow-y:auto;box-shadow:0 24px 80px rgba(0,0,0,0.25);font-family:Lato,sans-serif">' +
+    '<div style="background:#fff;border-radius:20px;width:100%;max-width:680px;max-height:94vh;overflow-y:auto;box-shadow:0 24px 80px rgba(0,0,0,0.25);font-family:Lato,sans-serif">' +
 
       // Header
-      '<div style="background:linear-gradient(135deg,#1a3a1e,#2d6a4f);padding:22px 24px;border-radius:16px 16px 0 0;display:flex;justify-content:space-between;align-items:flex-start">' +
+      '<div style="background:linear-gradient(135deg,#1a3a1e,#2d6a4f);padding:28px 32px;border-radius:20px 20px 0 0;display:flex;justify-content:space-between;align-items:flex-start">' +
         '<div>' +
           '<div style="font-size:11px;color:rgba(255,255,255,0.6);font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px">Return / Refund Request</div>' +
-          '<div style="font-size:20px;font-weight:900;color:#fff;font-family:Playfair Display,serif">' + orderNum + '</div>' +
-          '<div style="font-size:12px;color:rgba(255,255,255,0.6);margin-top:3px">Ordered ' + orderDate + ' · ₹' + orderTotal.toLocaleString('en-IN') + '</div>' +
+          '<div style="font-size:24px;font-weight:900;color:#fff;font-family:Playfair Display,serif">' + orderNum + '</div>' +
+          '<div style="font-size:13px;color:rgba(255,255,255,0.6);margin-top:5px">Ordered ' + orderDate + ' · ₹' + orderTotal.toLocaleString('en-IN') + '</div>' +
         '</div>' +
-        '<button onclick="closeReturnModal()" style="background:rgba(255,255,255,0.12);border:none;color:#fff;width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:20px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-left:16px">×</button>' +
+        '<button onclick="closeReturnModal()" style="background:rgba(255,255,255,0.15);border:none;color:#fff;width:40px;height:40px;border-radius:50%;cursor:pointer;font-size:22px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-left:16px">×</button>' +
       '</div>' +
 
-      '<div style="padding:22px 24px;display:flex;flex-direction:column;gap:18px">' +
+      '<div style="padding:28px 32px;display:flex;flex-direction:column;gap:22px">' +
 
         // Step 1: Select items
         '<div>' +
-          '<div style="font-size:10px;font-weight:900;color:#aaa;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px">① Select Items to Return</div>' +
+          '<div style="font-size:11px;font-weight:900;color:#aaa;letter-spacing:1px;text-transform:uppercase;margin-bottom:12px">① Select Items to Return</div>' +
           itemsHtml +
           '<div id="ret-total-bar" style="background:#f7f3ee;border-radius:8px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;margin-top:4px">' +
-            '<span style="font-size:12px;color:#7a7a7a;font-weight:700">Refund amount</span>' +
-            '<span id="ret-refund-amt" style="font-size:16px;font-weight:900;color:#1a3a1e">₹' + orderTotal.toLocaleString('en-IN') + '</span>' +
+            '<span style="font-size:14px;color:#7a7a7a;font-weight:700">Refund amount</span>' +
+            '<span id="ret-refund-amt" style="font-size:20px;font-weight:900;color:#1a3a1e">₹' + orderTotal.toLocaleString('en-IN') + '</span>' +
           '</div>' +
         '</div>' +
 
         // Step 2: Reason
         '<div>' +
-          '<div style="font-size:10px;font-weight:900;color:#aaa;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">② Return Reason *</div>' +
-          '<select id="ret-reason" style="width:100%;padding:12px 14px;border:1.5px solid #ddd;border-radius:10px;font-size:14px;font-family:Lato,sans-serif;color:#1a1a1a;background:#fff;outline:none;cursor:pointer">' +
+          '<div style="font-size:11px;font-weight:900;color:#aaa;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px">② Return Reason *</div>' +
+          '<select id="ret-reason" style="width:100%;padding:14px 16px;border:1.5px solid #ddd;border-radius:12px;font-size:15px;font-family:Lato,sans-serif;color:#1a1a1a;background:#fff;outline:none;cursor:pointer">' +
             Object.entries(typeof RETURN_REASONS_LABELS !== 'undefined' ? RETURN_REASONS_LABELS : {
               'damaged':'Item arrived damaged',
               'wrong_item':'Wrong item received',
@@ -771,20 +771,20 @@ function openReturnModal(orderId, orderJson) {
 
         // Step 3: Description
         '<div>' +
-          '<div style="font-size:10px;font-weight:900;color:#aaa;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">③ Tell us more <span style="font-weight:400;color:#bbb">(optional)</span></div>' +
-          '<textarea id="ret-desc" placeholder="Describe the issue in detail — helps us process faster…" rows="3" style="width:100%;padding:12px 14px;border:1.5px solid #ddd;border-radius:10px;font-size:13px;font-family:Lato,sans-serif;color:#1a1a1a;resize:vertical;outline:none;box-sizing:border-box;line-height:1.5"></textarea>' +
+          '<div style="font-size:11px;font-weight:900;color:#aaa;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px">③ Tell us more <span style="font-weight:400;color:#bbb">(optional)</span></div>' +
+          '<textarea id="ret-desc" placeholder="Describe the issue in detail — helps us process faster…" rows="3" style="width:100%;padding:14px 16px;border:1.5px solid #ddd;border-radius:12px;font-size:14px;font-family:Lato,sans-serif;color:#1a1a1a;resize:vertical;outline:none;box-sizing:border-box;line-height:1.6"></textarea>' +
         '</div>' +
 
         // Policy
         '<div style="background:#e8f5e9;border-radius:10px;padding:14px 16px;border-left:3px solid #2d6a4f">' +
-          '<div style="font-size:12px;font-weight:800;color:#1a3a1e;margin-bottom:4px">📋 Return Policy</div>' +
-          '<div style="font-size:12px;color:#2d6a4f;line-height:1.6">Returns accepted within <strong>7 days</strong> of delivery. Our team reviews within <strong>24–48 hours</strong>. Refund to original payment method within 5–7 business days after we receive the item.</div>' +
+          '<div style="font-size:13px;font-weight:800;color:#1a3a1e;margin-bottom:6px">📋 Return Policy</div>' +
+          '<div style="font-size:13px;color:#2d6a4f;line-height:1.7">Returns accepted within <strong>7 days</strong> of delivery. Our team reviews within <strong>24–48 hours</strong>. Refund to original payment method within 5–7 business days after we receive the item.</div>' +
         '</div>' +
 
         // Buttons
         '<div style="display:flex;gap:10px">' +
-          '<button onclick="closeReturnModal()" style="flex:1;padding:13px;border:2px solid #e0e0e0;border-radius:12px;background:#fff;color:#7a7a7a;font-size:14px;font-weight:800;cursor:pointer;font-family:Lato,sans-serif;transition:all .2s" onmouseover="this.style.borderColor=\'#aaa\'" onmouseout="this.style.borderColor=\'#e0e0e0\'">Cancel</button>' +
-          '<button onclick="submitReturn()" id="ret-submit-btn" style="flex:2;padding:13px;border:none;border-radius:12px;background:linear-gradient(135deg,#1a3a1e,#2d5233);color:#fff;font-size:14px;font-weight:900;cursor:pointer;font-family:Lato,sans-serif;letter-spacing:.3px;transition:opacity .2s">Submit Return Request →</button>' +
+          '<button onclick="closeReturnModal()" style="flex:1;padding:16px;border:2px solid #e0e0e0;border-radius:14px;background:#fff;color:#7a7a7a;font-size:15px;font-weight:800;cursor:pointer;font-family:Lato,sans-serif;transition:all .2s" onmouseover="this.style.borderColor=\'#aaa\'" onmouseout="this.style.borderColor=\'#e0e0e0\'">Cancel</button>' +
+          '<button onclick="submitReturn()" id="ret-submit-btn" style="flex:2;padding:16px;border:none;border-radius:14px;background:linear-gradient(135deg,#1a3a1e,#2d5233);color:#fff;font-size:15px;font-weight:900;cursor:pointer;font-family:Lato,sans-serif;letter-spacing:.3px;transition:opacity .2s">Submit Return Request →</button>' +
         '</div>' +
 
       '</div>' +
@@ -864,7 +864,7 @@ function openReturnStatusModal(orderId, orderJson) {
     return '<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #f0f0f0">' +
       imgHtml +
       '<div><div style="font-size:13px;font-weight:700;color:#1a1a1a">' + (item.name||'Product') + '</div>' +
-      '<div style="font-size:11px;color:#7a7a7a;margin-top:2px">Qty: ' + (item.qty||1) + '</div></div>' +
+      '<div style="font-size:13px;color:#7a7a7a;margin-top:4px">Qty: ' + (item.qty||1) + '</div></div>' +
     '</div>';
   }).join('');
 
@@ -913,9 +913,9 @@ function openReturnStatusModal(orderId, orderJson) {
         // Refund summary (if applicable)
         (displayStatus !== 'return_rejected' ?
           '<div style="background:#f7f3ee;border-radius:10px;padding:14px 16px">' +
-            '<div style="font-size:10px;font-weight:900;color:#aaa;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px">Refund Summary</div>' +
+            '<div style="font-size:11px;font-weight:900;color:#aaa;letter-spacing:1px;text-transform:uppercase;margin-bottom:12px">Refund Summary</div>' +
             '<div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:13px;color:#7a7a7a">Refund subtotal</span><span style="font-size:13px;color:#1a1a1a">₹' + refundAmt + '</span></div>' +
-            '<div style="display:flex;justify-content:space-between;border-top:1px solid #eee;padding-top:8px;margin-top:4px"><span style="font-size:14px;font-weight:900;color:#1a1a1a">Total expected refund</span><span style="font-size:16px;font-weight:900;color:#1a3a1e">₹' + refundAmt + '</span></div>' +
+            '<div style="display:flex;justify-content:space-between;border-top:1px solid #eee;padding-top:8px;margin-top:4px"><span style="font-size:14px;font-weight:900;color:#1a1a1a">Total expected refund</span><span style="font-size:20px;font-weight:900;color:#1a3a1e">₹' + refundAmt + '</span></div>' +
             (displayStatus === 'refunded' ? '<div style="font-size:12px;color:#2d6a4f;margin-top:8px;font-weight:600">💸 ₹' + refundAmt + ' refunded to your original payment method</div>' : '') +
           '</div>'
         : '') +
@@ -923,7 +923,7 @@ function openReturnStatusModal(orderId, orderJson) {
         // Items
         (items.length > 0 ?
           '<div>' +
-            '<div style="font-size:10px;font-weight:900;color:#aaa;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px">Items in Return</div>' +
+            '<div style="font-size:11px;font-weight:900;color:#aaa;letter-spacing:1px;text-transform:uppercase;margin-bottom:12px">Items in Return</div>' +
             itemsHtml +
           '</div>'
         : '') +
