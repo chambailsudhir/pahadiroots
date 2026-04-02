@@ -434,7 +434,25 @@ function buildOrdersHtml(orders) {
       var trackUrl = o.tracking_number ? (COURIER_URLS[o.courier] ? COURIER_URLS[o.courier] + o.tracking_number : 'https://www.google.com/search?q=' + encodeURIComponent((o.courier||'') + ' tracking ' + o.tracking_number)) : '';
       var viewUrl = '/order-confirmation?id=' + o.id + '&num=' + encodeURIComponent(o.order_number||'');
       var estDelivery = '';
-      if (o.order_status === 'delivered') {
+      // ── Return/refund statuses take priority over order_status ──
+      if (displayStatus === 'return_requested') {
+        estDelivery = '<span style="font-size:12px;color:#e65100;font-weight:700">⏳ Return under review · 24–48 hrs</span>';
+      } else if (displayStatus === 'return_approved') {
+        estDelivery = '<span style="font-size:12px;color:#1565c0;font-weight:700">✅ Return approved · Please courier item back to us</span>';
+      } else if (displayStatus === 'return_received') {
+        estDelivery = '<span style="font-size:12px;color:#7b1fa2;font-weight:700">📦 Item received · Processing refund now</span>';
+      } else if (displayStatus === 'refund_initiated') {
+        estDelivery = '<span style="font-size:12px;color:#f57c00;font-weight:700">💳 Refund initiated · 3–5 business days</span>';
+      } else if (displayStatus === 'refund_completed') {
+        estDelivery = '<span style="font-size:12px;color:#1b5e20;font-weight:700">💚 Refund credited to your account!</span>';
+      } else if (displayStatus === 'refunded') {
+        estDelivery = '<span style="font-size:12px;color:#2d6a4f;font-weight:700">💸 Refund issued to original payment method</span>';
+      } else if (displayStatus === 'return_rejected') {
+        estDelivery = '<span style="font-size:12px;color:#c0392b;font-weight:700">❌ Return request rejected · Contact support</span>';
+      } else if (displayStatus === 'returned' || o.order_status === 'returned') {
+        estDelivery = '<span style="font-size:12px;color:#2d6a4f;font-weight:700">✓ Return processed</span>';
+      // ── Regular order statuses ──
+      } else if (o.order_status === 'delivered') {
         estDelivery = '<span style="font-size:12px;color:#2e7d32;font-weight:700">✅ Delivered! Enjoy your Himalayan goodness 🌿</span>';
       } else if (o.order_status === 'shipped' && o.shipped_at) {
         var shipDate = new Date(o.shipped_at); shipDate.setDate(shipDate.getDate() + 5);
@@ -448,22 +466,6 @@ function buildOrdersHtml(orders) {
         estDelivery = '<span style="font-size:12px;color:#e65100;font-weight:700">⏳ Awaiting confirmation</span>';
       } else if (o.order_status === 'cancelled') {
         estDelivery = '<span style="font-size:12px;color:#c0392b;font-weight:700">❌ Order cancelled</span>';
-      } else if (displayStatus === 'return_requested') {
-        estDelivery = '<span style="font-size:12px;color:#e65100;font-weight:700">⏳ Return under review · 24–48 hrs</span>';
-      } else if (displayStatus === 'return_approved') {
-        estDelivery = '<span style="font-size:12px;color:#1565c0;font-weight:700">✅ Return approved · Please ship item back to us</span>';
-      } else if (displayStatus === 'return_received') {
-        estDelivery = '<span style="font-size:12px;color:#7b1fa2;font-weight:700">📦 Item received · Processing refund now</span>';
-      } else if (displayStatus === 'refund_initiated') {
-        estDelivery = '<span style="font-size:12px;color:#f57c00;font-weight:700">💳 Refund initiated · 3–5 business days</span>';
-      } else if (displayStatus === 'refund_completed') {
-        estDelivery = '<span style="font-size:12px;color:#1b5e20;font-weight:700">💚 Refund credited to your account!</span>';
-      } else if (displayStatus === 'refunded') {
-        estDelivery = '<span style="font-size:12px;color:#2d6a4f;font-weight:700">💸 Refund issued to original payment method</span>';
-      } else if (displayStatus === 'return_rejected') {
-        estDelivery = '<span style="font-size:12px;color:#c0392b;font-weight:700">❌ Return request rejected · Contact support</span>';
-      } else if (o.order_status === 'returned') {
-        estDelivery = '<span style="font-size:12px;color:#2d6a4f;font-weight:700">✓ Return processed</span>';
       }
       var cancelBtn = (o.order_status === 'pending' || o.order_status === 'confirmed')
         ? '<button onclick="cancelOrder(\'' + o.id + '\',\'' + (o.order_number||o.id) + '\')" style="border:1.5px solid #fdecea;background:#fff;color:#c0392b;font-size:12px;font-weight:700;cursor:pointer;padding:6px 14px;border-radius:20px;font-family:Lato,sans-serif">❌ Cancel</button>'
