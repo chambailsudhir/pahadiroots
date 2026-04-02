@@ -783,7 +783,7 @@ function openReturnModal(orderId, orderJson) {
 
         // Buttons
         '<div style="display:flex;gap:10px">' +
-          '<button onclick="closeReturnModal()" style="flex:1;padding:13px;border:2px solid #e0e0e0;border-radius:12px;background:#fff;color:#7a7a7a;font-size:14px;font-weight:800;cursor:pointer;font-family:Lato,sans-serif;transition:all .2s" onmouseover="this.style.borderColor='#aaa'" onmouseout="this.style.borderColor='#e0e0e0'">Cancel</button>' +
+          '<button onclick="closeReturnModal()" style="flex:1;padding:13px;border:2px solid #e0e0e0;border-radius:12px;background:#fff;color:#7a7a7a;font-size:14px;font-weight:800;cursor:pointer;font-family:Lato,sans-serif;transition:all .2s" onmouseover="this.style.borderColor=\'#aaa\'" onmouseout="this.style.borderColor=\'#e0e0e0\'">Cancel</button>' +
           '<button onclick="submitReturn()" id="ret-submit-btn" style="flex:2;padding:13px;border:none;border-radius:12px;background:linear-gradient(135deg,#1a3a1e,#2d5233);color:#fff;font-size:14px;font-weight:900;cursor:pointer;font-family:Lato,sans-serif;letter-spacing:.3px;transition:opacity .2s">Submit Return Request →</button>' +
         '</div>' +
 
@@ -870,9 +870,9 @@ function openReturnStatusModal(orderId, orderJson) {
 
   var refundAmt = Math.round(o.total_amount || 0).toLocaleString('en-IN');
   var statusMsg = {
-    return_requested: 'Your return request is under review. We'll respond within 24–48 hours.',
+    return_requested: 'Your return request is under review. We\'ll respond within 24–48 hours.',
     return_approved: 'Return approved! Please ship the item back to us.',
-    return_received: 'We've received your item. Refund is being processed.',
+    return_received: 'We\'ve received your item. Refund is being processed.',
     refunded: '₹' + refundAmt + ' has been refunded to your original payment method.',
     return_rejected: 'Your return request could not be approved. Contact support for help.',
   }[displayStatus] || '';
@@ -895,7 +895,7 @@ function openReturnStatusModal(orderId, orderJson) {
           '<div style="font-size:20px;font-weight:900;color:' + mainColor + ';font-family:Playfair Display,serif;margin-bottom:4px">' + mainTitle + '</div>' +
           '<div style="font-size:12px;color:#7a7a7a">' + orderNum + (retDate ? ' · Requested ' + retDate : '') + '</div>' +
         '</div>' +
-        '<button onclick="document.getElementById('pr-return-status-modal').remove()" style="background:#f5f5f5;border:none;color:#7a7a7a;width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:18px;flex-shrink:0">×</button>' +
+        '<button onclick="document.getElementById(\'pr-return-status-modal\').remove()" style="background:#f5f5f5;border:none;color:#7a7a7a;width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:18px;flex-shrink:0">×</button>' +
       '</div>' +
       '<div style="padding:22px 24px;display:flex;flex-direction:column;gap:20px">' +
 
@@ -929,7 +929,7 @@ function openReturnStatusModal(orderId, orderJson) {
         : '') +
 
         // Close button
-        '<button onclick="document.getElementById('pr-return-status-modal').remove()" style="width:100%;padding:13px;border:2px solid #e0e0e0;border-radius:12px;background:#fff;color:#7a7a7a;font-size:14px;font-weight:800;cursor:pointer;font-family:Lato,sans-serif">Close</button>' +
+        '<button onclick="document.getElementById(\'pr-return-status-modal\').remove()" style="width:100%;padding:13px;border:2px solid #e0e0e0;border-radius:12px;background:#fff;color:#7a7a7a;font-size:14px;font-weight:800;cursor:pointer;font-family:Lato,sans-serif">Close</button>' +
       '</div>' +
     '</div>';
 
