@@ -59,7 +59,7 @@ body{font-family:'Lato',sans-serif;background:#f7f3ee;min-height:100vh;color:var
 .badge-confirmed{background:#e8f5e9;color:#2d6a4f}
 .badge-packed{background:#e3f2fd;color:#0d47a1}
 .badge-shipped{background:#e8eaf6;color:#3949ab}
-.badge-delivered{background:#ede7f6;color:#6a1b9a}
+.badge-delivered{background:#e8f5e9;color:#1b5e20}
 .badge-pending{background:#fff8e1;color:#e65100}
 .badge-cancelled{background:#fdecea;color:#c0392b}
 .badge-processing{background:#e8f5e9;color:#2d6a4f}
@@ -1046,7 +1046,15 @@ async function submitReturn() {
       })
     });
     var data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Failed');
+    if (!res.ok) {
+      var errMsg = data.error || 'Failed';
+      if (errMsg.includes('already exists')) {
+        errMsg = 'A return request already exists for this order. Check your order status above.';
+      } else if (errMsg.includes('delivered')) {
+        errMsg = 'Returns are only accepted for delivered orders.';
+      }
+      throw new Error(errMsg);
+    }
 
     closeReturnModal();
     showToast('✅ Return request submitted! We\'ll respond within 24–48 hours.');
