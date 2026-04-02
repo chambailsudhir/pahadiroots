@@ -62,8 +62,12 @@ body{font-family:'Lato',sans-serif;background:#f7f3ee;min-height:100vh;color:var
 .badge-pending{background:#fff8e1;color:#e65100}
 .badge-cancelled{background:#fdecea;color:#c0392b}
 .badge-processing{background:#e8f5e9;color:#2d6a4f}
-.badge-returned{background:#fdecea;color:#c0392b}
+.badge-returned{background:#e8f5e9;color:#2d6a4f}
 .badge-return_requested{background:#fff3e0;color:#e65100}
+.badge-return_approved{background:#e3f2fd;color:#1565c0}
+.badge-return_received{background:#f3e5f5;color:#7b1fa2}
+.badge-refunded{background:#e8f5e9;color:#2d6a4f}
+.badge-return_rejected{background:#fdecea;color:#c0392b}
 .oc-items{font-size:13px;color:var(--tx3);margin-bottom:10px;line-height:1.5}
 .oc-footer{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
 .oc-total{font-weight:900;font-size:15px;color:var(--g)}
@@ -381,7 +385,16 @@ async function cancelOrder(orderId, orderNum) {
 }
 
 function buildOrdersHtml(orders) {
-  var badges = { confirmed:'badge-confirmed', shipped:'badge-shipped', delivered:'badge-delivered', pending:'badge-pending', cancelled:'badge-cancelled', processing:'badge-processing', returned:'badge-returned', return_requested:'badge-return_requested' };
+  var badges = {
+    confirmed:'badge-confirmed', shipped:'badge-shipped', delivered:'badge-delivered',
+    pending:'badge-pending', cancelled:'badge-cancelled', processing:'badge-processing',
+    returned:'badge-returned', packed:'badge-shipped',
+    return_requested:'badge-return_requested',
+    return_approved:'badge-return_requested',
+    return_received:'badge-processing',
+    refunded:'badge-delivered',
+    return_rejected:'badge-cancelled',
+  };
   if (!orders.length) return `
     <div class="empty-state">
       <div class="empty-icon">📦</div>
@@ -390,7 +403,16 @@ function buildOrdersHtml(orders) {
       <a href="/" class="btn-primary" style="display:inline-flex">🛍️ Shop Now</a>
     </div>`;
 
-  var statusLabels = { confirmed:'Confirmed', shipped:'Shipped', delivered:'Delivered', pending:'Pending', cancelled:'Cancelled', processing:'Processing', returned:'Returned', return_requested:'Return Requested', packed:'Packed' };
+  var statusLabels = {
+    confirmed:'Confirmed', shipped:'Shipped', delivered:'Delivered',
+    pending:'Pending', cancelled:'Cancelled', processing:'Processing',
+    returned:'Returned', packed:'Packed',
+    return_requested:'Return Requested',
+    return_approved:'Return Approved',
+    return_received:'Item Received',
+    refunded:'Refund Issued',
+    return_rejected:'Return Rejected',
+  };
 
   return '<div class="card"><div class="card-title">📦 My Orders <span style="font-size:15px;font-weight:400;color:var(--tx3);font-family:Lato,sans-serif">(' + orders.length + ')</span></div>' +
     orders.map(function(o) {
@@ -411,22 +433,36 @@ function buildOrdersHtml(orders) {
         var orderDate = new Date(o.created_at||Date.now()); orderDate.setDate(orderDate.getDate() + 7);
         estDelivery = '<span style="font-size:12px;color:var(--tx3);font-weight:600">📅 Est. delivery: ' + orderDate.toLocaleDateString('en-IN',{day:'numeric',month:'short'}) + '</span>';
       } else if (displayStatus === 'return_requested') {
-        estDelivery = '<span style="font-size:12px;color:#e65100;font-weight:700">↩ Return request under review · 24–48 hrs</span>';
+        estDelivery = '<span style="font-size:12px;color:#e65100;font-weight:700">⏳ Return under review · 24–48 hrs</span>';
+      } else if (displayStatus === 'return_approved') {
+        estDelivery = '<span style="font-size:12px;color:#1565c0;font-weight:700">✅ Return approved · Please ship item back</span>';
+      } else if (displayStatus === 'return_received') {
+        estDelivery = '<span style="font-size:12px;color:#7b1fa2;font-weight:700">📦 Item received · Refund processing</span>';
+      } else if (displayStatus === 'refunded') {
+        estDelivery = '<span style="font-size:12px;color:#2d6a4f;font-weight:700">💸 Refund issued to original payment method</span>';
+      } else if (displayStatus === 'return_rejected') {
+        estDelivery = '<span style="font-size:12px;color:#c0392b;font-weight:700">❌ Return request rejected</span>';
       } else if (o.order_status === 'returned') {
-        estDelivery = '<span style="font-size:12px;color:#c0392b;font-weight:700">↩ Return processed</span>';
+        estDelivery = '<span style="font-size:12px;color:#2d6a4f;font-weight:700">✓ Return processed</span>';
       }
       var cancelBtn = (o.order_status === 'pending' || o.order_status === 'confirmed')
         ? '<button onclick="cancelOrder(\'' + o.id + '\',\'' + (o.order_number||o.id) + '\')" style="border:1.5px solid #fdecea;background:#fff;color:#c0392b;font-size:12px;font-weight:700;cursor:pointer;padding:6px 14px;border-radius:20px;font-family:Lato,sans-serif">❌ Cancel</button>'
         : '';
       var returnBtn = '';
-      if (o.order_status === 'delivered' && displayStatus !== 'return_requested') {
+      var isReturnStatus = ['return_requested','return_approved','return_received','refunded','return_rejected'].includes(displayStatus);
+      if (o.order_status === 'delivered' && !isReturnStatus) {
         returnBtn = '<button onclick="openReturnModal(\'' + o.id + '\',\'' + encodeURIComponent(JSON.stringify(o)) + '\')" style="display:inline-flex;align-items:center;gap:4px;background:#fff5f5;color:#c0392b;border:1.5px solid #fdecea;padding:6px 16px;border-radius:20px;font-size:12px;font-weight:800;cursor:pointer;font-family:Lato,sans-serif;transition:all .2s" onmouseover="this.style.background=\'#c0392b\';this.style.color=\'#fff\'" onmouseout="this.style.background=\'#fff5f5\';this.style.color=\'#c0392b\'">↩ Return</button>';
-      } else if (o.order_status === 'returned' || displayStatus === 'return_requested') {
-        var retLabel = displayStatus === 'return_requested' ? '⏳ Return Requested' : '✓ Return Processed';
-        var retColor = displayStatus === 'return_requested' ? '#e65100' : '#2d6a4f';
-        var retBg    = displayStatus === 'return_requested' ? '#fff3e0' : '#e8f5e9';
-        var retBd    = displayStatus === 'return_requested' ? '#ffe0b2' : '#c8e6c9';
-        returnBtn = '<span style="display:inline-flex;align-items:center;gap:4px;background:' + retBg + ';color:' + retColor + ';border:1.5px solid ' + retBd + ';padding:6px 16px;border-radius:20px;font-size:12px;font-weight:800">' + retLabel + '</span>';
+      } else if (isReturnStatus || o.order_status === 'returned') {
+        var retConfig = {
+          return_requested: { label:'⏳ Return Requested', color:'#e65100', bg:'#fff3e0', bd:'#ffe0b2' },
+          return_approved:  { label:'✅ Return Approved',  color:'#1565c0', bg:'#e3f2fd', bd:'#90caf9' },
+          return_received:  { label:'📦 Item Received',    color:'#7b1fa2', bg:'#f3e5f5', bd:'#ce93d8' },
+          refunded:         { label:'💸 Refund Issued',    color:'#2d6a4f', bg:'#e8f5e9', bd:'#a5d6a7' },
+          return_rejected:  { label:'❌ Rejected',          color:'#c0392b', bg:'#fdecea', bd:'#ef9a9a' },
+          returned:         { label:'✓ Return Processed',  color:'#2d6a4f', bg:'#e8f5e9', bd:'#c8e6c9' },
+        };
+        var rc = retConfig[displayStatus] || retConfig['returned'];
+        returnBtn = '<button onclick="openReturnStatusModal(\'' + o.id + '\',\'' + encodeURIComponent(JSON.stringify(o)) + '\')" style="display:inline-flex;align-items:center;gap:4px;background:' + rc.bg + ';color:' + rc.color + ';border:1.5px solid ' + rc.bd + ';padding:6px 16px;border-radius:20px;font-size:12px;font-weight:800;cursor:pointer;font-family:Lato,sans-serif">' + rc.label + '</button>';
       }
       return '<div class="order-card" id="order-card-' + o.id + '">' +
         '<div class="oc-hdr"><span class="oc-num" style="font-size:15px">' + (o.order_number||'#'+String(o.id).slice(0,8)) + '</span><span class="oc-badge ' + badge + '">' + (statusLabels[displayStatus]||displayStatus||'pending') + '</span></div>' +
@@ -665,80 +701,240 @@ var RETURN_REASONS_LABELS = {
 
 function openReturnModal(orderId, orderJson) {
   try { _returnOrder = JSON.parse(decodeURIComponent(orderJson)); } catch(e) { _returnOrder = { id: orderId }; }
-
   var existing = document.getElementById('pr-return-modal');
   if (existing) existing.remove();
 
+  var o = _returnOrder;
+  var orderNum   = o.order_number || ('ORD-' + String(o.id).slice(-6));
+  var orderTotal = Math.round(o.total_amount || 0);
+  var items      = o.items || [];
+  var orderDate  = o.created_at ? new Date(o.created_at).toLocaleDateString('en-IN', {day:'numeric',month:'long',year:'numeric'}) : '';
+
+  // Product items with images
+  var itemsHtml = items.map(function(item, idx) {
+    var imgHtml = item.image_url
+      ? '<img src="' + item.image_url + '" style="width:52px;height:52px;object-fit:cover;border-radius:8px;border:1px solid #eee;flex-shrink:0" onerror="this.style.display='none'">'
+      : '<div style="width:52px;height:52px;border-radius:8px;background:#f5f0e8;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">' + (item.emoji||'🌿') + '</div>';
+    return '<label style="display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;cursor:pointer;border:1.5px solid #eee;margin-bottom:8px;transition:border-color .15s" id="ret-item-wrap-' + idx + '">' +
+      '<input type="checkbox" id="ret-item-' + idx + '" value="' + idx + '" checked style="width:17px;height:17px;accent-color:#1a3a1e;cursor:pointer;flex-shrink:0" onchange="updateReturnTotal()">' +
+      imgHtml +
+      '<div style="flex:1;min-width:0">' +
+        '<div style="font-size:13px;font-weight:700;color:#1a1a1a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + (item.name||'Product') + '</div>' +
+        '<div style="font-size:11px;color:#7a7a7a;margin-top:2px">Qty: ' + (item.qty||1) + ' · ₹' + Math.round((item.price||0) * (item.qty||1)).toLocaleString('en-IN') + '</div>' +
+      '</div>' +
+    '</label>';
+  }).join('') || '<div style="font-size:13px;color:#7a7a7a;padding:8px">Order items</div>';
+
   var modal = document.createElement('div');
   modal.id = 'pr-return-modal';
-  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9000;display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(4px)';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9000;display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(3px)';
 
-  var orderTotal = Math.round(_returnOrder.total_amount || 0);
-  var orderNum   = _returnOrder.order_number || ('ORD-' + String(_returnOrder.id).slice(-6));
-  var items      = (_returnOrder.items || []);
-  var itemsHtml  = items.length > 0
-    ? items.map(function(item, idx) {
-        return '<label style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;cursor:pointer;transition:background .15s" onmouseover="this.style.background=\'#f0f0f0\'" onmouseout="this.style.background=\'transparent\'">' +
-          '<input type="checkbox" id="ret-item-' + idx + '" value="' + idx + '" checked style="width:16px;height:16px;accent-color:#1a3a1e;cursor:pointer">' +
-          '<span style="font-size:14px">' + (item.emoji||'🌿') + '</span>' +
-          '<span style="flex:1;font-size:13px;color:#1a1a1a;font-weight:600">' + (item.name||'Product') + '</span>' +
-          '<span style="font-size:12px;color:#7a7a7a">×' + (item.qty||1) + '</span>' +
-        '</label>';
-      }).join('')
-    : '<div style="font-size:13px;color:#7a7a7a;padding:4px 0">Order items</div>';
+  modal.innerHTML =
+    '<div style="background:#fff;border-radius:16px;width:100%;max-width:560px;max-height:94vh;overflow-y:auto;box-shadow:0 24px 80px rgba(0,0,0,0.25);font-family:Lato,sans-serif">' +
 
-  modal.innerHTML = '\
-<div style="background:#fff;border-radius:20px;width:100%;max-width:440px;max-height:92vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.3)">\
-  <!-- Header -->\
-  <div style="background:linear-gradient(135deg,#1a3a1e,#2d5233);padding:20px 24px;border-radius:20px 20px 0 0;display:flex;justify-content:space-between;align-items:flex-start">\
-    <div>\
-      <div style="font-family:Playfair Display,serif;font-size:18px;font-weight:900;color:#fff">↩ Return Request</div>\
-      <div style="font-size:12px;color:rgba(255,255,255,0.65);margin-top:3px">' + orderNum + '</div>\
-    </div>\
-    <button onclick="closeReturnModal()" style="background:rgba(255,255,255,0.15);border:none;color:#fff;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;flex-shrink:0">×</button>\
-  </div>\
-  <div style="padding:20px 24px;display:flex;flex-direction:column;gap:16px">\
-    <!-- Order summary -->\
-    <div style="background:#f7f3ee;border-radius:12px;padding:14px">\
-      <div style="font-size:10px;font-weight:800;color:#aaa;letter-spacing:.8px;text-transform:uppercase;margin-bottom:8px">Select Items to Return</div>\
-      ' + (itemsHtml || '<div style="font-size:12px;color:#7a7a7a">Order items</div>') + '\
-      <div style="border-top:1px solid #eee;margin-top:8px;padding-top:8px;display:flex;justify-content:space-between">\
-        <span style="font-size:12px;font-weight:700;color:#4a4a4a">Total Paid</span>\
-        <span style="font-size:14px;font-weight:900;color:#1a3a1e">₹' + orderTotal.toLocaleString("en-IN") + '</span>\
-      </div>\
-    </div>\
-    <!-- Reason -->\
-    <div>\
-      <div style="font-size:10px;font-weight:800;color:#7a7a7a;letter-spacing:.8px;text-transform:uppercase;margin-bottom:6px">Return Reason *</div>\
-      <select id="ret-reason" style="width:100%;padding:11px 14px;border:1.5px solid #eee;border-radius:10px;font-size:14px;font-family:Lato,sans-serif;color:#1a1a1a;background:#fff;outline:none">\
-        ' + Object.entries(RETURN_REASONS_LABELS).map(function(e){ return '<option value="' + e[0] + '">' + e[1] + '</option>'; }).join('') + '\
-      </select>\
-    </div>\
-    <!-- Description -->\
-    <div>\
-      <div style="font-size:10px;font-weight:800;color:#7a7a7a;letter-spacing:.8px;text-transform:uppercase;margin-bottom:6px">Tell us more (optional)</div>\
-      <textarea id="ret-desc" placeholder="Describe the issue with your order…" rows="3" style="width:100%;padding:11px 14px;border:1.5px solid #eee;border-radius:10px;font-size:13px;font-family:Lato,sans-serif;color:#1a1a1a;resize:none;outline:none;box-sizing:border-box"></textarea>\
-    </div>\
-    <!-- Policy note -->\
-    <div style="background:#e8f5e9;border-radius:10px;padding:12px 14px;font-size:12px;color:#2d6a4f;line-height:1.5">\
-      📋 <strong>Return Policy:</strong> Returns accepted within 7 days of delivery. Our team will review and respond within 24–48 hours.\
-    </div>\
-    <!-- Buttons -->\
-    <div style="display:flex;gap:10px;margin-top:4px">\
-      <button onclick="closeReturnModal()" style="flex:1;padding:12px;border:2px solid #eee;border-radius:12px;background:#fff;color:#7a7a7a;font-size:14px;font-weight:800;cursor:pointer;font-family:Lato,sans-serif">Cancel</button>\
-      <button onclick="submitReturn()" id="ret-submit-btn" style="flex:2;padding:12px;border:none;border-radius:12px;background:linear-gradient(135deg,#1a3a1e,#2d5233);color:#fff;font-size:14px;font-weight:800;cursor:pointer;font-family:Lato,sans-serif">Submit Return Request</button>\
-    </div>\
-  </div>\
-</div>';
+      // Header
+      '<div style="background:linear-gradient(135deg,#1a3a1e,#2d6a4f);padding:22px 24px;border-radius:16px 16px 0 0;display:flex;justify-content:space-between;align-items:flex-start">' +
+        '<div>' +
+          '<div style="font-size:11px;color:rgba(255,255,255,0.6);font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px">Return / Refund Request</div>' +
+          '<div style="font-size:20px;font-weight:900;color:#fff;font-family:Playfair Display,serif">' + orderNum + '</div>' +
+          '<div style="font-size:12px;color:rgba(255,255,255,0.6);margin-top:3px">Ordered ' + orderDate + ' · ₹' + orderTotal.toLocaleString('en-IN') + '</div>' +
+        '</div>' +
+        '<button onclick="closeReturnModal()" style="background:rgba(255,255,255,0.12);border:none;color:#fff;width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:20px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-left:16px">×</button>' +
+      '</div>' +
+
+      '<div style="padding:22px 24px;display:flex;flex-direction:column;gap:18px">' +
+
+        // Step 1: Select items
+        '<div>' +
+          '<div style="font-size:10px;font-weight:900;color:#aaa;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px">① Select Items to Return</div>' +
+          itemsHtml +
+          '<div id="ret-total-bar" style="background:#f7f3ee;border-radius:8px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;margin-top:4px">' +
+            '<span style="font-size:12px;color:#7a7a7a;font-weight:700">Refund amount</span>' +
+            '<span id="ret-refund-amt" style="font-size:16px;font-weight:900;color:#1a3a1e">₹' + orderTotal.toLocaleString('en-IN') + '</span>' +
+          '</div>' +
+        '</div>' +
+
+        // Step 2: Reason
+        '<div>' +
+          '<div style="font-size:10px;font-weight:900;color:#aaa;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">② Return Reason *</div>' +
+          '<select id="ret-reason" style="width:100%;padding:12px 14px;border:1.5px solid #ddd;border-radius:10px;font-size:14px;font-family:Lato,sans-serif;color:#1a1a1a;background:#fff;outline:none;cursor:pointer">' +
+            Object.entries(typeof RETURN_REASONS_LABELS !== 'undefined' ? RETURN_REASONS_LABELS : {
+              'damaged':'Item arrived damaged',
+              'wrong_item':'Wrong item received',
+              'not_as_described':'Not as described',
+              'changed_mind':'Changed my mind',
+              'missing_parts':'Parts/accessories missing',
+              'other':'Other reason'
+            }).map(function(e){ return '<option value="' + e[0] + '">' + e[1] + '</option>'; }).join('') +
+          '</select>' +
+        '</div>' +
+
+        // Step 3: Description
+        '<div>' +
+          '<div style="font-size:10px;font-weight:900;color:#aaa;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">③ Tell us more <span style="font-weight:400;color:#bbb">(optional)</span></div>' +
+          '<textarea id="ret-desc" placeholder="Describe the issue in detail — helps us process faster…" rows="3" style="width:100%;padding:12px 14px;border:1.5px solid #ddd;border-radius:10px;font-size:13px;font-family:Lato,sans-serif;color:#1a1a1a;resize:vertical;outline:none;box-sizing:border-box;line-height:1.5"></textarea>' +
+        '</div>' +
+
+        // Policy
+        '<div style="background:#e8f5e9;border-radius:10px;padding:14px 16px;border-left:3px solid #2d6a4f">' +
+          '<div style="font-size:12px;font-weight:800;color:#1a3a1e;margin-bottom:4px">📋 Return Policy</div>' +
+          '<div style="font-size:12px;color:#2d6a4f;line-height:1.6">Returns accepted within <strong>7 days</strong> of delivery. Our team reviews within <strong>24–48 hours</strong>. Refund to original payment method within 5–7 business days after we receive the item.</div>' +
+        '</div>' +
+
+        // Buttons
+        '<div style="display:flex;gap:10px">' +
+          '<button onclick="closeReturnModal()" style="flex:1;padding:13px;border:2px solid #e0e0e0;border-radius:12px;background:#fff;color:#7a7a7a;font-size:14px;font-weight:800;cursor:pointer;font-family:Lato,sans-serif;transition:all .2s" onmouseover="this.style.borderColor='#aaa'" onmouseout="this.style.borderColor='#e0e0e0'">Cancel</button>' +
+          '<button onclick="submitReturn()" id="ret-submit-btn" style="flex:2;padding:13px;border:none;border-radius:12px;background:linear-gradient(135deg,#1a3a1e,#2d5233);color:#fff;font-size:14px;font-weight:900;cursor:pointer;font-family:Lato,sans-serif;letter-spacing:.3px;transition:opacity .2s">Submit Return Request →</button>' +
+        '</div>' +
+
+      '</div>' +
+    '</div>';
 
   document.body.appendChild(modal);
   modal.addEventListener('click', function(e){ if(e.target===modal) closeReturnModal(); });
+}
+
+// Update refund total when items toggled
+function updateReturnTotal() {
+  if (!_returnOrder) return;
+  var items = _returnOrder.items || [];
+  var total = 0;
+  items.forEach(function(item, idx) {
+    var cb = document.getElementById('ret-item-' + idx);
+    if (cb && cb.checked) total += (item.price || 0) * (item.qty || 1);
+  });
+  var el = document.getElementById('ret-refund-amt');
+  if (el) el.textContent = '₹' + Math.round(total).toLocaleString('en-IN');
 }
 
 function closeReturnModal() {
   var m = document.getElementById('pr-return-modal');
   if (m) m.remove();
   _returnOrder = null;
+}
+
+// Amazon-style Return/Refund Status tracker
+function openReturnStatusModal(orderId, orderJson) {
+  try { _returnOrder = JSON.parse(decodeURIComponent(orderJson)); } catch(e) { _returnOrder = { id: orderId }; }
+  var o = _returnOrder;
+  var ret = o._return || {};
+  var orderNum = o.order_number || ('ORD-' + String(o.id).slice(-6));
+  var displayStatus = o._displayStatus || 'return_requested';
+
+  var existing = document.getElementById('pr-return-status-modal');
+  if (existing) existing.remove();
+
+  // Timeline steps — like Amazon
+  var STEPS = [
+    { key:'return_requested', label:'Return started',         icon:'↩', done:true },
+    { key:'return_approved',  label:'Return approved',        icon:'✅', done:['return_approved','return_received','refunded'].includes(displayStatus) },
+    { key:'return_received',  label:'Item received by us',    icon:'📦', done:['return_received','refunded'].includes(displayStatus) },
+    { key:'refunded',         label:'Refund credited',        icon:'💸', done:displayStatus === 'refunded' },
+  ];
+  if (displayStatus === 'return_rejected') {
+    STEPS = [
+      { key:'return_requested', label:'Return started',     icon:'↩',  done:true },
+      { key:'return_rejected',  label:'Request rejected',   icon:'❌',  done:true, rejected:true },
+    ];
+  }
+
+  var retDate = ret.created_at ? new Date(ret.created_at).toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'}) : '';
+  var items = o.items || [];
+
+  var timelineHtml = STEPS.map(function(step, i) {
+    var isLast = i === STEPS.length - 1;
+    var dotColor  = step.done ? (step.rejected ? '#c0392b' : '#2d6a4f') : '#ddd';
+    var lineColor = (i < STEPS.length - 1 && STEPS[i+1].done) ? '#2d6a4f' : '#eee';
+    var labelColor = step.done ? (step.rejected ? '#c0392b' : '#1a1a1a') : '#bbb';
+    return '<div style="display:flex;gap:14px;position:relative">' +
+      '<div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0">' +
+        '<div style="width:32px;height:32px;border-radius:50%;background:' + dotColor + ';display:flex;align-items:center;justify-content:center;font-size:14px;color:#fff;font-weight:900;border:2px solid ' + dotColor + '">' + (step.done ? step.icon : '') + '</div>' +
+        (!isLast ? '<div style="width:2px;flex:1;background:' + lineColor + ';min-height:28px;margin:4px 0"></div>' : '') +
+      '</div>' +
+      '<div style="padding-top:4px;padding-bottom:' + (!isLast ? '20px' : '0') + '">' +
+        '<div style="font-size:14px;font-weight:' + (step.done ? '800' : '400') + ';color:' + labelColor + '">' + step.label + '</div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+
+  var itemsHtml = items.map(function(item) {
+    var imgHtml = item.image_url
+      ? '<img src="' + item.image_url + '" style="width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid #eee;flex-shrink:0" onerror="this.style.display='none'">'
+      : '<div style="width:56px;height:56px;border-radius:8px;background:#f5f0e8;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0">' + (item.emoji||'🌿') + '</div>';
+    return '<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #f0f0f0">' +
+      imgHtml +
+      '<div><div style="font-size:13px;font-weight:700;color:#1a1a1a">' + (item.name||'Product') + '</div>' +
+      '<div style="font-size:11px;color:#7a7a7a;margin-top:2px">Qty: ' + (item.qty||1) + '</div></div>' +
+    '</div>';
+  }).join('');
+
+  var refundAmt = Math.round(o.total_amount || 0).toLocaleString('en-IN');
+  var statusMsg = {
+    return_requested: 'Your return request is under review. We'll respond within 24–48 hours.',
+    return_approved: 'Return approved! Please ship the item back to us.',
+    return_received: 'We've received your item. Refund is being processed.',
+    refunded: '₹' + refundAmt + ' has been refunded to your original payment method.',
+    return_rejected: 'Your return request could not be approved. Contact support for help.',
+  }[displayStatus] || '';
+
+  var mainColor = displayStatus === 'return_rejected' ? '#c0392b' : '#2d6a4f';
+  var mainTitle = displayStatus === 'refunded' ? 'Refund Issued ✅' :
+    displayStatus === 'return_rejected' ? 'Return Rejected ❌' :
+    displayStatus === 'return_received' ? 'Item Received 📦' :
+    displayStatus === 'return_approved' ? 'Return Approved ✅' : 'Return In Progress ⏳';
+
+  var modal = document.createElement('div');
+  modal.id = 'pr-return-status-modal';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9000;display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(3px)';
+
+  modal.innerHTML =
+    '<div style="background:#fff;border-radius:16px;width:100%;max-width:540px;max-height:94vh;overflow-y:auto;box-shadow:0 24px 80px rgba(0,0,0,0.25);font-family:Lato,sans-serif">' +
+      // Header
+      '<div style="padding:22px 24px;border-bottom:1px solid #f0f0f0;display:flex;justify-content:space-between;align-items:flex-start">' +
+        '<div>' +
+          '<div style="font-size:20px;font-weight:900;color:' + mainColor + ';font-family:Playfair Display,serif;margin-bottom:4px">' + mainTitle + '</div>' +
+          '<div style="font-size:12px;color:#7a7a7a">' + orderNum + (retDate ? ' · Requested ' + retDate : '') + '</div>' +
+        '</div>' +
+        '<button onclick="document.getElementById('pr-return-status-modal').remove()" style="background:#f5f5f5;border:none;color:#7a7a7a;width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:18px;flex-shrink:0">×</button>' +
+      '</div>' +
+      '<div style="padding:22px 24px;display:flex;flex-direction:column;gap:20px">' +
+
+        // Status message
+        '<div style="background:' + (displayStatus==='return_rejected'?'#fdecea':'#e8f5e9') + ';border-radius:10px;padding:14px 16px;border-left:3px solid ' + mainColor + '">' +
+          '<div style="font-size:13px;color:' + mainColor + ';line-height:1.5;font-weight:600">' + statusMsg + '</div>' +
+        '</div>' +
+
+        // Timeline
+        '<div>' +
+          '<div style="font-size:10px;font-weight:900;color:#aaa;letter-spacing:1px;text-transform:uppercase;margin-bottom:14px">Return Timeline</div>' +
+          timelineHtml +
+        '</div>' +
+
+        // Refund summary (if applicable)
+        (displayStatus !== 'return_rejected' ?
+          '<div style="background:#f7f3ee;border-radius:10px;padding:14px 16px">' +
+            '<div style="font-size:10px;font-weight:900;color:#aaa;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px">Refund Summary</div>' +
+            '<div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:13px;color:#7a7a7a">Refund subtotal</span><span style="font-size:13px;color:#1a1a1a">₹' + refundAmt + '</span></div>' +
+            '<div style="display:flex;justify-content:space-between;border-top:1px solid #eee;padding-top:8px;margin-top:4px"><span style="font-size:14px;font-weight:900;color:#1a1a1a">Total expected refund</span><span style="font-size:16px;font-weight:900;color:#1a3a1e">₹' + refundAmt + '</span></div>' +
+            (displayStatus === 'refunded' ? '<div style="font-size:12px;color:#2d6a4f;margin-top:8px;font-weight:600">💸 ₹' + refundAmt + ' refunded to your original payment method</div>' : '') +
+          '</div>'
+        : '') +
+
+        // Items
+        (items.length > 0 ?
+          '<div>' +
+            '<div style="font-size:10px;font-weight:900;color:#aaa;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px">Items in Return</div>' +
+            itemsHtml +
+          '</div>'
+        : '') +
+
+        // Close button
+        '<button onclick="document.getElementById('pr-return-status-modal').remove()" style="width:100%;padding:13px;border:2px solid #e0e0e0;border-radius:12px;background:#fff;color:#7a7a7a;font-size:14px;font-weight:800;cursor:pointer;font-family:Lato,sans-serif">Close</button>' +
+      '</div>' +
+    '</div>';
+
+  document.body.appendChild(modal);
+  modal.addEventListener('click', function(e){ if(e.target===modal) modal.remove(); });
 }
 
 async function submitReturn() {
