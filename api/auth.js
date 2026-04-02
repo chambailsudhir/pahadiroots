@@ -125,11 +125,13 @@ async function getCustomerOrders(customerId) {
       let displayStatus = o.order_status;
       if (ret) {
         const statusMap = {
-          requested: 'return_requested',
-          approved:  'return_approved',
-          received:  'return_received',
-          refunded:  'refunded',
-          rejected:  'return_rejected',
+          requested:         'return_requested',
+          approved:          'return_approved',
+          received:          'return_received',
+          refunded:          'refunded',
+          refund_initiated:  'refund_initiated',
+          refund_completed:  'refund_completed',
+          rejected:          'return_rejected',
         };
         displayStatus = statusMap[ret.status] || 'return_requested';
       }
