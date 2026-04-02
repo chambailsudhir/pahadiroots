@@ -27,7 +27,7 @@ const ALLOWED_TABLES = new Set([
   'admin_logs', 'order_detailed', 'order_summary', 'site_settings',
   'revenue_summary', 'states', 'sales_summary', 'stock_overview', 'daily_revenue',
   'state_images', 'product_images', 'founder_images',
-  'product_variants', 'team_members',
+  'product_variants', 'team_members', 'returns', 'stock_movements', 'abandoned_carts', 'channel_inventory', 'channels', 'inventory_overview', 'warehouses',
 ]);
 
 const WRITE_METHODS = new Set(['POST', 'PATCH', 'DELETE']);
@@ -247,7 +247,7 @@ export default async function handler(req, res) {
 
       // 3. Save order items
       if (items && items.length) {
-        const orderItems = items.map(i => ({ order_id: orderId, product_id: i.id||null, quantity: i.qty, price_at_time: i.price }));
+        const orderItems = items.map(i => ({ order_id: orderId, product_id: i.id||null, variant_id: i.variantId||null, quantity: i.qty, price_at_time: i.price }));
         await sbFetch('POST', 'order_items', '', orderItems).catch(e => console.warn('order_items failed:', e));
       }
 
@@ -337,12 +337,14 @@ export default async function handler(req, res) {
 
   // ── public_get_order — order confirmation page ──────────────────
   if (reqBody.action === 'public_get_order') {
-    const order_id = reqBody.order_id ? parseInt(reqBody.order_id, 10) : null;
-    if (!order_id || isNaN(order_id)) return err(400, 'order_id required');
+    const order_id     = reqBody.order_id ? parseInt(reqBody.order_id, 10) : null;
+    const order_number = reqBody.order_number ? String(reqBody.order_number).trim() : null;
+    if ((!order_id || isNaN(order_id)) && !order_number) return err(400, 'order_id or order_number required');
     try {
-      // Query 1: Fetch order — minimal safe fields only
+      // Query 1: Fetch order — by id or order_number, minimal safe fields only
+      const filter = order_id ? `id=eq.${order_id}` : `order_number=eq.${encodeURIComponent(order_number)}`;
       const orderRes = await fetch(
-        `${SUPABASE_URL}/rest/v1/orders?id=eq.${order_id}&select=id,order_number,order_status,payment_status,total_amount,subtotal,shipping_charge,tracking_number,courier,shipped_at,delivered_at,created_at,payment_method,customer_id`,
+        `${SUPABASE_URL}/rest/v1/orders?${filter}&select=id,order_number,order_status,payment_status,total_amount,subtotal,shipping_charge,tracking_number,courier,shipped_at,delivered_at,created_at,payment_method,customer_id`,
         { headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY } }
       );
       if (!orderRes.ok) {

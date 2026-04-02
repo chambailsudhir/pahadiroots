@@ -8,11 +8,12 @@ export const config = {
   api: { bodyParser: false }
 };
 
-const SUPABASE_URL = process.env.SUPABASE_URL;
-const SUPABASE_KEY = process.env.SUPABASE_SERVICE_KEY;
+const SUPABASE_URL      = process.env.SUPABASE_URL;
+const SUPABASE_KEY      = process.env.SUPABASE_SERVICE_KEY;
+const RAZORPAY_KEY_ID   = process.env.RAZORPAY_KEY_ID || ''; // ← from Vercel env, never hardcoded
 
 const CORS = {
-  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Origin': 'https://pahadiroots.com',
   'Access-Control-Allow-Methods': 'GET, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type',
   'Cache-Control': 'public, s-maxage=0, stale-while-revalidate=5',
@@ -58,15 +59,16 @@ export default async function handler(req, res) {
     (siteSettings || []).forEach(s => { settings[s.key] = s.value; });
 
     res.status(200).json({
-      states:           states         || [],
-      products:         products       || [],
+      states:           states          || [],
+      products:         products        || [],
       settings,
-      coupons:          coupons        || [],
-      state_images:     stateImages    || [],
-      product_images:   productImages  || [],
-      founder_images:   founderImages  || [],
+      coupons:          coupons         || [],
+      state_images:     stateImages     || [],
+      product_images:   productImages   || [],
+      founder_images:   founderImages   || [],
       product_variants: productVariants || [],
-      team_members:     teamMembers    || [],
+      team_members:     teamMembers     || [],
+      razorpay_key:     RAZORPAY_KEY_ID,   // ← served from env, safe
     });
 
   } catch (e) {

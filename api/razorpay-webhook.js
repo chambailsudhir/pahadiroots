@@ -135,7 +135,34 @@ async function saveOrderFromWebhook(payment) {
   const orderNumber = newOrder && newOrder[0] ? newOrder[0].order_number : null;
   if (!orderId) throw new Error('Could not create order');
 
-  // 3. Save order_status_history
+  // 3. Save order_items — webhook has no cart data from Razorpay payload
+  // items[] in notes field if passed, otherwise create a placeholder so DB trigger doesn't block
+  let notesItems = null;
+  try { notesItems = payment.notes?.items ? JSON.parse(payment.notes.items) : null; } catch(e) { notesItems = null; }
+  if (Array.isArray(notesItems) && notesItems.length > 0) {
+    // items were passed via Razorpay notes — save them
+    const orderItems = notesItems.map(i => ({
+      order_id:       orderId,
+      product_id:     i.id     || null,
+      variant_id:     i.variantId || null,
+      quantity:       i.qty    || 1,
+      price_at_time:  i.price  || 0,
+    }));
+    await sbFetch('POST', 'order_items', '', orderItems).catch(e => {
+      console.warn('[Webhook] order_items insert failed:', e.message);
+    });
+  } else {
+    // No cart data in webhook — log for manual review
+    console.warn(`[Webhook] No items data for order ${orderNumber} (payment: ${paymentId}) — admin must add items manually`);
+    await sbFetch('POST', 'admin_logs', '', {
+      table_name:  'order_items',
+      action:      'WEBHOOK_MISSING_ITEMS',
+      record_id:   orderId,
+      admin_email: 'webhook@razorpay',
+    }).catch(() => {});
+  }
+
+  // 4. Save order_status_history
   await sbFetch('POST', 'order_status_history', '', {
     order_id:   orderId,
     old_status: 'new',
@@ -144,7 +171,7 @@ async function saveOrderFromWebhook(payment) {
     notes:      `Webhook — payment_id: ${paymentId}`,
   }).catch(() => {});
 
-  // 4. Log to admin_logs
+  // 5. Log to admin_logs
   await sbFetch('POST', 'admin_logs', '', {
     table_name:  'orders',
     action:      'WEBHOOK_CREATE',
@@ -183,23 +210,22 @@ export default async function handler(req, res) {
   // We verify: HMAC-SHA256(rawBody, WEBHOOK_SECRET) === signature
   const signature = req.headers['x-razorpay-signature'];
 
+  // WEBHOOK_SECRET is required — reject all requests if not configured
   if (!WEBHOOK_SECRET) {
-    // No secret set — log warning but continue (for initial setup)
-    console.warn('[Webhook] RAZORPAY_WEBHOOK_SECRET not set — skipping signature check');
-  } else {
-    if (!signature) {
-      console.warn('[Webhook] Missing signature header');
-      return res.status(400).json({ error: 'Missing signature' });
-    }
-    const expectedSig = crypto
-      .createHmac('sha256', WEBHOOK_SECRET)
-      .update(rawBody)
-      .digest('hex');
-
-    if (expectedSig !== signature) {
-      console.warn('[Webhook] Signature mismatch — possible fake request');
-      return res.status(400).json({ error: 'Invalid signature' });
-    }
+    console.error('[Webhook] RAZORPAY_WEBHOOK_SECRET not set — rejecting request for security');
+    return res.status(500).json({ error: 'Webhook secret not configured' });
+  }
+  if (!signature) {
+    console.warn('[Webhook] Missing x-razorpay-signature header');
+    return res.status(400).json({ error: 'Missing signature' });
+  }
+  const expectedSig = crypto
+    .createHmac('sha256', WEBHOOK_SECRET)
+    .update(rawBody)
+    .digest('hex');
+  if (expectedSig !== signature) {
+    console.warn('[Webhook] Signature mismatch — possible fake/spoofed request');
+    return res.status(400).json({ error: 'Invalid signature' });
   }
 
   // ── 3. Parse event ────────────────────────────────────────
