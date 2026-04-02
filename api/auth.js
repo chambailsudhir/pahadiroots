@@ -100,23 +100,52 @@ async function syncCustomerProfile(user) {
 async function getCustomerOrders(customerId) {
   try {
     const orders = await sbAdmin('GET',
-      `/rest/v1/orders?customer_id=eq.${customerId}&order=created_at.desc&limit=20&select=id,order_number,total_amount,order_status,payment_status,payment_method,created_at,tracking_number,courier`
+      `/rest/v1/orders?customer_id=eq.${customerId}&order=created_at.desc&limit=20&select=id,order_number,total_amount,order_status,payment_status,payment_method,created_at,tracking_number,courier,shipped_at,delivered_at`
     );
     if (!orders || !orders.length) return [];
-    // Get items for each order
     const orderIds = orders.map(o => o.id);
-    const items = await sbAdmin('GET',
-      `/rest/v1/order_items?order_id=in.(${orderIds.join(',')})&select=order_id,quantity,price_at_time,product_id,products(name,emoji)`
-    ).catch(() => []);
-    return orders.map(o => ({
-      ...o,
-      items: (items || []).filter(i => String(i.order_id) === String(o.id)).map(i => ({
-        qty:   i.quantity,
-        price: i.price_at_time,
-        name:  i.products?.name || 'Product',
-        emoji: i.products?.emoji || '🌿',
-      }))
-    }));
+
+    // Fetch items + images in parallel with returns
+    const [items, returns] = await Promise.all([
+      sbAdmin('GET',
+        `/rest/v1/order_items?order_id=in.(${orderIds.join(',')})&select=order_id,quantity,price_at_time,product_id,products(name,emoji,image_url)`
+      ).catch(() => []),
+      sbAdmin('GET',
+        `/rest/v1/returns?order_id=in.(${orderIds.join(',')})&select=order_id,id,status,reason,created_at,updated_at`
+      ).catch(() => []),
+    ]);
+
+    // Map return status per order
+    const returnMap = {};
+    (returns || []).forEach(r => { returnMap[String(r.order_id)] = r; });
+
+    return orders.map(o => {
+      const ret = returnMap[String(o.id)];
+      // Compute display status: return status takes priority over order_status
+      let displayStatus = o.order_status;
+      if (ret) {
+        const statusMap = {
+          requested: 'return_requested',
+          approved:  'return_approved',
+          received:  'return_received',
+          refunded:  'refunded',
+          rejected:  'return_rejected',
+        };
+        displayStatus = statusMap[ret.status] || 'return_requested';
+      }
+      return {
+        ...o,
+        _return: ret || null,
+        _displayStatus: displayStatus,
+        items: (items || []).filter(i => String(i.order_id) === String(o.id)).map(i => ({
+          qty:       i.quantity,
+          price:     i.price_at_time,
+          name:      i.products?.name || 'Product',
+          emoji:     i.products?.emoji || '🌿',
+          image_url: i.products?.image_url || null,
+        }))
+      };
+    });
   } catch (e) {
     return [];
   }
