@@ -528,13 +528,19 @@ export default async function handler(req, res) {
       );
       if (!orders || !orders.length) return err(403, 'Order not found or does not belong to you');
       const order = orders[0];
-      if (order.order_status !== 'delivered') return err(400, 'Only delivered orders can be returned');
+      // Allow return for delivered orders (order_status may still be 'delivered' even if return in progress)
+      const allowedStatuses = ['delivered', 'returned'];
+      if (!allowedStatuses.includes(order.order_status)) {
+        return err(400, `Returns are only accepted for delivered orders. Current status: ${order.order_status}`);
+      }
 
-      // Check if return already exists
+      // Check if return already exists — if so return friendly message
       const existing = await sbAdmin('GET',
         `/rest/v1/returns?order_id=eq.${order_id}&select=id,status`
       ).catch(() => []);
-      if (existing && existing.length > 0) return err(400, 'Return request already exists for this order');
+      if (existing && existing.length > 0) {
+        return err(400, `A return request already exists for this order (status: ${existing[0].status}). Please check your order status.`);
+      }
 
       // Create return record
       const returnRecord = await sbAdmin('POST', '/rest/v1/returns', {
