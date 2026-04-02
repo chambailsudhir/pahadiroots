@@ -288,7 +288,7 @@ export default async function handler(req, res) {
 
   // ── 6. Get Profile + Orders ────────────────────────────────
   if (action === 'get_profile') {
-    const token = (req.headers['authorization'] || '').replace('Bearer ', '');
+    const token = (req.headers['authorization'] || '').replace(/^Bearer\s+/i, '');
     if (!token) return err(401, 'Not logged in');
     try {
       const user = await sbAuth('/user', null, token);
@@ -302,7 +302,7 @@ export default async function handler(req, res) {
 
   // ── 7. Link Email to Phone account (or vice versa) ─────────
   if (action === 'link_email') {
-    const token = (req.headers['authorization'] || '').replace('Bearer ', '');
+    const token = (req.headers['authorization'] || '').replace(/^Bearer\s+/i, '');
     const { email, password } = body;
     if (!token)          return err(401, 'Not logged in');
     if (!email || !password) return err(400, 'Email and password required');
@@ -321,7 +321,7 @@ export default async function handler(req, res) {
 
   // ── 8. Link Phone to Email account ────────────────────────
   if (action === 'link_phone') {
-    const token = (req.headers['authorization'] || '').replace('Bearer ', '');
+    const token = (req.headers['authorization'] || '').replace(/^Bearer\s+/i, '');
     const { phone } = body;
     if (!token) return err(401, 'Not logged in');
     if (!phone) return err(400, 'Phone required');
@@ -339,7 +339,7 @@ export default async function handler(req, res) {
 
   // ── 9. Update Profile ──────────────────────────────────────
   if (action === 'update_profile') {
-    const token = (req.headers['authorization'] || '').replace('Bearer ', '');
+    const token = (req.headers['authorization'] || '').replace(/^Bearer\s+/i, '');
     if (!token) return err(401, 'Not logged in');
     const { first_name, last_name, address_line1, city, state, postal_code, saved_addresses } = body;
     try {
@@ -363,7 +363,7 @@ export default async function handler(req, res) {
 
   // ── 10. Logout ─────────────────────────────────────────────
   if (action === 'logout') {
-    const token = (req.headers['authorization'] || '').replace('Bearer ', '');
+    const token = (req.headers['authorization'] || '').replace(/^Bearer\s+/i, '');
     if (token) {
       try { await sbAuth('/logout', {}, token); } catch(e) {}
     }
@@ -453,7 +453,7 @@ export default async function handler(req, res) {
 
   // ── 12. Reset Password — set new password with token ────────
   if (action === 'reset_password') {
-    const token = (req.headers['authorization'] || '').replace('Bearer ', '');
+    const token = (req.headers['authorization'] || '').replace(/^Bearer\s+/i, '');
     const { password } = body;
     if (!token)   return err(401, 'Invalid or expired reset link');
     if (!password || password.length < 6) return err(400, 'Password must be at least 6 characters');
@@ -496,7 +496,7 @@ export default async function handler(req, res) {
 
   // ── change_password ──────────────────────────────────────────
   if (action === 'change_password') {
-    const token = (req.headers['authorization'] || '').replace('Bearer ', '');
+    const token = (req.headers['authorization'] || '').replace(/^Bearer\s+/i, '');
     const { new_password } = body;
     if (!token) return err(401, 'Not logged in');
     if (!new_password || new_password.length < 6) return err(400, 'Password min 6 characters');
@@ -511,7 +511,7 @@ export default async function handler(req, res) {
 
   // ── create_return — customer self-service return request ────
   if (action === 'create_return') {
-    const token = (req.headers['authorization'] || '').replace('Bearer ', '');
+    const token = (req.headers['authorization'] || '').replace(/^Bearer\s+/i, '');
     if (!token) return err(401, 'Not logged in');
     const { order_id, order_number, customer_name, reason, description, refund_amount, selected_items, is_partial } = body;
     if (!order_id || !reason) return err(400, 'order_id and reason required');
