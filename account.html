@@ -57,16 +57,19 @@ body{font-family:'Lato',sans-serif;background:#f7f3ee;min-height:100vh;color:var
 .oc-num{font-weight:900;font-size:17px;color:var(--g)}
 .oc-badge{padding:5px 16px;border-radius:20px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.5px}
 .badge-confirmed{background:#e8f5e9;color:#2d6a4f}
-.badge-shipped{background:#e3f2fd;color:#1565c0}
+.badge-packed{background:#e3f2fd;color:#0d47a1}
+.badge-shipped{background:#e8eaf6;color:#3949ab}
 .badge-delivered{background:#ede7f6;color:#6a1b9a}
 .badge-pending{background:#fff8e1;color:#e65100}
 .badge-cancelled{background:#fdecea;color:#c0392b}
 .badge-processing{background:#e8f5e9;color:#2d6a4f}
-.badge-returned{background:#e8f5e9;color:#2d6a4f}
+.badge-returned{background:#fce4ec;color:#c62828}
 .badge-return_requested{background:#fff3e0;color:#e65100}
 .badge-return_approved{background:#e3f2fd;color:#1565c0}
 .badge-return_received{background:#f3e5f5;color:#7b1fa2}
 .badge-refunded{background:#e8f5e9;color:#2d6a4f}
+.badge-refund_initiated{background:#fff8e1;color:#f57c00}
+.badge-refund_completed{background:#e8f5e9;color:#1b5e20}
 .badge-return_rejected{background:#fdecea;color:#c0392b}
 .oc-items{font-size:14px;color:var(--tx3);margin-bottom:12px;line-height:1.6}
 .oc-footer{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
@@ -379,14 +382,21 @@ function renderOrders(orders) {
 function buildOrdersHtml(orders) {
   window._lastOrders = orders;
   var badges = {
-    confirmed:'badge-confirmed', shipped:'badge-shipped', delivered:'badge-delivered',
-    pending:'badge-pending', cancelled:'badge-cancelled', processing:'badge-processing',
-    returned:'badge-returned', packed:'badge-shipped',
-    return_requested:'badge-return_requested',
-    return_approved:'badge-return_requested',
-    return_received:'badge-processing',
-    refunded:'badge-delivered',
-    return_rejected:'badge-cancelled',
+    pending:           'badge-pending',
+    confirmed:         'badge-confirmed',
+    processing:        'badge-confirmed',
+    packed:            'badge-packed',
+    shipped:           'badge-shipped',
+    delivered:         'badge-delivered',
+    cancelled:         'badge-cancelled',
+    returned:          'badge-returned',
+    return_requested:  'badge-return_requested',
+    return_approved:   'badge-return_approved',
+    return_received:   'badge-return_received',
+    refunded:          'badge-refunded',
+    refund_initiated:  'badge-refund_initiated',
+    refund_completed:  'badge-refund_completed',
+    return_rejected:   'badge-return_rejected',
   };
   if (!orders.length) return `
     <div class="empty-state">
@@ -397,14 +407,21 @@ function buildOrdersHtml(orders) {
     </div>`;
 
   var statusLabels = {
-    confirmed:'Confirmed', shipped:'Shipped', delivered:'Delivered',
-    pending:'Pending', cancelled:'Cancelled', processing:'Processing',
-    returned:'Returned', packed:'Packed',
-    return_requested:'Return Requested',
-    return_approved:'Return Approved',
-    return_received:'Item Received',
-    refunded:'Refund Issued',
-    return_rejected:'Return Rejected',
+    pending:           'Pending',
+    confirmed:         'Confirmed',
+    processing:        'Processing',
+    packed:            'Packed',
+    shipped:           'Shipped',
+    delivered:         'Delivered',
+    cancelled:         'Cancelled',
+    returned:          'Returned',
+    return_requested:  'Return Requested',
+    return_approved:   'Return Approved',
+    return_received:   'Item Received',
+    refunded:          'Refund Issued',
+    refund_initiated:  'Refund Initiated',
+    refund_completed:  'Refund Credited',
+    return_rejected:   'Return Rejected',
   };
 
   return '<div class="card"><div class="card-title">📦 My Orders <span style="font-size:15px;font-weight:400;color:var(--tx3);font-family:Lato,sans-serif">(' + orders.length + ')</span></div>' +
@@ -418,23 +435,33 @@ function buildOrdersHtml(orders) {
       var viewUrl = '/order-confirmation?id=' + o.id + '&num=' + encodeURIComponent(o.order_number||'');
       var estDelivery = '';
       if (o.order_status === 'delivered') {
-        estDelivery = '<span style="font-size:12px;color:#2e7d32;font-weight:700">✅ Delivered</span>';
+        estDelivery = '<span style="font-size:12px;color:#2e7d32;font-weight:700">✅ Delivered! Enjoy your Himalayan goodness 🌿</span>';
       } else if (o.order_status === 'shipped' && o.shipped_at) {
         var shipDate = new Date(o.shipped_at); shipDate.setDate(shipDate.getDate() + 5);
-        estDelivery = '<span style="font-size:12px;color:var(--gd);font-weight:700">🚚 Est. delivery: ' + shipDate.toLocaleDateString('en-IN',{day:'numeric',month:'short'}) + '</span>';
+        estDelivery = '<span style="font-size:12px;color:var(--gd);font-weight:700">🚚 Shipped · Est. delivery: ' + shipDate.toLocaleDateString('en-IN',{day:'numeric',month:'short'}) + '</span>';
+      } else if (o.order_status === 'packed') {
+        estDelivery = '<span style="font-size:12px;color:#0d47a1;font-weight:700">📦 Packed · Awaiting courier pickup</span>';
       } else if (o.order_status === 'confirmed' || o.order_status === 'processing') {
         var orderDate = new Date(o.created_at||Date.now()); orderDate.setDate(orderDate.getDate() + 7);
         estDelivery = '<span style="font-size:12px;color:var(--tx3);font-weight:600">📅 Est. delivery: ' + orderDate.toLocaleDateString('en-IN',{day:'numeric',month:'short'}) + '</span>';
+      } else if (o.order_status === 'pending') {
+        estDelivery = '<span style="font-size:12px;color:#e65100;font-weight:700">⏳ Awaiting confirmation</span>';
+      } else if (o.order_status === 'cancelled') {
+        estDelivery = '<span style="font-size:12px;color:#c0392b;font-weight:700">❌ Order cancelled</span>';
       } else if (displayStatus === 'return_requested') {
         estDelivery = '<span style="font-size:12px;color:#e65100;font-weight:700">⏳ Return under review · 24–48 hrs</span>';
       } else if (displayStatus === 'return_approved') {
-        estDelivery = '<span style="font-size:12px;color:#1565c0;font-weight:700">✅ Return approved · Please ship item back</span>';
+        estDelivery = '<span style="font-size:12px;color:#1565c0;font-weight:700">✅ Return approved · Please ship item back to us</span>';
       } else if (displayStatus === 'return_received') {
-        estDelivery = '<span style="font-size:12px;color:#7b1fa2;font-weight:700">📦 Item received · Refund processing</span>';
+        estDelivery = '<span style="font-size:12px;color:#7b1fa2;font-weight:700">📦 Item received · Processing refund now</span>';
+      } else if (displayStatus === 'refund_initiated') {
+        estDelivery = '<span style="font-size:12px;color:#f57c00;font-weight:700">💳 Refund initiated · 3–5 business days</span>';
+      } else if (displayStatus === 'refund_completed') {
+        estDelivery = '<span style="font-size:12px;color:#1b5e20;font-weight:700">💚 Refund credited to your account!</span>';
       } else if (displayStatus === 'refunded') {
         estDelivery = '<span style="font-size:12px;color:#2d6a4f;font-weight:700">💸 Refund issued to original payment method</span>';
       } else if (displayStatus === 'return_rejected') {
-        estDelivery = '<span style="font-size:12px;color:#c0392b;font-weight:700">❌ Return request rejected</span>';
+        estDelivery = '<span style="font-size:12px;color:#c0392b;font-weight:700">❌ Return request rejected · Contact support</span>';
       } else if (o.order_status === 'returned') {
         estDelivery = '<span style="font-size:12px;color:#2d6a4f;font-weight:700">✓ Return processed</span>';
       }
@@ -442,17 +469,19 @@ function buildOrdersHtml(orders) {
         ? '<button onclick="cancelOrder(\'' + o.id + '\',\'' + (o.order_number||o.id) + '\')" style="border:1.5px solid #fdecea;background:#fff;color:#c0392b;font-size:12px;font-weight:700;cursor:pointer;padding:6px 14px;border-radius:20px;font-family:Lato,sans-serif">❌ Cancel</button>'
         : '';
       var returnBtn = '';
-      var isReturnStatus = ['return_requested','return_approved','return_received','refunded','return_rejected'].includes(displayStatus);
+      var isReturnStatus = ['return_requested','return_approved','return_received','refunded','refund_initiated','refund_completed','return_rejected'].includes(displayStatus);
       if (o.order_status === 'delivered' && !isReturnStatus) {
         returnBtn = '<button onclick="openReturnModal(\'' + o.id + '\',\'' + encodeURIComponent(JSON.stringify(o)) + '\')" style="display:inline-flex;align-items:center;gap:4px;background:#fff5f5;color:#c0392b;border:1.5px solid #fdecea;padding:6px 16px;border-radius:20px;font-size:12px;font-weight:800;cursor:pointer;font-family:Lato,sans-serif;transition:all .2s" onmouseover="this.style.background=\'#c0392b\';this.style.color=\'#fff\'" onmouseout="this.style.background=\'#fff5f5\';this.style.color=\'#c0392b\'">↩ Return</button>';
       } else if (isReturnStatus || o.order_status === 'returned') {
         var retConfig = {
-          return_requested: { label:'⏳ Return Requested', color:'#e65100', bg:'#fff3e0', bd:'#ffe0b2' },
-          return_approved:  { label:'✅ Return Approved',  color:'#1565c0', bg:'#e3f2fd', bd:'#90caf9' },
-          return_received:  { label:'📦 Item Received',    color:'#7b1fa2', bg:'#f3e5f5', bd:'#ce93d8' },
-          refunded:         { label:'💸 Refund Issued',    color:'#2d6a4f', bg:'#e8f5e9', bd:'#a5d6a7' },
-          return_rejected:  { label:'❌ Rejected',          color:'#c0392b', bg:'#fdecea', bd:'#ef9a9a' },
-          returned:         { label:'✓ Return Processed',  color:'#2d6a4f', bg:'#e8f5e9', bd:'#c8e6c9' },
+          return_requested:  { label:'⏳ Return Requested',  color:'#e65100', bg:'#fff3e0', bd:'#ffe0b2' },
+          return_approved:   { label:'✅ Return Approved',   color:'#1565c0', bg:'#e3f2fd', bd:'#90caf9' },
+          return_received:   { label:'📦 Item Received',     color:'#7b1fa2', bg:'#f3e5f5', bd:'#ce93d8' },
+          refunded:          { label:'💸 Refund Issued',     color:'#2d6a4f', bg:'#e8f5e9', bd:'#a5d6a7' },
+          refund_initiated:  { label:'💳 Refund Initiated',  color:'#f57c00', bg:'#fff8e1', bd:'#ffcc80' },
+          refund_completed:  { label:'💚 Refund Credited',   color:'#1b5e20', bg:'#e8f5e9', bd:'#a5d6a7' },
+          return_rejected:   { label:'❌ Rejected',           color:'#c0392b', bg:'#fdecea', bd:'#ef9a9a' },
+          returned:          { label:'✓ Return Processed',   color:'#2d6a4f', bg:'#e8f5e9', bd:'#c8e6c9' },
         };
         var rc = retConfig[displayStatus] || retConfig['returned'];
         returnBtn = '<button onclick="openReturnStatusModal(\'' + o.id + '\',\'' + encodeURIComponent(JSON.stringify(o)) + '\')" style="display:inline-flex;align-items:center;gap:4px;background:' + rc.bg + ';color:' + rc.color + ';border:1.5px solid ' + rc.bd + ';padding:6px 16px;border-radius:20px;font-size:12px;font-weight:800;cursor:pointer;font-family:Lato,sans-serif">' + rc.label + '</button>';
@@ -835,16 +864,17 @@ function openReturnStatusModal(orderId, orderJson) {
   var orderNum = o.order_number || ('ORD-' + String(o.id).slice(-6));
   var displayStatus = o._displayStatus || 'return_requested';
 
-  // Timeline steps
+  // Timeline steps — full flow including refund stages
   var STEPS = [
-    { key:'return_requested', label:'Return started',      icon:'↩',  done:true },
-    { key:'return_approved',  label:'Return approved',     icon:'✅', done:['return_approved','return_received','refunded'].includes(displayStatus) },
-    { key:'return_received',  label:'Item received by us', icon:'📦', done:['return_received','refunded'].includes(displayStatus) },
-    { key:'refunded',         label:'Refund credited',     icon:'💸', done:displayStatus === 'refunded' },
+    { key:'return_requested',  label:'Return requested',       icon:'↩',  done:true },
+    { key:'return_approved',   label:'Return approved',        icon:'✅', done:['return_approved','return_received','refund_initiated','refund_completed','refunded'].includes(displayStatus) },
+    { key:'return_received',   label:'Item received by us',    icon:'📦', done:['return_received','refund_initiated','refund_completed','refunded'].includes(displayStatus) },
+    { key:'refund_initiated',  label:'Refund initiated',       icon:'💳', done:['refund_initiated','refund_completed','refunded'].includes(displayStatus) },
+    { key:'refund_completed',  label:'Refund credited to you', icon:'💚', done:['refund_completed','refunded'].includes(displayStatus) },
   ];
   if (displayStatus === 'return_rejected') {
     STEPS = [
-      { key:'return_requested', label:'Return started',   icon:'↩', done:true },
+      { key:'return_requested', label:'Return requested', icon:'↩', done:true },
       { key:'return_rejected',  label:'Request rejected', icon:'❌', done:true, rejected:true },
     ];
   }
@@ -855,21 +885,29 @@ function openReturnStatusModal(orderId, orderJson) {
   var refundAmt = Math.round(o.total_amount || 0).toLocaleString('en-IN');
 
   var mainColor = displayStatus === 'return_rejected' ? '#c0392b' : '#2d6a4f';
-  var mainTitle = displayStatus === 'refunded' ? 'Refund Issued' :
-    displayStatus === 'return_rejected' ? 'Return Rejected' :
-    displayStatus === 'return_received' ? 'Item Received' :
-    displayStatus === 'return_approved' ? 'Return Approved' : 'Return In Progress';
-  var mainIcon = displayStatus === 'refunded' ? '✅' :
-    displayStatus === 'return_rejected' ? '❌' :
-    displayStatus === 'return_received' ? '📦' :
-    displayStatus === 'return_approved' ? '✅' : '⏳';
+  var mainTitle =
+    displayStatus === 'refund_completed' ? 'Refund Credited!' :
+    displayStatus === 'refunded'         ? 'Refund Issued' :
+    displayStatus === 'refund_initiated' ? 'Refund Initiated' :
+    displayStatus === 'return_rejected'  ? 'Return Rejected' :
+    displayStatus === 'return_received'  ? 'Item Received' :
+    displayStatus === 'return_approved'  ? 'Return Approved' : 'Return In Progress';
+  var mainIcon =
+    displayStatus === 'refund_completed' ? '💚' :
+    displayStatus === 'refunded'         ? '💸' :
+    displayStatus === 'refund_initiated' ? '💳' :
+    displayStatus === 'return_rejected'  ? '❌' :
+    displayStatus === 'return_received'  ? '📦' :
+    displayStatus === 'return_approved'  ? '✅' : '⏳';
 
   var statusMsg = {
-    return_requested: 'Your return request is under review. We\'ll respond within 24–48 hours.',
-    return_approved:  'Return approved! Please ship the item back to us.',
-    return_received:  'We\'ve received your item. Refund is being processed.',
-    refunded:         '₹' + refundAmt + ' has been refunded to your original payment method.',
-    return_rejected:  'Your return request could not be approved. Contact support for help.',
+    return_requested:  'Your return request is under review. We\'ll respond within 24–48 hours.',
+    return_approved:   'Return approved! Please courier the item back to us at our return address.',
+    return_received:   'We\'ve received your item. Refund is being initiated now.',
+    refund_initiated:  '₹' + refundAmt + ' refund has been initiated. It will reflect in your account within 3–5 business days.',
+    refund_completed:  '₹' + refundAmt + ' has been successfully credited to your original payment method!',
+    refunded:          '₹' + refundAmt + ' has been refunded to your original payment method.',
+    return_rejected:   'Your return request could not be approved. Please WhatsApp us for help.',
   }[displayStatus] || '';
 
   var timelineHtml = STEPS.map(function(step, i) {
