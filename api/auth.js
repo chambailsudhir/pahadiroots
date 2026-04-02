@@ -484,7 +484,7 @@ export default async function handler(req, res) {
   if (action === 'create_return') {
     const token = (req.headers['authorization'] || '').replace('Bearer ', '');
     if (!token) return err(401, 'Not logged in');
-    const { order_id, order_number, customer_name, reason, description, refund_amount } = body;
+    const { order_id, order_number, customer_name, reason, description, refund_amount, selected_items, is_partial } = body;
     if (!order_id || !reason) return err(400, 'order_id and reason required');
     try {
       // Verify the order belongs to this customer
@@ -507,16 +507,20 @@ export default async function handler(req, res) {
 
       // Create return record
       const returnRecord = await sbAdmin('POST', '/rest/v1/returns', {
-        order_id:      Number(order_id),
-        order_number:  order_number || order.order_number,
-        customer_name: customer_name || null,
+        order_id:       Number(order_id),
+        order_number:   order_number || order.order_number,
+        customer_name:  customer_name || null,
         reason,
-        description:   description || null,
-        refund_amount: refund_amount ? parseFloat(refund_amount) : null,
-        status:        'requested',   // Customer-initiated → starts at requested
-        restock:       true,
-        created_at:    new Date().toISOString(),
-        updated_at:    new Date().toISOString(),
+        description:    description
+          ? description
+          : (is_partial && selected_items?.length)
+            ? `Partial return: ${selected_items.map(i => i.name).join(', ')}`
+            : null,
+        refund_amount:  refund_amount ? parseFloat(refund_amount) : null,
+        status:         'requested',
+        restock:        true,
+        created_at:     new Date().toISOString(),
+        updated_at:     new Date().toISOString(),
       });
       return ok({ success: true, return: returnRecord });
     } catch(e) {
