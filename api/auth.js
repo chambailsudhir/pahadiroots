@@ -381,7 +381,7 @@ export default async function handler(req, res) {
     const SITE_URL   = 'https://pahadiroots.com';
 
     try {
-      // Step 1: Generate reset token via Supabase Admin
+      // Step 1: Generate reset link via Supabase Admin
       const genRes = await fetch(`${SUPABASE_URL}/auth/v1/admin/generate_link`, {
         method: 'POST',
         headers: {
@@ -392,18 +392,19 @@ export default async function handler(req, res) {
         body: JSON.stringify({
           type:       'recovery',
           email,
-          options: { redirect_to: SITE_URL }
+          options: { redirect_to: `${SITE_URL}/account` }
         }),
       });
       const genData = await genRes.json();
       if (!genRes.ok) {
-        // Don't reveal if email exists
+        // Don't reveal if email exists — always return success
         return ok({ success: true });
       }
 
-      // Step 2: Build reset URL using hashed token
-      const token         = genData.hashed_token || '';
-      const finalResetUrl = `${SITE_URL}#access_token=${token}&type=recovery`;
+      // Step 2: Use action_link directly from Supabase response
+      // (hashed_token alone is not enough — action_link is the complete valid URL)
+      const finalResetUrl = genData.action_link || genData.properties?.action_link || '';
+      if (!finalResetUrl) return ok({ success: true });
 
       // Step 3: Send via Resend
       if (RESEND_KEY) {
@@ -416,32 +417,38 @@ export default async function handler(req, res) {
           body: JSON.stringify({
             from:    'Pahadi Roots <noreply@pahadiroots.com>',
             to:      [email],
-            subject: 'Reset Your Password — Pahadi Roots',
+            subject: '🔑 Reset Your Password — Pahadi Roots',
             html: `
-              <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:32px 24px">
-                <div style="text-align:center;margin-bottom:24px">
-                  <span style="font-size:36px">🌿</span>
-                  <h2 style="color:#1a3a1e;margin:8px 0">Pahadi Roots</h2>
+              <div style="font-family:sans-serif;max-width:500px;margin:0 auto;background:#fff;border-radius:16px;overflow:hidden;border:1px solid #e8e8e8">
+                <div style="background:linear-gradient(135deg,#1a3a1e,#2d6a4f);padding:32px 24px;text-align:center">
+                  <div style="font-size:36px;margin-bottom:8px">🌿</div>
+                  <div style="color:#fff;font-size:20px;font-weight:800;letter-spacing:.3px">Pahadi Roots</div>
+                  <div style="color:rgba(255,255,255,.7);font-size:13px;margin-top:4px">Himalayan Organic Store</div>
                 </div>
-                <h3 style="color:#1a3a1e">Reset Your Password</h3>
-                <p style="color:#555;line-height:1.6">
-                  Aapne password reset request ki hai. Neeche diye button pe click karke naya password set karein.
-                </p>
-                <div style="text-align:center;margin:32px 0">
-                  <a href="${finalResetUrl}" 
-                     style="background:#1a5c2a;color:#fff;padding:14px 32px;border-radius:10px;text-decoration:none;font-weight:700;font-size:15px">
-                    🔑 Reset Password
-                  </a>
+                <div style="padding:32px 28px">
+                  <h2 style="color:#1a3a1e;margin:0 0 12px;font-size:22px">Reset Your Password</h2>
+                  <p style="color:#555;line-height:1.7;margin:0 0 28px;font-size:15px">
+                    Aapne password reset request ki hai.<br>
+                    Neeche button pe click karke naya password set karein.
+                  </p>
+                  <div style="text-align:center;margin:0 0 28px">
+                    <a href="${finalResetUrl}"
+                       style="display:inline-block;background:linear-gradient(135deg,#1a5c2a,#2d6a4f);color:#fff;padding:16px 40px;border-radius:12px;text-decoration:none;font-weight:800;font-size:16px;letter-spacing:.3px">
+                      🔑 Reset Password
+                    </a>
+                  </div>
+                  <div style="background:#f8fdf9;border-radius:10px;padding:14px 16px;border-left:3px solid #2d6a4f">
+                    <p style="color:#555;font-size:13px;margin:0;line-height:1.6">
+                      ⏱ Yeh link <strong>1 ghante</strong> mein expire ho jaayega.<br>
+                      🔒 Agar aapne request nahi ki toh is email ko ignore karein.
+                    </p>
+                  </div>
                 </div>
-                <p style="color:#888;font-size:12px;text-align:center">
-                  Yeh link 1 ghante mein expire ho jaayega.<br>
-                  Agar aapne request nahi ki, please ignore karein.
-                </p>
-                <hr style="border:none;border-top:1px solid #eee;margin:24px 0">
-                <p style="color:#aaa;font-size:11px;text-align:center">
-                  Pahadi Roots — Pure Himalayan Products<br>
-                  pahadiroots.com
-                </p>
+                <div style="background:#f5f5f5;padding:16px 24px;text-align:center;border-top:1px solid #eee">
+                  <p style="color:#aaa;font-size:11px;margin:0">
+                    Pahadi Roots — Pure Himalayan Products &nbsp;|&nbsp; pahadiroots.com
+                  </p>
+                </div>
               </div>
             `,
           }),
