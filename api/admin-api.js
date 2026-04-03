@@ -404,10 +404,10 @@ export default async function handler(req, res) {
         pincode: cust.postal_code || '—',
       };
 
-      // Query 3: Fetch order items
+      // Query 3: Fetch order items — use raw.id (always valid) not order_id (null when looked up by order_number)
       try {
         const itemsRes = await fetch(
-          `${SUPABASE_URL}/rest/v1/order_items?order_id=eq.${order_id}&select=quantity,price_at_time,products(name,emoji,image_url)`,
+          `${SUPABASE_URL}/rest/v1/order_items?order_id=eq.${raw.id}&select=quantity,price_at_time,products(name,emoji,image_url)`,
           { headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY } }
         );
         if (itemsRes.ok) {
