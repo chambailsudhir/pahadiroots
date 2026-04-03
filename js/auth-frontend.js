@@ -656,8 +656,8 @@ async function forgotPassword() {
   var errEl = document.getElementById('auth-forgot-err');
   var sucEl = document.getElementById('auth-forgot-success');
   errEl.classList.remove('show'); sucEl.style.display = 'none';
-  if (!email) { errEl.textContent = 'Email address daalo'; errEl.classList.add('show'); return; }
-  if (!email.includes('@')) { errEl.textContent = 'Valid email daalo'; errEl.classList.add('show'); return; }
+  if (!email) { errEl.textContent = 'Please enter your email address'; errEl.classList.add('show'); return; }
+  if (!email.includes('@')) { errEl.textContent = 'Please enter a valid email address'; errEl.classList.add('show'); return; }
   var btn = document.getElementById('forgotBtn');
   btn.disabled = true; btn.textContent = 'Sending…';
   _forgotEmail = email;
@@ -668,7 +668,7 @@ async function forgotPassword() {
     startResendCountdown();
   } catch(e) {
     // Show actual error to help debug
-    var msg = e.message || 'Email nahi bheji ja saki — please try again';
+    var msg = e.message || 'Could not send reset email — please try again';
     errEl.textContent = '❌ ' + msg;
     errEl.classList.add('show');
     btn.disabled = false;
@@ -734,13 +734,13 @@ async function submitResetPassword(token) {
   var pass2 = (document.getElementById('reset-pass2').value || '');
   var errEl = document.getElementById('reset-err');
   errEl.classList.remove('show');
-  if (pass.length < 6) { errEl.textContent = 'Kam se kam 6 characters chahiye'; errEl.classList.add('show'); return; }
-  if (pass !== pass2)  { errEl.textContent = 'Dono passwords match nahi kar rahe'; errEl.classList.add('show'); return; }
+  if (pass.length < 6) { errEl.textContent = 'Password must be at least 6 characters'; errEl.classList.add('show'); return; }
+  if (pass !== pass2)  { errEl.textContent = 'Passwords do not match'; errEl.classList.add('show'); return; }
   var btn = document.getElementById('resetBtn');
   btn.disabled = true; btn.textContent = 'Updating…';
   try {
     var controller = new AbortController();
-    var timeoutId  = setTimeout(function(){ controller.abort(); }, 8000);
+    var timeoutId  = setTimeout(function(){ controller.abort(); }, 20000); // 20s timeout
     var res = await fetch(getStoreApiBase() + '/auth', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
@@ -751,13 +751,16 @@ async function submitResetPassword(token) {
     var data = await res.json();
     if (!res.ok) throw new Error(data.error || 'Reset failed');
     closeAuth();
-    showToast('✅ Password update ho gaya! Ab login karo.');
+    showToast('✅ Password updated! Please login with your new password.');
     setTimeout(openAuth, 1200);
   } catch(e) {
-    var msg = e.name === 'AbortError' ? 'Timeout — please try again' : (e.message || 'Reset failed — link expire ho gaya, dobara try karo');
+    var msg = e.name === 'AbortError'
+      ? 'Request timed out — please try again'
+      : (e.message || 'Reset failed — link may have expired, please request a new one');
     errEl.textContent = msg;
     errEl.classList.add('show');
     btn.disabled = false; btn.textContent = 'Update Password';
+    console.error('[submitResetPassword] Error:', e.message);
   }
 }
 
