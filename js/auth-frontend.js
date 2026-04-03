@@ -657,13 +657,24 @@ async function forgotPassword() {
   var sucEl = document.getElementById('auth-forgot-success');
   errEl.classList.remove('show'); sucEl.style.display = 'none';
   if (!email) { errEl.textContent = 'Email address daalo'; errEl.classList.add('show'); return; }
+  if (!email.includes('@')) { errEl.textContent = 'Valid email daalo'; errEl.classList.add('show'); return; }
   var btn = document.getElementById('forgotBtn');
   btn.disabled = true; btn.textContent = 'Sending…';
   _forgotEmail = email;
-  try { await callAuth('forgot_password', { email }); } catch(e) {}
-  sucEl.style.display = 'block';
-  btn.style.display = 'none';
-  startResendCountdown();
+  try {
+    await callAuth('forgot_password', { email });
+    sucEl.style.display = 'block';
+    btn.style.display = 'none';
+    startResendCountdown();
+  } catch(e) {
+    // Show actual error to help debug
+    var msg = e.message || 'Email nahi bheji ja saki — please try again';
+    errEl.textContent = '❌ ' + msg;
+    errEl.classList.add('show');
+    btn.disabled = false;
+    btn.textContent = 'Send Reset Link';
+    console.error('[forgotPassword] Error:', e.message);
+  }
 }
 
 async function resendResetLink() {
@@ -671,13 +682,19 @@ async function resendResetLink() {
   var btn = document.getElementById('resendBtn');
   var cd  = document.getElementById('resend-countdown');
   btn.disabled = true; btn.textContent = 'Sending…';
-  try { await callAuth('forgot_password', { email: _forgotEmail }); } catch(e) {}
-  btn.textContent = '✅ Sent!';
-  setTimeout(function() {
+  try {
+    await callAuth('forgot_password', { email: _forgotEmail });
+    btn.textContent = '✅ Sent!';
+    setTimeout(function() {
+      btn.disabled = false;
+      btn.textContent = '🔄 Resend Reset Link';
+      startResendCountdown();
+    }, 1500);
+  } catch(e) {
     btn.disabled = false;
     btn.textContent = '🔄 Resend Reset Link';
-    startResendCountdown();
-  }, 1500);
+    console.error('[resendResetLink] Error:', e.message);
+  }
 }
 
 // ── Handle reset link from email (runs on page load) ───────────
