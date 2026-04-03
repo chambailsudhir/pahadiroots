@@ -712,21 +712,36 @@ async function resendResetLink() {
 })();
 
 function showResetPasswordModal(token) {
+  var overlay = document.getElementById('authModal');
   var box = document.querySelector('.auth-box');
-  if (!box) return;
-  box.innerHTML = '<button class="auth-close" onclick="closeAuth()">✕</button>' +
-    '<div class="auth-logo">🌿</div>' +
-    '<div class="auth-title">Set New Password</div>' +
-    '<div class="auth-sub">Apna naya password daalo</div>' +
-    '<div class="auth-fg" style="margin-top:20px">' +
-    '<label class="auth-label">New Password (min 6 chars)</label>' +
-    '<input class="auth-input" id="reset-pass" type="password" placeholder="New password"></div>' +
-    '<div class="auth-fg"><label class="auth-label">Confirm Password</label>' +
-    '<input class="auth-input" id="reset-pass2" type="password" placeholder="Confirm password"></div>' +
-    '<div class="auth-err" id="reset-err"></div>' +
-    '<button class="auth-submit" id="resetBtn" onclick="submitResetPassword(\'' + token + '\')">Update Password</button>';
-  document.getElementById('authModal').classList.add('open');
+  if (!box || !overlay) return;
+  box.innerHTML =
+    '<div style="background:linear-gradient(135deg,#1a3a1e,#2d6a4f);padding:28px 24px 20px;text-align:center;position:sticky;top:0;z-index:2">' +
+      '<div style="font-size:32px;margin-bottom:6px">🌿</div>' +
+      '<div style="font-size:18px;font-weight:800;color:#fff;">Pahadi Roots</div>' +
+      '<div style="font-size:12px;color:rgba(255,255,255,.6);margin-top:2px">Himalayan Organic Store</div>' +
+    '</div>' +
+    '<div style="padding:32px 24px">' +
+      '<div style="text-align:center;margin-bottom:28px">' +
+        '<div style="width:60px;height:60px;background:#e8f5e9;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:26px;margin:0 auto 14px">🔑</div>' +
+        '<div style="font-size:22px;font-weight:800;color:#1a3a1e;margin-bottom:8px">Set New Password</div>' +
+        '<div style="font-size:14px;color:#888;line-height:1.6">Choose a strong password to secure your account</div>' +
+      '</div>' +
+      '<div style="margin-bottom:18px">' +
+        '<label class="auth-label">New Password</label>' +
+        '<input class="auth-input" id="reset-pass" type="password" placeholder="Minimum 6 characters">' +
+      '</div>' +
+      '<div style="margin-bottom:24px">' +
+        '<label class="auth-label">Confirm Password</label>' +
+        '<input class="auth-input" id="reset-pass2" type="password" placeholder="Re-enter your password">' +
+      '</div>' +
+      '<div class="auth-err" id="reset-err" style="margin-bottom:14px"></div>' +
+      '<button class="auth-submit" id="resetBtn" onclick="submitResetPassword(\'' + token + '\')">Update Password</button>' +
+      '<div style="text-align:center;margin-top:16px"><a onclick="closeAuth()" style="font-size:13px;color:#aaa;cursor:pointer">Cancel</a></div>' +
+    '</div>';
+  overlay.classList.add('open');
   document.body.style.overflow = 'hidden';
+  setTimeout(function() { var i = document.getElementById('reset-pass'); if(i) i.focus(); }, 300);
 }
 
 async function submitResetPassword(token) {
