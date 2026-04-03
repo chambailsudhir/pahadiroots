@@ -397,26 +397,38 @@ export default async function handler(req, res) {
         body: JSON.stringify({
           type:    'recovery',
           email,
-          options: { redirect_to: `${SITE_URL}/account` }
+          options: { redirect_to: `${SITE_URL}` }
         }),
       });
 
       const genData = await genRes.json();
 
+      console.log('[forgot_password] Supabase response status:', genRes.status, '| keys:', Object.keys(genData || {}).join(','));
+
       if (!genRes.ok) {
         console.error('[forgot_password] Supabase generate_link failed:', genRes.status, JSON.stringify(genData));
-        // Don't reveal if email exists — return success silently
-        return ok({ success: true });
+        return ok({ success: true }); // Don't reveal if email exists
       }
 
-      // Step 2: Extract action_link from Supabase response
-      const finalResetUrl = genData.action_link || genData.properties?.action_link || '';
+      // Step 2: Extract action_link — handle all Supabase response formats
+      // Format 1 (older Supabase): { action_link: "https://..." }
+      // Format 2 (newer Supabase): { properties: { action_link: "https://..." } }
+      // Format 3: { data: { action_link: "https://..." } }
+      let finalResetUrl = '';
+      if (genData.action_link) {
+        finalResetUrl = genData.action_link;
+      } else if (genData.properties && genData.properties.action_link) {
+        finalResetUrl = genData.properties.action_link;
+      } else if (genData.data && genData.data.action_link) {
+        finalResetUrl = genData.data.action_link;
+      }
+
       if (!finalResetUrl) {
-        console.error('[forgot_password] No action_link in Supabase response:', JSON.stringify(genData));
-        return ok({ success: true });
+        console.error('[forgot_password] No action_link found. Full response:', JSON.stringify(genData));
+        return err(500, 'Could not generate reset link — please contact support');
       }
 
-      console.log('[forgot_password] Reset link generated for:', email, '| URL preview:', finalResetUrl.slice(0, 60) + '...');
+      console.log('[forgot_password] action_link extracted successfully for:', email);
 
       // Step 3: Send via Resend — check response for errors
       const resendRes = await fetch('https://api.resend.com/emails', {
