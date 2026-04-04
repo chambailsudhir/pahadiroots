@@ -278,31 +278,11 @@ export default async function handler(req, res) {
         }
       }
 
-      // 5. Stock deduction — for ALL orders (both Razorpay and COD)
-      // We handle this in app-code for reliability — DO NOT rely on DB triggers
-      // For COD: deduct immediately on order placement (stock is reserved)
-      // Admin can manually restore stock if COD is cancelled/rejected
-      if (items && items.length) {
-        for (const item of items) {
-          try {
-            if (!item.id) continue;
-            const prods = await sbFetch('GET', 'products', `id=eq.${item.id}&select=id,stock_quantity`).catch(()=>[]);
-            const prod = prods && prods[0];
-            if (prod) {
-              const deduct   = item.qty || 1;
-              const newStock = Math.max(0, (prod.stock_quantity || 0) - deduct);
-              await sbFetch('PATCH', 'products', `id=eq.${prod.id}`, { stock_quantity: newStock });
-              // Log inventory change
-              await sbFetch('POST', 'inventory_logs', '', {
-                product_id: prod.id,
-                change: -deduct,
-                reason: `order_placed_${payMethod}`,
-                order_id: orderId || null,
-              }).catch(() => {});
-            }
-          } catch(e) { console.warn('stock deduct failed:', item.id, e.message); }
-        }
-      }
+      // 5. Stock — handled automatically by DB trigger handle_order_status_change
+      // When order is inserted with status 'pending' or 'confirmed':
+      // → trigger fires RESERVE or OUT movement into stock_movements
+      // → process_stock_movement trigger updates product_variants.available_stock
+      // NO manual stock deduction needed here
 
       // 6. Save order_status_history
       await sbFetch('POST', 'order_status_history', '', {
