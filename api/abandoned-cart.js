@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════
-// Pahadi Roots — Abandoned Cart Recovery API
+// 5 Pahadi Roots — Abandoned Cart Recovery API
 // File: api/abandoned-cart.js
 // Reminders: 2hr, 24hr, 48hr
 // ═══════════════════════════════════════════════════════════════
@@ -41,9 +41,9 @@ async function getUserFromToken(token) {
 }
 
 function getEmailSubject(reminderCount) {
-  if (reminderCount === 0) return '🏔️ Your Pahadi Roots cart is waiting — complete your order!';
-  if (reminderCount === 1) return '🌿 Still thinking? Your Pahadi Roots cart is saved!';
-  return '⚡ Last reminder — Your Pahadi Roots cart expires soon!';
+  if (reminderCount === 0) return '🏔️ Your 5 Pahadi Roots cart is waiting — complete your order!';
+  if (reminderCount === 1) return '🌿 Still thinking? Your 5 Pahadi Roots cart is saved!';
+  return '⚡ Last reminder — Your 5 Pahadi Roots cart expires soon!';
 }
 
 function getEmailHeadline(reminderCount) {
@@ -91,7 +91,7 @@ async function sendAbandonedCartEmail(email, cartItems, cartTotal, reminderCount
   <!-- Header -->
   <div style="background:linear-gradient(135deg,#1a3a1e 0%,#2d6a4f 100%);border-radius:16px 16px 0 0;padding:32px;text-align:center">
     <div style="font-size:40px">🏔️</div>
-    <div style="font-family:Georgia,serif;font-size:26px;font-weight:900;color:#fff;margin-top:8px">Pahadi Roots</div>
+    <div style="font-family:Georgia,serif;font-size:26px;font-weight:900;color:#fff;margin-top:8px">5 Pahadi Roots</div>
     <div style="font-size:11px;color:rgba(255,255,255,.6);letter-spacing:2px;margin-top:4px">HIMALAYAN ORGANIC STORE</div>
   </div>
 
@@ -146,7 +146,7 @@ async function sendAbandonedCartEmail(email, cartItems, cartTotal, reminderCount
 
   <!-- Footer -->
   <div style="text-align:center;padding:20px 0;font-size:11px;color:#aaa">
-    © 2026 Pahadi Roots · New Delhi, India · <a href="https://pahadiroots.com" style="color:#aaa">pahadiroots.com</a>
+    © 2026 5 Pahadi Roots · New Delhi, India · <a href="https://pahadiroots.com" style="color:#aaa">pahadiroots.com</a>
   </div>
 
 </div>
@@ -157,7 +157,7 @@ async function sendAbandonedCartEmail(email, cartItems, cartTotal, reminderCount
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${RESEND_KEY}` },
     body: JSON.stringify({
-      from: 'Pahadi Roots <noreply@pahadiroots.com>',
+      from: '5 Pahadi Roots <noreply@pahadiroots.com>',
       to: [email],
       subject: getEmailSubject(reminderCount),
       html,

@@ -205,7 +205,7 @@ async function verifyOtp() {
     saveAuthSession(data);
     closeAuth();
     updateAccountBtn();
-    showToast('🎉 Welcome to Pahadi Roots!');
+    showToast('🎉 Welcome to 5 Pahadi Roots!');
     handlePostLogin();
   } catch(e) {
     errEl.textContent = e.message || 'Invalid OTP. Try again.';
@@ -257,7 +257,7 @@ async function emailSignup() {
     saveAuthSession(data);
     closeAuth();
     updateAccountBtn();
-    showToast('🎉 Account created! Welcome to Pahadi Roots!');
+    showToast('🎉 Account created! Welcome to 5 Pahadi Roots!');
   } catch(e) {
     errEl.textContent = e.message || 'Signup failed. Email may already be registered.';
     errEl.classList.add('show');
@@ -718,7 +718,7 @@ function showResetPasswordModal(token) {
   box.innerHTML =
     '<div style="background:linear-gradient(135deg,#1a3a1e,#2d6a4f);padding:28px 24px 20px;text-align:center;position:sticky;top:0;z-index:2">' +
       '<div style="font-size:32px;margin-bottom:6px">🌿</div>' +
-      '<div style="font-size:18px;font-weight:800;color:#fff;">Pahadi Roots</div>' +
+      '<div style="font-size:18px;font-weight:800;color:#fff;">5 Pahadi Roots</div>' +
       '<div style="font-size:12px;color:rgba(255,255,255,.6);margin-top:2px">Himalayan Organic Store</div>' +
     '</div>' +
     '<div style="padding:32px 24px">' +

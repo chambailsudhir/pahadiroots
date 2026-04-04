@@ -1111,7 +1111,7 @@ async function checkoutRazorpay() {
     key: RAZORPAY_KEY, // loaded from store-data API (env var RAZORPAY_KEY_ID) — never hardcoded
     amount: final * 100, // paise
     currency: 'INR',
-    name: 'Pahadi Roots',
+    name: '5 Pahadi Roots',
     description: 'Himalayan Organic Products',
     image: 'https://pahadiroots.com/favicon.ico',
     prefill: {
@@ -1134,7 +1134,7 @@ async function checkoutRazorpay() {
       var orderNumber = (orderResult && orderResult.orderNumber) || '';
       // Send WhatsApp confirmation
       var shipLine = shipCharge > 0 ? '\n🚚 Shipping: ₹' + shipCharge : '\n🚚 Shipping: FREE';
-      var msg = '✅ *Payment Confirmed — Pahadi Roots* 🌿\n\n'+
+      var msg = '✅ *Payment Confirmed — 5 Pahadi Roots* 🌿\n\n'+
         '✅ *Payment ID:* '+response.razorpay_payment_id+'\n'+
         '👤 *'+name.trim()+'*\n📱 '+phone.trim()+'\n\n'+
         '📍 '+addr.trim()+', '+city.trim()+' - '+pin.trim()+'\n\n'+
@@ -1265,7 +1265,7 @@ async function checkout() {
   var couponLine = activeCoupon ? '\n🎟️ Coupon ' + activeCoupon.code + ': -₹' + discount : '';
   var shipLine   = shipCharge > 0 ? '\n🚚 Shipping: ₹' + shipCharge : '\n🚚 Shipping: FREE';
 
-  var msg = '*New Order — Pahadi Roots* 🌿\n\n' +
+  var msg = '*New Order — 5 Pahadi Roots* 🌿\n\n' +
     '👤 *' + name.trim() + '*\n' +
     '📱 ' + phone.trim() + '\n' +
     (email ? '📧 ' + email.trim() + '\n' : '') +
@@ -1754,7 +1754,7 @@ function trackOrder() {
       confirmed: '✅ Order confirmed! Being carefully packed for you.',
       packed:    '📦 Packed and ready to ship! Courier pickup expected soon.',
       shipped:   '🚚 Your order is on the way!' + (order.courier ? ' via ' + order.courier : '') + (order.tracking_number ? ' · Tracking: ' + order.tracking_number : '') + ' · Expected in 2–4 business days.',
-      delivered: '🎉 Delivered! Thank you for choosing Pahadi Roots. Enjoy your mountain goodies 🌿',
+      delivered: '🎉 Delivered! Thank you for choosing 5 Pahadi Roots. Enjoy your mountain goodies 🌿',
       cancelled: '❌ This order was cancelled. For queries, WhatsApp us at +91 98999 84895.',
     };
     if (isCancelled) {
@@ -1885,13 +1885,13 @@ function injectProductSchema() {
       "name":  p.name,
       "description": p.description || '',
       "image": p.image_url || '',
-      "brand": {"@type":"Brand","name":"Pahadi Roots"},
+      "brand": {"@type":"Brand","name":"5 Pahadi Roots"},
       "offers": {
         "@type": "Offer",
         "priceCurrency": "INR",
         "price": p.price,
         "availability": "https://schema.org/InStock",
-        "seller": {"@type":"Organization","name":"Pahadi Roots"}
+        "seller": {"@type":"Organization","name":"5 Pahadi Roots"}
       }
     };
   });
@@ -1901,7 +1901,7 @@ function injectProductSchema() {
   s.textContent = JSON.stringify({
     "@context": "https://schema.org",
     "@type": "ItemList",
-    "name": "Pahadi Roots — Himalayan Organic Products",
+    "name": "5 Pahadi Roots — Himalayan Organic Products",
     "itemListElement": items.map(function(item, i) {
       return {"@type":"ListItem","position":i+1,"item":item};
     })

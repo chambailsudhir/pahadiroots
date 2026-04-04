@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════
-// Pahadi Roots — Customer Auth API (Vercel Serverless Function)
+// 5 Pahadi Roots — Customer Auth API (Vercel Serverless Function)
 // Version: 1.0 — Phone OTP + Email/Password, linked accounts
 // File path: api/auth.js
 // ═══════════════════════════════════════════════════════════════
@@ -435,16 +435,16 @@ export default async function handler(req, res) {
           'Authorization': `Bearer ${RESEND_KEY}`,
         },
         body: JSON.stringify({
-          from:    'Pahadi Roots <noreply@pahadiroots.com>',
+          from:    '5 Pahadi Roots <noreply@pahadiroots.com>',
           to:      [email],
-          subject: '🔑 Reset Your Password — Pahadi Roots',
+          subject: '🔑 Reset Your Password — 5 Pahadi Roots',
           html: `<!DOCTYPE html>
 <html>
 <body style="margin:0;padding:0;background:#f5f0e8;font-family:Arial,sans-serif">
 <div style="max-width:520px;margin:32px auto;padding:0 16px">
   <div style="background:linear-gradient(135deg,#1a3a1e,#2d6a4f);border-radius:16px 16px 0 0;padding:36px 24px;text-align:center">
     <div style="font-size:40px;margin-bottom:8px">🌿</div>
-    <div style="font-size:24px;font-weight:900;color:#fff;font-family:Georgia,serif">Pahadi Roots</div>
+    <div style="font-size:24px;font-weight:900;color:#fff;font-family:Georgia,serif">5 Pahadi Roots</div>
     <div style="font-size:12px;color:rgba(255,255,255,.6);letter-spacing:2px;margin-top:4px">HIMALAYAN ORGANIC STORE</div>
   </div>
   <div style="background:#fff;border-radius:0 0 16px 16px;padding:40px 32px;box-shadow:0 4px 24px rgba(0,0,0,.08)">
@@ -470,7 +470,7 @@ export default async function handler(req, res) {
     </p>
   </div>
   <p style="text-align:center;color:#bbb;font-size:11px;margin-top:20px">
-    © 2026 Pahadi Roots · pahadiroots.com
+    © 2026 5 Pahadi Roots · pahadiroots.com
   </p>
 </div>
 </body>

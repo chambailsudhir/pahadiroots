@@ -375,7 +375,7 @@ function renderProduct(p, images, related, data, stateMap) {
 
   // ── JSON-LD Product Schema (Google Rich Snippets) ──
   var priceVal = p.price || (VARIANTS && VARIANTS[0] ? VARIANTS[0].price : null);
-  var stockStatus = (p.available_stock > 0 || (VARIANTS && VARIANTS.some(function(v){ return v.available_stock > 0; })))
+  var stockStatus = (p.stock_quantity > 0 || (VARIANTS && VARIANTS.some(function(v){ return v.stock_quantity > 0; })))
     ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock';
   var schemaObj = {
     '@context': 'https://schema.org/',
@@ -453,7 +453,7 @@ function renderProduct(p, images, related, data, stateMap) {
 
   var pct = p.mrp && p.price ? Math.round((1 - p.price / p.mrp) * 100) : 0;
   // If product has variants, use first variant stock; else product stock
-  var initStock = (VARIANTS && VARIANTS.length > 0) ? (VARIANTS[0].available_stock || 0) : (p.available_stock !== undefined ? p.available_stock : 99);
+  var initStock = (VARIANTS && VARIANTS.length > 0) ? (VARIANTS[0].stock_quantity || 0) : (p.stock_quantity !== undefined ? p.stock_quantity : 99);
   var stock = initStock;
   var stockClass = stock > 20 ? '' : stock > 5 ? 'low' : 'oos';
   var stockLabel = stock <= 0 ? 'Out of Stock' : stock <= 5 ? 'Only ' + stock + ' left!' : stock <= 20 ? stock + ' in stock' : 'In Stock';
@@ -486,7 +486,7 @@ function renderProduct(p, images, related, data, stateMap) {
       '<div class="variants-label">Select Size: <span id="var-label">' + VARIANTS[0].variant_value + '</span></div>' +
       '<div class="variant-btns">' +
       VARIANTS.map(function(v, i) {
-        return '<button class="vbtn' + (i===0?' active':'') + (v.available_stock<=0?' oos':'') + '" ' +
+        return '<button class="vbtn' + (i===0?' active':'') + (v.stock_quantity<=0?' oos':'') + '" ' +
           'onclick="selectVariant(' + v.id + ')" data-id="' + v.id + '">' +
           v.variant_value + '</button>';
       }).join('') +
@@ -557,10 +557,10 @@ function renderProduct(p, images, related, data, stateMap) {
       '<div id="tab-desc" class="desc-content active">' + (p.long_description || p.short_description || p.description || 'Authentic Himalayan product sourced directly from local farmers. No preservatives, no additives — pure and natural.') + '</div>' +
       '<div id="tab-ship" class="desc-content">We ship Pan India via trusted courier partners. Delivery in 5-7 business days. Free shipping on orders above ₹799. COD available on select pincodes.</div>' +
       '<div id="tab-care" class="desc-content">Store in a cool, dry place away from direct sunlight. Keep container tightly sealed after use. Best consumed within the expiry date printed on the pack.</div>' +
-      '<div id="tab-returns" class="desc-content"><strong>🔄 Return & Refund Policy</strong><br><br>We want you to love every product from Pahadi Roots. Here\'s our policy:<br><br><strong>✅ Eligible for return:</strong> Damaged, defective, or wrong item delivered — report within <strong>3 days</strong> of delivery with a photo/video.<br><br><strong>❌ Not eligible:</strong> Products opened & used (unless defective), items returned after 3 days, or without original packaging.<br><br><strong>How to claim:</strong> WhatsApp us at +91 ' + WHATSAPP_NUMBER.replace('91','').replace(/(\d{5})(\d{5})/,'$1 $2') + ' with your order number and photos. We process refunds within 5-7 business days once approved.<br><br><strong>Refund method:</strong> UPI / original payment method.<br><br>For any issues, reach us at support@pahadiroots.com</div>' +
+      '<div id="tab-returns" class="desc-content"><strong>🔄 Return & Refund Policy</strong><br><br>We want you to love every product from 5 Pahadi Roots. Here\'s our policy:<br><br><strong>✅ Eligible for return:</strong> Damaged, defective, or wrong item delivered — report within <strong>3 days</strong> of delivery with a photo/video.<br><br><strong>❌ Not eligible:</strong> Products opened & used (unless defective), items returned after 3 days, or without original packaging.<br><br><strong>How to claim:</strong> WhatsApp us at +91 ' + WHATSAPP_NUMBER.replace('91','').replace(/(\d{5})(\d{5})/,'$1 $2') + ' with your order number and photos. We process refunds within 5-7 business days once approved.<br><br><strong>Refund method:</strong> UPI / original payment method.<br><br>For any issues, reach us at support@pahadiroots.com</div>' +
     '</div>' +
     relHtml +
-    '<footer class="mini-footer">© 2026 Pahadi Roots · <a href="/">Shop Now</a> · <a href="/terms">Terms & Returns</a> · <a href="mailto:support@pahadiroots.com">support@pahadiroots.com</a></footer>';
+    '<footer class="mini-footer">© 2026 5 Pahadi Roots · <a href="/">Shop Now</a> · <a href="/terms">Terms & Returns</a> · <a href="mailto:support@pahadiroots.com">support@pahadiroots.com</a></footer>';
 }
 
 // ── Switch main image ──
@@ -600,7 +600,7 @@ function selectVariant(varId) {
   }
   // Update stock label
   var sv = selectedVariant;
-  var svStock = sv ? (sv.available_stock !== undefined ? sv.available_stock : 99) : 99;
+  var svStock = sv ? (sv.stock_quantity !== undefined ? sv.stock_quantity : 99) : 99;
   var svClass = svStock > 20 ? '' : svStock > 5 ? 'low' : 'oos';
   var svLabel = svStock <= 0 ? 'Out of Stock' : svStock <= 5 ? 'Only ' + svStock + ' left!' : svStock <= 20 ? svStock + ' in stock' : 'In Stock';
   var stockDot = document.querySelector('.stock-dot');
@@ -617,7 +617,7 @@ function selectVariant(varId) {
 
 // ── Change quantity ──
 function changeQty(d) {
-  var stock = selectedVariant ? selectedVariant.available_stock : (PRODUCT ? PRODUCT.available_stock : 99);
+  var stock = selectedVariant ? selectedVariant.stock_quantity : (PRODUCT ? PRODUCT.stock_quantity : 99);
   qty = Math.max(1, Math.min(qty + d, stock || 99));
   document.getElementById('qty-display').textContent = qty;
   // Visually disable minus at 1, plus at stock limit
@@ -633,7 +633,7 @@ function shareProduct() {
   var pname = (PRODUCT && PRODUCT.name) ? PRODUCT.name : 'this product';
   var pprice = (PRODUCT && PRODUCT.price) ? ' at ₹' + PRODUCT.price : '';
   if (navigator.share) {
-    navigator.share({ title: pname + ' — Pahadi Roots', text: '🌿 Check out ' + pname + pprice + ' on 5 Pahadi Roots!', url: url });
+    navigator.share({ title: pname + ' — 5 Pahadi Roots', text: '🌿 Check out ' + pname + pprice + ' on 5 Pahadi Roots!', url: url });
   } else {
     var waText = encodeURIComponent('🌿 Check out ' + pname + pprice + ' on 5 Pahadi Roots!\n' + url);
     var wa = 'https://wa.me/?text=' + waText;

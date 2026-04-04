@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════
-// Pahadi Roots — Admin API (Vercel Serverless Function)
+// 5 Pahadi Roots — Admin API (Vercel Serverless Function)
 // Version: 2.2 — Secure storage upload + increased body limit
 // File path: api/admin-api.js
 // ═══════════════════════════════════════════════════════════════

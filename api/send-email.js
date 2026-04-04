@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════
-// Pahadi Roots — Email Service (Vercel Serverless Function)
+// 5 Pahadi Roots — Email Service (Vercel Serverless Function)
 // Types: order_confirmation | admin_new_order | order_shipped | order_cancelled
 // File path: api/send-email.js
 // ═══════════════════════════════════════════════════════════════
@@ -86,7 +86,7 @@ export default async function handler(req, res) {
       : `<tr><td style="padding:6px 0;color:#2d6a4f;font-weight:700">Shipping</td><td style="text-align:right;color:#2d6a4f;font-weight:700">FREE 🎉</td></tr>`;
     const payLabel = payMethod === 'razorpay_online' ? '💳 Paid Online' : '💵 Cash on Delivery';
 
-    subject = `Order Confirmed — ${orderNumber || 'Your Pahadi Roots Order'} 🌿`;
+    subject = `Order Confirmed — ${orderNumber || 'Your 5 Pahadi Roots Order'} 🌿`;
     html = emailWrapper(`
       <div style="background:#fff;padding:28px 32px;text-align:center;border-left:1px solid #eee;border-right:1px solid #eee">
         <div style="font-size:44px;margin-bottom:10px">✅</div>

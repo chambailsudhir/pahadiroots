@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════
-// Pahadi Roots — Newsletter Subscribe API (Public — no auth needed)
+// 5 Pahadi Roots — Newsletter Subscribe API (Public — no auth needed)
 // File path: api/subscribe.js
 //
 // Bug #6 fix: newsletter signup previously showed a success toast
