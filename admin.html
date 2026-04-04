@@ -1295,7 +1295,7 @@ function addVariantRow(v) {
     </select>
     <input class="fi v-value" placeholder="e.g. 250g" value="${v.variant_value||''}" style="padding:5px 8px;font-size:12px">
     <input class="fi v-price" type="number" placeholder="Selling ₹" value="${v.price||''}" oninput="updateVBase(this,${gst})" style="padding:5px 8px;font-size:12px">
-    <input class="fi v-stock" type="number" placeholder="Stock" value="${v.stock_quantity !== undefined ? v.stock_quantity : stock}" style="padding:5px 8px;font-size:12px">
+    <input class="fi v-stock" type="number" placeholder="Stock" value="${v.available_stock !== undefined ? v.available_stock : stock}" style="padding:5px 8px;font-size:12px">
     <input class="fi v-base" type="number" placeholder="Base ₹" value="${basePrice}" readonly title="Base price excl. GST @${gst}%" style="padding:5px 8px;font-size:11px;opacity:.55;cursor:default">
     <select class="fi v-active" style="padding:5px 8px;font-size:12px">
       <option value="true" ${v.is_active!==false?'selected':''}>✓ Active</option>
@@ -1359,7 +1359,7 @@ function generateVariants() {
     var unitGrams = parseGrams(unit);
     var ratio = unitGrams / baseGrams;
     var price = Math.round(basePrice * ratio);
-    addVariantRow({ variant_type:'weight', variant_value:unit, price:price, stock_quantity:stock, is_active:true });
+    addVariantRow({ variant_type:'weight', variant_value:unit, price:price, available_stock:stock, is_active:true });
     added++;
   });
   document.getElementById('auto-variant-panel').style.display = 'none';
@@ -1377,7 +1377,7 @@ async function saveVariants(prodId) {
       variant_type:  row.querySelector('.v-type').value,
       variant_value: row.querySelector('.v-value').value.trim(),
       price:         parseFloat(row.querySelector('.v-price').value) || 0,
-      stock_quantity:parseInt(row.querySelector('.v-stock').value) || 0,
+      available_stock:parseInt(row.querySelector('.v-stock').value) || 0,
       is_active:     row.querySelector('.v-active').value === 'true',
       sort_order:    i,
     };
