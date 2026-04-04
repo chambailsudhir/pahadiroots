@@ -381,12 +381,13 @@ export default async function handler(req, res) {
     const SITE_URL   = 'https://pahadiroots.com';
 
     if (!RESEND_KEY) {
-      console.error('[forgot_password] RESEND_API_KEY not set in environment variables');
+      console.error('[forgot_password] RESEND_API_KEY not set');
       return err(500, 'Email service not configured');
     }
 
     try {
-      // Step 1: Generate recovery link via Supabase Admin
+      // Step 1: Generate recovery link via Supabase Admin generate_link
+      // This is the most reliable method — returns a ready-to-use action_link
       const genRes = await fetch(`${SUPABASE_URL}/auth/v1/admin/generate_link`, {
         method: 'POST',
         headers: {
@@ -395,42 +396,38 @@ export default async function handler(req, res) {
           'Authorization': `Bearer ${SUPABASE_KEY}`,
         },
         body: JSON.stringify({
-          type:    'recovery',
-          email,
-          options: { redirect_to: `${SITE_URL}` }
+          type:       'recovery',
+          email:      email,
+          options:    { redirect_to: SITE_URL }
         }),
       });
 
-      const genData = await genRes.json();
+      const genText = await genRes.text();
+      console.log('[forgot_password] Supabase raw response:', genRes.status, genText.slice(0, 300));
 
-      console.log('[forgot_password] Supabase response status:', genRes.status, '| keys:', Object.keys(genData || {}).join(','));
+      let genData = {};
+      try { genData = JSON.parse(genText); } catch(e) {}
 
       if (!genRes.ok) {
-        console.error('[forgot_password] Supabase generate_link failed:', genRes.status, JSON.stringify(genData));
-        return ok({ success: true }); // Don't reveal if email exists
+        // User may not exist — don't reveal, return success
+        console.warn('[forgot_password] generate_link failed:', genRes.status);
+        return ok({ success: true });
       }
 
-      // Step 2: Extract action_link — handle all Supabase response formats
-      // Format 1 (older Supabase): { action_link: "https://..." }
-      // Format 2 (newer Supabase): { properties: { action_link: "https://..." } }
-      // Format 3: { data: { action_link: "https://..." } }
-      let finalResetUrl = '';
-      if (genData.action_link) {
-        finalResetUrl = genData.action_link;
-      } else if (genData.properties && genData.properties.action_link) {
-        finalResetUrl = genData.properties.action_link;
-      } else if (genData.data && genData.data.action_link) {
-        finalResetUrl = genData.data.action_link;
-      }
+      // Extract action_link — Supabase returns it at top level or inside properties
+      const finalResetUrl =
+        genData.action_link ||
+        (genData.properties && genData.properties.action_link) ||
+        (genData.data && genData.data.action_link) || '';
 
       if (!finalResetUrl) {
-        console.error('[forgot_password] No action_link found. Full response:', JSON.stringify(genData));
-        return err(500, 'Could not generate reset link — please contact support');
+        console.error('[forgot_password] No action_link in response. Keys:', Object.keys(genData).join(','));
+        return err(500, 'Could not generate reset link — please try again');
       }
 
-      console.log('[forgot_password] action_link extracted successfully for:', email);
+      console.log('[forgot_password] action_link OK for:', email);
 
-      // Step 3: Send via Resend — check response for errors
+      // Step 2: Send beautiful email via Resend
       const resendRes = await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: {
@@ -441,57 +438,63 @@ export default async function handler(req, res) {
           from:    'Pahadi Roots <noreply@pahadiroots.com>',
           to:      [email],
           subject: '🔑 Reset Your Password — Pahadi Roots',
-          html: `
-            <div style="font-family:sans-serif;max-width:500px;margin:0 auto;background:#fff;border-radius:16px;overflow:hidden;border:1px solid #e8e8e8">
-              <div style="background:linear-gradient(135deg,#1a3a1e,#2d6a4f);padding:32px 24px;text-align:center">
-                <div style="font-size:36px;margin-bottom:8px">🌿</div>
-                <div style="color:#fff;font-size:20px;font-weight:800;letter-spacing:.3px">Pahadi Roots</div>
-                <div style="color:rgba(255,255,255,.7);font-size:13px;margin-top:4px">Himalayan Organic Store</div>
-              </div>
-              <div style="padding:32px 28px">
-                <h2 style="color:#1a3a1e;margin:0 0 12px;font-size:22px">Reset Your Password</h2>
-                <p style="color:#555;line-height:1.7;margin:0 0 28px;font-size:15px">
-                  Aapne password reset request ki hai.<br>
-                  Neeche button pe click karke naya password set karein.
-                </p>
-                <div style="text-align:center;margin:0 0 28px">
-                  <a href="${finalResetUrl}"
-                     style="display:inline-block;background:linear-gradient(135deg,#1a5c2a,#2d6a4f);color:#fff;padding:16px 40px;border-radius:12px;text-decoration:none;font-weight:800;font-size:16px;letter-spacing:.3px">
-                    🔑 Reset Password
-                  </a>
-                </div>
-                <div style="background:#f8fdf9;border-radius:10px;padding:14px 16px;border-left:3px solid #2d6a4f">
-                  <p style="color:#555;font-size:13px;margin:0;line-height:1.6">
-                    ⏱ Yeh link <strong>1 ghante</strong> mein expire ho jaayega.<br>
-                    🔒 Agar aapne request nahi ki toh is email ko ignore karein.
-                  </p>
-                </div>
-              </div>
-              <div style="background:#f5f5f5;padding:16px 24px;text-align:center;border-top:1px solid #eee">
-                <p style="color:#aaa;font-size:11px;margin:0">
-                  Pahadi Roots — Pure Himalayan Products &nbsp;|&nbsp; pahadiroots.com
-                </p>
-              </div>
-            </div>
-          `,
+          html: `<!DOCTYPE html>
+<html>
+<body style="margin:0;padding:0;background:#f5f0e8;font-family:Arial,sans-serif">
+<div style="max-width:520px;margin:32px auto;padding:0 16px">
+  <div style="background:linear-gradient(135deg,#1a3a1e,#2d6a4f);border-radius:16px 16px 0 0;padding:36px 24px;text-align:center">
+    <div style="font-size:40px;margin-bottom:8px">🌿</div>
+    <div style="font-size:24px;font-weight:900;color:#fff;font-family:Georgia,serif">Pahadi Roots</div>
+    <div style="font-size:12px;color:rgba(255,255,255,.6);letter-spacing:2px;margin-top:4px">HIMALAYAN ORGANIC STORE</div>
+  </div>
+  <div style="background:#fff;border-radius:0 0 16px 16px;padding:40px 32px;box-shadow:0 4px 24px rgba(0,0,0,.08)">
+    <div style="text-align:center;margin-bottom:28px">
+      <div style="width:64px;height:64px;background:#e8f5e9;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:28px;margin-bottom:16px">🔑</div>
+      <h2 style="font-family:Georgia,serif;color:#1a3a1e;margin:0 0 8px;font-size:24px">Reset Your Password</h2>
+      <p style="color:#666;font-size:15px;line-height:1.6;margin:0">We received a request to reset your password.<br>Click the button below to set a new one.</p>
+    </div>
+    <div style="text-align:center;margin:32px 0">
+      <a href="${finalResetUrl}"
+         style="display:inline-block;background:linear-gradient(135deg,#1a5c2a,#2d6a4f);color:#fff;padding:18px 48px;border-radius:12px;text-decoration:none;font-weight:800;font-size:17px;letter-spacing:.3px;box-shadow:0 4px 16px rgba(45,106,79,.35)">
+        🔑 Reset Password
+      </a>
+    </div>
+    <div style="background:#f8fdf9;border-radius:10px;padding:16px;border-left:4px solid #2d6a4f;margin-bottom:24px">
+      <p style="color:#555;font-size:13px;margin:0;line-height:1.7">
+        ⏱ <strong>This link expires in 1 hour.</strong><br>
+        🔒 If you did not request this, please ignore this email — your account is safe.
+      </p>
+    </div>
+    <p style="color:#aaa;font-size:12px;text-align:center;margin:0">
+      Need help? <a href="https://wa.me/919899984895" style="color:#2d6a4f">WhatsApp us</a> — we're happy to help!
+    </p>
+  </div>
+  <p style="text-align:center;color:#bbb;font-size:11px;margin-top:20px">
+    © 2026 Pahadi Roots · pahadiroots.com
+  </p>
+</div>
+</body>
+</html>`,
         }),
       });
 
-      const resendData = await resendRes.json();
+      const resendText = await resendRes.text();
+      console.log('[forgot_password] Resend response:', resendRes.status, resendText.slice(0, 200));
 
       if (!resendRes.ok) {
-        console.error('[forgot_password] Resend API failed:', resendRes.status, JSON.stringify(resendData));
-        return err(500, 'Email bhejne mein problem aayi — please try again');
+        console.error('[forgot_password] Resend failed:', resendRes.status, resendText);
+        return err(500, 'Could not send email — please try again in a few minutes');
       }
 
-      console.log('[forgot_password] Email sent successfully via Resend. ID:', resendData.id);
+      console.log('[forgot_password] Reset email sent successfully to:', email);
       return ok({ success: true });
 
     } catch(e) {
-      console.error('[forgot_password] Unexpected error:', e.message || e);
-      return err(500, 'Email bhejne mein problem aayi — please try again');
+      console.error('[forgot_password] Unexpected error:', e.message);
+      return err(500, 'Something went wrong — please try again');
     }
   }
+
 
   // ── 12. Reset Password — set new password with token ────────
   if (action === 'reset_password') {
