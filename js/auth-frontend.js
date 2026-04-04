@@ -706,8 +706,8 @@ async function resendResetLink() {
     var kv = p.split('='); params[kv[0]] = decodeURIComponent(kv[1] || '');
   });
   if (params.type === 'recovery' && params.access_token) {
-    window.history.replaceState(null, '', window.location.pathname);
-    setTimeout(function() { showResetPasswordModal(params.access_token); }, 600);
+    // Redirect to dedicated full-page reset experience
+    window.location.href = '/reset-password#access_token=' + encodeURIComponent(params.access_token) + '&type=recovery';
   }
 })();
 
