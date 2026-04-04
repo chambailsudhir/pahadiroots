@@ -398,7 +398,7 @@ export default async function handler(req, res) {
         body: JSON.stringify({
           type:       'recovery',
           email:      email,
-          options:    { redirect_to: SITE_URL }
+          options:    { redirect_to: `${SITE_URL}/reset-password` }
         }),
       });
 
