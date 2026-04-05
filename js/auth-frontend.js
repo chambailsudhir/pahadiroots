@@ -274,21 +274,29 @@ function updateAccountBtn() {
   var ddSub = document.getElementById('dd-sub');
   var ddLogin = document.getElementById('dd-login-btn');
   var ddLogout = document.getElementById('dd-logout-btn');
+  // Update nav account button to show name when logged in
+  var acctBtn = document.getElementById('accountBtn');
   if (_authToken && _authProfile) {
     var name = [_authProfile.first_name, _authProfile.last_name].filter(Boolean).join(' ') || 'Account';
-    if (ddName) ddName.textContent = 'Hi, ' + name.split(' ')[0] + '! 👋';
+    var firstName = name.split(' ')[0];
+    var initial = (firstName[0] || '?').toUpperCase();
+    if (ddName) ddName.textContent = 'Hi, ' + firstName + '! 👋';
     if (ddSub) ddSub.textContent = _authProfile.email || '';
     if (ddLogin) ddLogin.style.display = 'none';
     if (ddLogout) ddLogout.style.display = 'block';
+    // Show name pill on button
+    if (acctBtn) acctBtn.innerHTML = '<span style="display:inline-flex;align-items:center;gap:7px;background:#f0f7f4;border:1.5px solid #c8e6c9;padding:5px 13px 5px 7px;border-radius:24px;font-size:13px;font-weight:800;color:#1a3a1e"><span style="width:26px;height:26px;background:linear-gradient(135deg,#1a3a1e,#2d5233);border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;color:#fff;flex-shrink:0">' + initial + '</span>Hi, ' + firstName + '</span>';
   } else if (_authToken) {
     if (ddName) ddName.textContent = 'My Account';
     if (ddLogin) ddLogin.style.display = 'none';
     if (ddLogout) ddLogout.style.display = 'block';
+    if (acctBtn) acctBtn.innerHTML = '👤';
   } else {
     if (ddName) ddName.textContent = 'Welcome!';
     if (ddSub) ddSub.textContent = 'Login to manage your account';
     if (ddLogin) ddLogin.style.display = 'block';
     if (ddLogout) ddLogout.style.display = 'none';
+    if (acctBtn) acctBtn.innerHTML = '👤';
   }
 }
 
