@@ -168,7 +168,13 @@ body{font-family:'Lato',sans-serif;background:#f7f3ee;min-height:100vh;color:var
     <div class="logo-icon">🌿</div>
     <div><div class="logo-name">5 Pahadi Roots</div><div class="logo-tl">Himalayan Organic Store</div></div>
   </a>
-  <div class="nav-right"><a href="/">🛍️ Continue Shopping</a></div>
+  <div class="nav-right" style="display:flex;align-items:center;gap:12px">
+    <div id="nav-user-pill" style="display:none;align-items:center;gap:8px;background:#f0f7f4;border:1.5px solid #c8e6c9;padding:6px 14px 6px 8px;border-radius:24px">
+      <div id="nav-avatar" style="width:28px;height:28px;background:linear-gradient(135deg,#1a3a1e,#2d5233);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:#fff;flex-shrink:0">?</div>
+      <span id="nav-uname" style="font-size:13px;font-weight:800;color:#1a3a1e;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
+    </div>
+    <a href="/">🛍️ Continue Shopping</a>
+  </div>
 </nav>
 
 <div class="page" id="page">
@@ -331,6 +337,16 @@ function showAccount() {
   document.getElementById('sb-email').textContent = email;
   document.getElementById('sidebar').style.display = 'block';
   document.getElementById('mob-tabs').style.display = 'flex';
+  // Update top nav user pill
+  var pill = document.getElementById('nav-user-pill');
+  var navAv = document.getElementById('nav-avatar');
+  var navUn = document.getElementById('nav-uname');
+  if (pill && navAv && navUn) {
+    var displayName = firstName || fullName.split(' ')[0] || 'Account';
+    navAv.textContent = initials;
+    navUn.textContent = 'Hi, ' + displayName;
+    pill.style.display = 'flex';
+  }
 }
 
 // ── Tab switching ──
@@ -815,6 +831,8 @@ function renderProfileTab() {
     if (sel) { for (var i=0;i<sel.options.length;i++) { if (sel.options[i].text === savedState || sel.options[i].value === savedState) { sel.selectedIndex=i; break; } } }
   }
 }
+
+async function saveProfileInfo() {
   try {
     var updates = { first_name: document.getElementById('pf-fname').value.trim(), last_name: document.getElementById('pf-lname').value.trim() };
     await callAuth('update_profile', updates, true);
