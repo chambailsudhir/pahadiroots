@@ -503,32 +503,42 @@ function buildOrdersHtml(orders) {
       if (allItems.length > 3) itemNames += ' & ' + (allItems.length-3) + ' more';
 
       return '<div class="order-card" id="order-card-' + o.id + '">' +
-        // Top bar: order number + badge
-        '<div class="oc-hdr">' +
-          '<div>' +
-            '<span class="oc-num">' + (o.order_number||'#'+String(o.id).slice(0,8)) + '</span>' +
-            '<span style="font-size:12px;color:#7a7a7a;margin-left:10px;font-weight:500">' + date + '</span>' +
+        // Top bar: order meta (Amazon style)
+        '<div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;padding-bottom:14px;border-bottom:1px solid #f0f0f0;margin-bottom:14px">' +
+          '<div style="display:flex;gap:24px;flex-wrap:wrap">' +
+            '<div><div style="font-size:10px;font-weight:800;color:#888;text-transform:uppercase;letter-spacing:.6px;margin-bottom:2px">Order Placed</div>' +
+            '<div style="font-size:13px;font-weight:700;color:#1a1a1a">' + date + '</div></div>' +
+            '<div><div style="font-size:10px;font-weight:800;color:#888;text-transform:uppercase;letter-spacing:.6px;margin-bottom:2px">Total</div>' +
+            '<div style="font-size:13px;font-weight:800;color:#1a1a1a">₹' + (o.total_amount||0).toLocaleString('en-IN') + '</div></div>' +
+            (o.payment_method ? '<div><div style="font-size:10px;font-weight:800;color:#888;text-transform:uppercase;letter-spacing:.6px;margin-bottom:2px">Payment</div>' +
+            '<div style="font-size:12px;font-weight:700;color:#555">' + (o.payment_method === 'cod' ? '💵 COD' : '💳 Prepaid') + '</div></div>' : '') +
           '</div>' +
-          '<span class="oc-badge ' + badge + '">' + (statusLabels[displayStatus]||displayStatus||'pending') + '</span>' +
+          '<div style="text-align:right">' +
+            '<div style="font-size:10px;font-weight:800;color:#888;text-transform:uppercase;letter-spacing:.6px;margin-bottom:2px">Order #</div>' +
+            '<div style="font-size:12px;font-weight:800;color:#1a3a1e;font-family:monospace">' + (o.order_number||'#'+String(o.id).slice(0,8)) + '</div>' +
+            '<span class="oc-badge ' + badge + '" style="margin-top:6px;display:inline-block">' + (statusLabels[displayStatus]||displayStatus||'pending') + '</span>' +
+          '</div>' +
         '</div>' +
         // Product image strip
-        (imgStrip ? '<div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap">' + imgStrip + '</div>' : '') +
+        (imgStrip ? '<div style="display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap">' + imgStrip + '</div>' : '') +
         // Item names
-        '<div style="font-size:14px;color:#3a3a3a;margin-bottom:10px;line-height:1.5;font-weight:500">' + itemNames + '</div>' +
-        // Status line
+        '<div style="font-size:13px;color:#3a3a3a;margin-bottom:10px;line-height:1.6;font-weight:500">' + itemNames + '</div>' +
+        // Status / delivery line
         (estDelivery ? '<div style="margin-bottom:12px">' + estDelivery + '</div>' : '') +
+        // Tracking if shipped
+        (trackUrl ? '<div style="margin-bottom:12px"><a href="' + trackUrl + '" target="_blank" style="display:inline-flex;align-items:center;gap:6px;background:#e8f5e9;color:#1b5e20;border:1.5px solid #a5d6a7;padding:6px 14px;border-radius:20px;font-size:12px;font-weight:800;text-decoration:none;font-family:Lato,sans-serif">🚚 Track Shipment' + (o.tracking_number ? ' · ' + o.tracking_number : '') + '</a></div>' : '') +
         // Divider
-        '<div style="border-top:1px solid #f0f0f0;margin:14px 0"></div>' +
-        // Footer: amount + actions
-        '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">' +
-          '<span class="oc-total">₹' + (o.total_amount||0).toLocaleString('en-IN') + '</span>' +
+        '<div style="border-top:1px solid #f0f0f0;margin:12px 0"></div>' +
+        // Actions row
+        '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">' +
           '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">' +
-            '<a href="' + viewUrl + '" class="view-chip" style="font-size:12px;padding:7px 16px">📄 View Order</a>' +
-            (trackUrl ? '<a href="' + trackUrl + '" target="_blank" class="track-chip" style="font-size:12px;padding:7px 16px">🚚 Track</a>' : '') +
-            '<a href="/order-confirmation?id=' + o.id + '&num=' + encodeURIComponent(o.order_number||'') + '&print=1" target="_blank" class="view-chip" style="font-size:12px;padding:7px 16px" title="Invoice">🧾 Invoice</a>' +
+            '<a href="' + viewUrl + '" class="view-chip" style="font-size:12px;padding:7px 14px">📄 View Details</a>' +
+            '<a href="/order-confirmation?id=' + o.id + '&num=' + encodeURIComponent(o.order_number||'') + '&print=1" target="_blank" class="view-chip" style="font-size:12px;padding:7px 14px" title="Invoice">🧾 Invoice</a>' +
             cancelBtn +
             returnBtn +
           '</div>' +
+          // Support button — always visible
+          '<a href="https://wa.me/919899984895?text=' + encodeURIComponent('Hi, I need help with my order ' + (o.order_number||'') + '.') + '" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;background:#fff;color:#1a7a3a;border:1.5px solid #c8e6c9;padding:7px 14px;border-radius:20px;font-size:12px;font-weight:800;text-decoration:none;font-family:Lato,sans-serif;transition:all .2s" onmouseover="this.style.background=\'#e8f5e9\'" onmouseout="this.style.background=\'#fff\'">💬 Support</a>' +
         '</div>' +
         '</div>';
     }).join('') + '</div>';
@@ -541,15 +551,17 @@ function getSavedAddresses() {
   try { return JSON.parse((_authProfile && _authProfile.saved_addresses) || localStorage.getItem('pr_saved_addresses') || '[]'); } catch(e) { return []; }
 }
 
+var ADDR_LABEL_ICONS = { 'Home':'🏠', 'Office':'🏢', 'Parents':'👨‍👩‍👦', 'Friends':'👫', 'Others':'📍' };
+
 function renderAddressesTab() {
   var p = _authProfile || {};
   var addrs = getSavedAddresses();
-  var html = '<div class="card"><div class="card-title">📍 Delivery Addresses</div>';
+  var html = '<div class="card"><div class="card-title" style="display:flex;justify-content:space-between;align-items:center">📍 Delivery Addresses<button onclick="showAddAddrForm()" style="display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,var(--g),var(--g2));color:#fff;border:none;padding:9px 18px;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer;font-family:Lato,sans-serif">+ Add Address</button></div>';
 
   // Default address from profile
   if (p.address_line1) {
     html += '<div class="addr-card default">' +
-      '<div class="addr-label">🏠 Default</div>' +
+      '<div class="addr-label">🏠 Home (Default)</div>' +
       '<div class="addr-line">' + [p.first_name, p.last_name].filter(Boolean).join(' ') + '<br>' + [p.address_line1, p.city, p.state, p.postal_code].filter(Boolean).join(', ') + '</div>' +
       '<div class="addr-actions"><button class="addr-btn" onclick="switchTab(\'profile\')" style="border-color:#c8e6c9;color:var(--g);background:#fff">✏️ Edit</button></div>' +
       '</div>';
@@ -557,20 +569,108 @@ function renderAddressesTab() {
 
   // Extra saved addresses
   addrs.filter(function(a){ return a.label !== 'Default'; }).forEach(function(a, i) {
-    var icon = a.label === 'Parents' ? '👨‍👩‍👦' : a.label === 'Office' ? '🏢' : '📍';
+    var icon = ADDR_LABEL_ICONS[a.label] || '📍';
     html += '<div class="addr-card">' +
       '<div class="addr-label">' + icon + ' ' + (a.label||'Address') + '</div>' +
-      '<div class="addr-line">' + (a.name||'') + (a.name?'<br>':'') + (a.addr||'') + ', ' + (a.city||'') + ' — ' + (a.pin||'') + '</div>' +
+      '<div class="addr-line">' + (a.name||'') + (a.name?'<br>':'') + (a.addr||'') + (a.city ? ', ' + a.city : '') + (a.state ? ', ' + a.state : '') + (a.pin ? ' — ' + a.pin : '') + '</div>' +
       '<div class="addr-actions"><button class="addr-btn addr-btn-del" onclick="deleteSavedAddr(' + i + ')">🗑 Remove</button></div>' +
       '</div>';
   });
 
   if (!p.address_line1 && !addrs.length) {
-    html += '<div class="empty-state"><div class="empty-icon">📍</div><div class="empty-title">No addresses saved</div><div class="empty-sub">Profile mein apna address add karein.</div><button class="btn-primary" onclick="switchTab(\'profile\')">+ Add Address</button></div>';
+    html += '<div class="empty-state"><div class="empty-icon">📍</div><div class="empty-title">No addresses saved</div><div class="empty-sub">Apna delivery address add karein.</div></div>';
   }
 
   html += '</div>';
   setPanel(html);
+}
+
+function showAddAddrForm() {
+  var overlay = document.getElementById('addr-form-overlay');
+  if (overlay) { overlay.remove(); }
+  var div = document.createElement('div');
+  div.id = 'addr-form-overlay';
+  div.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.45);display:flex;align-items:center;justify-content:center;padding:16px';
+  div.innerHTML = `
+    <div style="background:#fff;border-radius:20px;padding:28px 24px;width:100%;max-width:480px;box-shadow:0 20px 60px rgba(0,0,0,0.2);font-family:Lato,sans-serif">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+        <div style="font-size:17px;font-weight:900;color:#1a1a1a">📍 Add New Address</div>
+        <button onclick="document.getElementById('addr-form-overlay').remove()" style="background:none;border:none;font-size:22px;cursor:pointer;color:#888;line-height:1">×</button>
+      </div>
+      <div style="margin-bottom:14px">
+        <div style="font-size:11px;font-weight:800;color:#888;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px">Save As</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap" id="addr-label-btns">
+          ${Object.entries(ADDR_LABEL_ICONS).map(([lbl,ico]) =>
+            `<button onclick="selectAddrLabel('${lbl}')" id="addr-lbl-${lbl}" style="padding:8px 14px;border-radius:10px;border:1.5px solid #e0e0e0;background:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:Lato,sans-serif;transition:all .15s">${ico} ${lbl}</button>`
+          ).join('')}
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+        <div style="grid-column:1/-1">
+          <div style="font-size:11px;font-weight:800;color:#888;text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px">Full Name</div>
+          <input id="af-name" placeholder="Recipient name" style="width:100%;box-sizing:border-box;padding:11px 14px;border-radius:10px;border:1.5px solid #e0e0e0;font-size:14px;font-family:Lato,sans-serif;outline:none" />
+        </div>
+        <div style="grid-column:1/-1">
+          <div style="font-size:11px;font-weight:800;color:#888;text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px">Address</div>
+          <input id="af-addr" placeholder="House no, Street, Colony" style="width:100%;box-sizing:border-box;padding:11px 14px;border-radius:10px;border:1.5px solid #e0e0e0;font-size:14px;font-family:Lato,sans-serif;outline:none" />
+        </div>
+        <div>
+          <div style="font-size:11px;font-weight:800;color:#888;text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px">City</div>
+          <input id="af-city" placeholder="City" style="width:100%;box-sizing:border-box;padding:11px 14px;border-radius:10px;border:1.5px solid #e0e0e0;font-size:14px;font-family:Lato,sans-serif;outline:none" />
+        </div>
+        <div>
+          <div style="font-size:11px;font-weight:800;color:#888;text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px">State</div>
+          <input id="af-state" placeholder="State" style="width:100%;box-sizing:border-box;padding:11px 14px;border-radius:10px;border:1.5px solid #e0e0e0;font-size:14px;font-family:Lato,sans-serif;outline:none" />
+        </div>
+        <div>
+          <div style="font-size:11px;font-weight:800;color:#888;text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px">Pincode</div>
+          <input id="af-pin" placeholder="110001" maxlength="6" style="width:100%;box-sizing:border-box;padding:11px 14px;border-radius:10px;border:1.5px solid #e0e0e0;font-size:14px;font-family:Lato,sans-serif;outline:none" />
+        </div>
+        <div>
+          <div style="font-size:11px;font-weight:800;color:#888;text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px">Phone</div>
+          <input id="af-phone" placeholder="10-digit mobile" maxlength="10" style="width:100%;box-sizing:border-box;padding:11px 14px;border-radius:10px;border:1.5px solid #e0e0e0;font-size:14px;font-family:Lato,sans-serif;outline:none" />
+        </div>
+      </div>
+      <button onclick="saveNewAddress()" style="width:100%;padding:14px;background:linear-gradient(135deg,#1a3a1e,#2d5233);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:900;cursor:pointer;font-family:Lato,sans-serif">💾 Save Address</button>
+    </div>`;
+  document.body.appendChild(div);
+  // Select Home by default
+  selectAddrLabel('Home');
+}
+
+window._selectedAddrLabel = 'Home';
+function selectAddrLabel(lbl) {
+  window._selectedAddrLabel = lbl;
+  Object.keys(ADDR_LABEL_ICONS).forEach(function(l) {
+    var btn = document.getElementById('addr-lbl-' + l);
+    if (!btn) return;
+    if (l === lbl) {
+      btn.style.background = '#1a3a1e'; btn.style.color = '#fff'; btn.style.borderColor = '#1a3a1e';
+    } else {
+      btn.style.background = '#fff'; btn.style.color = '#1a1a1a'; btn.style.borderColor = '#e0e0e0';
+    }
+  });
+}
+
+async function saveNewAddress() {
+  var label = window._selectedAddrLabel || 'Home';
+  var name  = (document.getElementById('af-name')||{}).value?.trim();
+  var addr  = (document.getElementById('af-addr')||{}).value?.trim();
+  var city  = (document.getElementById('af-city')||{}).value?.trim();
+  var state = (document.getElementById('af-state')||{}).value?.trim();
+  var pin   = (document.getElementById('af-pin')||{}).value?.trim();
+  var phone = (document.getElementById('af-phone')||{}).value?.trim();
+  if (!addr || !city || !pin) { showToast('❌ Address, city aur pincode zaroori hain'); return; }
+  var all = getSavedAddresses();
+  all.push({ label, name, addr, city, state, pin, phone });
+  try {
+    await callAuth('update_profile', { saved_addresses: JSON.stringify(all.filter(a => a.label !== 'Default')) }, true);
+    _authProfile.saved_addresses = JSON.stringify(all.filter(a => a.label !== 'Default'));
+    try { localStorage.setItem('pr_auth_profile', JSON.stringify(_authProfile)); } catch(e){}
+    document.getElementById('addr-form-overlay')?.remove();
+    showToast('✅ Address saved!');
+    renderAddressesTab();
+  } catch(e) { showToast('❌ Save failed. Try again.'); }
 }
 
 async function deleteSavedAddr(idx) {
