@@ -1059,7 +1059,17 @@ function fillSavedAddress(idx) {
   if (!a) return;
   var phone = (a.phone || '').replace(/^\+91/, '').replace(/\D/g,'').slice(-10);
   var map = { 'del-name': a.name, 'del-phone': phone, 'del-addr': a.addr, 'del-city': a.city, 'del-state': a.state, 'del-pin': a.pin, 'del-email': a.email };
-  Object.entries(map).forEach(function(kv){ var el = document.getElementById(kv[0]); if(el) el.value = kv[1] || ''; });
+  Object.entries(map).forEach(function(kv) {
+    var el = document.getElementById(kv[0]); if (!el) return;
+    var val = kv[1] || '';
+    if (el.tagName === 'SELECT') {
+      var matched = false;
+      for (var i = 0; i < el.options.length; i++) {
+        if (el.options[i].value === val || el.options[i].text === val) { el.selectedIndex = i; matched = true; break; }
+      }
+      if (!matched) el.selectedIndex = 0;
+    } else { el.value = val; }
+  });
 }
 
 function showNewAddressForm() {
