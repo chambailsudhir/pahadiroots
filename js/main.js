@@ -1115,6 +1115,23 @@ async function checkoutRazorpay() {
   var final      = subtotal + shipCharge;
   var gstAmount  = calcGST(cart).total; // GST already included in price
 
+  // Issue 21 fix: re-fetch stock before opening Razorpay — frontend data may be stale
+  try {
+    var rzpStockRes = await fetch('/api/admin-api', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        action: 'check_stock',
+        items: cart.map(function(i){ return {variantId:i.variantId||null, qty:i.qty, name:i.name||''}; })
+      })
+    });
+    var rzpStockData = await rzpStockRes.json();
+    if (!rzpStockRes.ok) {
+      showToast('⚠️ ' + (rzpStockData.error || 'Some items are out of stock. Please update your cart.'));
+      return;
+    }
+  } catch(e) { /* network error — proceed, server will validate at save */ }
+
   var options = {
     key: 'rzp_live_SNFVJBHdd3dYRQ',
     amount: final * 100, // paise
@@ -1195,9 +1212,16 @@ async function saveOrderToDB(name, phone, email, addr, city, state, pin, final, 
       })
     });
     var data = await res.json();
-    if(!res.ok) { console.warn('Order save failed:', data.error); return null; }
+    if(!res.ok) {
+      // Surface stock error clearly to user
+      var errMsg = (data && data.error) || 'Order could not be placed. Please try again.';
+      showToast('⚠️ ' + errMsg);
+      console.warn('Order save failed:', errMsg);
+      return null;
+    }
     return { orderId: data.orderId || null, orderNumber: data.orderNumber || null };
   } catch(e) {
+    showToast('⚠️ Order could not be placed. Please check your connection.');
     console.warn('Order save failed:', e.message);
     return null;
   }
@@ -1288,6 +1312,24 @@ async function checkout() {
 
   // Snapshot cart BEFORE clearing (non-blocking save needs items)
   var cartSnapshot = cart.slice();
+
+  // Quick stock check before proceeding — avoids showing success then error
+  try {
+    var stockCheckRes = await fetch('/api/admin-api', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        action: 'check_stock',
+        items: cartSnapshot.map(function(i){ return {variantId:i.variantId||null, qty:i.qty, name:i.name||''}; })
+      })
+    });
+    var stockData = await stockCheckRes.json();
+    if (!stockCheckRes.ok) {
+      _orderProcessing = false;
+      showToast('⚠️ ' + (stockData.error || 'Some items are out of stock. Please update your cart.'));
+      return;
+    }
+  } catch(e) { /* network error — proceed, server will validate */ }
 
   // Open WhatsApp IMMEDIATELY — no waiting for DB
   var payMsg = msg + '\n\n💵 *Payment: Cash on Delivery*';
