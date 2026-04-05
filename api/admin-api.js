@@ -192,11 +192,62 @@ export default async function handler(req, res) {
     }
   }
 
+  // ── Check Stock (public, no password) — used by frontend before checkout ──
+  if (reqBody.action === 'check_stock') {
+    try {
+      const { items } = reqBody;
+      if (!items || !items.length) return ok({ available: true });
+      for (const item of items) {
+        if (!item.variantId) continue;
+        const qty = parseInt(item.qty) || 1;
+        const variant = await sbFetch('GET', 'product_variants',
+          `id=eq.${item.variantId}&select=available_stock,variant_value,sku`
+        ).catch(() => []);
+        const available = variant && variant[0] ? (variant[0].available_stock || 0) : 0;
+        if (available < qty) {
+          const label = variant?.[0]?.variant_value || variant?.[0]?.sku || item.name || 'Item';
+          return err(400, `Sorry, "${label}" is out of stock. Only ${available} left.`);
+        }
+      }
+      return ok({ available: true });
+    } catch(e) {
+      return err(500, 'Stock check failed: ' + e.message);
+    }
+  }
+
   // ── Public Order Save (no password required) ──
   if (reqBody.action === 'save_order') {
     try {
       const { name, phone, email, addr, city, state, pin, final, discount, shipCharge, payMethod, paymentId, items, auth_user_id, gstAmount } = reqBody;
       if (!name || !phone || !final) return err(400, 'Missing required order fields');
+
+      // 0. Stock + price validation — prevent overselling and price tampering
+      // Always validate against DB — never trust frontend values
+      if (items && items.length) {
+        for (const item of items) {
+          if (!item.variantId) continue;
+          const qty = parseInt(item.qty) || 1;
+          const variant = await sbFetch('GET', 'product_variants',
+            `id=eq.${item.variantId}&select=available_stock,sku,variant_value,price`
+          ).catch(() => []);
+          const v = variant && variant[0];
+          if (!v) continue;
+          const available = v.available_stock || 0;
+          if (available < qty) {
+            const label = v.sku || v.variant_value || item.name || `variant #${item.variantId}`;
+            return err(400, `Sorry, "${label}" is out of stock. Only ${available} left.`);
+          }
+          // Issue 20 fix: validate price against DB — prevent price tampering
+          if (v.price && item.price) {
+            const dbPrice = parseFloat(v.price);
+            const sentPrice = parseFloat(item.price);
+            // Allow small rounding difference but reject significant mismatch
+            if (dbPrice > 0 && sentPrice < dbPrice * 0.9) {
+              return err(400, `Price mismatch detected for "${item.name || 'item'}". Please refresh and try again.`);
+            }
+          }
+        }
+      }
 
       // 1. Upsert customer
       const nameParts = name.trim().split(' ');
@@ -253,12 +304,22 @@ export default async function handler(req, res) {
       const orderNumber = newOrder && newOrder[0] ? newOrder[0].order_number : null;
       if (!orderId) return err(500, 'Could not create order');
 
-      // 3. Save order items
+      // 3. Save order items — critical, must succeed
+      // Issue 18 fix: if items fail, delete orphan order and return error
       if (items && items.length) {
-        const orderItems = items.map(i => ({ order_id: orderId, product_id: i.id||null, variant_id: i.variantId||null, quantity: i.qty, price_at_time: i.price }));
-        await sbFetch('POST', 'order_items', '', orderItems).catch(e => console.warn('order_items failed:', e));
+        const orderItems = items.map(i => ({
+          order_id: orderId, product_id: i.id||null,
+          variant_id: i.variantId||null, quantity: i.qty, price_at_time: i.price
+        }));
+        try {
+          const savedItems = await sbFetch('POST', 'order_items', '', orderItems);
+          if (!savedItems || savedItems.length === 0) throw new Error('no items saved');
+        } catch(itemsErr) {
+          console.error('order_items failed — cleaning up orphan order:', itemsErr.message);
+          await sbFetch('DELETE', 'orders', `id=eq.${orderId}`, null).catch(()=>{});
+          return err(500, 'Order could not be saved. Please try again.');
+        }
       }
-
       // 4. Increment coupon uses_count + save coupon_usage
       if (reqBody.couponCode && discount > 0) {
         const coup = await sbFetch('GET', 'coupons', `code=eq.${reqBody.couponCode}&select=id`).catch(()=>[]);
@@ -278,11 +339,42 @@ export default async function handler(req, res) {
         }
       }
 
-      // 5. Stock — handled automatically by DB trigger handle_order_status_change
-      // When order is inserted with status 'pending' or 'confirmed':
-      // → trigger fires RESERVE or OUT movement into stock_movements
-      // → process_stock_movement trigger updates product_variants.available_stock
-      // NO manual stock deduction needed here
+      // 5. Stock movements — fire RESERVE on order creation
+      // This reduces available_stock and increases orders_reserved.
+      // OUT fires later when admin confirms (COD), or immediately here for Razorpay.
+      // Flow: COD:      pending(RESERVE) → admin confirms(OUT)
+      //       Razorpay: confirmed(RESERVE+OUT) → already sold
+      if (items && items.length) {
+        for (const item of items) {
+          if (!item.variantId) continue;
+          const qty = parseInt(item.qty) || 1;
+          const ref = orderNumber || String(orderId);
+          // Always fire RESERVE first (available-1, reserved+1)
+          await sbFetch('POST', 'stock_movements', '', {
+            variant_id:   item.variantId,
+            type:         'RESERVE',
+            quantity:     qty,
+            source:       'website_order',
+            reference_id: orderId,
+            notes:        `Order ${ref} placed — stock reserved`,
+            performed_by: 'system',
+          }).catch(e => console.warn('RESERVE movement failed:', e));
+          // Razorpay orders are already confirmed — fire OUT immediately
+          // (reserved-1, sold+1, available stays)
+          // COD orders stay in pending — OUT fires when admin confirms
+          if (payMethod === 'razorpay_online') {
+            await sbFetch('POST', 'stock_movements', '', {
+              variant_id:   item.variantId,
+              type:         'OUT',
+              quantity:     qty,
+              source:       'website_order',
+              reference_id: orderId,
+              notes:        `Order ${ref} confirmed (Razorpay) — stock sold`,
+              performed_by: 'system',
+            }).catch(e => console.warn('OUT movement failed:', e));
+          }
+        }
+      }
 
       // 6. Save order_status_history
       await sbFetch('POST', 'order_status_history', '', {
