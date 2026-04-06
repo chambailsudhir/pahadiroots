@@ -1,731 +1,766 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title id="pg-title">Product — 5 Pahadi Roots</title>
-  <meta name="description" id="pg-desc" content="Authentic Himalayan organic products — 5 Pahadi Roots">
-  <meta property="og:title" id="og-title" content="5 Pahadi Roots – Pure Himalayan Organic Products">
-  <meta property="og:description" id="og-desc" content="Authentic Himalayan organic products sourced directly from mountain farmers.">
-  <meta property="og:image" id="og-image" content="https://pahadiroots.com/images/og-cover.jpg">
-  <meta property="og:url" id="og-url" content="https://pahadiroots.com/products/">
-  <meta property="og:type" content="product">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" id="tw-title" content="5 Pahadi Roots">
-  <meta name="twitter:image" id="tw-image" content="https://pahadiroots.com/images/og-cover.jpg">
-  <link rel="canonical" id="pg-canonical" href="https://pahadiroots.com/products/">
-  <link rel="icon" href="/images/favicon.ico" type="image/x-icon">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Lato:wght@300;400;700;900&display=swap" rel="stylesheet">
-  <!-- Static JSON-LD placeholder — updated by JS once product data loads -->
-  <script type="application/ld+json" id="product-jsonld">
-  {
-    "@context": "https://schema.org/",
-    "@type": "Product",
-    "name": "5 Pahadi Roots Product",
-    "description": "Authentic Himalayan organic product sourced directly from mountain farmers.",
-    "image": "https://pahadiroots.com/images/og-cover.jpg",
-    "brand": { "@type": "Brand", "name": "5 Pahadi Roots" },
-    "url": "https://pahadiroots.com/products/",
-    "aggregateRating": {
-      "@type": "AggregateRating",
-      "ratingValue": "4.8",
-      "reviewCount": "39"
-    },
-    "offers": {
-      "@type": "Offer",
-      "priceCurrency": "INR",
-      "price": "1",
-      "priceValidUntil": "2027-03-21",
-      "availability": "https://schema.org/InStock",
-      "seller": { "@type": "Organization", "name": "5 Pahadi Roots" },
-      "shippingDetails": {
-        "@type": "OfferShippingDetails",
-        "shippingRate": {
-          "@type": "MonetaryAmount",
-          "value": "99",
-          "currency": "INR"
-        },
-        "shippingDestination": {
-          "@type": "DefinedRegion",
-          "addressCountry": "IN"
-        },
-        "deliveryTime": {
-          "@type": "ShippingDeliveryTime",
-          "handlingTime": {
-            "@type": "QuantitativeValue",
-            "minValue": 1,
-            "maxValue": 4,
-            "unitCode": "DAY"
-          },
-          "transitTime": {
-            "@type": "QuantitativeValue",
-            "minValue": 3,
-            "maxValue": 14,
-            "unitCode": "DAY"
-          }
-        }
-      },
-      "hasMerchantReturnPolicy": {
-        "@type": "MerchantReturnPolicy",
-        "applicableCountry": "IN",
-        "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
-        "merchantReturnDays": 2,
-        "returnMethod": "https://schema.org/ReturnByMail",
-        "returnFees": "https://schema.org/FreeReturn",
-        "refundType": "https://schema.org/FullRefund"
-      }
-    }
-  }
-  </script>
-  <style>
-    :root{--g:#1a3a1e;--g2:#2d5233;--g3:#3d6b42;--gd:#c8920a;--gd2:#e8b84b;--tx:#1a1a1a;--tx2:#4a4a4a;--tx3:#7a7a7a;--bd:rgba(26,58,30,.12);--bg:#fff;--bg2:#f8f9f5}
-    *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:'Lato',sans-serif;color:var(--tx);background:var(--bg);overflow-x:hidden}
-    a{text-decoration:none;color:inherit}
-    img{max-width:100%;display:block}
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pahadi Roots — Himalayan Natural Store</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--forest:#1a3a2a;--fmid:#2d5a3d;--flight:#4a8a5a;--gold:#c8922a;--goldl:#e8b84a;--cream:#f5f0e8;--warm:#faf6f0;--td:#1a1a14;--tm:#4a4a3a;--tmu:#7a7a6a}
+body{font-family:'DM Sans',sans-serif;background:var(--warm);color:var(--td)}
 
-    /* ── NAV ── */
-    .nav{position:sticky;top:0;z-index:100;background:#fff;border-bottom:1px solid var(--bd);padding:0 20px;display:flex;align-items:center;justify-content:space-between;height:60px;box-shadow:0 2px 12px rgba(0,0,0,.06)}
-    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
-    .logo-icon{font-size:24px;line-height:1}
-    .logo-name{font-family:'Playfair Display',serif;font-size:19px;font-weight:900;color:var(--g);line-height:1.1}
-    .logo-tl{font-size:10.5px;color:var(--gd);font-weight:600;letter-spacing:.5px}
-    .nav-back{display:flex;align-items:center;gap:6px;color:var(--g);font-weight:700;font-size:14px;cursor:pointer;padding:8px 14px;border-radius:20px;border:1.5px solid var(--bd);transition:all .2s}
-    .nav-back:hover{background:var(--g);color:#fff;border-color:var(--g)}
-    .cart-btn{background:var(--g);color:#fff;border:none;border-radius:20px;padding:7px 16px;font-size:13px;font-weight:700;display:flex;align-items:center;gap:6px;cursor:pointer;transition:background .2s}
-    .cart-btn:hover{background:var(--g2)}
+/* NAV */
+.nav{background:var(--forest);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:62px;position:sticky;top:0;z-index:200}
+.brand{font-family:'Playfair Display',serif;font-size:18px;color:#fff;font-weight:700;cursor:pointer;text-decoration:none}
+.brand span{font-size:9px;color:var(--goldl);letter-spacing:1.5px;text-transform:uppercase;display:block;margin-top:1px}
+.nav-links{display:flex;gap:1.5rem;list-style:none}
+.nav-links a{color:rgba(255,255,255,.75);text-decoration:none;font-size:13px;cursor:pointer;transition:color .2s}
+.nav-links a:hover,.nav-links a.active-nav{color:var(--goldl)}
+.nav-right{display:flex;align-items:center;gap:10px}
+.user-chip{display:flex;align-items:center;gap:7px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:24px;padding:5px 12px 5px 6px;cursor:pointer}
+.av{width:28px;height:28px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff}
+.ut .hi{font-size:9px;color:rgba(255,255,255,.55);display:block}
+.ut .nm{font-size:13px;font-weight:500;color:#fff}
+.cart-btn{display:flex;align-items:center;gap:6px;background:var(--gold);color:#fff;border:none;border-radius:24px;padding:7px 14px;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background .2s}
+.cart-btn:hover{background:var(--goldl);color:var(--td)}
+.cbadge{background:#fff;color:var(--forest);border-radius:50%;width:18px;height:18px;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center}
 
-    /* ── BREADCRUMB ── */
-    .breadcrumb{padding:14px 20px;font-size:12px;color:var(--tx3);max-width:1200px;margin:0 auto}
-    .breadcrumb a{color:var(--g);font-weight:600}
-    .breadcrumb span{margin:0 6px}
+/* TICKER */
+.ticker{background:#2d5a3d;padding:6px 0;overflow:hidden;white-space:nowrap}
+.ticker-inner{display:inline-flex;gap:3rem;animation:tick 30s linear infinite;font-size:11px;color:rgba(255,255,255,.85);font-weight:500}
+@keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.ticker-item::before{content:'🌿 '}
 
-    /* ── MAIN LAYOUT ── */
-    .product-wrap{max-width:1200px;margin:0 auto;padding:20px;display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:start}
-    @media(max-width:768px){.product-wrap{grid-template-columns:1fr;gap:24px;padding:16px}}
+/* PAGES */
+.page{display:none}.page.active{display:block}
 
-    /* ── IMAGE SECTION ── */
-    .img-section{}
-    .main-img-wrap{position:relative;border-radius:20px;overflow:hidden;background:var(--bg2);aspect-ratio:1;cursor:zoom-in}
-    .main-img-wrap img{width:100%;height:100%;object-fit:cover;transition:transform .4s}
-    .main-img-wrap:hover img{transform:scale(1.05)}
-    .main-img-placeholder{width:100%;aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:80px;background:var(--bg2);border-radius:20px}
-    .thumb-row{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
-    .thumb{width:72px;height:72px;border-radius:10px;overflow:hidden;cursor:pointer;border:2px solid transparent;transition:border-color .2s;flex-shrink:0}
-    .thumb.active{border-color:var(--g)}
-    .thumb img{width:100%;height:100%;object-fit:cover}
-    .badge-row{position:absolute;top:14px;left:14px;display:flex;flex-direction:column;gap:6px;z-index:2}
-    .badge{padding:4px 10px;border-radius:20px;font-size:11px;font-weight:800;letter-spacing:.3px}
-    .badge.bs{background:#e8f5e9;color:#1a3a1e}
-    .badge.nw{background:#e3f2fd;color:#1565c0}
-    .badge.pm{background:#fff3e0;color:#e65100}
-    .disc-badge{position:absolute;top:14px;right:14px;background:#e53;color:#fff;font-size:11px;font-weight:800;padding:4px 10px;border-radius:20px;z-index:2}
+/* ===== SHOP PAGE ===== */
+.shop-hero{background:linear-gradient(135deg,var(--forest) 0%,var(--fmid) 60%,#1a3a2a 100%);padding:2.5rem 2rem 2rem;text-align:center;position:relative;overflow:hidden}
+.shop-hero::before{content:'⛰️';position:absolute;right:5%;top:50%;transform:translateY(-50%);font-size:120px;opacity:.08}
+.shop-hero::after{content:'🌿';position:absolute;left:5%;top:50%;transform:translateY(-50%);font-size:100px;opacity:.08}
+.shop-hero h2{font-family:'Playfair Display',serif;font-size:30px;color:#fff;margin-bottom:8px;font-weight:700}
+.shop-hero p{font-size:13px;color:rgba(255,255,255,.7);margin-bottom:1.2rem}
+.search-bar{display:flex;gap:9px;max-width:500px;margin:0 auto}
+.search-input{flex:1;padding:11px 16px;border-radius:9px;border:none;font-family:'DM Sans',sans-serif;font-size:13px;outline:none;color:var(--td);box-shadow:0 2px 12px rgba(0,0,0,.2)}
+.search-go{padding:11px 18px;background:var(--gold);color:#fff;border:none;border-radius:9px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;white-space:nowrap;transition:background .2s}
+.search-go:hover{background:var(--goldl);color:var(--td)}
 
-    /* ── INFO SECTION ── */
-    .info-section{position:sticky;top:80px}
-    .prod-region{font-size:12px;color:var(--g);font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:4px}
-    .prod-name{font-family:'Playfair Display',serif;font-size:clamp(22px,3vw,32px);font-weight:900;color:var(--g);line-height:1.2;margin-bottom:8px}
-    .prod-rating{display:flex;align-items:center;gap:8px;margin-bottom:14px}
-    .stars{color:#f5a623;font-size:15px}
-    .rating-count{font-size:13px;color:var(--tx3)}
-    .prod-desc{font-size:14px;color:var(--tx2);line-height:1.7;margin-bottom:20px}
-    
-    /* ── PRICE ── */
-    .price-row{display:flex;align-items:baseline;gap:10px;margin-bottom:20px}
-    .price-now{font-size:32px;font-weight:900;color:var(--g)}
-    .price-was{font-size:18px;color:var(--tx3);text-decoration:line-through}
-    .price-save{background:#e8f5e9;color:#2d6a4f;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:800}
+.filters{display:flex;gap:8px;padding:12px 2rem;background:#fff;border-bottom:1px solid rgba(0,0,0,.07);flex-wrap:wrap;align-items:center}
+.filter-label{font-size:11px;font-weight:700;color:var(--tmu);text-transform:uppercase;letter-spacing:.5px}
+.ftag{padding:5px 13px;border:1.5px solid rgba(0,0,0,.12);border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;color:var(--tm);background:#fff;transition:all .2s;font-family:'DM Sans',sans-serif}
+.ftag:hover,.ftag.on{background:var(--forest);color:#fff;border-color:var(--forest)}
 
-    /* ── VARIANTS ── */
-    .variants-section{margin-bottom:22px}
-    .variants-label{font-size:13px;font-weight:700;color:var(--tx2);margin-bottom:10px}
-    .variants-label span{color:var(--g);font-weight:900}
-    .variant-btns{display:flex;gap:8px;flex-wrap:wrap}
-    .vbtn{padding:8px 16px;border:2px solid var(--bd);border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;background:#fff;color:var(--tx);transition:all .2s;font-family:'Lato',sans-serif}
-    .vbtn:hover{border-color:var(--g);color:var(--g)}
-    .vbtn.active{border-color:var(--g);background:var(--g);color:#fff}
-    .vbtn.oos{opacity:.45;cursor:not-allowed;text-decoration:line-through}
+.catalog{padding:1.5rem 2rem;max-width:1200px;margin:0 auto}
+.catalog-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.catalog-count{font-size:12px;color:var(--tmu);font-weight:500}
+.sort-sel{padding:6px 11px;border:1.5px solid rgba(0,0,0,.12);border-radius:7px;font-size:12px;font-family:'DM Sans',sans-serif;color:var(--tm);background:#fff;cursor:pointer;outline:none}
 
-    /* ── STOCK ── */
-    .stock-row{display:flex;align-items:center;gap:8px;margin-bottom:20px;font-size:13px;font-weight:700}
-    .stock-dot{width:8px;height:8px;border-radius:50%;background:#4caf50}
-    .stock-dot.low{background:#ff9800}
-    .stock-dot.oos{background:#f44336}
+.product-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:16px}
+.pcard{background:#fff;border-radius:14px;border:1px solid rgba(0,0,0,.07);overflow:hidden;cursor:pointer;transition:transform .2s,box-shadow .2s;position:relative}
+.pcard:hover{transform:translateY(-4px);box-shadow:0 10px 28px rgba(0,0,0,.12)}
+.pcard-img{height:170px;background:linear-gradient(135deg,var(--forest) 0%,var(--fmid) 100%);display:flex;align-items:center;justify-content:center;font-size:60px;position:relative}
+.pcard-badge{position:absolute;top:10px;left:10px;background:var(--gold);color:#fff;font-size:9px;font-weight:700;padding:3px 8px;border-radius:10px;letter-spacing:.3px}
+.pcard-disc{position:absolute;top:10px;right:10px;background:#e74c3c;color:#fff;font-size:9px;font-weight:700;padding:3px 8px;border-radius:10px}
+.pcard-body{padding:12px 14px}
+.pcard-cat{font-size:9px;color:var(--gold);font-weight:700;text-transform:uppercase;letter-spacing:.7px;margin-bottom:3px}
+.pcard-name{font-family:'Playfair Display',serif;font-size:15px;font-weight:600;color:var(--td);margin-bottom:4px;line-height:1.25}
+.pcard-tag{font-size:10px;color:var(--tmu);margin-bottom:9px}
+.pcard-price-row{display:flex;align-items:baseline;gap:7px;margin-bottom:9px}
+.pcard-price{font-size:17px;font-weight:700;color:var(--forest)}
+.pcard-orig{font-size:12px;color:var(--tmu);text-decoration:line-through}
+.pcard-actions{display:flex;gap:7px}
+.pca-cart{flex:1;padding:7px;background:#f0f7f2;border:1.5px solid var(--forest);border-radius:7px;color:var(--forest);font-size:11px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s}
+.pca-cart:hover{background:var(--forest);color:#fff}
+.pca-buy{flex:1;padding:7px;background:var(--gold);border:1.5px solid var(--gold);border-radius:7px;color:#fff;font-size:11px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background .2s}
+.pca-buy:hover{background:#a87820}
 
-    /* ── QTY + ATC ── */
-    .qty-atc{display:flex;gap:12px;align-items:center;margin-bottom:20px;flex-wrap:wrap}
-    .qty-ctrl{display:flex;align-items:center;gap:0;border:2px solid var(--bd);border-radius:12px;overflow:hidden}
-    .qty-btn{width:40px;height:46px;border:none;background:#fff;font-size:18px;font-weight:700;cursor:pointer;color:var(--g);transition:background .2s}
-    .qty-btn:hover{background:var(--bg2)}
-    .qty-num{width:44px;height:46px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;border-left:1.5px solid var(--bd);border-right:1.5px solid var(--bd)}
-    .atc-btn{flex:1;min-width:160px;padding:14px 24px;background:var(--g);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer;transition:all .2s;font-family:'Lato',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px}
-    .atc-btn:hover{background:var(--g2);transform:translateY(-1px)}
-    .atc-btn:disabled{opacity:.6;cursor:not-allowed;transform:none}
-    .wl-btn-lg{padding:14px;border:2px solid var(--bd);border-radius:12px;background:#fff;cursor:pointer;font-size:18px;transition:all .2s}
-    .wl-btn-lg:hover{border-color:#e74c3c}
-    .wl-btn-lg.active{border-color:#e74c3c;background:#fff5f5}
+/* ADD CARD */
+.add-card{background:#fff;border-radius:14px;border:2px dashed rgba(0,0,0,.15);display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:320px;padding:1.2rem;transition:border-color .2s;position:relative}
+.add-card:hover{border-color:var(--forest)}
+.add-icon{width:52px;height:52px;background:var(--cream);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:10px}
+.add-card h3{font-size:14px;font-weight:700;color:var(--td);margin-bottom:5px;text-align:center}
+.add-card p{font-size:11px;color:var(--tmu);text-align:center;line-height:1.5}
+.add-input{width:100%;margin-top:12px;padding:9px 12px;border:1.5px solid rgba(0,0,0,.15);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--td);outline:none}
+.add-input:focus{border-color:var(--forest)}
+.add-gen-btn{width:100%;margin-top:8px;padding:9px;background:var(--forest);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;align-items:center;justify-content:center;gap:6px;transition:background .2s}
+.add-gen-btn:hover{background:var(--fmid)}
+.add-gen-btn:disabled{opacity:.6;cursor:not-allowed}
 
-    /* ── HIGHLIGHTS ── */
-    .highlights{background:var(--bg2);border-radius:16px;padding:18px;margin-bottom:20px}
-    .highlights h4{font-size:13px;font-weight:800;color:var(--g);margin-bottom:12px;text-transform:uppercase;letter-spacing:.5px}
-    .hl-list{list-style:none;display:flex;flex-direction:column;gap:8px}
-    .hl-list li{font-size:13px;color:var(--tx2);display:flex;align-items:center;gap:8px}
-    .hl-list li::before{content:'✓';color:var(--g);font-weight:900;flex-shrink:0}
+/* ===== PRODUCT DETAIL PAGE ===== */
+.pdp-wrap{max-width:1080px;margin:0 auto;padding:0 2rem 2rem}
+.breadcrumb{padding:.9rem 2rem;font-size:12px;color:var(--tmu);max-width:1080px;margin:0 auto}
+.breadcrumb a{color:var(--gold);cursor:pointer;text-decoration:none}
+.breadcrumb a:hover{text-decoration:underline}
 
-    /* ── DELIVERY ── */
-    .delivery-row{display:flex;align-items:center;gap:10px;padding:12px 16px;background:#e8f5e9;border-radius:12px;margin-bottom:20px;font-size:13px;color:var(--g);font-weight:700}
+.pdp{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start}
+.gallery{position:sticky;top:72px}
+.main-img-box{width:100%;aspect-ratio:1;background:linear-gradient(135deg,var(--forest) 0%,var(--fmid) 100%);border-radius:16px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;font-size:100px}
+.ibadge{position:absolute;top:14px;left:14px;background:var(--gold);color:#fff;font-size:10px;font-weight:700;padding:4px 10px;border-radius:18px}
+.thumbs{display:flex;gap:8px;margin-top:10px}
+.thumb{width:58px;height:58px;border-radius:9px;border:2px solid transparent;cursor:pointer;background:var(--cream);display:flex;align-items:center;justify-content:center;font-size:22px;transition:border-color .2s}
+.thumb:hover{border-color:rgba(0,0,0,.2)}
+.thumb.active{border-color:var(--gold)}
 
-    /* ── DESCRIPTION ── */
-    .desc-section{max-width:1200px;margin:0 auto;padding:0 20px 40px}
-    .desc-tabs{display:flex;gap:0;border-bottom:2px solid var(--bd);margin-bottom:24px}
-    .desc-tab{padding:12px 20px;font-size:14px;font-weight:700;color:var(--tx3);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .2s}
-    .desc-tab.active{color:var(--g);border-bottom-color:var(--g)}
-    .desc-content{display:none;font-size:14px;color:var(--tx2);line-height:1.8}
-    .desc-content.active{display:block}
+.pinfo{padding:.3rem 0}
+.pvendor{font-size:11px;color:var(--gold);font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px}
+.ptitle{font-family:'Playfair Display',serif;font-size:27px;font-weight:700;color:var(--td);line-height:1.25;margin-bottom:8px}
+.ptag{font-size:13px;color:var(--tmu);font-style:italic;margin-bottom:12px}
+.rrow{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.stars{color:var(--gold);font-size:14px;letter-spacing:.5px}
+.rc{font-size:12px;color:var(--tmu)}
+.sbadge{background:#e8f5e9;color:#2e7d32;font-size:10px;font-weight:700;padding:3px 8px;border-radius:12px}
+.price-row{display:flex;align-items:baseline;gap:10px;margin-bottom:6px;flex-wrap:wrap}
+.pcurr{font-family:'Playfair Display',serif;font-size:32px;font-weight:700;color:var(--forest)}
+.porig{font-size:18px;color:var(--tmu);text-decoration:line-through}
+.dbadge{background:var(--forest);color:#fff;font-size:11px;font-weight:700;padding:3px 9px;border-radius:12px}
+.psub{font-size:12px;color:var(--tmu);margin-bottom:16px}
+.warn{background:#fff8e1;border:1px solid #ffe082;border-radius:9px;padding:10px 13px;font-size:12px;color:#7a6a20;margin-bottom:14px;line-height:1.5}
+.hdiv{border:none;border-top:1px solid rgba(0,0,0,.08);margin:14px 0}
+.slabel{font-size:11px;font-weight:700;color:var(--tm);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px}
+.sgrid{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:16px}
+.sbtn{padding:7px 13px;border:1.5px solid rgba(0,0,0,.15);border-radius:8px;background:#fff;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--tm);transition:all .2s;text-align:left;position:relative}
+.sbtn .sn{font-weight:600;display:block;font-size:11px}
+.sbtn .sp{font-size:13px;font-weight:700;color:var(--forest)}
+.sbtn .ss{font-size:10px;color:var(--gold)}
+.sbtn.active{border-color:var(--forest);background:#f0f7f2}
+.sbtn.featured,.sbtn.deal{position:relative;margin-top:10px}
+.sbtn.featured::before{content:'Best Value';position:absolute;top:-10px;left:7px;background:var(--forest);color:#fff;font-size:8px;padding:2px 6px;border-radius:4px;font-weight:700}
+.sbtn.deal::before{content:'Steal Deal';position:absolute;top:-10px;left:7px;background:var(--gold);color:#fff;font-size:8px;padding:2px 6px;border-radius:4px;font-weight:700}
+.qrow{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.qctrl{display:flex;align-items:center;border:1.5px solid rgba(0,0,0,.15);border-radius:8px;overflow:hidden}
+.qb{width:36px;height:36px;border:none;background:#f5f5f0;font-size:18px;cursor:pointer;color:var(--tm);font-family:'DM Sans',sans-serif;transition:background .15s}
+.qb:hover{background:var(--cream)}
+.qn{width:40px;height:36px;border:none;border-left:1.5px solid rgba(0,0,0,.1);border-right:1.5px solid rgba(0,0,0,.1);text-align:center;font-size:14px;font-weight:700;background:#fff;color:var(--td);font-family:'DM Sans',sans-serif}
+.cta-row{display:flex;flex-direction:column;gap:9px;margin-bottom:16px}
+.btn-ac{width:100%;padding:14px;background:#fff;border:2px solid var(--forest);border-radius:10px;color:var(--forest);font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:7px}
+.btn-ac:hover,.btn-ac.added{background:var(--forest);color:#fff}
+.btn-bn{width:100%;padding:14px;background:var(--gold);border:2px solid var(--gold);border-radius:10px;color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background .2s;display:flex;align-items:center;justify-content:center;gap:7px}
+.btn-bn:hover{background:#a87820}
+.trust-row{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:16px}
+.ti{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--tmu);background:var(--cream);padding:4px 9px;border-radius:18px}
+.tdot{width:5px;height:5px;border-radius:50%;background:var(--flight);flex-shrink:0}
 
-    /* ── RELATED ── */
-    .related-section{max-width:1200px;margin:0 auto;padding:0 20px 60px}
-    .section-title{font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--g);margin-bottom:20px}
-    .related-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px}
-    .rel-card{background:#fff;border:1.5px solid var(--bd);border-radius:16px;overflow:hidden;cursor:pointer;transition:transform .3s,box-shadow .3s}
-    .rel-card:hover{transform:translateY(-4px);box-shadow:0 12px 32px rgba(0,0,0,.1)}
-    .rel-img{aspect-ratio:1;overflow:hidden;background:var(--bg2)}
-    .rel-img img{width:100%;height:100%;object-fit:cover}
-    .rel-body{padding:12px}
-    .rel-name{font-family:'Playfair Display',serif;font-size:13px;font-weight:700;color:var(--g);margin-bottom:4px}
-    .rel-price{font-size:14px;font-weight:900;color:var(--g)}
+/* TABS */
+.tabs{display:flex;gap:0;border-bottom:2px solid rgba(0,0,0,.08);margin-bottom:14px}
+.tab{padding:8px 14px;font-size:12px;font-weight:700;color:var(--tmu);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .2s;text-transform:uppercase;letter-spacing:.5px}
+.tab.active{color:var(--forest);border-bottom-color:var(--forest)}
+.tc{display:none}.tc.active{display:block}
+.bi{display:flex;align-items:flex-start;gap:7px;margin-bottom:8px;font-size:13px;color:var(--tm);line-height:1.4}
+.bck{color:var(--flight);font-size:13px;margin-top:1px;flex-shrink:0}
+.dr{display:flex;gap:8px;margin-bottom:6px;font-size:13px}
+.dk{color:var(--tmu);min-width:100px;flex-shrink:0}.dv{color:var(--td);font-weight:500}
 
-    /* ── TOAST ── */
-    .toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:#1a3a1e;color:#fff;padding:11px 22px;border-radius:24px;font-size:13.5px;font-weight:700;box-shadow:0 8px 24px rgba(0,0,0,.2);z-index:9999;opacity:0;transition:opacity .3s,transform .3s;pointer-events:none;white-space:nowrap;max-width:90vw;text-align:center}
-    .toast.show{opacity:1;transform:translateX(-50%) translateY(-6px)}
+/* CART SIDEBAR */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:400;align-items:flex-end;justify-content:flex-end}
+.overlay.show{display:flex}
+.cpanel{background:#fff;width:380px;height:100vh;display:flex;flex-direction:column;animation:si .3s ease;box-shadow:-4px 0 20px rgba(0,0,0,.15)}
+@keyframes si{from{transform:translateX(100%)}to{transform:translateX(0)}}
+.ch{background:var(--forest);padding:1rem 1.3rem;display:flex;align-items:center;justify-content:space-between}
+.ch h3{color:#fff;font-family:'Playfair Display',serif;font-size:18px}
+.xb{background:none;border:none;color:#fff;font-size:22px;cursor:pointer;line-height:1}
+.cbody{flex:1;overflow-y:auto;padding:1rem 1.3rem}
+.ci{display:flex;gap:10px;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid rgba(0,0,0,.06)}
+.ci-img{width:54px;height:54px;border-radius:8px;background:var(--cream);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+.ci-info{flex:1}
+.ci-name{font-size:12px;font-weight:700;margin-bottom:2px;color:var(--td)}
+.ci-size{font-size:11px;color:var(--tmu);margin-bottom:5px}
+.ci-qty{display:flex;align-items:center;gap:6px}
+.cqb{width:22px;height:22px;border:1px solid rgba(0,0,0,.2);border-radius:4px;background:#f5f5f0;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;transition:background .15s}
+.cqb:hover{background:var(--cream)}
+.ci-price{font-size:13px;font-weight:700;color:var(--forest);align-self:center}
+.ec{text-align:center;padding:3rem 1rem;color:var(--tmu)}
+.cfoot{padding:1rem 1.3rem;border-top:1px solid rgba(0,0,0,.08)}
+.ctrow{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.ctl{font-size:13px;color:var(--tm)}.ctv{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--forest)}
+.csav{font-size:11px;color:#2e7d32;background:#e8f5e9;padding:4px 10px;border-radius:18px;margin-bottom:10px;text-align:center}
+.btn-co{width:100%;padding:13px;background:var(--forest);border:none;border-radius:10px;color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background .2s;display:flex;align-items:center;justify-content:center;gap:7px}
+.btn-co:hover{background:var(--fmid)}
+.pm-chips{display:flex;gap:6px;justify-content:center;margin-top:8px}
+.pmc{font-size:10px;background:var(--cream);color:var(--tmu);padding:3px 7px;border-radius:4px;font-weight:600}
 
-    /* ── LOADING ── */
-    .loading-wrap{display:flex;align-items:center;justify-content:center;min-height:60vh;flex-direction:column;gap:16px}
-    .spinner{width:40px;height:40px;border:4px solid var(--bd);border-top-color:var(--g);border-radius:50%;animation:spin .8s linear infinite}
-    @keyframes spin{to{transform:rotate(360deg)}}
-    .not-found{text-align:center;padding:60px 20px;color:var(--tx3)}
-    .not-found h2{font-family:'Playfair Display',serif;font-size:28px;color:var(--g);margin-bottom:12px}
+/* PAYMENT MODAL */
+.pov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:500;align-items:center;justify-content:center}
+.pov.show{display:flex}
+.pmod{background:#fff;border-radius:16px;width:460px;max-width:95vw;max-height:90vh;overflow-y:auto;animation:fu .3s ease;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+@keyframes fu{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+.phead{background:var(--forest);padding:1rem 1.5rem;border-radius:16px 16px 0 0;display:flex;align-items:center;justify-content:space-between}
+.phead h3{color:#fff;font-family:'Playfair Display',serif;font-size:18px}
+.pbdy{padding:1.4rem}
+.psec{margin-bottom:18px}
+.pst{font-size:11px;font-weight:700;color:var(--tmu);text-transform:uppercase;letter-spacing:.7px;margin-bottom:9px}
+.poi{display:flex;justify-content:space-between;font-size:13px;color:var(--tm);margin-bottom:5px}
+.pdiv{border:none;border-top:1px dashed rgba(0,0,0,.12);margin:10px 0}
+.ptr{display:flex;justify-content:space-between;font-size:16px;font-weight:700;color:var(--forest)}
+.pmths{display:flex;flex-direction:column;gap:7px}
+.pm{display:flex;align-items:center;gap:10px;padding:11px 13px;border:1.5px solid rgba(0,0,0,.1);border-radius:10px;cursor:pointer;transition:all .2s}
+.pm:hover,.pm.sel{border-color:var(--forest);background:#f0f7f2}
+.pmi{width:32px;height:32px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:16px}
+.pmn{font-size:13px;font-weight:600;color:var(--td)}.pmd{font-size:11px;color:var(--tmu)}
+.pck{width:18px;height:18px;border-radius:50%;border:2px solid rgba(0,0,0,.2);display:flex;align-items:center;justify-content:center;margin-left:auto;font-size:9px}
+.pm.sel .pck{border-color:var(--forest);background:var(--forest);color:#fff}
+.ain{width:100%;padding:9px 12px;border:1.5px solid rgba(0,0,0,.15);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--td);margin-bottom:7px;outline:none}
+.ain:focus{border-color:var(--forest)}
+.btn-po{width:100%;padding:14px;background:var(--gold);border:none;border-radius:10px;color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background .2s;letter-spacing:.3px}
+.btn-po:hover{background:#a87820}
 
-    /* ── FOOTER ── */
-    .mini-footer{background:var(--g);color:rgba(255,255,255,.7);text-align:center;padding:20px;font-size:12px;margin-top:40px}
-    .mini-footer a{color:var(--gd2);font-weight:700}
-  </style>
+/* ORDER SUCCESS */
+.success-screen{display:none;text-align:center;padding:2rem;position:fixed;inset:0;background:#fff;z-index:600;flex-direction:column;align-items:center;justify-content:center}
+.success-screen.show{display:flex}
+.success-icon{font-size:72px;margin-bottom:1rem}
+.success-screen h2{font-family:'Playfair Display',serif;font-size:28px;color:var(--forest);margin-bottom:.5rem}
+.success-screen p{color:var(--tmu);font-size:14px;margin-bottom:1.5rem}
+.btn-continue{padding:12px 28px;background:var(--forest);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif}
+
+/* AI */
+.skel{background:linear-gradient(90deg,rgba(0,0,0,.06) 25%,rgba(0,0,0,.10) 50%,rgba(0,0,0,.06) 75%);background-size:200% 100%;animation:sh 1.5s infinite;border-radius:6px;height:14px;margin-bottom:9px}
+@keyframes sh{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.aitag{font-size:9px;background:#e8f5e9;color:#2e7d32;padding:2px 7px;border-radius:8px;margin-left:5px;font-weight:700;vertical-align:middle}
+.spin{display:inline-block;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:sp .7s linear infinite;vertical-align:middle}
+@keyframes sp{to{transform:rotate(360deg)}}
+.gen-ov{position:absolute;inset:0;background:rgba(26,58,42,.88);display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:14px;z-index:10}
+.gen-ov p{color:#fff;font-size:13px;margin-top:10px;font-weight:600}
+
+/* TOAST */
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--forest);color:#fff;padding:10px 20px;border-radius:24px;font-size:13px;font-weight:600;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;box-shadow:0 4px 16px rgba(0,0,0,.2)}
+.toast.show{opacity:1}
+
+/* FOOTER */
+.footer{background:var(--forest);color:rgba(255,255,255,.7);text-align:center;padding:1.5rem 2rem;font-size:12px;margin-top:3rem}
+.footer strong{color:var(--goldl)}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  .pdp{grid-template-columns:1fr}
+  .gallery{position:static}
+  .nav-links{display:none}
+  .product-grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}
+  .cpanel{width:100%}
+}
+</style>
 </head>
 <body>
 
 <!-- NAV -->
 <nav class="nav">
-  <a href="/" class="logo">
-    <div class="logo-icon">🌿</div>
-    <div style="display:flex;flex-direction:column">
-      <span class="logo-name">5 Pahadi Roots</span>
-      <span class="logo-tl">Himalayan Organic Store</span>
+  <a class="brand" onclick="showPage('shop')">Pahadi Roots<span>Himalayan Natural Store</span></a>
+  <ul class="nav-links">
+    <li><a onclick="showPage('shop')" id="nl-shop" class="active-nav">Shop</a></li>
+    <li><a href="#">By State</a></li>
+    <li><a href="#">Our Story</a></li>
+    <li><a href="#">Contact</a></li>
+  </ul>
+  <div class="nav-right">
+    <div class="user-chip">
+      <div class="av">S</div>
+      <div class="ut"><span class="hi">Welcome back</span><span class="nm">Sudhir</span></div>
     </div>
-  </a>
-  <button class="nav-back" onclick="document.referrer ? history.back() : window.location.href='/'">← Back to Store</button>
-  <button class="cart-btn" onclick="goToCart()" id="nav-cart-btn">🛒 Cart (<span id="nav-cart-count">0</span>)</button>
+    <button class="cart-btn" onclick="openCart()">🛒 Cart <span class="cbadge" id="cart-count">0</span></button>
+  </div>
 </nav>
 
-<!-- BREADCRUMB -->
-<div class="breadcrumb">
-  <a href="/">Home</a><span>›</span>
-  <a href="/">Products</a><span>›</span>
-  <span id="bc-name">Loading…</span>
-</div>
-
-<!-- MAIN CONTENT -->
-<div id="main-content" style="min-height:70vh">
-  <div class="loading-wrap">
-    <div class="spinner"></div>
-    <p style="color:var(--tx3);font-size:14px">Loading product…</p>
+<!-- TICKER -->
+<div class="ticker">
+  <div class="ticker-inner">
+    <span class="ticker-item">Free Shipping above ₹500</span>
+    <span class="ticker-item">100% Natural · Lab-tested · Pure</span>
+    <span class="ticker-item">Direct from 200+ Mountain Families</span>
+    <span class="ticker-item">Rated 4.9/5 · 10,000+ Happy Customers</span>
+    <span class="ticker-item">Use code WELCOME50 · ₹50 off first order</span>
+    <span class="ticker-item">Free Shipping above ₹500</span>
+    <span class="ticker-item">100% Natural · Lab-tested · Pure</span>
+    <span class="ticker-item">Direct from 200+ Mountain Families</span>
+    <span class="ticker-item">Rated 4.9/5 · 10,000+ Happy Customers</span>
+    <span class="ticker-item">Use code WELCOME50 · ₹50 off first order</span>
   </div>
 </div>
 
-<!-- TOAST -->
+<!-- ===== SHOP PAGE ===== -->
+<div class="page active" id="page-shop">
+  <div class="shop-hero">
+    <h2>Pure Himalayan Products</h2>
+    <p>Sourced directly from 200+ mountain families across 10 Himalayan states</p>
+    <div class="search-bar">
+      <input class="search-input" id="search-input" type="text" placeholder="Search products..." oninput="filterProducts()">
+      <button class="search-go" onclick="filterProducts()">Search</button>
+    </div>
+  </div>
+
+  <div class="filters">
+    <span class="filter-label">Category:</span>
+    <button class="ftag on" onclick="setFilter(this,'all')">All</button>
+    <button class="ftag" onclick="setFilter(this,'juice')">Juices</button>
+    <button class="ftag" onclick="setFilter(this,'oil')">Oils</button>
+    <button class="ftag" onclick="setFilter(this,'honey')">Honey</button>
+    <button class="ftag" onclick="setFilter(this,'spice')">Spices</button>
+    <button class="ftag" onclick="setFilter(this,'tea')">Teas</button>
+    <button class="ftag" onclick="setFilter(this,'other')">Other</button>
+  </div>
+
+  <div class="catalog">
+    <div class="catalog-header">
+      <span class="catalog-count" id="catalog-count">Showing all products</span>
+      <select class="sort-sel" onchange="sortProducts(this.value)">
+        <option value="default">Sort: Default</option>
+        <option value="price-low">Price: Low to High</option>
+        <option value="price-high">Price: High to Low</option>
+        <option value="discount">Highest Discount</option>
+      </select>
+    </div>
+    <div class="product-grid" id="product-grid"></div>
+  </div>
+</div>
+
+<!-- ===== PRODUCT DETAIL PAGE ===== -->
+<div class="page" id="page-pdp">
+  <div class="breadcrumb"><a onclick="showPage('shop')">← Back to Shop</a> › <span id="pdp-breadcrumb">Product</span></div>
+  <div class="pdp-wrap">
+    <div class="pdp">
+      <div class="gallery">
+        <div class="main-img-box" id="pdp-img">
+          <span class="ibadge" id="pdp-badge">100% Natural</span>
+          <span id="pdp-emoji">🍊</span>
+        </div>
+        <div class="thumbs" id="pdp-thumbs">
+          <div class="thumb active">🍊</div>
+          <div class="thumb">🌿</div>
+          <div class="thumb">⛰️</div>
+          <div class="thumb">🧪</div>
+        </div>
+      </div>
+      <div class="pinfo" id="pdp-info">
+        <div class="skel" style="width:40%;height:12px"></div>
+        <div class="skel" style="width:80%;height:24px;margin-top:8px"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CART SIDEBAR -->
+<div class="overlay" id="cart-overlay" onclick="if(event.target===this)closeCart()">
+  <div class="cpanel">
+    <div class="ch"><h3>Your Cart</h3><button class="xb" onclick="closeCart()">×</button></div>
+    <div class="cbody" id="cart-body">
+      <div class="ec"><div style="font-size:42px;margin-bottom:10px">🛒</div><p style="font-size:13px">Your cart is empty</p></div>
+    </div>
+    <div class="cfoot">
+      <div class="ctrow"><span class="ctl">Total</span><span class="ctv" id="cart-total">₹0</span></div>
+      <div class="csav" id="cart-sav" style="display:none"></div>
+      <button class="btn-co" onclick="openPayment()">🔒 Proceed to Payment</button>
+      <div class="pm-chips">
+        <span class="pmc">UPI</span><span class="pmc">Cards</span><span class="pmc">COD</span><span class="pmc">Net Banking</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PAYMENT MODAL -->
+<div class="pov" id="pay-ov" onclick="if(event.target===this)closePay()">
+  <div class="pmod">
+    <div class="phead"><h3>🔒 Secure Checkout</h3><button class="xb" onclick="closePay()">×</button></div>
+    <div class="pbdy">
+      <div class="psec">
+        <p class="pst">Order Summary</p>
+        <div id="pay-sum"></div>
+        <div class="pdiv"></div>
+        <div class="ptr"><span>Total</span><span id="pay-tot">₹0</span></div>
+      </div>
+      <div class="psec">
+        <p class="pst">Delivery Address</p>
+        <input class="ain" type="text" placeholder="Full Name" value="Sudhir">
+        <input class="ain" type="text" placeholder="Phone Number">
+        <input class="ain" type="text" placeholder="Address Line 1">
+        <input class="ain" type="text" placeholder="City, State, PIN">
+      </div>
+      <div class="psec">
+        <p class="pst">Payment Method</p>
+        <div class="pmths">
+          <div class="pm sel" onclick="selPay(this)"><div class="pmi" style="background:#f0f7f2">💳</div><div><div class="pmn">UPI / QR Code</div><div class="pmd">PhonePe, GPay, Paytm, BHIM</div></div><div class="pck">✓</div></div>
+          <div class="pm" onclick="selPay(this)"><div class="pmi" style="background:#fff3e0">🏦</div><div><div class="pmn">Credit / Debit Card</div><div class="pmd">Visa, Mastercard, RuPay</div></div><div class="pck"></div></div>
+          <div class="pm" onclick="selPay(this)"><div class="pmi" style="background:#e8f5e9">🚚</div><div><div class="pmn">Cash on Delivery</div><div class="pmd">Pay when your order arrives</div></div><div class="pck"></div></div>
+          <div class="pm" onclick="selPay(this)"><div class="pmi" style="background:#e3f2fd">🏛️</div><div><div class="pmn">Net Banking</div><div class="pmd">All major Indian banks</div></div><div class="pck"></div></div>
+        </div>
+      </div>
+      <button class="btn-po" onclick="placeOrder()">Place Order Securely 🔒</button>
+    </div>
+  </div>
+</div>
+
+<!-- ORDER SUCCESS -->
+<div class="success-screen" id="success-screen">
+  <div class="success-icon">🎉</div>
+  <h2>Order Placed!</h2>
+  <p>Thank you, Sudhir! Your Himalayan products are on their way.<br>You'll receive a confirmation shortly.</p>
+  <button class="btn-continue" onclick="document.getElementById('success-screen').classList.remove('show');showPage('shop')">Continue Shopping</button>
+</div>
+
+<footer class="footer">
+  <strong>Pahadi Roots</strong> — Pure Himalayan Natural Store &nbsp;|&nbsp; FSSAI Licensed &nbsp;|&nbsp; UPI · Cards · COD &nbsp;|&nbsp; Free Shipping above ₹500
+</footer>
+
 <div class="toast" id="toast"></div>
 
 <script>
-// ── Globals ──
-var PRODUCT = null;
-var VARIANTS = [];
-var ALL_PRODUCTS = [];
-var selectedVariant = null;
-var qty = 1;
-var cart = [];
-var wishlist = [];
-var WHATSAPP_NUMBER = '919899984895'; // overridden from site_settings in loadProduct()
+// ============================================================
+// DATA
+// ============================================================
+let cart = [];
+let products = [
+  {id:1,name:'Sea Buckthorn Juice',cat:'juice',emoji:'🍊',badge:'Wild Harvested',tagline:'Pure nectar from the valleys of Leh-Ladakh',rating:'4.8',reviews:'1,239',sold:'1,00,000+',warn:'Not recommended for pregnant women or those with low blood pressure.',sizes:[{label:'300ml',price:699,save:22},{label:'600ml',price:1199,save:33},{label:'1200ml',price:2069,save:42,featured:true},{label:'3600ml',price:5599,save:48,deal:true}],benefits:['Boosts Immunity — High Vitamin C strengthens defense against illness','Improves Skin Health — Heals acne and promotes glowing skin','Supports Heart Health — Rich in omega fatty acids','Aids Digestion — Better gut and liver function','Reduces Inflammation — Fights chronic inflammation and related issues'],ingredients:'Seabuckthorn Pulp 99.99%, Permitted Class 2 Preservatives (E211)',origin:'Leh-Ladakh, Himachal Pradesh',shelf:'12 months',storage:'Store in a cool, dry place away from sunlight',certs:'FSSAI Certified · Lab Tested',usage:['Mix 1 tbsp (10ml) in a glass of warm water','Best consumed in the morning on an empty stomach','Can be diluted with juice or smoothie for better taste','Do not heat — consume at room temperature or chilled'],discount:42},
+  {id:2,name:'Himalayan Pink Salt',cat:'spice',emoji:'🧂',badge:'Mineral Rich',tagline:'Ancient crystal salt from deep Himalayan rock beds',rating:'4.7',reviews:'3,412',sold:'5,00,000+',warn:'',sizes:[{label:'250g',price:149,save:15},{label:'500g',price:249,save:25,featured:true},{label:'1kg',price:399,save:35},{label:'5kg',price:1499,save:45,deal:true}],benefits:['84+ Trace Minerals — Natural mineral composition unmatched by table salt','Regulates Hydration — Balances body electrolytes effectively','Better Digestion — Stimulates natural digestive enzymes','Supports Thyroid — Natural iodine content for thyroid function','No Additives — 100% unprocessed, chemical-free salt'],ingredients:'100% Himalayan Rock Salt (Sodium Chloride)',origin:'Himachal Pradesh',shelf:'Indefinite',storage:'Store in airtight container away from moisture',certs:'FSSAI Certified · Mineral Lab Tested',usage:['Use as a direct replacement for regular table salt','Add a pinch to your drinking water for electrolytes','Use in cooking for mineral-rich flavour','Dissolve in bath water for a relaxing skin detox'],discount:35},
+  {id:3,name:'Wild Pahadi Honey',cat:'honey',emoji:'🍯',badge:'Raw & Unfiltered',tagline:'Hand-harvested wild honey from pristine Himalayan meadows',rating:'4.9',reviews:'2,108',sold:'2,00,000+',warn:'Not suitable for children under 1 year of age.',sizes:[{label:'250g',price:399,save:10},{label:'500g',price:699,save:22,featured:true},{label:'1kg',price:1199,save:33},{label:'2kg',price:2099,save:40,deal:true}],benefits:['Rich in Antioxidants — Fights free radicals and slows aging','Natural Antibacterial — Kills harmful bacteria naturally','Instant Energy Boost — Natural sugars for quick energy','Soothes Throat & Cough — Time-tested natural remedy','Skin Nourishment — Applied topically for glowing skin'],ingredients:'100% Raw Wild Honey (Multifloral)',origin:'Uttarakhand · Himachal Pradesh',shelf:'24 months',storage:'Store at room temperature, away from heat and sunlight',certs:'FSSAI Certified · NMR Tested · No Added Sugar',usage:['Take 1 tsp daily dissolved in warm water','Use as a natural sweetener in place of sugar','Apply a thin layer on skin for a natural glow','Mix with lemon juice for an immunity-boosting drink'],discount:33},
+  {id:4,name:'Cold Pressed Walnut Oil',cat:'oil',emoji:'🫙',badge:'Cold Pressed',tagline:'Stone-cold pressed from premium Kashmiri hill walnuts',rating:'4.6',reviews:'876',sold:'30,000+',warn:'',sizes:[{label:'100ml',price:299,save:10},{label:'250ml',price:599,save:22,featured:true},{label:'500ml',price:999,save:33},{label:'1L',price:1699,save:40,deal:true}],benefits:['Brain Health — Rich in Omega-3 DHA and ALA fatty acids','Heart Protective — Reduces bad LDL cholesterol levels','Anti-Inflammatory — Natural ALA content fights inflammation','Skin & Hair Nourishment — Deep conditioning from the inside out','Antioxidant Rich — Vitamin E protects cells from damage'],ingredients:'100% Cold Pressed Walnut Oil (Juglans Regia)',origin:'Jammu & Kashmir',shelf:'18 months',storage:'Refrigerate after opening, use within 6 months',certs:'FSSAI Certified · Lab Tested · No Additives',usage:['Take 1 tsp daily on empty stomach for best results','Use as a salad dressing or drizzle on pasta','Replace refined oil in low-heat cooking','Massage into hair and scalp for deep conditioning'],discount:33},
+  {id:5,name:'Rhododendron Buransh Juice',cat:'juice',emoji:'🌸',badge:'Rare & Pure',tagline:'Rare buransh flower juice from the peaks of Uttarakhand',rating:'4.7',reviews:'654',sold:'25,000+',warn:'Consult a doctor before use if you are on blood pressure medication.',sizes:[{label:'500ml',price:349,save:20},{label:'1L',price:599,save:30,featured:true},{label:'2L',price:999,save:40,deal:true}],benefits:['Heart Tonic — Traditionally used to strengthen cardiac muscles','Antioxidant Powerhouse — Rich in natural polyphenols','Anti-Inflammatory — Used in Ayurveda for centuries','Liver Support — Helps detoxify and cleanse the liver','Blood Pressure — Helps regulate blood pressure naturally'],ingredients:'Rhododendron Arboreum Flower Extract, Water, E211',origin:'Uttarakhand',shelf:'12 months',storage:'Refrigerate after opening, consume within 30 days',certs:'FSSAI Certified · Ayurvedic Lab Tested',usage:['Dilute 30ml in 200ml of water or juice','Consume twice daily, preferably before meals','Add a teaspoon of honey to balance the tartness','Shake the bottle well before each use'],discount:30},
+  {id:6,name:'Himalayan Green Tea',cat:'tea',emoji:'🍵',badge:'First Flush',tagline:'First flush full-leaf green tea from Darjeeling and Sikkim',rating:'4.8',reviews:'1,987',sold:'1,50,000+',warn:'',sizes:[{label:'50g',price:199,save:10},{label:'100g',price:349,save:20,featured:true},{label:'250g',price:749,save:32},{label:'500g',price:1299,save:40,deal:true}],benefits:['Powerful Antioxidants — EGCG catechins fight aging and disease','Boosts Metabolism — Natural support for healthy weight management','Mental Clarity — L-theanine and caffeine work in synergy','Heart Health — Lowers bad LDL cholesterol naturally','Anti-Cancer Properties — High polyphenol concentration'],ingredients:'100% Himalayan Green Tea Leaves (Camellia Sinensis)',origin:'Darjeeling · Sikkim',shelf:'24 months',storage:'Airtight container, away from moisture, heat and light',certs:'FSSAI Certified · Organic Certified · Lab Tested',usage:['Use 2g of leaves per 200ml of water at 80°C','Never use boiling water — it makes the tea bitter','Steep for 2–3 minutes for the perfect cup','Enjoy 2–3 cups daily; add honey or lemon to taste'],discount:32},
+];
 
-// ── Cart count from localStorage ──
-function updateNavCart() {
-  var latestCart;
-  try { latestCart = JSON.parse(localStorage.getItem('pr_cart') || '[]'); } catch(e) { latestCart = []; }
-  cart = latestCart; // keep global in sync
-  var total = latestCart.reduce(function(s, x) { return s + (parseInt(x.qty) || 1); }, 0);
-  var el = document.getElementById('nav-cart-count');
-  if (el) el.textContent = total;
+let activeFilter = 'all';
+let currentPdp = null;
+let pdpSelPrice = 0, pdpSelSize = '', pdpQty = 1;
+
+// ============================================================
+// PAGES
+// ============================================================
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active-nav'));
+  if (id === 'shop') document.getElementById('nl-shop').classList.add('active-nav');
+  window.scrollTo(0, 0);
 }
 
-// ── Go to cart — passes cart state back to main site ──
-function goToCart() {
-  window.location.href = '/?opencart=1';
+// ============================================================
+// SHOP PAGE
+// ============================================================
+function renderShop() {
+  let list = [...products];
+  const q = document.getElementById('search-input').value.toLowerCase();
+  if (q) list = list.filter(p => p.name.toLowerCase().includes(q) || p.cat.includes(q));
+  if (activeFilter !== 'all') list = list.filter(p => p.cat === activeFilter);
+  document.getElementById('catalog-count').textContent = `Showing ${list.length} product${list.length !== 1 ? 's' : ''}`;
+
+  const getFeat = p => p.sizes.find(s => s.featured) || p.sizes[0];
+
+  const grid = document.getElementById('product-grid');
+  grid.innerHTML = list.map(p => {
+    const fs = getFeat(p);
+    const orig = Math.round(fs.price / (1 - fs.save / 100));
+    return `
+    <div class="pcard" id="pcard-${p.id}">
+      <div class="pcard-img" onclick="openPdp(${p.id})">
+        <span class="pcard-badge">${p.badge}</span>
+        <span class="pcard-disc">-${p.discount}%</span>
+        <span style="font-size:58px">${p.emoji}</span>
+      </div>
+      <div class="pcard-body">
+        <div class="pcard-cat">${p.cat}</div>
+        <div class="pcard-name" onclick="openPdp(${p.id})">${p.name}</div>
+        <div class="pcard-tag">⭐ ${p.rating} · ${p.reviews} reviews</div>
+        <div class="pcard-price-row">
+          <span class="pcard-price">₹${fs.price.toLocaleString('en-IN')}</span>
+          <span class="pcard-orig">₹${orig.toLocaleString('en-IN')}</span>
+        </div>
+        <div class="pcard-actions">
+          <button class="pca-cart" onclick="quickAdd(${p.id},event)">🛒 Add</button>
+          <button class="pca-buy" onclick="quickBuy(${p.id},event)">⚡ Buy Now</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('') + `
+  <div class="add-card" id="add-card">
+    <div class="add-icon">✨</div>
+    <h3>Add New Product with AI</h3>
+    <p>Type any Himalayan product — AI auto-generates the full product page, benefits, sizes & pricing instantly</p>
+    <input class="add-input" id="new-prod-input" type="text" placeholder="e.g. Moringa Powder, Saffron, Chyawanprash..." onkeydown="if(event.key==='Enter')genNewProduct()">
+    <button class="add-gen-btn" id="new-gen-btn" onclick="genNewProduct()">✨ Generate with AI</button>
+  </div>`;
 }
 
-// ── Load cart from localStorage ──
-try { cart = JSON.parse(localStorage.getItem('pr_cart') || '[]'); } catch(e) { cart = []; }
-try { wishlist = JSON.parse(localStorage.getItem('pr_wishlist') || '[]'); } catch(e) { wishlist = []; }
-
-// ── Toast ──
-function showToast(msg) {
-  var t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(function() { t.classList.remove('show'); }, 2800);
+function setFilter(btn, cat) {
+  document.querySelectorAll('.ftag').forEach(f => f.classList.remove('on'));
+  btn.classList.add('on');
+  activeFilter = cat;
+  renderShop();
 }
 
-// ── Get slug from URL ──
-function getSlug() {
-  var path = window.location.pathname;
-  var parts = path.split('/').filter(Boolean);
-  return (parts[parts.length - 1] || '').toLowerCase().trim();
+function filterProducts() { renderShop(); }
+
+function sortProducts(v) {
+  const feat = p => p.sizes.find(s => s.featured) || p.sizes[0];
+  if (v === 'price-low') products.sort((a, b) => feat(a).price - feat(b).price);
+  else if (v === 'price-high') products.sort((a, b) => feat(b).price - feat(a).price);
+  else if (v === 'discount') products.sort((a, b) => b.discount - a.discount);
+  else products.sort((a, b) => a.id - b.id);
+  renderShop();
 }
 
-// ── Fetch store data ──
-async function loadProduct() {
-  var slug = getSlug();
-  if (!slug || slug === 'product.html') {
-    showNotFound('No product specified');
+function quickAdd(id, e) {
+  e.stopPropagation();
+  const p = products.find(x => x.id === id);
+  const fs = p.sizes.find(s => s.featured) || p.sizes[0];
+  addItem(p, fs.label, fs.price, 1);
+  showToast(`${p.name} added to cart! 🛒`);
+}
+
+function quickBuy(id, e) {
+  e.stopPropagation();
+  const p = products.find(x => x.id === id);
+  const fs = p.sizes.find(s => s.featured) || p.sizes[0];
+  addItem(p, fs.label, fs.price, 1);
+  openCart();
+  showToast('Review cart & checkout!');
+}
+
+// ============================================================
+// PRODUCT DETAIL PAGE
+// ============================================================
+function openPdp(id) {
+  currentPdp = products.find(p => p.id === id);
+  pdpQty = 1;
+  const feat = currentPdp.sizes.find(s => s.featured) || currentPdp.sizes[0];
+  pdpSelPrice = feat.price;
+  pdpSelSize = feat.label;
+  document.getElementById('pdp-breadcrumb').textContent = currentPdp.name;
+  document.getElementById('pdp-emoji').textContent = currentPdp.emoji;
+  document.getElementById('pdp-badge').textContent = currentPdp.badge;
+  renderPdpInfo();
+  showPage('pdp');
+}
+
+function renderPdpInfo() {
+  const p = currentPdp;
+  const feat = p.sizes.find(s => s.featured) || p.sizes[0];
+  const orig = Math.round(feat.price / (1 - feat.save / 100));
+
+  const sizeHTML = p.sizes.map(s => `
+    <button class="sbtn ${s.featured ? 'featured' : ''} ${s.deal ? 'deal' : ''} ${s.featured ? 'active' : ''}"
+      onclick="pdpSelSize='${s.label}';pdpSelPrice=${s.price};document.querySelectorAll('.sbtn').forEach(b=>b.classList.remove('active'));this.classList.add('active')">
+      <span class="sn">${s.label}</span>
+      <span class="sp">₹${s.price.toLocaleString('en-IN')}</span>
+      <span class="ss">Save ${s.save}%</span>
+    </button>`).join('');
+
+  const bHTML = p.benefits.map(b => {
+    const [t, d] = b.split(' — ');
+    return `<div class="bi"><span class="bck">✔</span><span><strong>${t}</strong>${d ? ' — ' + d : ''}</span></div>`;
+  }).join('');
+
+  const uHTML = p.usage.map((u, i) =>
+    `<div class="bi"><span class="bck">${i + 1}.</span><span>${u}</span></div>`
+  ).join('');
+
+  document.getElementById('pdp-info').innerHTML = `
+    <p class="pvendor">Pahadi Roots</p>
+    <h1 class="ptitle">${p.name}</h1>
+    <p class="ptag">${p.tagline}</p>
+    <div class="rrow">
+      <span class="stars">★★★★★</span>
+      <span class="rc">${p.reviews} reviews</span>
+      <span class="sbadge">${p.sold} sold</span>
+    </div>
+    <div class="price-row">
+      <span class="pcurr">₹${feat.price.toLocaleString('en-IN')}</span>
+      <span class="porig">₹${orig.toLocaleString('en-IN')}</span>
+      <span class="dbadge">SAVE ${feat.save}%</span>
+    </div>
+    <p class="psub">MRP inclusive of all taxes · ${feat.label}</p>
+    ${p.warn ? `<div class="warn">⚠️ ${p.warn}</div>` : ''}
+    <hr class="hdiv">
+    <p class="slabel">Select Size</p>
+    <div class="sgrid">${sizeHTML}</div>
+    <div class="qrow">
+      <div class="qctrl">
+        <button class="qb" onclick="pdpQty=Math.max(1,pdpQty-1);document.getElementById('pdp-qty').value=pdpQty">−</button>
+        <input class="qn" type="text" id="pdp-qty" value="1" readonly>
+        <button class="qb" onclick="pdpQty++;document.getElementById('pdp-qty').value=pdpQty">+</button>
+      </div>
+      <span style="font-size:12px;color:var(--tmu)">Quantity</span>
+    </div>
+    <div class="cta-row">
+      <button class="btn-ac" id="pdp-add-btn" onclick="pdpAddCart()">🛒 Add to Cart</button>
+      <button class="btn-bn" onclick="pdpBuyNow()">⚡ Buy Now</button>
+    </div>
+    <div class="trust-row">
+      <div class="ti"><div class="tdot"></div>Free delivery above ₹500</div>
+      <div class="ti"><div class="tdot"></div>Lab-tested & pure</div>
+      <div class="ti"><div class="tdot"></div>Direct from farmers</div>
+      <div class="ti"><div class="tdot"></div>UPI · Cards · COD</div>
+    </div>
+    <div class="tabs">
+      <div class="tab active" onclick="swTab('ben',this)">Benefits</div>
+      <div class="tab" onclick="swTab('det',this)">Details</div>
+      <div class="tab" onclick="swTab('use',this)">How to Use</div>
+    </div>
+    <div class="tc active" id="tc-ben">${bHTML}</div>
+    <div class="tc" id="tc-det">
+      <div class="dr"><span class="dk">Ingredients</span><span class="dv">${p.ingredients}</span></div>
+      <div class="dr"><span class="dk">Origin</span><span class="dv">${p.origin}</span></div>
+      <div class="dr"><span class="dk">Shelf Life</span><span class="dv">${p.shelf}</span></div>
+      <div class="dr"><span class="dk">Storage</span><span class="dv">${p.storage}</span></div>
+      <div class="dr"><span class="dk">Certifications</span><span class="dv">${p.certs}</span></div>
+    </div>
+    <div class="tc" id="tc-use">${uHTML}</div>`;
+}
+
+function swTab(id, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tc').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('tc-' + id).classList.add('active');
+}
+
+function pdpAddCart() {
+  addItem(currentPdp, pdpSelSize, pdpSelPrice, pdpQty);
+  showToast('Added to cart!');
+  const b = document.getElementById('pdp-add-btn');
+  b.innerHTML = '✓ Added to Cart'; b.classList.add('added');
+  setTimeout(() => { b.innerHTML = '🛒 Add to Cart'; b.classList.remove('added'); }, 1800);
+}
+
+function pdpBuyNow() {
+  addItem(currentPdp, pdpSelSize, pdpSelPrice, pdpQty);
+  openCart();
+  showToast('Review your cart & checkout!');
+}
+
+// ============================================================
+// CART
+// ============================================================
+function addItem(p, size, price, q) {
+  const key = p.name + '|' + size;
+  const ex = cart.find(i => i.key === key);
+  if (ex) ex.qty += q;
+  else cart.push({ key, name: p.name, emoji: p.emoji, size, price, qty: q });
+  updateCartUI();
+}
+
+function updateCartUI() {
+  const total = cart.reduce((s, i) => s + i.price * i.qty, 0);
+  document.getElementById('cart-count').textContent = cart.reduce((s, i) => s + i.qty, 0);
+  document.getElementById('cart-total').textContent = '₹' + total.toLocaleString('en-IN');
+
+  const savEl = document.getElementById('cart-sav');
+  savEl.style.display = total > 0 ? 'block' : 'none';
+  savEl.textContent = total >= 500
+    ? '🎉 Free delivery on this order!'
+    : `Add ₹${(500 - total).toLocaleString('en-IN')} more for free delivery`;
+
+  const body = document.getElementById('cart-body');
+  if (!cart.length) {
+    body.innerHTML = '<div class="ec"><div style="font-size:42px;margin-bottom:10px">🛒</div><p style="font-size:13px">Your cart is empty</p></div>';
     return;
   }
+  body.innerHTML = cart.map((item, idx) => `
+    <div class="ci">
+      <div class="ci-img">${item.emoji}</div>
+      <div class="ci-info">
+        <div class="ci-name">${item.name}</div>
+        <div class="ci-size">${item.size}</div>
+        <div class="ci-qty">
+          <button class="cqb" onclick="adjQty(${idx},-1)">−</button>
+          <span style="font-size:12px;font-weight:700;min-width:18px;text-align:center">${item.qty}</span>
+          <button class="cqb" onclick="adjQty(${idx},1)">+</button>
+          <button onclick="removeItem(${idx})" style="margin-left:8px;background:none;border:none;color:#c0392b;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600">Remove</button>
+        </div>
+      </div>
+      <div class="ci-price">₹${(item.price * item.qty).toLocaleString('en-IN')}</div>
+    </div>`).join('');
+}
 
-  // 12 second timeout — agar API respond nahi kare
-  var controller = new AbortController();
-  var _timer = setTimeout(function() { controller.abort(); }, 12000);
+function adjQty(idx, d) { cart[idx].qty += d; if (cart[idx].qty <= 0) cart.splice(idx, 1); updateCartUI(); }
+function removeItem(idx) { cart.splice(idx, 1); updateCartUI(); }
+function openCart() { document.getElementById('cart-overlay').classList.add('show'); }
+function closeCart() { document.getElementById('cart-overlay').classList.remove('show'); }
+
+// ============================================================
+// PAYMENT
+// ============================================================
+function openPayment() {
+  closeCart();
+  const total = cart.reduce((s, i) => s + i.price * i.qty, 0);
+  document.getElementById('pay-tot').textContent = '₹' + total.toLocaleString('en-IN');
+  document.getElementById('pay-sum').innerHTML = cart.length
+    ? cart.map(i => `<div class="poi"><span>${i.name} — ${i.size} ×${i.qty}</span><span>₹${(i.price * i.qty).toLocaleString('en-IN')}</span></div>`).join('')
+    : '<div class="poi"><span style="color:var(--tmu)">No items in cart</span></div>';
+  document.getElementById('pay-ov').classList.add('show');
+}
+function closePay() { document.getElementById('pay-ov').classList.remove('show'); }
+
+function selPay(el) {
+  document.querySelectorAll('.pm').forEach(m => { m.classList.remove('sel'); m.querySelector('.pck').textContent = ''; });
+  el.classList.add('sel'); el.querySelector('.pck').textContent = '✓';
+}
+
+function placeOrder() {
+  closePay();
+  cart = [];
+  updateCartUI();
+  document.getElementById('success-screen').classList.add('show');
+}
+
+// ============================================================
+// AI PRODUCT GENERATOR
+// ============================================================
+async function genNewProduct() {
+  const input = document.getElementById('new-prod-input').value.trim();
+  if (!input) { showToast('Please enter a product name'); return; }
+
+  const btn = document.getElementById('new-gen-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin" style="width:13px;height:13px;border-width:2px"></span> Generating...';
+
+  const card = document.getElementById('add-card');
+  const ov = document.createElement('div');
+  ov.className = 'gen-ov';
+  ov.innerHTML = `<span class="spin" style="width:28px;height:28px;border-width:3px"></span><p>AI generating "${input}"...</p>`;
+  card.appendChild(ov);
 
   try {
-    var res = await fetch('/api/store-data', { signal: controller.signal });
-    clearTimeout(_timer);
-
-    if (!res.ok) throw new Error('Server error ' + res.status);
-    var data = await res.json();
-    ALL_PRODUCTS = data.products || [];
-
-    // Find product by slug (case-insensitive)
-    var prod = ALL_PRODUCTS.find(function(p) { return (p.slug || '').toLowerCase() === slug; });
-    if (!prod) {
-      // Try by id as fallback
-      prod = ALL_PRODUCTS.find(function(p) { return String(p.id) === String(slug); });
-    }
-    if (!prod) { showNotFound('Product not found'); return; }
-
-    PRODUCT = prod;
-
-    // Attach images
-    var prodImages = (data.product_images || []).filter(function(i) { return String(i.product_id) === String(prod.id); });
-
-    // Attach variants
-    VARIANTS = (data.product_variants || []).filter(function(v) { return String(v.product_id) === String(prod.id); });
-
-    // Related products (same state or category)
-    var related = ALL_PRODUCTS.filter(function(p) {
-      return p.id !== prod.id && (p.state_id === prod.state_id || p.category_id === prod.category_id);
-    }).slice(0, 4);
-
-    // Build state name map
-    var stateMap = {};
-    (data.states || []).forEach(function(s) { stateMap[s.id] = s.name; });
-
-    // Load settings
-    if (data.settings) {
-      if (data.settings.whatsapp_number) WHATSAPP_NUMBER = data.settings.whatsapp_number;
-    }
-
-    renderProduct(prod, prodImages, related, data, stateMap);
-  } catch(e) {
-    clearTimeout(_timer);
-    if (e.name === 'AbortError') {
-      showNotFound('Request timed out — please check your connection and refresh');
-    } else {
-      showNotFound('Failed to load product. Please refresh the page.');
-    }
-  }
-}
-
-// ── Render full product page ──
-function renderProduct(p, images, related, data, stateMap) {
-  stateMap = stateMap || {};
-  // Update page title & meta
-  document.getElementById('pg-title').textContent = (p.name || 'Product') + ' — 5 Pahadi Roots';
-  document.getElementById('pg-desc').setAttribute('content', p.short_description || p.name + ' — Authentic Himalayan product from 5 Pahadi Roots');
-  // Dynamic OG tags for social sharing
-  var ogImg = p.image_url || 'https://pahadiroots.com/images/og-cover.jpg';
-  var ogUrl = 'https://pahadiroots.com/products/' + (p.slug && !/^\d+$/.test(p.slug) ? p.slug : (p.name ? p.name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'') : p.id));
-  var ogDesc = p.short_description || p.name + ' — Authentic Himalayan organic product from 5 Pahadi Roots. Sourced directly from mountain farmers.';
-  document.getElementById('og-title').setAttribute('content', (p.name||'Product') + ' — 5 Pahadi Roots');
-  document.getElementById('og-desc').setAttribute('content', ogDesc);
-  document.getElementById('og-image').setAttribute('content', ogImg);
-  document.getElementById('og-url').setAttribute('content', ogUrl);
-  document.getElementById('tw-title').setAttribute('content', (p.name||'Product') + ' — 5 Pahadi Roots');
-  document.getElementById('tw-image').setAttribute('content', ogImg);
-  document.getElementById('bc-name').textContent = p.name;
-  // Update canonical URL to exact product URL
-  var canonical = document.getElementById('pg-canonical');
-  if (canonical) canonical.setAttribute('href', ogUrl);
-
-  // ── JSON-LD Product Schema (Google Rich Snippets) ──
-  var priceVal = p.price || (VARIANTS && VARIANTS[0] ? VARIANTS[0].price : null);
-  var stockStatus = (p.available_stock > 0 || (VARIANTS && VARIANTS.some(function(v){ return v.available_stock > 0; })))
-    ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock';
-  var schemaObj = {
-    '@context': 'https://schema.org/',
-    '@type': 'Product',
-    'name': p.name || '',
-    'description': p.short_description || p.description || '',
-    'image': ogImg,
-    'url': ogUrl,
-    'brand': { '@type': 'Brand', 'name': '5 Pahadi Roots' },
-    'aggregateRating': {
-      '@type': 'AggregateRating',
-      'ratingValue': '4.8',
-      'reviewCount': String(p.review_count || 39)
-    }
-  };
-  if (priceVal) {
-    // priceValidUntil — 1 year from now
-    var nextYear = new Date();
-    nextYear.setFullYear(nextYear.getFullYear() + 1);
-    var priceValidUntil = nextYear.toISOString().split('T')[0];
-
-    schemaObj['offers'] = {
-      '@type': 'Offer',
-      'priceCurrency': 'INR',
-      'price': String(priceVal),
-      'priceValidUntil': priceValidUntil,
-      'availability': stockStatus,
-      'seller': { '@type': 'Organization', 'name': '5 Pahadi Roots' },
-      'shippingDetails': {
-        '@type': 'OfferShippingDetails',
-        'shippingRate': {
-          '@type': 'MonetaryAmount',
-          'value': '99',
-          'currency': 'INR'
-        },
-        'shippingDestination': {
-          '@type': 'DefinedRegion',
-          'addressCountry': 'IN'
-        },
-        'deliveryTime': {
-          '@type': 'ShippingDeliveryTime',
-          'handlingTime': {
-            '@type': 'QuantitativeValue',
-            'minValue': 1,
-            'maxValue': 4,
-            'unitCode': 'DAY'
-          },
-          'transitTime': {
-            '@type': 'QuantitativeValue',
-            'minValue': 3,
-            'maxValue': 14,
-            'unitCode': 'DAY'
-          }
-        }
-      },
-      'hasMerchantReturnPolicy': {
-        '@type': 'MerchantReturnPolicy',
-        'applicableCountry': 'IN',
-        'returnPolicyCategory': 'https://schema.org/MerchantReturnFiniteReturnWindow',
-        'merchantReturnDays': 2,
-        'returnMethod': 'https://schema.org/ReturnByMail',
-        'returnFees': 'https://schema.org/FreeReturn',
-        'refundType': 'https://schema.org/FullRefund'
-      }
-    };
-  }
-  var schemaTag = document.getElementById('product-jsonld');
-  if (!schemaTag) {
-    schemaTag = document.createElement('script');
-    schemaTag.type = 'application/ld+json';
-    schemaTag.id = 'product-jsonld';
-    document.head.appendChild(schemaTag);
-  }
-  schemaTag.textContent = JSON.stringify(schemaObj);
-
-  var pct = p.mrp && p.price ? Math.round((1 - p.price / p.mrp) * 100) : 0;
-  // If product has variants, use first variant stock; else product stock
-  var initStock = (VARIANTS && VARIANTS.length > 0) ? (VARIANTS[0].available_stock || 0) : (p.available_stock !== undefined ? p.available_stock : 99);
-  var stock = initStock;
-  var stockClass = stock > 20 ? '' : stock > 5 ? 'low' : 'oos';
-  var stockLabel = stock <= 0 ? 'Out of Stock' : stock <= 5 ? 'Only ' + stock + ' left!' : stock <= 20 ? stock + ' in stock' : 'In Stock';
-
-  // Build images array
-  var allImgs = [];
-  if (p.image_url) allImgs.push(p.image_url);
-  images.forEach(function(i) { if (i.image_url && i.image_url !== p.image_url) allImgs.push(i.image_url); });
-
-  // Main image HTML
-  var mainImgHtml = allImgs.length
-    ? '<div class="main-img-wrap"><img id="main-img" src="' + allImgs[0] + '" alt="' + p.name + '" loading="eager">' +
-      (p.badges && p.badges.length ? '<div class="badge-row">' + p.badges.map(function(b) { return '<span class="badge ' + b.substring(0,2) + '">' + b.charAt(0).toUpperCase() + b.slice(1) + '</span>'; }).join('') + '</div>' : '') +
-      (pct > 0 ? '<span class="disc-badge">-' + pct + '%</span>' : '') +
-      '</div>'
-    : '<div class="main-img-placeholder">' + (p.emoji || '🌿') + '</div>';
-
-  // Thumbnails
-  var thumbHtml = allImgs.length > 1
-    ? '<div class="thumb-row">' + allImgs.map(function(src, i) {
-        return '<div class="thumb' + (i===0?' active':'') + '" onclick="switchImg(\'' + src + '\',this)"><img src="' + src + '" loading="lazy"></div>';
-      }).join('') + '</div>'
-    : '';
-
-  // Variants HTML
-  var variantHtml = '';
-  if (VARIANTS.length > 0) {
-    selectedVariant = VARIANTS[0];
-    variantHtml = '<div class="variants-section">' +
-      '<div class="variants-label">Select Size: <span id="var-label">' + VARIANTS[0].variant_value + '</span></div>' +
-      '<div class="variant-btns">' +
-      VARIANTS.map(function(v, i) {
-        return '<button class="vbtn' + (i===0?' active':'') + (v.available_stock<=0?' oos':'') + '" ' +
-          'onclick="selectVariant(' + v.id + ')" data-id="' + v.id + '">' +
-          v.variant_value + '</button>';
-      }).join('') +
-      '</div></div>';
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{
+          role: 'user',
+          content: `Generate product data for "Pahadi Roots" Himalayan natural store. Product: "${input}". Return ONLY valid JSON (no markdown, no backticks):
+{"name":"product display name 4-6 words","cat":"juice|oil|honey|spice|tea|other","emoji":"single most relevant emoji","badge":"2-word quality badge","tagline":"8-10 word romantic Himalayan tagline","rating":"4.7","reviews":"800","sold":"40,000+","warn":"brief health warning if relevant else empty string","sizes":[{"label":"100g","price":199,"save":15},{"label":"250g","price":349,"save":22,"featured":true},{"label":"500g","price":599,"save":33},{"label":"1kg","price":999,"save":42,"deal":true}],"benefits":["Benefit Title — explanation","Benefit Title — explanation","Benefit Title — explanation","Benefit Title — explanation","Benefit Title — explanation"],"ingredients":"ingredients list","origin":"Himalayan region/state","shelf":"X months","storage":"storage instructions","certs":"certifications","usage":["Step 1 instruction","Step 2 instruction","Step 3 instruction","Step 4 instruction"],"discount":33}`
+        }]
+      })
+    });
+    const data = await resp.json();
+    const text = data.content.map(c => c.text || '').join('');
+    const clean = text.replace(/```json|```/g, '').trim();
+    const p = JSON.parse(clean);
+    const newId = products.length + 1;
+    const feat = p.sizes.find(s => s.featured) || p.sizes[0];
+    products.push({ id: newId, ...p, discount: p.discount || feat.save });
+    renderShop();
+    showToast(`✨ ${p.name} added to catalog!`);
+    document.getElementById('new-prod-input').value = '';
+  } catch (e) {
+    showToast('AI generation failed — please try again');
+    console.error(e);
   }
 
-  // Highlights
-  var hlItems = ['100% Natural & Organic', 'Directly from Himalayan farmers', 'No preservatives or additives', 'Lab tested for purity'];
-  if (p.tags && p.tags.length) {
-    hlItems = p.tags.concat(hlItems).slice(0, 5);
-  }
-
-  // Related cards
-  var relHtml = related.length ? '<div class="related-section">' +
-    '<h2 class="section-title">You May Also Like</h2>' +
-    '<div class="related-grid">' +
-    related.map(function(r) {
-      return '<div class="rel-card" onclick="goToProduct(\'' + (r.slug && !/^\\d+$/.test(r.slug) ? r.slug : (r.name ? r.name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^\-|-$)/g,'') : r.id)) + '\')" style="cursor:pointer">' +
-        '<div class="rel-img">' + (r.image_url ? '<img src="' + r.image_url + '" alt="' + r.name + '" loading="lazy">' : '<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:40px">' + (r.emoji||'🌿') + '</div>') + '</div>' +
-        '<div class="rel-body"><div class="rel-name">' + r.name + '</div><div class="rel-price">₹' + r.price + '</div></div>' +
-        '</div>';
-    }).join('') +
-    '</div></div>' : '';
-
-  var displayPrice = selectedVariant ? selectedVariant.price : p.price;
-  var displayMrp = selectedVariant ? (selectedVariant.original_price || p.mrp) : p.mrp;
-
-  document.getElementById('main-content').innerHTML =
-    '<div class="product-wrap">' +
-      // LEFT — Images
-      '<div class="img-section">' + mainImgHtml + thumbHtml + '</div>' +
-      // RIGHT — Info
-      '<div class="info-section">' +
-        '<div class="prod-region">📍 ' + (p.region || stateMap[p.state_id] || p.state_id || '') + '</div>' +
-        '<h1 class="prod-name">' + p.name + '</h1>' +
-        '<div class="prod-rating"><span class="stars">★★★★★</span><span class="rating-count">(4.8 · ' + (p.review_count || 39) + ' reviews)</span></div>' +
-        '<p class="prod-desc">' + (p.short_description || p.description || '') + '</p>' +
-        '<div class="price-row">' +
-          '<span class="price-now" id="dp-price">₹' + displayPrice + '</span>' +
-          (displayMrp && displayMrp > displayPrice ? '<span class="price-was" id="dp-mrp">₹' + displayMrp + '</span><span class="price-save" id="dp-save">Save ₹' + (displayMrp - displayPrice) + '</span>' : '') +
-        '</div>' +
-        variantHtml +
-        '<div class="stock-row"><div class="stock-dot ' + stockClass + '"></div><span>' + stockLabel + '</span></div>' +
-        '<div class="qty-atc">' +
-          '<div class="qty-ctrl">' +
-            '<button class="qty-btn" onclick="changeQty(-1)">−</button>' +
-            '<span class="qty-num" id="qty-display">1</span>' +
-            '<button class="qty-btn" onclick="changeQty(1)">+</button>' +
-          '</div>' +
-          '<button class="atc-btn" id="atc-btn" onclick="addToCartProduct()" ' + (stock<=0?'disabled':'') + '>⚡ Buy Now</button>' +
-          '<button class="wl-btn-lg' + (wishlist.includes(p.id)?' active':'') + '" onclick="toggleWL()" id="wl-btn">' + (wishlist.includes(p.id)?'❤️':'🤍') + '</button>' +
-          '<button class="share-btn" onclick="shareProduct()" title="Share this product">🔗</button>' +
-        '</div>' +
-        '<div class="delivery-row">🚚 Free delivery available · Pan India · Estimated 5-7 days</div>' +
-        '<div class="highlights"><h4>Why 5 Pahadi Roots?</h4><ul class="hl-list">' +
-          hlItems.map(function(h) { return '<li>' + h + '</li>'; }).join('') +
-        '</ul></div>' +
-      '</div>' +
-    '</div>' +
-    // Description tabs
-    '<div class="desc-section">' +
-      '<div class="desc-tabs">' +
-        '<div class="desc-tab active" onclick="switchTab(\'desc\',this)">Description</div>' +
-        '<div class="desc-tab" onclick="switchTab(\'ship\',this)">Shipping</div>' +
-        '<div class="desc-tab" onclick="switchTab(\'care\',this)">Storage & Care</div>' +
-        '<div class="desc-tab" onclick="switchTab(\'returns\',this)">Returns & Refunds</div>' +
-      '</div>' +
-      '<div id="tab-desc" class="desc-content active">' + (p.long_description || p.short_description || p.description || 'Authentic Himalayan product sourced directly from local farmers. No preservatives, no additives — pure and natural.') + '</div>' +
-      '<div id="tab-ship" class="desc-content">We ship Pan India via trusted courier partners. Delivery in 5-7 business days. Free shipping on orders above ₹799. COD available on select pincodes.</div>' +
-      '<div id="tab-care" class="desc-content">Store in a cool, dry place away from direct sunlight. Keep container tightly sealed after use. Best consumed within the expiry date printed on the pack.</div>' +
-      '<div id="tab-returns" class="desc-content"><strong>🔄 Return & Refund Policy</strong><br><br>We want you to love every product from 5 Pahadi Roots. Here\'s our policy:<br><br><strong>✅ Eligible for return:</strong> Damaged, defective, or wrong item delivered — report within <strong>3 days</strong> of delivery with a photo/video.<br><br><strong>❌ Not eligible:</strong> Products opened & used (unless defective), items returned after 3 days, or without original packaging.<br><br><strong>How to claim:</strong> WhatsApp us at +91 ' + WHATSAPP_NUMBER.replace('91','').replace(/(\d{5})(\d{5})/,'$1 $2') + ' with your order number and photos. We process refunds within 5-7 business days once approved.<br><br><strong>Refund method:</strong> UPI / original payment method.<br><br>For any issues, reach us at support@pahadiroots.com</div>' +
-    '</div>' +
-    relHtml +
-    '<footer class="mini-footer">© 2026 5 Pahadi Roots · <a href="/">Shop Now</a> · <a href="/terms">Terms & Returns</a> · <a href="mailto:support@pahadiroots.com">support@pahadiroots.com</a></footer>';
+  btn.disabled = false;
+  btn.innerHTML = '✨ Generate with AI';
+  const ovEl = card.querySelector('.gen-ov');
+  if (ovEl) card.removeChild(ovEl);
 }
 
-// ── Switch main image ──
-function switchImg(src, thumb) {
-  document.getElementById('main-img').src = src;
-  document.querySelectorAll('.thumb').forEach(function(t) { t.classList.remove('active'); });
-  thumb.classList.add('active');
+// ============================================================
+// UTILS
+// ============================================================
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
 }
 
-// ── Switch tab ──
-function switchTab(id, el) {
-  document.querySelectorAll('.desc-content').forEach(function(c) { c.classList.remove('active'); });
-  document.querySelectorAll('.desc-tab').forEach(function(t) { t.classList.remove('active'); });
-  document.getElementById('tab-' + id).classList.add('active');
-  el.classList.add('active');
-}
-
-// ── Select variant ──
-function selectVariant(varId) {
-  selectedVariant = VARIANTS.find(function(v) { return v.id === varId; });
-  if (!selectedVariant) return;
-  // Update buttons
-  document.querySelectorAll('.vbtn').forEach(function(b) {
-    b.classList.toggle('active', parseInt(b.dataset.id) === varId);
-  });
-  // Update label
-  var lbl = document.getElementById('var-label');
-  if (lbl) lbl.textContent = selectedVariant.variant_value;
-  // Update price
-  var priceEl = document.getElementById('dp-price');
-  if (priceEl) priceEl.textContent = '₹' + selectedVariant.price;
-  var mrpEl = document.getElementById('dp-mrp');
-  var saveEl = document.getElementById('dp-save');
-  if (mrpEl && selectedVariant.original_price) {
-    mrpEl.textContent = '₹' + selectedVariant.original_price;
-    if (saveEl) saveEl.textContent = 'Save ₹' + (selectedVariant.original_price - selectedVariant.price);
-  }
-  // Update stock label
-  var sv = selectedVariant;
-  var svStock = sv ? (sv.available_stock !== undefined ? sv.available_stock : 99) : 99;
-  var svClass = svStock > 20 ? '' : svStock > 5 ? 'low' : 'oos';
-  var svLabel = svStock <= 0 ? 'Out of Stock' : svStock <= 5 ? 'Only ' + svStock + ' left!' : svStock <= 20 ? svStock + ' in stock' : 'In Stock';
-  var stockDot = document.querySelector('.stock-dot');
-  var stockSpan = document.querySelector('.stock-row span');
-  if (stockDot) { stockDot.className = 'stock-dot ' + svClass; }
-  if (stockSpan) stockSpan.textContent = svLabel;
-  // Disable/enable buy button
-  var atcBtn = document.getElementById('atc-btn');
-  if (atcBtn) atcBtn.disabled = svStock <= 0;
-  // Update qty to 1 on variant change
-  qty = 1;
-  document.getElementById('qty-display').textContent = '1';
-}
-
-// ── Change quantity ──
-function changeQty(d) {
-  var stock = selectedVariant ? selectedVariant.available_stock : (PRODUCT ? PRODUCT.available_stock : 99);
-  qty = Math.max(1, Math.min(qty + d, stock || 99));
-  document.getElementById('qty-display').textContent = qty;
-  // Visually disable minus at 1, plus at stock limit
-  var minusBtn = document.querySelector('.qty-ctrl .qty-btn:first-child');
-  var plusBtn = document.querySelector('.qty-ctrl .qty-btn:last-child');
-  if (minusBtn) minusBtn.style.opacity = qty <= 1 ? '0.3' : '1';
-  if (plusBtn) plusBtn.style.opacity = qty >= (stock || 99) ? '0.3' : '1';
-}
-
-// ── Add to cart ──
-function shareProduct() {
-  var url  = window.location.href;
-  var pname = (PRODUCT && PRODUCT.name) ? PRODUCT.name : 'this product';
-  var pprice = (PRODUCT && PRODUCT.price) ? ' at ₹' + PRODUCT.price : '';
-  if (navigator.share) {
-    navigator.share({ title: pname + ' — 5 Pahadi Roots', text: '🌿 Check out ' + pname + pprice + ' on 5 Pahadi Roots!', url: url });
-  } else {
-    var waText = encodeURIComponent('🌿 Check out ' + pname + pprice + ' on 5 Pahadi Roots!\n' + url);
-    var wa = 'https://wa.me/?text=' + waText;
-    var modal = document.createElement('div');
-    modal.id = 'share-modal';
-    modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
-    var box = document.createElement('div');
-    box.style.cssText = 'background:#fff;border-radius:20px;padding:28px;max-width:340px;width:100%';
-    var h3 = document.createElement('h3');
-    h3.style.cssText = 'font-family:Playfair Display,serif;margin-bottom:4px';
-    h3.textContent = 'Share Product';
-    var sub = document.createElement('p');
-    sub.style.cssText = 'color:#888;font-size:13px;margin-bottom:20px';
-    sub.textContent = pname;
-    var waBtn = document.createElement('a');
-    waBtn.href = wa; waBtn.target = '_blank';
-    waBtn.style.cssText = 'display:block;background:#25d366;color:#fff;padding:12px 20px;border-radius:10px;text-align:center;font-weight:700;text-decoration:none;margin-bottom:10px';
-    waBtn.textContent = '💬 Share on WhatsApp';
-    var copyBtn = document.createElement('button');
-    copyBtn.style.cssText = 'display:block;width:100%;background:var(--g);color:#fff;padding:12px 20px;border-radius:10px;font-weight:700;border:none;cursor:pointer;font-size:14px;margin-bottom:10px';
-    copyBtn.textContent = '📋 Copy Link';
-    copyBtn.onclick = function(){ navigator.clipboard.writeText(url).then(function(){ showToastP('🔗 Link copied!'); modal.remove(); }); };
-    var cancelBtn = document.createElement('button');
-    cancelBtn.style.cssText = 'display:block;width:100%;padding:10px;border:none;background:#f5f5f5;border-radius:10px;cursor:pointer;font-weight:700';
-    cancelBtn.textContent = 'Cancel';
-    cancelBtn.onclick = function(){ modal.remove(); };
-    box.appendChild(h3); box.appendChild(sub); box.appendChild(waBtn); box.appendChild(copyBtn); box.appendChild(cancelBtn);
-    modal.appendChild(box);
-    document.body.appendChild(modal);
-    modal.addEventListener('click', function(e){ if(e.target===modal) modal.remove(); });
-  }
-}
-function showToastP(msg) { var t=document.getElementById('toast'); if(t){t.textContent=msg;t.style.opacity=1;setTimeout(function(){t.style.opacity=0;},2200);} }
-
-function addToCartProduct() {
-  if (!PRODUCT) return;
-  var price = selectedVariant ? selectedVariant.price : PRODUCT.price;
-  var variantId = selectedVariant ? selectedVariant.id : null;
-  var variantLabel = selectedVariant ? selectedVariant.variant_value : '';
-  var cartKey = variantId ? (PRODUCT.id + '_' + variantId) : PRODUCT.id;
-  var displayName = PRODUCT.name + (variantLabel ? ' (' + variantLabel + ')' : '');
-
-  var cartKeyStr = String(cartKey);
-  var ex = cart.find(function(x) { return String(x.cartKey || x.id) === cartKeyStr; });
-  if (ex) ex.qty += qty;
-  else cart.push({ cartKey: cartKey, id: PRODUCT.id, variantId: variantId, name: displayName, emoji: PRODUCT.emoji, image: PRODUCT.image_url || '', price: price, qty: qty });
-
-  try { localStorage.setItem('pr_cart', JSON.stringify(cart)); } catch(e) {}
-  updateNavCart();
-  showToast('✅ ' + displayName + ' added! Cart: ' + cart.reduce(function(s,x){return s+(x.qty||0);},0) + ' items');
-  document.getElementById('atc-btn').textContent = '✅ Added!';
-  setTimeout(function() { document.getElementById('atc-btn').innerHTML = '⚡ Buy Now'; }, 1500);
-  // Reset qty to 1 after adding
-  qty = 1;
-  var qd = document.getElementById('qty-display');
-  if (qd) qd.textContent = '1';
-  var minusBtn = document.querySelector('.qty-ctrl .qty-btn:first-child');
-  if (minusBtn) minusBtn.style.opacity = '0.3';
-}
-
-// ── Toggle wishlist ──
-function toggleWL() {
-  if (!PRODUCT) return;
-  var idx = wishlist.indexOf(PRODUCT.id);
-  if (idx > -1) wishlist.splice(idx, 1);
-  else wishlist.push(PRODUCT.id);
-  try { localStorage.setItem('pr_wishlist', JSON.stringify(wishlist)); } catch(e) {}
-  var btn = document.getElementById('wl-btn');
-  if (btn) { btn.textContent = wishlist.includes(PRODUCT.id) ? '❤️' : '🤍'; btn.classList.toggle('active', wishlist.includes(PRODUCT.id)); }
-  showToast(wishlist.includes(PRODUCT.id) ? '❤️ Saved to wishlist!' : 'Removed from wishlist');
-}
-
-// ── Go to product ──
-function goToProduct(slug) {
-  var s = String(slug || '');
-  // Never use numeric ID — generate from name if needed
-  if (!s || /^\d+$/.test(s)) {
-    var prod = ALL_PRODUCTS.find(function(p){ return String(p.id) === s; });
-    if (prod) s = prod.slug && !/^\d+$/.test(prod.slug) ? prod.slug : (prod.name ? prod.name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'') : s);
-  }
-  window.location.href = '/products/' + s;
-}
-
-// ── Not found ──
-function showNotFound(msg) {
-  document.getElementById('main-content').innerHTML =
-    '<div class="not-found"><h2>Product not found</h2><p>' + msg + '</p><br><a href="/" style="color:var(--g);font-weight:700">← Back to store</a></div>';
-}
-
-// ── Init ──
-updateNavCart();
-loadProduct();
+// INIT
+renderShop();
 </script>
 </body>
 </html>
