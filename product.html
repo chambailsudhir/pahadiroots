@@ -211,6 +211,90 @@
     /* ── FOOTER ── */
     .mini-footer{background:var(--g);color:rgba(255,255,255,.7);text-align:center;padding:20px;font-size:12px;margin-top:40px}
     .mini-footer a{color:var(--gd2);font-weight:700}
+
+    /* ── AI ADMIN BAR ── */
+    .ai-bar{background:#fff;border-bottom:1.5px solid var(--bd);padding:8px 20px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+    .ai-bar label{font-size:12px;font-weight:800;color:var(--g);white-space:nowrap}
+    .ai-prod-input{flex:1;max-width:320px;padding:7px 12px;border:1.5px solid var(--bd);border-radius:8px;font-family:'Lato',sans-serif;font-size:13px;color:var(--tx);outline:none}
+    .ai-prod-input:focus{border-color:var(--g)}
+    .ai-gen-btn{padding:7px 16px;background:var(--g);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:800;cursor:pointer;font-family:'Lato',sans-serif;display:flex;align-items:center;gap:6px;white-space:nowrap;transition:background .2s}
+    .ai-gen-btn:hover{background:var(--g2)}
+    .ai-gen-btn:disabled{opacity:.6;cursor:not-allowed}
+    .ai-hint{font-size:11px;color:var(--tx3)}
+    .ai-spin{display:inline-block;width:12px;height:12px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle}
+
+    /* ── SEPARATE ADD TO CART + BUY NOW BUTTONS ── */
+    .atc-btn-add{flex:1;min-width:140px;padding:14px 20px;background:#fff;color:var(--g);border:2px solid var(--g);border-radius:12px;font-size:14px;font-weight:800;cursor:pointer;transition:all .2s;font-family:'Lato',sans-serif;display:flex;align-items:center;justify-content:center;gap:7px}
+    .atc-btn-add:hover,.atc-btn-add.added{background:var(--g);color:#fff}
+    .atc-btn-add:disabled{opacity:.6;cursor:not-allowed}
+    .atc-btn-buy{flex:1;min-width:140px;padding:14px 20px;background:var(--gd);color:#fff;border:2px solid var(--gd);border-radius:12px;font-size:14px;font-weight:800;cursor:pointer;transition:all .2s;font-family:'Lato',sans-serif;display:flex;align-items:center;justify-content:center;gap:7px}
+    .atc-btn-buy:hover{background:#a87820;border-color:#a87820}
+    .atc-btn-buy:disabled{opacity:.6;cursor:not-allowed}
+
+    /* ── CART SIDEBAR ── */
+    .cart-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;align-items:flex-end;justify-content:flex-end}
+    .cart-overlay.open{display:flex}
+    .cart-panel{background:#fff;width:380px;height:100vh;display:flex;flex-direction:column;animation:slideIn .3s ease;box-shadow:-4px 0 24px rgba(0,0,0,.15)}
+    @keyframes slideIn{from{transform:translateX(100%)}to{transform:translateX(0)}}
+    .cart-head{background:var(--g);padding:16px 18px;display:flex;align-items:center;justify-content:space-between}
+    .cart-head h3{color:#fff;font-family:'Playfair Display',serif;font-size:18px;font-weight:700}
+    .cart-close{background:none;border:none;color:#fff;font-size:22px;cursor:pointer;line-height:1}
+    .cart-body{flex:1;overflow-y:auto;padding:14px 18px}
+    .cart-item{display:flex;gap:10px;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--bd)}
+    .cart-item-img{width:52px;height:52px;border-radius:8px;background:var(--bg2);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;overflow:hidden}
+    .cart-item-img img{width:100%;height:100%;object-fit:cover}
+    .cart-item-info{flex:1}
+    .cart-item-name{font-size:12px;font-weight:700;margin-bottom:2px;color:var(--tx)}
+    .cart-item-var{font-size:11px;color:var(--tx3);margin-bottom:5px}
+    .cart-item-qty{display:flex;align-items:center;gap:6px}
+    .cq-btn{width:22px;height:22px;border:1.5px solid var(--bd);border-radius:4px;background:#fff;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;transition:background .15s}
+    .cq-btn:hover{background:var(--bg2)}
+    .cart-item-price{font-size:13px;font-weight:800;color:var(--g);align-self:center}
+    .cart-empty{text-align:center;padding:40px 16px;color:var(--tx3)}
+    .cart-foot{padding:14px 18px;border-top:1.5px solid var(--bd)}
+    .cart-total-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+    .cart-total-lbl{font-size:13px;color:var(--tx2);font-weight:700}
+    .cart-total-val{font-family:'Playfair Display',serif;font-size:22px;font-weight:900;color:var(--g)}
+    .cart-del-note{font-size:11px;color:#2d6a4f;background:#e8f5e9;padding:4px 10px;border-radius:16px;margin-bottom:10px;text-align:center;font-weight:700}
+    .cart-checkout-btn{width:100%;padding:14px;background:var(--g);border:none;border-radius:12px;color:#fff;font-size:14px;font-weight:800;cursor:pointer;font-family:'Lato',sans-serif;transition:background .2s;display:flex;align-items:center;justify-content:center;gap:7px}
+    .cart-checkout-btn:hover{background:var(--g2)}
+    .cart-pay-chips{display:flex;gap:5px;justify-content:center;margin-top:8px;flex-wrap:wrap}
+    .cart-pay-chip{font-size:10px;background:var(--bg2);color:var(--tx3);padding:3px 7px;border-radius:4px;font-weight:700}
+
+    /* ── PAYMENT MODAL ── */
+    .pay-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:1100;align-items:center;justify-content:center;padding:16px}
+    .pay-overlay.open{display:flex}
+    .pay-modal{background:#fff;border-radius:18px;width:460px;max-width:100%;max-height:90vh;overflow-y:auto;animation:fadeUp .3s ease;box-shadow:0 24px 60px rgba(0,0,0,.25)}
+    @keyframes fadeUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+    .pay-head{background:var(--g);padding:14px 18px;border-radius:18px 18px 0 0;display:flex;align-items:center;justify-content:space-between}
+    .pay-head h3{color:#fff;font-family:'Playfair Display',serif;font-size:17px}
+    .pay-body{padding:18px}
+    .pay-sec{margin-bottom:16px}
+    .pay-sec-title{font-size:11px;font-weight:800;color:var(--tx3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:9px}
+    .pay-order-item{display:flex;justify-content:space-between;font-size:13px;color:var(--tx2);margin-bottom:5px}
+    .pay-divider{border:none;border-top:1px dashed var(--bd);margin:10px 0}
+    .pay-total-row{display:flex;justify-content:space-between;font-size:15px;font-weight:900;color:var(--g)}
+    .pay-methods{display:flex;flex-direction:column;gap:7px}
+    .pay-method{display:flex;align-items:center;gap:10px;padding:10px 13px;border:1.5px solid var(--bd);border-radius:10px;cursor:pointer;transition:all .2s}
+    .pay-method:hover,.pay-method.sel{border-color:var(--g);background:#f0f7f0}
+    .pay-method-icon{width:30px;height:30px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:16px}
+    .pay-method-name{font-size:13px;font-weight:700;color:var(--tx)}
+    .pay-method-desc{font-size:11px;color:var(--tx3)}
+    .pay-method-check{width:17px;height:17px;border-radius:50%;border:2px solid var(--bd);display:flex;align-items:center;justify-content:center;margin-left:auto;font-size:9px;transition:all .2s}
+    .pay-method.sel .pay-method-check{border-color:var(--g);background:var(--g);color:#fff}
+    .pay-addr-input{width:100%;padding:9px 12px;border:1.5px solid var(--bd);border-radius:8px;font-family:'Lato',sans-serif;font-size:13px;color:var(--tx);margin-bottom:7px;outline:none}
+    .pay-addr-input:focus{border-color:var(--g)}
+    .pay-place-btn{width:100%;padding:14px;background:var(--gd);border:none;border-radius:12px;color:#fff;font-size:15px;font-weight:800;cursor:pointer;font-family:'Lato',sans-serif;transition:background .2s;letter-spacing:.3px}
+    .pay-place-btn:hover{background:#a87820}
+
+    /* ── SUCCESS OVERLAY ── */
+    .success-overlay{display:none;position:fixed;inset:0;background:#fff;z-index:1200;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:32px}
+    .success-overlay.open{display:flex}
+    .success-overlay .s-icon{font-size:72px;margin-bottom:16px}
+    .success-overlay h2{font-family:'Playfair Display',serif;font-size:28px;color:var(--g);margin-bottom:8px}
+    .success-overlay p{color:var(--tx3);font-size:14px;margin-bottom:24px;line-height:1.6}
+    .success-overlay .s-btn{padding:13px 28px;background:var(--g);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:800;cursor:pointer;font-family:'Lato',sans-serif}
+    @media(max-width:768px){.cart-panel{width:100%}.pay-modal{width:100%}}
   </style>
 </head>
 <body>
@@ -225,8 +309,19 @@
     </div>
   </a>
   <button class="nav-back" onclick="document.referrer ? history.back() : window.location.href='/'">← Back to Store</button>
-  <button class="cart-btn" onclick="goToCart()" id="nav-cart-btn">🛒 Cart (<span id="nav-cart-count">0</span>)</button>
+  <button class="cart-btn" onclick="openCartPanel()" id="nav-cart-btn">🛒 Cart (<span id="nav-cart-count">0</span>)</button>
 </nav>
+
+<!-- AI ADMIN BAR -->
+<div class="ai-bar">
+  <label>⚡ Add Product:</label>
+  <input class="ai-prod-input" id="ai-prod-input" type="text" placeholder="e.g. Himalayan Pink Salt, Wild Honey..." onkeydown="if(event.key==='Enter')aiGenerateProduct()">
+  <button class="ai-gen-btn" id="ai-gen-btn" onclick="aiGenerateProduct()">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+    Auto-Generate with AI
+  </button>
+  <span class="ai-hint">AI fills all product details automatically</span>
+</div>
 
 <!-- BREADCRUMB -->
 <div class="breadcrumb">
@@ -241,6 +336,76 @@
     <div class="spinner"></div>
     <p style="color:var(--tx3);font-size:14px">Loading product…</p>
   </div>
+</div>
+
+<!-- CART SIDEBAR -->
+<div class="cart-overlay" id="cart-overlay" onclick="if(event.target===this)closeCartPanel()">
+  <div class="cart-panel">
+    <div class="cart-head">
+      <h3>Your Cart</h3>
+      <button class="cart-close" onclick="closeCartPanel()">×</button>
+    </div>
+    <div class="cart-body" id="cart-panel-body">
+      <div class="cart-empty"><div style="font-size:40px;margin-bottom:10px">🛒</div><p style="font-size:13px">Your cart is empty</p></div>
+    </div>
+    <div class="cart-foot">
+      <div class="cart-total-row">
+        <span class="cart-total-lbl">Total</span>
+        <span class="cart-total-val" id="cart-panel-total">₹0</span>
+      </div>
+      <div class="cart-del-note" id="cart-del-note"></div>
+      <button class="cart-checkout-btn" onclick="openPaymentModal()">🔒 Proceed to Payment</button>
+      <div class="cart-pay-chips">
+        <span class="cart-pay-chip">UPI</span>
+        <span class="cart-pay-chip">Cards</span>
+        <span class="cart-pay-chip">COD</span>
+        <span class="cart-pay-chip">Net Banking</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PAYMENT MODAL -->
+<div class="pay-overlay" id="pay-overlay" onclick="if(event.target===this)closePaymentModal()">
+  <div class="pay-modal">
+    <div class="pay-head">
+      <h3>🔒 Secure Checkout</h3>
+      <button class="cart-close" onclick="closePaymentModal()">×</button>
+    </div>
+    <div class="pay-body">
+      <div class="pay-sec">
+        <p class="pay-sec-title">Order Summary</p>
+        <div id="pay-order-summary"></div>
+        <div class="pay-divider"></div>
+        <div class="pay-total-row"><span>Total</span><span id="pay-grand-total">₹0</span></div>
+      </div>
+      <div class="pay-sec">
+        <p class="pay-sec-title">Delivery Address</p>
+        <input class="pay-addr-input" type="text" placeholder="Full Name" id="pay-name">
+        <input class="pay-addr-input" type="text" placeholder="Phone Number">
+        <input class="pay-addr-input" type="text" placeholder="Address Line 1">
+        <input class="pay-addr-input" type="text" placeholder="City, State, PIN Code">
+      </div>
+      <div class="pay-sec">
+        <p class="pay-sec-title">Payment Method</p>
+        <div class="pay-methods">
+          <div class="pay-method sel" onclick="selectPayMethod(this)"><div class="pay-method-icon" style="background:#f0f7f0">💳</div><div><div class="pay-method-name">UPI / QR Code</div><div class="pay-method-desc">PhonePe, GPay, Paytm, BHIM</div></div><div class="pay-method-check">✓</div></div>
+          <div class="pay-method" onclick="selectPayMethod(this)"><div class="pay-method-icon" style="background:#fff3e0">🏦</div><div><div class="pay-method-name">Credit / Debit Card</div><div class="pay-method-desc">Visa, Mastercard, RuPay</div></div><div class="pay-method-check"></div></div>
+          <div class="pay-method" onclick="selectPayMethod(this)"><div class="pay-method-icon" style="background:#e8f5e9">🚚</div><div><div class="pay-method-name">Cash on Delivery</div><div class="pay-method-desc">Pay when your order arrives</div></div><div class="pay-method-check"></div></div>
+          <div class="pay-method" onclick="selectPayMethod(this)"><div class="pay-method-icon" style="background:#e3f2fd">🏛️</div><div><div class="pay-method-name">Net Banking</div><div class="pay-method-desc">All major Indian banks</div></div><div class="pay-method-check"></div></div>
+        </div>
+      </div>
+      <button class="pay-place-btn" onclick="placeOrderNow()">Place Order Securely 🔒</button>
+    </div>
+  </div>
+</div>
+
+<!-- ORDER SUCCESS -->
+<div class="success-overlay" id="success-overlay">
+  <div class="s-icon">🎉</div>
+  <h2>Order Placed!</h2>
+  <p>Thank you! Your Himalayan product is on its way.<br>You will receive a confirmation shortly.</p>
+  <button class="s-btn" onclick="document.getElementById('success-overlay').classList.remove('open');window.location.href='/'">Continue Shopping</button>
 </div>
 
 <!-- TOAST -->
@@ -267,9 +432,16 @@ function updateNavCart() {
   if (el) el.textContent = total;
 }
 
-// ── Go to cart — passes cart state back to main site ──
+// ── Go to cart — opens cart panel ──
 function goToCart() {
-  window.location.href = '/?opencart=1';
+  openCartPanel();
+}
+function openCartPanel() {
+  renderCartPanel();
+  document.getElementById('cart-overlay').classList.add('open');
+}
+function closeCartPanel() {
+  document.getElementById('cart-overlay').classList.remove('open');
 }
 
 // ── Load cart from localStorage ──
@@ -536,7 +708,8 @@ function renderProduct(p, images, related, data, stateMap) {
             '<span class="qty-num" id="qty-display">1</span>' +
             '<button class="qty-btn" onclick="changeQty(1)">+</button>' +
           '</div>' +
-          '<button class="atc-btn" id="atc-btn" onclick="addToCartProduct()" ' + (stock<=0?'disabled':'') + '>⚡ Buy Now</button>' +
+          '<button class="atc-btn-add" id="atc-add-btn" onclick="addToCartProduct(\'addcart\')" ' + (stock<=0?'disabled':'') + '>🛒 Add to Cart</button>' +
+          '<button class="atc-btn-buy" id="atc-btn" onclick="addToCartProduct(\'buynow\')" ' + (stock<=0?'disabled':'') + '>⚡ Buy Now</button>' +
           '<button class="wl-btn-lg' + (wishlist.includes(p.id)?' active':'') + '" onclick="toggleWL()" id="wl-btn">' + (wishlist.includes(p.id)?'❤️':'🤍') + '</button>' +
           '<button class="share-btn" onclick="shareProduct()" title="Share this product">🔗</button>' +
         '</div>' +
@@ -668,7 +841,7 @@ function shareProduct() {
 }
 function showToastP(msg) { var t=document.getElementById('toast'); if(t){t.textContent=msg;t.style.opacity=1;setTimeout(function(){t.style.opacity=0;},2200);} }
 
-function addToCartProduct() {
+function addToCartProduct(mode) {
   if (!PRODUCT) return;
   var price = selectedVariant ? selectedVariant.price : PRODUCT.price;
   var variantId = selectedVariant ? selectedVariant.id : null;
@@ -683,9 +856,22 @@ function addToCartProduct() {
 
   try { localStorage.setItem('pr_cart', JSON.stringify(cart)); } catch(e) {}
   updateNavCart();
-  showToast('✅ ' + displayName + ' added! Cart: ' + cart.reduce(function(s,x){return s+(x.qty||0);},0) + ' items');
-  document.getElementById('atc-btn').textContent = '✅ Added!';
-  setTimeout(function() { document.getElementById('atc-btn').innerHTML = '⚡ Buy Now'; }, 1500);
+
+  if (mode === 'buynow') {
+    // Buy Now → open cart panel (Amazon style) → user proceeds to payment
+    openCartPanel();
+    showToast('🛒 Review your cart & checkout!');
+  } else {
+    // Add to Cart → show confirmation, stay on page
+    showToast('✅ ' + displayName + ' added to cart!');
+    var addBtn = document.getElementById('atc-add-btn');
+    if (addBtn) {
+      addBtn.textContent = '✅ Added!';
+      addBtn.classList.add('added');
+      setTimeout(function() { addBtn.textContent = '🛒 Add to Cart'; addBtn.classList.remove('added'); }, 1600);
+    }
+  }
+
   // Reset qty to 1 after adding
   qty = 1;
   var qd = document.getElementById('qty-display');
@@ -721,6 +907,135 @@ function goToProduct(slug) {
 function showNotFound(msg) {
   document.getElementById('main-content').innerHTML =
     '<div class="not-found"><h2>Product not found</h2><p>' + msg + '</p><br><a href="/" style="color:var(--g);font-weight:700">← Back to store</a></div>';
+}
+
+// ── Render cart panel ──
+function renderCartPanel() {
+  var total = cart.reduce(function(s,i){return s+(i.price*i.qty);},0);
+  document.getElementById('cart-panel-total').textContent = '₹' + total.toLocaleString('en-IN');
+  var delNote = document.getElementById('cart-del-note');
+  if (delNote) {
+    delNote.style.display = total > 0 ? 'block' : 'none';
+    delNote.textContent = total >= 799 ? '🎉 Free delivery on this order!' : 'Add ₹' + (799 - total) + ' more for free delivery';
+  }
+  var body = document.getElementById('cart-panel-body');
+  if (!cart.length) {
+    body.innerHTML = '<div class="cart-empty"><div style="font-size:40px;margin-bottom:10px">🛒</div><p style="font-size:13px">Your cart is empty</p></div>';
+    return;
+  }
+  body.innerHTML = cart.map(function(item, idx) {
+    var imgHtml = item.image
+      ? '<img src="' + item.image + '" alt="">'
+      : (item.emoji || '🌿');
+    return '<div class="cart-item">' +
+      '<div class="cart-item-img">' + imgHtml + '</div>' +
+      '<div class="cart-item-info">' +
+        '<div class="cart-item-name">' + item.name + '</div>' +
+        '<div class="cart-item-var">Qty: ' + item.qty + '</div>' +
+        '<div class="cart-item-qty">' +
+          '<button class="cq-btn" onclick="cartAdjQty(' + idx + ',-1)">−</button>' +
+          '<span style="font-size:12px;font-weight:800;min-width:18px;text-align:center">' + item.qty + '</span>' +
+          '<button class="cq-btn" onclick="cartAdjQty(' + idx + ',1)">+</button>' +
+          '<button onclick="cartRemoveItem(' + idx + ')" style="margin-left:8px;background:none;border:none;color:#c0392b;font-size:11px;cursor:pointer;font-weight:700">Remove</button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="cart-item-price">₹' + (item.price * item.qty).toLocaleString('en-IN') + '</div>' +
+    '</div>';
+  }).join('');
+}
+function cartAdjQty(idx, d) {
+  cart[idx].qty += d;
+  if (cart[idx].qty <= 0) cart.splice(idx, 1);
+  try { localStorage.setItem('pr_cart', JSON.stringify(cart)); } catch(e) {}
+  updateNavCart();
+  renderCartPanel();
+}
+function cartRemoveItem(idx) {
+  cart.splice(idx, 1);
+  try { localStorage.setItem('pr_cart', JSON.stringify(cart)); } catch(e) {}
+  updateNavCart();
+  renderCartPanel();
+}
+
+// ── Payment modal ──
+function openPaymentModal() {
+  closeCartPanel();
+  var total = cart.reduce(function(s,i){return s+(i.price*i.qty);},0);
+  document.getElementById('pay-grand-total').textContent = '₹' + total.toLocaleString('en-IN');
+  document.getElementById('pay-order-summary').innerHTML = cart.length
+    ? cart.map(function(i){ return '<div class="pay-order-item"><span>' + i.name + ' ×' + i.qty + '</span><span>₹' + (i.price*i.qty).toLocaleString('en-IN') + '</span></div>'; }).join('')
+    : '<div class="pay-order-item" style="color:var(--tx3)">No items in cart</div>';
+  // Pre-fill name if known
+  var nameInput = document.getElementById('pay-name');
+  if (nameInput && !nameInput.value) nameInput.value = '';
+  document.getElementById('pay-overlay').classList.add('open');
+}
+function closePaymentModal() {
+  document.getElementById('pay-overlay').classList.remove('open');
+}
+function selectPayMethod(el) {
+  document.querySelectorAll('.pay-method').forEach(function(m){m.classList.remove('sel');m.querySelector('.pay-method-check').textContent='';});
+  el.classList.add('sel'); el.querySelector('.pay-method-check').textContent = '✓';
+}
+function placeOrderNow() {
+  closePaymentModal();
+  cart = [];
+  try { localStorage.setItem('pr_cart', JSON.stringify(cart)); } catch(e) {}
+  updateNavCart();
+  document.getElementById('success-overlay').classList.add('open');
+}
+
+// ── AI Product Generator ──
+async function aiGenerateProduct() {
+  var input = document.getElementById('ai-prod-input').value.trim();
+  if (!input) { showToast('Please enter a product name'); return; }
+  var btn = document.getElementById('ai-gen-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="ai-spin"></span> Generating...';
+  try {
+    var resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: 'Generate product data for "Pahadi Roots" Himalayan organic store. Product: "' + input + '". Return ONLY valid JSON (no markdown, no backticks, no explanation):\n{"name":"product display name","emoji":"single emoji","region":"Himalayan region","short_description":"2 sentence description","price":499,"mrp":699,"review_count":312,"available_stock":85,"badges":["organic"],"tags":["100% Natural","Direct from farmers","Lab tested","No preservatives","FSSAI Certified"],"long_description":"3-4 paragraph HTML description with benefits","variants":[{"id":1,"variant_value":"250g","price":299,"original_price":399,"available_stock":50},{"id":2,"variant_value":"500g","price":499,"original_price":699,"available_stock":85},{"id":3,"variant_value":"1kg","price":849,"original_price":1199,"available_stock":40}],"storage_instructions":"storage and care instructions","usage_instructions":"how to use instructions"}' }]
+      })
+    });
+    var data = await resp.json();
+    var text = data.content.map(function(c){return c.text||'';}).join('');
+    var clean = text.replace(/```json|```/g,'').trim();
+    var p = JSON.parse(clean);
+    // Inject as PRODUCT and render
+    PRODUCT = {
+      id: Date.now(),
+      name: p.name,
+      emoji: p.emoji || '🌿',
+      region: p.region || 'Himalayan',
+      short_description: p.short_description || '',
+      long_description: p.long_description || p.short_description || '',
+      price: p.variants ? p.variants[0].price : p.price,
+      mrp: p.variants ? p.variants[0].original_price : p.mrp,
+      available_stock: p.available_stock || 99,
+      review_count: p.review_count || 200,
+      badges: p.badges || [],
+      tags: p.tags || [],
+      image_url: '',
+      slug: p.name.toLowerCase().replace(/[^a-z0-9]+/g,'-')
+    };
+    VARIANTS = p.variants ? p.variants.map(function(v,i){return {id:v.id||i+1,product_id:PRODUCT.id,variant_value:v.variant_value,price:v.price,original_price:v.original_price,available_stock:v.available_stock||50};}) : [];
+    var stateMap = {};
+    document.getElementById('bc-name').textContent = PRODUCT.name;
+    document.getElementById('pg-title').textContent = PRODUCT.name + ' — Pahadi Roots';
+    renderProduct(PRODUCT, [], [], {settings:{}}, stateMap);
+    document.getElementById('ai-prod-input').value = '';
+    showToast('✨ ' + PRODUCT.name + ' loaded!');
+  } catch(e) {
+    showToast('AI generation failed — please try again');
+    console.error(e);
+  }
+  btn.disabled = false;
+  btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg> Auto-Generate with AI';
 }
 
 // ── Init ──
