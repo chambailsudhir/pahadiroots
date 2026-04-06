@@ -285,7 +285,7 @@ function updateAccountBtn() {
     if (ddLogin) ddLogin.style.display = 'none';
     if (ddLogout) ddLogout.style.display = 'block';
     // Show name pill on button
-    if (acctBtn) acctBtn.innerHTML = '<span style="display:inline-flex;align-items:center;gap:7px;background:#f0f7f4;border:1.5px solid #c8e6c9;padding:5px 13px 5px 7px;border-radius:24px;font-size:13px;font-weight:800;color:#1a3a1e"><span style="width:26px;height:26px;background:linear-gradient(135deg,#1a3a1e,#2d5233);border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;color:#fff;flex-shrink:0">' + initial + '</span>Hi, ' + firstName + '</span>';
+    if (acctBtn) { acctBtn.innerHTML = '<span style="display:inline-flex;align-items:center;gap:6px;background:#f0f7f4;border:1.5px solid #c8e6c9;padding:4px 10px 4px 5px;border-radius:24px;font-size:12px;font-weight:800;color:#1a3a1e;white-space:nowrap;max-width:140px;overflow:hidden"><span style="width:24px;height:24px;min-width:24px;background:linear-gradient(135deg,#1a3a1e,#2d5233);border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:#fff">' + initial + '</span>Hi, ' + firstName.slice(0,10) + '</span>'; acctBtn.style.background = 'none'; acctBtn.style.border = 'none'; acctBtn.style.padding = '0'; }
   } else if (_authToken) {
     if (ddName) ddName.textContent = 'My Account';
     if (ddLogin) ddLogin.style.display = 'none';
