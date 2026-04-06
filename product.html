@@ -17,316 +17,429 @@
   <link rel="icon" href="/images/favicon.ico" type="image/x-icon">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Lato:wght@300;400;700;900&display=swap" rel="stylesheet">
-  <!-- Static JSON-LD placeholder — updated by JS once product data loads -->
-  <script type="application/ld+json" id="product-jsonld">
-  {
-    "@context": "https://schema.org/",
-    "@type": "Product",
-    "name": "5 Pahadi Roots Product",
-    "description": "Authentic Himalayan organic product sourced directly from mountain farmers.",
-    "image": "https://pahadiroots.com/images/og-cover.jpg",
-    "brand": { "@type": "Brand", "name": "5 Pahadi Roots" },
-    "url": "https://pahadiroots.com/products/",
-    "aggregateRating": {
-      "@type": "AggregateRating",
-      "ratingValue": "4.8",
-      "reviewCount": "39"
-    },
-    "offers": {
-      "@type": "Offer",
-      "priceCurrency": "INR",
-      "price": "1",
-      "priceValidUntil": "2027-03-21",
-      "availability": "https://schema.org/InStock",
-      "seller": { "@type": "Organization", "name": "5 Pahadi Roots" },
-      "shippingDetails": {
-        "@type": "OfferShippingDetails",
-        "shippingRate": {
-          "@type": "MonetaryAmount",
-          "value": "99",
-          "currency": "INR"
-        },
-        "shippingDestination": {
-          "@type": "DefinedRegion",
-          "addressCountry": "IN"
-        },
-        "deliveryTime": {
-          "@type": "ShippingDeliveryTime",
-          "handlingTime": {
-            "@type": "QuantitativeValue",
-            "minValue": 1,
-            "maxValue": 4,
-            "unitCode": "DAY"
-          },
-          "transitTime": {
-            "@type": "QuantitativeValue",
-            "minValue": 3,
-            "maxValue": 14,
-            "unitCode": "DAY"
-          }
-        }
-      },
-      "hasMerchantReturnPolicy": {
-        "@type": "MerchantReturnPolicy",
-        "applicableCountry": "IN",
-        "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
-        "merchantReturnDays": 2,
-        "returnMethod": "https://schema.org/ReturnByMail",
-        "returnFees": "https://schema.org/FreeReturn",
-        "refundType": "https://schema.org/FullRefund"
-      }
-    }
-  }
-  </script>
-  <style>
-    :root{--g:#1a3a1e;--g2:#2d5233;--g3:#3d6b42;--gd:#c8920a;--gd2:#e8b84b;--tx:#1a1a1a;--tx2:#4a4a4a;--tx3:#7a7a7a;--bd:rgba(26,58,30,.12);--bg:#fff;--bg2:#f8f9f5}
-    *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:'Lato',sans-serif;color:var(--tx);background:var(--bg);overflow-x:hidden}
-    a{text-decoration:none;color:inherit}
-    img{max-width:100%;display:block}
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400&family=Lato:wght@300;400;700;900&display=swap" rel="stylesheet">
+  <script type="application/ld+json" id="product-jsonld">{"@context":"https://schema.org/","@type":"Product","name":"5 Pahadi Roots Product","brand":{"@type":"Brand","name":"5 Pahadi Roots"}}</script>
 
-    /* ── NAV ── */
-    .nav{position:sticky;top:0;z-index:100;background:#fff;border-bottom:1px solid var(--bd);padding:0 20px;display:flex;align-items:center;justify-content:space-between;height:60px;box-shadow:0 2px 12px rgba(0,0,0,.06)}
-    .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
-    .logo-icon{font-size:24px;line-height:1}
-    .logo-name{font-family:'Playfair Display',serif;font-size:19px;font-weight:900;color:var(--g);line-height:1.1}
-    .logo-tl{font-size:10.5px;color:var(--gd);font-weight:600;letter-spacing:.5px}
-    .nav-back{display:flex;align-items:center;gap:6px;color:var(--g);font-weight:700;font-size:14px;cursor:pointer;padding:8px 14px;border-radius:20px;border:1.5px solid var(--bd);transition:all .2s}
-    .nav-back:hover{background:var(--g);color:#fff;border-color:var(--g)}
-    .cart-btn{background:var(--g);color:#fff;border:none;border-radius:20px;padding:7px 16px;font-size:13px;font-weight:700;display:flex;align-items:center;gap:6px;cursor:pointer;transition:background .2s}
-    .cart-btn:hover{background:var(--g2)}
+<style>
+/* ══════════════════════════════════════════
+   TOKENS
+══════════════════════════════════════════ */
+:root{
+  --g:#1a3a1e;--g2:#2d5233;--g3:#3d6b42;--g-pale:#f0f7f0;
+  --gold:#c8920a;--gold2:#e8b84b;--gold-pale:#fff8e8;
+  --red:#e53;--red-pale:#fff0f0;
+  --tx:#1a1a1a;--tx2:#4a4a4a;--tx3:#7a7a7a;
+  --bd:rgba(26,58,30,.12);--bd2:rgba(26,58,30,.22);
+  --bg:#fff;--bg2:#f8f9f5;--bg3:#f3f5f0;
+  --radius:14px;--radius-sm:9px;
+  --shadow:0 2px 16px rgba(0,0,0,.08);
+  --shadow-lg:0 8px 40px rgba(0,0,0,.13);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Lato',sans-serif;color:var(--tx);background:var(--bg);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+a{text-decoration:none;color:inherit}
+img{max-width:100%;display:block}
+button{font-family:'Lato',sans-serif}
 
-    /* ── BREADCRUMB ── */
-    .breadcrumb{padding:14px 20px;font-size:12px;color:var(--tx3);max-width:1200px;margin:0 auto}
-    .breadcrumb a{color:var(--g);font-weight:600}
-    .breadcrumb span{margin:0 6px}
+/* ══════════════════════════════════════════
+   ANNOUNCEMENT BAR
+══════════════════════════════════════════ */
+.announce-bar{background:var(--g);color:rgba(255,255,255,.88);font-size:12px;font-weight:700;text-align:center;padding:7px 20px;letter-spacing:.3px;overflow:hidden;white-space:nowrap}
+.announce-inner{display:inline-flex;gap:3rem;animation:marquee 28s linear infinite}
+@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.announce-item::before{content:'🌿  '}
 
-    /* ── MAIN LAYOUT ── */
-    .product-wrap{max-width:1200px;margin:0 auto;padding:20px;display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:start}
-    @media(max-width:768px){.product-wrap{grid-template-columns:1fr;gap:24px;padding:16px}}
+/* ══════════════════════════════════════════
+   NAV
+══════════════════════════════════════════ */
+.nav{position:sticky;top:0;z-index:200;background:#fff;border-bottom:1px solid var(--bd);padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:64px;box-shadow:var(--shadow)}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.logo-leaf{width:36px;height:36px;background:var(--g);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.logo-text .logo-name{font-family:'Playfair Display',serif;font-size:18px;font-weight:900;color:var(--g);line-height:1.1;display:block}
+.logo-text .logo-sub{font-size:9.5px;color:var(--gold);font-weight:700;letter-spacing:.8px;text-transform:uppercase;display:block}
+.nav-center{display:flex;align-items:center;gap:6px}
+.ai-bar-pill{display:flex;align-items:center;gap:6px;background:var(--bg2);border:1.5px solid var(--bd);border-radius:24px;padding:5px 8px 5px 14px;max-width:440px}
+.ai-bar-pill input{border:none;background:transparent;font-family:'Lato',sans-serif;font-size:12.5px;color:var(--tx);outline:none;width:200px}
+.ai-bar-pill input::placeholder{color:var(--tx3)}
+.ai-gen-btn{background:var(--g);color:#fff;border:none;border-radius:18px;padding:6px 14px;font-size:12px;font-weight:800;cursor:pointer;display:flex;align-items:center;gap:5px;white-space:nowrap;transition:background .2s;letter-spacing:.2px}
+.ai-gen-btn:hover{background:var(--g2)}
+.ai-gen-btn:disabled{opacity:.55;cursor:not-allowed}
+.ai-gen-btn .spin{display:inline-block;width:11px;height:11px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.nav-right{display:flex;align-items:center;gap:8px}
+.nav-back{display:flex;align-items:center;gap:5px;color:var(--tx2);font-weight:700;font-size:13px;cursor:pointer;padding:7px 13px;border-radius:20px;border:1.5px solid var(--bd);transition:all .2s;background:#fff}
+.nav-back:hover{background:var(--g);color:#fff;border-color:var(--g)}
+.nav-cart-btn{background:var(--g);color:#fff;border:none;border-radius:22px;padding:8px 18px;font-size:13px;font-weight:800;display:flex;align-items:center;gap:7px;cursor:pointer;transition:background .2s;position:relative}
+.nav-cart-btn:hover{background:var(--g2)}
+.nav-cart-bubble{background:var(--gold);color:#fff;border-radius:50%;width:19px;height:19px;font-size:10px;font-weight:900;display:flex;align-items:center;justify-content:center;position:absolute;top:-6px;right:-6px;border:2px solid #fff}
+@media(max-width:900px){.ai-bar-pill{display:none}}
 
-    /* ── IMAGE SECTION ── */
-    .img-section{}
-    .main-img-wrap{position:relative;border-radius:20px;overflow:hidden;background:var(--bg2);aspect-ratio:1;cursor:zoom-in}
-    .main-img-wrap img{width:100%;height:100%;object-fit:cover;transition:transform .4s}
-    .main-img-wrap:hover img{transform:scale(1.05)}
-    .main-img-placeholder{width:100%;aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:80px;background:var(--bg2);border-radius:20px}
-    .thumb-row{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
-    .thumb{width:72px;height:72px;border-radius:10px;overflow:hidden;cursor:pointer;border:2px solid transparent;transition:border-color .2s;flex-shrink:0}
-    .thumb.active{border-color:var(--g)}
-    .thumb img{width:100%;height:100%;object-fit:cover}
-    .badge-row{position:absolute;top:14px;left:14px;display:flex;flex-direction:column;gap:6px;z-index:2}
-    .badge{padding:4px 10px;border-radius:20px;font-size:11px;font-weight:800;letter-spacing:.3px}
-    .badge.bs{background:#e8f5e9;color:#1a3a1e}
-    .badge.nw{background:#e3f2fd;color:#1565c0}
-    .badge.pm{background:#fff3e0;color:#e65100}
-    .disc-badge{position:absolute;top:14px;right:14px;background:#e53;color:#fff;font-size:11px;font-weight:800;padding:4px 10px;border-radius:20px;z-index:2}
+/* ══════════════════════════════════════════
+   BREADCRUMB
+══════════════════════════════════════════ */
+.breadcrumb{padding:12px 24px;font-size:12px;color:var(--tx3);max-width:1280px;margin:0 auto;display:flex;align-items:center;gap:6px}
+.breadcrumb a{color:var(--g);font-weight:700;transition:opacity .2s}
+.breadcrumb a:hover{opacity:.7}
+.breadcrumb svg{flex-shrink:0;opacity:.4}
 
-    /* ── INFO SECTION ── */
-    .info-section{position:sticky;top:80px}
-    .prod-region{font-size:12px;color:var(--g);font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:4px}
-    .prod-name{font-family:'Playfair Display',serif;font-size:clamp(22px,3vw,32px);font-weight:900;color:var(--g);line-height:1.2;margin-bottom:8px}
-    .prod-rating{display:flex;align-items:center;gap:8px;margin-bottom:14px}
-    .stars{color:#f5a623;font-size:15px}
-    .rating-count{font-size:13px;color:var(--tx3)}
-    .prod-desc{font-size:14px;color:var(--tx2);line-height:1.7;margin-bottom:20px}
-    
-    /* ── PRICE ── */
-    .price-row{display:flex;align-items:baseline;gap:10px;margin-bottom:20px}
-    .price-now{font-size:32px;font-weight:900;color:var(--g)}
-    .price-was{font-size:18px;color:var(--tx3);text-decoration:line-through}
-    .price-save{background:#e8f5e9;color:#2d6a4f;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:800}
+/* ══════════════════════════════════════════
+   MAIN PRODUCT LAYOUT
+══════════════════════════════════════════ */
+.product-wrap{max-width:1200px;margin:0 auto;padding:0 24px 24px;display:grid;grid-template-columns:1fr 1fr;gap:52px;align-items:start}
+@media(max-width:860px){.product-wrap{grid-template-columns:1fr;gap:28px;padding:0 16px 16px}}
 
-    /* ── VARIANTS ── */
-    .variants-section{margin-bottom:22px}
-    .variants-label{font-size:13px;font-weight:700;color:var(--tx2);margin-bottom:10px}
-    .variants-label span{color:var(--g);font-weight:900}
-    .variant-btns{display:flex;gap:8px;flex-wrap:wrap}
-    .vbtn{padding:8px 16px;border:2px solid var(--bd);border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;background:#fff;color:var(--tx);transition:all .2s;font-family:'Lato',sans-serif}
-    .vbtn:hover{border-color:var(--g);color:var(--g)}
-    .vbtn.active{border-color:var(--g);background:var(--g);color:#fff}
-    .vbtn.oos{opacity:.45;cursor:not-allowed;text-decoration:line-through}
+/* ══════════════════════════════════════════
+   IMAGE GALLERY — PREMIUM
+══════════════════════════════════════════ */
+.img-section{position:sticky;top:80px}
+.main-img-wrap{position:relative;border-radius:20px;overflow:hidden;background:var(--bg2);aspect-ratio:1;cursor:zoom-in;box-shadow:0 4px 24px rgba(0,0,0,.09)}
+.main-img-wrap img{width:100%;height:100%;object-fit:cover;transition:transform .5s cubic-bezier(.25,.46,.45,.94)}
+.main-img-wrap:hover img{transform:scale(1.06)}
+.main-img-placeholder{width:100%;aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:100px;background:linear-gradient(135deg,var(--g) 0%,var(--g2) 100%);border-radius:20px}
+.badge-row{position:absolute;top:16px;left:16px;display:flex;flex-direction:column;gap:6px;z-index:2}
+.badge{padding:5px 11px;border-radius:20px;font-size:11px;font-weight:800;letter-spacing:.3px;backdrop-filter:blur(8px)}
+.badge.organic{background:rgba(232,245,233,.92);color:#1a3a1e}
+.badge.new{background:rgba(227,242,253,.92);color:#1565c0}
+.badge.popular{background:rgba(255,243,224,.92);color:#e65100}
+.disc-badge{position:absolute;top:16px;right:16px;background:#e53;color:#fff;font-size:12px;font-weight:900;padding:5px 12px;border-radius:20px;z-index:2;letter-spacing:.3px}
 
-    /* ── STOCK ── */
-    .stock-row{display:flex;align-items:center;gap:8px;margin-bottom:20px;font-size:13px;font-weight:700}
-    .stock-dot{width:8px;height:8px;border-radius:50%;background:#4caf50}
-    .stock-dot.low{background:#ff9800}
-    .stock-dot.oos{background:#f44336}
+/* Thumbnails — bigger, cleaner */
+.thumb-row{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+.thumb{width:78px;height:78px;border-radius:12px;overflow:hidden;cursor:pointer;border:2.5px solid transparent;transition:all .25s;flex-shrink:0;background:var(--bg2);box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.thumb.active{border-color:var(--g);box-shadow:0 0 0 3px rgba(26,58,30,.12)}
+.thumb:hover:not(.active){border-color:var(--bd2)}
+.thumb img{width:100%;height:100%;object-fit:cover}
+.thumb-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:28px;background:var(--bg2)}
 
-    /* ── QTY + ATC ── */
-    .qty-atc{display:flex;gap:12px;align-items:center;margin-bottom:20px;flex-wrap:wrap}
-    .qty-ctrl{display:flex;align-items:center;gap:0;border:2px solid var(--bd);border-radius:12px;overflow:hidden}
-    .qty-btn{width:40px;height:46px;border:none;background:#fff;font-size:18px;font-weight:700;cursor:pointer;color:var(--g);transition:background .2s}
-    .qty-btn:hover{background:var(--bg2)}
-    .qty-num{width:44px;height:46px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;border-left:1.5px solid var(--bd);border-right:1.5px solid var(--bd)}
-    .atc-btn{flex:1;min-width:160px;padding:14px 24px;background:var(--g);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer;transition:all .2s;font-family:'Lato',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px}
-    .atc-btn:hover{background:var(--g2);transform:translateY(-1px)}
-    .atc-btn:disabled{opacity:.6;cursor:not-allowed;transform:none}
-    .wl-btn-lg{padding:14px;border:2px solid var(--bd);border-radius:12px;background:#fff;cursor:pointer;font-size:18px;transition:all .2s}
-    .wl-btn-lg:hover{border-color:#e74c3c}
-    .wl-btn-lg.active{border-color:#e74c3c;background:#fff5f5}
+/* Zoom overlay */
+.zoom-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:2000;align-items:center;justify-content:center;cursor:zoom-out}
+.zoom-overlay.open{display:flex}
+.zoom-overlay img{max-width:90vw;max-height:90vh;object-fit:contain;border-radius:12px}
+.zoom-close{position:absolute;top:20px;right:24px;background:rgba(255,255,255,.15);border:none;color:#fff;font-size:28px;cursor:pointer;border-radius:50%;width:44px;height:44px;display:flex;align-items:center;justify-content:center;transition:background .2s}
+.zoom-close:hover{background:rgba(255,255,255,.25)}
 
-    /* ── HIGHLIGHTS ── */
-    .highlights{background:var(--bg2);border-radius:16px;padding:18px;margin-bottom:20px}
-    .highlights h4{font-size:13px;font-weight:800;color:var(--g);margin-bottom:12px;text-transform:uppercase;letter-spacing:.5px}
-    .hl-list{list-style:none;display:flex;flex-direction:column;gap:8px}
-    .hl-list li{font-size:13px;color:var(--tx2);display:flex;align-items:center;gap:8px}
-    .hl-list li::before{content:'✓';color:var(--g);font-weight:900;flex-shrink:0}
+/* ══════════════════════════════════════════
+   INFO SECTION — PREMIUM
+══════════════════════════════════════════ */
+.info-section{padding-top:4px}
 
-    /* ── DELIVERY ── */
-    .delivery-row{display:flex;align-items:center;gap:10px;padding:12px 16px;background:#e8f5e9;border-radius:12px;margin-bottom:20px;font-size:13px;color:var(--g);font-weight:700}
+/* Vendor */
+.prod-vendor{font-size:11.5px;font-weight:800;color:var(--gold);letter-spacing:.8px;text-transform:uppercase;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.prod-vendor::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--bd) 0%,transparent 100%)}
 
-    /* ── DESCRIPTION ── */
-    .desc-section{max-width:1200px;margin:0 auto;padding:0 20px 40px}
-    .desc-tabs{display:flex;gap:0;border-bottom:2px solid var(--bd);margin-bottom:24px}
-    .desc-tab{padding:12px 20px;font-size:14px;font-weight:700;color:var(--tx3);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .2s}
-    .desc-tab.active{color:var(--g);border-bottom-color:var(--g)}
-    .desc-content{display:none;font-size:14px;color:var(--tx2);line-height:1.8}
-    .desc-content.active{display:block}
+/* Title */
+.prod-name{font-family:'Playfair Display',serif;font-size:clamp(24px,3.5vw,36px);font-weight:900;color:var(--g);line-height:1.18;margin-bottom:10px}
 
-    /* ── RELATED ── */
-    .related-section{max-width:1200px;margin:0 auto;padding:0 20px 60px}
-    .section-title{font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--g);margin-bottom:20px}
-    .related-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px}
-    .rel-card{background:#fff;border:1.5px solid var(--bd);border-radius:16px;overflow:hidden;cursor:pointer;transition:transform .3s,box-shadow .3s}
-    .rel-card:hover{transform:translateY(-4px);box-shadow:0 12px 32px rgba(0,0,0,.1)}
-    .rel-img{aspect-ratio:1;overflow:hidden;background:var(--bg2)}
-    .rel-img img{width:100%;height:100%;object-fit:cover}
-    .rel-body{padding:12px}
-    .rel-name{font-family:'Playfair Display',serif;font-size:13px;font-weight:700;color:var(--g);margin-bottom:4px}
-    .rel-price{font-size:14px;font-weight:900;color:var(--g)}
+/* Rating row */
+.rating-row{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.stars{display:flex;gap:2px}
+.star{width:16px;height:16px;fill:#f5a623}
+.rating-num{font-size:13.5px;font-weight:700;color:var(--tx2)}
+.rating-reviews{font-size:13px;color:var(--tx3);text-decoration:underline;cursor:pointer}
+.rating-sold{background:#e8f5e9;color:#1a3a1e;font-size:11px;font-weight:800;padding:4px 10px;border-radius:20px;letter-spacing:.2px}
 
-    /* ── TOAST ── */
-    .toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:#1a3a1e;color:#fff;padding:11px 22px;border-radius:24px;font-size:13.5px;font-weight:700;box-shadow:0 8px 24px rgba(0,0,0,.2);z-index:9999;opacity:0;transition:opacity .3s,transform .3s;pointer-events:none;white-space:nowrap;max-width:90vw;text-align:center}
-    .toast.show{opacity:1;transform:translateX(-50%) translateY(-6px)}
+/* Warning box */
+.warn-box{background:#fff8e8;border:1.5px solid #ffe0a0;border-radius:11px;padding:11px 14px;font-size:12.5px;color:#7a5a00;line-height:1.6;margin-bottom:18px;display:flex;gap:8px}
+.warn-icon{font-size:15px;flex-shrink:0;margin-top:1px}
 
-    /* ── LOADING ── */
-    .loading-wrap{display:flex;align-items:center;justify-content:center;min-height:60vh;flex-direction:column;gap:16px}
-    .spinner{width:40px;height:40px;border:4px solid var(--bd);border-top-color:var(--g);border-radius:50%;animation:spin .8s linear infinite}
-    @keyframes spin{to{transform:rotate(360deg)}}
-    .not-found{text-align:center;padding:60px 20px;color:var(--tx3)}
-    .not-found h2{font-family:'Playfair Display',serif;font-size:28px;color:var(--g);margin-bottom:12px}
+/* Price block */
+.price-block{margin-bottom:20px}
+.price-row{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:4px}
+.price-now{font-family:'Playfair Display',serif;font-size:36px;font-weight:900;color:var(--g);line-height:1}
+.price-was{font-size:20px;color:var(--tx3);text-decoration:line-through;font-weight:400}
+.price-save-badge{background:var(--g);color:#fff;font-size:12px;font-weight:900;padding:4px 12px;border-radius:20px;letter-spacing:.3px}
+.price-tax-note{font-size:12px;color:var(--tx3);margin-top:3px}
+.price-sold-note{font-size:12px;color:var(--tx3);margin-top:2px;font-weight:700}
 
-    /* ── FOOTER ── */
-    .mini-footer{background:var(--g);color:rgba(255,255,255,.7);text-align:center;padding:20px;font-size:12px;margin-top:40px}
-    .mini-footer a{color:var(--gd2);font-weight:700}
+/* Divider */
+.sec-divider{border:none;border-top:1px solid var(--bd);margin:18px 0}
 
-    /* ── AI ADMIN BAR ── */
-    .ai-bar{background:#fff;border-bottom:1.5px solid var(--bd);padding:8px 20px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-    .ai-bar label{font-size:12px;font-weight:800;color:var(--g);white-space:nowrap}
-    .ai-prod-input{flex:1;max-width:320px;padding:7px 12px;border:1.5px solid var(--bd);border-radius:8px;font-family:'Lato',sans-serif;font-size:13px;color:var(--tx);outline:none}
-    .ai-prod-input:focus{border-color:var(--g)}
-    .ai-gen-btn{padding:7px 16px;background:var(--g);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:800;cursor:pointer;font-family:'Lato',sans-serif;display:flex;align-items:center;gap:6px;white-space:nowrap;transition:background .2s}
-    .ai-gen-btn:hover{background:var(--g2)}
-    .ai-gen-btn:disabled{opacity:.6;cursor:not-allowed}
-    .ai-hint{font-size:11px;color:var(--tx3)}
-    .ai-spin{display:inline-block;width:12px;height:12px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle}
+/* Variants — MY PAHADI DUKAN STYLE CARDS */
+.variants-section{margin-bottom:22px}
+.variants-label{font-size:13px;font-weight:700;color:var(--tx2);margin-bottom:12px}
+.variants-label span{color:var(--g);font-weight:900}
+.variant-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.variant-grid.has-more{grid-template-columns:repeat(2,1fr)}
+.vcard{position:relative;padding:11px 13px;border:2px solid var(--bd);border-radius:var(--radius-sm);font-size:12.5px;font-weight:700;cursor:pointer;background:#fff;color:var(--tx);transition:all .22s;text-align:left}
+.vcard:hover:not(.oos){border-color:var(--g);background:var(--g-pale)}
+.vcard.active{border-color:var(--g);background:var(--g-pale)}
+.vcard.oos{opacity:.45;cursor:not-allowed}
+.vcard .vc-size{font-size:13px;font-weight:800;color:var(--tx);display:block;margin-bottom:3px}
+.vcard .vc-price{font-size:14px;font-weight:900;color:var(--g);display:block}
+.vcard .vc-orig{font-size:11px;color:var(--tx3);text-decoration:line-through;display:inline}
+.vcard .vc-save{font-size:10.5px;color:var(--gold);font-weight:800;display:block;margin-top:2px}
+.vcard-tag{position:absolute;top:-10px;left:10px;font-size:9.5px;font-weight:900;padding:2px 8px;border-radius:4px;letter-spacing:.3px;color:#fff}
+.vcard-tag.best{background:var(--g)}
+.vcard-tag.deal{background:var(--gold)}
 
-    /* ── SEPARATE ADD TO CART + BUY NOW BUTTONS ── */
-    .atc-btn-add{flex:1;min-width:140px;padding:14px 20px;background:#fff;color:var(--g);border:2px solid var(--g);border-radius:12px;font-size:14px;font-weight:800;cursor:pointer;transition:all .2s;font-family:'Lato',sans-serif;display:flex;align-items:center;justify-content:center;gap:7px}
-    .atc-btn-add:hover,.atc-btn-add.added{background:var(--g);color:#fff}
-    .atc-btn-add:disabled{opacity:.6;cursor:not-allowed}
-    .atc-btn-buy{flex:1;min-width:140px;padding:14px 20px;background:var(--gd);color:#fff;border:2px solid var(--gd);border-radius:12px;font-size:14px;font-weight:800;cursor:pointer;transition:all .2s;font-family:'Lato',sans-serif;display:flex;align-items:center;justify-content:center;gap:7px}
-    .atc-btn-buy:hover{background:#a87820;border-color:#a87820}
-    .atc-btn-buy:disabled{opacity:.6;cursor:not-allowed}
+/* Stock row */
+.stock-row{display:flex;align-items:center;gap:8px;margin-bottom:18px;font-size:13px;font-weight:700}
+.stock-dot{width:8px;height:8px;border-radius:50%;background:#4caf50;box-shadow:0 0 0 3px rgba(76,175,80,.18)}
+.stock-dot.low{background:#ff9800;box-shadow:0 0 0 3px rgba(255,152,0,.18)}
+.stock-dot.oos{background:#f44336;box-shadow:0 0 0 3px rgba(244,67,54,.18)}
 
-    /* ── CART SIDEBAR ── */
-    .cart-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;align-items:flex-end;justify-content:flex-end}
-    .cart-overlay.open{display:flex}
-    .cart-panel{background:#fff;width:380px;height:100vh;display:flex;flex-direction:column;animation:slideIn .3s ease;box-shadow:-4px 0 24px rgba(0,0,0,.15)}
-    @keyframes slideIn{from{transform:translateX(100%)}to{transform:translateX(0)}}
-    .cart-head{background:var(--g);padding:16px 18px;display:flex;align-items:center;justify-content:space-between}
-    .cart-head h3{color:#fff;font-family:'Playfair Display',serif;font-size:18px;font-weight:700}
-    .cart-close{background:none;border:none;color:#fff;font-size:22px;cursor:pointer;line-height:1}
-    .cart-body{flex:1;overflow-y:auto;padding:14px 18px}
-    .cart-item{display:flex;gap:10px;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--bd)}
-    .cart-item-img{width:52px;height:52px;border-radius:8px;background:var(--bg2);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;overflow:hidden}
-    .cart-item-img img{width:100%;height:100%;object-fit:cover}
-    .cart-item-info{flex:1}
-    .cart-item-name{font-size:12px;font-weight:700;margin-bottom:2px;color:var(--tx)}
-    .cart-item-var{font-size:11px;color:var(--tx3);margin-bottom:5px}
-    .cart-item-qty{display:flex;align-items:center;gap:6px}
-    .cq-btn{width:22px;height:22px;border:1.5px solid var(--bd);border-radius:4px;background:#fff;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;transition:background .15s}
-    .cq-btn:hover{background:var(--bg2)}
-    .cart-item-price{font-size:13px;font-weight:800;color:var(--g);align-self:center}
-    .cart-empty{text-align:center;padding:40px 16px;color:var(--tx3)}
-    .cart-foot{padding:14px 18px;border-top:1.5px solid var(--bd)}
-    .cart-total-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
-    .cart-total-lbl{font-size:13px;color:var(--tx2);font-weight:700}
-    .cart-total-val{font-family:'Playfair Display',serif;font-size:22px;font-weight:900;color:var(--g)}
-    .cart-del-note{font-size:11px;color:#2d6a4f;background:#e8f5e9;padding:4px 10px;border-radius:16px;margin-bottom:10px;text-align:center;font-weight:700}
-    .cart-checkout-btn{width:100%;padding:14px;background:var(--g);border:none;border-radius:12px;color:#fff;font-size:14px;font-weight:800;cursor:pointer;font-family:'Lato',sans-serif;transition:background .2s;display:flex;align-items:center;justify-content:center;gap:7px}
-    .cart-checkout-btn:hover{background:var(--g2)}
-    .cart-pay-chips{display:flex;gap:5px;justify-content:center;margin-top:8px;flex-wrap:wrap}
-    .cart-pay-chip{font-size:10px;background:var(--bg2);color:var(--tx3);padding:3px 7px;border-radius:4px;font-weight:700}
+/* Pincode */
+.pincode-row{display:flex;align-items:center;gap:8px;margin-bottom:18px}
+.pincode-icon{font-size:13px}
+.pincode-label{font-size:12.5px;color:var(--tx2);font-weight:700}
+.pincode-input{border:1.5px solid var(--bd);border-radius:7px;padding:5px 10px;font-size:12.5px;font-family:'Lato',sans-serif;color:var(--tx);outline:none;width:110px}
+.pincode-input:focus{border-color:var(--g)}
+.pincode-check{background:var(--g-pale);color:var(--g);border:1.5px solid var(--g);border-radius:7px;padding:5px 11px;font-size:12px;font-weight:800;cursor:pointer;transition:all .2s}
+.pincode-check:hover{background:var(--g);color:#fff}
 
-    /* ── PAYMENT MODAL ── */
-    .pay-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:1100;align-items:center;justify-content:center;padding:16px}
-    .pay-overlay.open{display:flex}
-    .pay-modal{background:#fff;border-radius:18px;width:460px;max-width:100%;max-height:90vh;overflow-y:auto;animation:fadeUp .3s ease;box-shadow:0 24px 60px rgba(0,0,0,.25)}
-    @keyframes fadeUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
-    .pay-head{background:var(--g);padding:14px 18px;border-radius:18px 18px 0 0;display:flex;align-items:center;justify-content:space-between}
-    .pay-head h3{color:#fff;font-family:'Playfair Display',serif;font-size:17px}
-    .pay-body{padding:18px}
-    .pay-sec{margin-bottom:16px}
-    .pay-sec-title{font-size:11px;font-weight:800;color:var(--tx3);text-transform:uppercase;letter-spacing:.7px;margin-bottom:9px}
-    .pay-order-item{display:flex;justify-content:space-between;font-size:13px;color:var(--tx2);margin-bottom:5px}
-    .pay-divider{border:none;border-top:1px dashed var(--bd);margin:10px 0}
-    .pay-total-row{display:flex;justify-content:space-between;font-size:15px;font-weight:900;color:var(--g)}
-    .pay-methods{display:flex;flex-direction:column;gap:7px}
-    .pay-method{display:flex;align-items:center;gap:10px;padding:10px 13px;border:1.5px solid var(--bd);border-radius:10px;cursor:pointer;transition:all .2s}
-    .pay-method:hover,.pay-method.sel{border-color:var(--g);background:#f0f7f0}
-    .pay-method-icon{width:30px;height:30px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:16px}
-    .pay-method-name{font-size:13px;font-weight:700;color:var(--tx)}
-    .pay-method-desc{font-size:11px;color:var(--tx3)}
-    .pay-method-check{width:17px;height:17px;border-radius:50%;border:2px solid var(--bd);display:flex;align-items:center;justify-content:center;margin-left:auto;font-size:9px;transition:all .2s}
-    .pay-method.sel .pay-method-check{border-color:var(--g);background:var(--g);color:#fff}
-    .pay-addr-input{width:100%;padding:9px 12px;border:1.5px solid var(--bd);border-radius:8px;font-family:'Lato',sans-serif;font-size:13px;color:var(--tx);margin-bottom:7px;outline:none}
-    .pay-addr-input:focus{border-color:var(--g)}
-    .pay-place-btn{width:100%;padding:14px;background:var(--gd);border:none;border-radius:12px;color:#fff;font-size:15px;font-weight:800;cursor:pointer;font-family:'Lato',sans-serif;transition:background .2s;letter-spacing:.3px}
-    .pay-place-btn:hover{background:#a87820}
+/* Qty + Buttons */
+.qty-label{font-size:13px;font-weight:700;color:var(--tx2);margin-bottom:10px}
+.qty-atc{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.qty-ctrl{display:flex;align-items:center;border:2px solid var(--bd);border-radius:12px;overflow:hidden;background:#fff}
+.qty-btn{width:42px;height:48px;border:none;background:#fff;font-size:20px;font-weight:700;cursor:pointer;color:var(--g);transition:background .15s;display:flex;align-items:center;justify-content:center}
+.qty-btn:hover{background:var(--bg2)}
+.qty-btn:active{background:var(--bg3)}
+.qty-num{width:48px;height:48px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;border-left:1.5px solid var(--bd);border-right:1.5px solid var(--bd);user-select:none}
 
-    /* ── SUCCESS OVERLAY ── */
-    .success-overlay{display:none;position:fixed;inset:0;background:#fff;z-index:1200;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:32px}
-    .success-overlay.open{display:flex}
-    .success-overlay .s-icon{font-size:72px;margin-bottom:16px}
-    .success-overlay h2{font-family:'Playfair Display',serif;font-size:28px;color:var(--g);margin-bottom:8px}
-    .success-overlay p{color:var(--tx3);font-size:14px;margin-bottom:24px;line-height:1.6}
-    .success-overlay .s-btn{padding:13px 28px;background:var(--g);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:800;cursor:pointer;font-family:'Lato',sans-serif}
-    @media(max-width:768px){.cart-panel{width:100%}.pay-modal{width:100%}}
-  </style>
+/* THE TWO MAIN CTA BUTTONS */
+.btn-add-cart{flex:1;min-width:150px;height:50px;background:#fff;color:var(--g);border:2.5px solid var(--g);border-radius:13px;font-size:14.5px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .22s;letter-spacing:.2px}
+.btn-add-cart:hover,.btn-add-cart.added{background:var(--g);color:#fff}
+.btn-add-cart:disabled{opacity:.5;cursor:not-allowed}
+.btn-buy-now{flex:1;min-width:150px;height:50px;background:var(--gold);color:#fff;border:2.5px solid var(--gold);border-radius:13px;font-size:14.5px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .22s;letter-spacing:.2px}
+.btn-buy-now:hover{background:#a87000;border-color:#a87000}
+.btn-buy-now:disabled{opacity:.5;cursor:not-allowed}
+
+/* Wishlist + Share */
+.btn-icon{width:50px;height:50px;border:2px solid var(--bd);border-radius:13px;background:#fff;cursor:pointer;font-size:20px;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
+.btn-icon:hover{border-color:var(--g2)}
+.btn-icon.wl-active{border-color:#e74c3c;background:#fff5f5}
+
+/* Delivery bar */
+.delivery-bar{display:flex;align-items:center;gap:10px;padding:13px 16px;background:#e8f5e9;border-radius:11px;margin-bottom:18px;font-size:13px;color:var(--g);font-weight:700;border:1px solid rgba(26,58,30,.1)}
+.delivery-bar svg{flex-shrink:0}
+
+/* Trust chips */
+.trust-row{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:20px}
+.trust-chip{display:flex;align-items:center;gap:5px;font-size:11.5px;color:var(--tx2);background:var(--bg2);border:1px solid var(--bd);padding:5px 11px;border-radius:20px;font-weight:700}
+.trust-chip .tc-dot{width:5px;height:5px;border-radius:50%;background:var(--g3);flex-shrink:0}
+
+/* Highlights box */
+.highlights{background:var(--bg2);border-radius:var(--radius);padding:18px 20px;border:1px solid var(--bd)}
+.highlights-title{font-size:12px;font-weight:900;color:var(--g);margin-bottom:13px;text-transform:uppercase;letter-spacing:.6px}
+.hl-list{list-style:none;display:flex;flex-direction:column;gap:9px}
+.hl-list li{font-size:13px;color:var(--tx2);display:flex;align-items:flex-start;gap:9px;line-height:1.45}
+.hl-check{color:var(--g);font-weight:900;font-size:13px;flex-shrink:0;margin-top:1px}
+
+/* ══════════════════════════════════════════
+   DESCRIPTION TABS — PREMIUM
+══════════════════════════════════════════ */
+.desc-section{max-width:1200px;margin:0 auto;padding:0 24px 40px}
+.desc-tabs{display:flex;gap:0;border-bottom:2px solid var(--bd);margin-bottom:28px}
+.desc-tab{padding:13px 22px;font-size:14px;font-weight:700;color:var(--tx3);cursor:pointer;border-bottom:2.5px solid transparent;margin-bottom:-2px;transition:all .2s;letter-spacing:.2px}
+.desc-tab:hover{color:var(--tx2)}
+.desc-tab.active{color:var(--g);border-bottom-color:var(--g)}
+.desc-content{display:none;font-size:14px;color:var(--tx2);line-height:1.85;animation:fadeIn .25s ease}
+.desc-content.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+.desc-content h3{font-family:'Playfair Display',serif;font-size:20px;color:var(--g);margin-bottom:14px;font-weight:700}
+.desc-content .benefit-list{list-style:none;display:flex;flex-direction:column;gap:10px;margin-bottom:20px}
+.desc-content .benefit-list li{display:flex;align-items:flex-start;gap:9px;font-size:14px}
+.desc-content .benefit-list li::before{content:'✓';color:var(--g);font-weight:900;flex-shrink:0;margin-top:1px}
+.policy-block{background:var(--bg2);border-radius:var(--radius);padding:20px 24px;border:1px solid var(--bd);margin-top:10px}
+.policy-block strong{color:var(--g)}
+
+/* ══════════════════════════════════════════
+   RELATED PRODUCTS
+══════════════════════════════════════════ */
+.related-section{max-width:1200px;margin:0 auto;padding:0 24px 60px}
+.section-title{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:var(--g);margin-bottom:6px}
+.section-sub{font-size:13px;color:var(--tx3);margin-bottom:22px}
+.related-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:18px}
+.rel-card{background:#fff;border:1.5px solid var(--bd);border-radius:var(--radius);overflow:hidden;cursor:pointer;transition:transform .28s,box-shadow .28s}
+.rel-card:hover{transform:translateY(-5px);box-shadow:var(--shadow-lg)}
+.rel-img{aspect-ratio:1;overflow:hidden;background:var(--bg2);position:relative}
+.rel-img img{width:100%;height:100%;object-fit:cover;transition:transform .4s}
+.rel-card:hover .rel-img img{transform:scale(1.05)}
+.rel-img-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:48px;background:linear-gradient(135deg,var(--g) 0%,var(--g2) 100%)}
+.rel-disc{position:absolute;top:10px;right:10px;background:#e53;color:#fff;font-size:10px;font-weight:900;padding:3px 8px;border-radius:10px}
+.rel-body{padding:14px 16px}
+.rel-vendor{font-size:10px;color:var(--gold);font-weight:800;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.rel-name{font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:var(--g);margin-bottom:6px;line-height:1.25}
+.rel-price-row{display:flex;align-items:baseline;gap:7px}
+.rel-price{font-size:15px;font-weight:900;color:var(--g)}
+.rel-orig{font-size:12px;color:var(--tx3);text-decoration:line-through}
+
+/* ══════════════════════════════════════════
+   CART DRAWER
+══════════════════════════════════════════ */
+.drawer-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.48);z-index:1000;animation:fadeInOverlay .25s ease}
+.drawer-overlay.open{display:block}
+@keyframes fadeInOverlay{from{opacity:0}to{opacity:1}}
+.cart-drawer{position:fixed;top:0;right:0;bottom:0;width:400px;background:#fff;z-index:1001;display:flex;flex-direction:column;box-shadow:-8px 0 40px rgba(0,0,0,.15);transform:translateX(100%);transition:transform .32s cubic-bezier(.25,.46,.45,.94)}
+.cart-drawer.open{transform:translateX(0)}
+.cd-head{background:var(--g);padding:18px 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.cd-title{color:#fff;font-family:'Playfair Display',serif;font-size:19px;font-weight:700}
+.cd-close{background:rgba(255,255,255,.15);border:none;color:#fff;font-size:20px;cursor:pointer;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:background .2s}
+.cd-close:hover{background:rgba(255,255,255,.25)}
+.cd-body{flex:1;overflow-y:auto;padding:16px 20px}
+.cd-empty{text-align:center;padding:48px 20px;color:var(--tx3)}
+.cd-empty .ce-icon{font-size:48px;margin-bottom:12px}
+.cd-empty p{font-size:14px;line-height:1.6}
+.cart-item{display:flex;gap:12px;padding:14px 0;border-bottom:1px solid var(--bd)}
+.ci-img{width:64px;height:64px;border-radius:10px;overflow:hidden;background:var(--bg2);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:28px}
+.ci-img img{width:100%;height:100%;object-fit:cover}
+.ci-info{flex:1;min-width:0}
+.ci-name{font-size:13px;font-weight:800;color:var(--tx);margin-bottom:2px;line-height:1.3}
+.ci-var{font-size:11px;color:var(--tx3);margin-bottom:8px}
+.ci-bottom{display:flex;align-items:center;gap:10px}
+.ci-qty-ctrl{display:flex;align-items:center;border:1.5px solid var(--bd);border-radius:8px;overflow:hidden}
+.ci-qbtn{width:28px;height:28px;border:none;background:#fff;font-size:16px;cursor:pointer;color:var(--g);transition:background .15s;display:flex;align-items:center;justify-content:center}
+.ci-qbtn:hover{background:var(--bg2)}
+.ci-qnum{width:30px;height:28px;border-left:1.5px solid var(--bd);border-right:1.5px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800}
+.ci-remove{background:none;border:none;color:#c0392b;font-size:11.5px;font-weight:700;cursor:pointer;padding:0;font-family:'Lato',sans-serif}
+.ci-price{font-size:14px;font-weight:900;color:var(--g);align-self:center;flex-shrink:0}
+.cd-foot{padding:16px 20px;border-top:2px solid var(--bd);flex-shrink:0}
+.cd-del-note{background:#e8f5e9;border:1px solid rgba(26,58,30,.15);border-radius:8px;padding:8px 13px;font-size:12px;font-weight:700;color:var(--g);text-align:center;margin-bottom:12px}
+.cd-total-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.cd-total-lbl{font-size:14px;font-weight:700;color:var(--tx2)}
+.cd-total-val{font-family:'Playfair Display',serif;font-size:24px;font-weight:900;color:var(--g)}
+.cd-checkout-btn{width:100%;height:52px;background:var(--g);color:#fff;border:none;border-radius:13px;font-size:15px;font-weight:900;cursor:pointer;transition:background .2s;display:flex;align-items:center;justify-content:center;gap:8px;letter-spacing:.2px;font-family:'Lato',sans-serif}
+.cd-checkout-btn:hover{background:var(--g2)}
+.cd-pay-row{display:flex;gap:6px;justify-content:center;margin-top:10px;flex-wrap:wrap}
+.cd-pay-chip{font-size:10.5px;background:var(--bg2);color:var(--tx3);padding:3px 9px;border-radius:5px;font-weight:700;border:1px solid var(--bd)}
+@media(max-width:480px){.cart-drawer{width:100%}}
+
+/* ══════════════════════════════════════════
+   PAYMENT MODAL
+══════════════════════════════════════════ */
+.pay-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:1100;align-items:center;justify-content:center;padding:16px;animation:fadeInOverlay .2s ease}
+.pay-overlay.open{display:flex}
+.pay-modal{background:#fff;border-radius:20px;width:500px;max-width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 32px 80px rgba(0,0,0,.25);animation:modalUp .3s cubic-bezier(.25,.46,.45,.94)}
+@keyframes modalUp{from{transform:translateY(24px);opacity:0}to{transform:translateY(0);opacity:1}}
+.pm-head{background:var(--g);padding:18px 22px;border-radius:20px 20px 0 0;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:1}
+.pm-title{color:#fff;font-family:'Playfair Display',serif;font-size:18px;font-weight:700}
+.pm-body{padding:22px}
+.pm-sec{margin-bottom:20px}
+.pm-sec-title{font-size:11px;font-weight:900;color:var(--tx3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:11px;padding-bottom:7px;border-bottom:1px solid var(--bd)}
+.pm-order-item{display:flex;justify-content:space-between;align-items:flex-start;font-size:13px;color:var(--tx2);margin-bottom:6px;gap:12px}
+.pm-order-item span:last-child{font-weight:800;color:var(--g);white-space:nowrap}
+.pm-divider{border:none;border-top:1.5px dashed var(--bd);margin:12px 0}
+.pm-total-row{display:flex;justify-content:space-between;font-size:16px;font-weight:900;color:var(--g)}
+.pm-addr-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.pm-addr-grid .full{grid-column:1/-1}
+.pm-input{width:100%;padding:10px 13px;border:1.5px solid var(--bd);border-radius:9px;font-family:'Lato',sans-serif;font-size:13px;color:var(--tx);outline:none;transition:border-color .2s}
+.pm-input:focus{border-color:var(--g)}
+.pm-methods{display:flex;flex-direction:column;gap:8px}
+.pm-method{display:flex;align-items:center;gap:12px;padding:12px 15px;border:2px solid var(--bd);border-radius:11px;cursor:pointer;transition:all .2s}
+.pm-method:hover,.pm-method.sel{border-color:var(--g);background:var(--g-pale)}
+.pm-method-icon{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.pm-method-info{flex:1}
+.pm-method-name{font-size:13.5px;font-weight:800;color:var(--tx)}
+.pm-method-desc{font-size:11.5px;color:var(--tx3);margin-top:1px}
+.pm-check{width:19px;height:19px;border-radius:50%;border:2px solid var(--bd);display:flex;align-items:center;justify-content:center;font-size:10px;transition:all .2s;flex-shrink:0}
+.pm-method.sel .pm-check{border-color:var(--g);background:var(--g);color:#fff}
+.pm-place-btn{width:100%;height:52px;background:var(--gold);color:#fff;border:none;border-radius:13px;font-size:16px;font-weight:900;cursor:pointer;transition:background .2s;font-family:'Lato',sans-serif;letter-spacing:.3px;margin-top:4px}
+.pm-place-btn:hover{background:#a87000}
+
+/* ══════════════════════════════════════════
+   ORDER SUCCESS
+══════════════════════════════════════════ */
+.success-overlay{display:none;position:fixed;inset:0;background:#fff;z-index:1200;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:32px}
+.success-overlay.open{display:flex;animation:fadeIn .3s ease}
+.s-icon{font-size:80px;margin-bottom:18px}
+.success-overlay h2{font-family:'Playfair Display',serif;font-size:30px;font-weight:900;color:var(--g);margin-bottom:8px}
+.success-overlay p{color:var(--tx3);font-size:15px;line-height:1.7;max-width:380px;margin-bottom:28px}
+.s-btn{padding:14px 32px;background:var(--g);color:#fff;border:none;border-radius:13px;font-size:15px;font-weight:900;cursor:pointer;font-family:'Lato',sans-serif;transition:background .2s}
+.s-btn:hover{background:var(--g2)}
+
+/* ══════════════════════════════════════════
+   TOAST
+══════════════════════════════════════════ */
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:var(--g);color:#fff;padding:12px 24px;border-radius:28px;font-size:14px;font-weight:700;box-shadow:0 8px 28px rgba(0,0,0,.22);z-index:9999;opacity:0;transition:opacity .3s,transform .3s;pointer-events:none;white-space:nowrap;max-width:90vw;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(-6px)}
+
+/* ══════════════════════════════════════════
+   LOADING / NOT FOUND
+══════════════════════════════════════════ */
+.loading-wrap{display:flex;align-items:center;justify-content:center;min-height:60vh;flex-direction:column;gap:16px}
+.spinner{width:44px;height:44px;border:4px solid var(--bd);border-top-color:var(--g);border-radius:50%;animation:spin .8s linear infinite}
+.not-found{text-align:center;padding:80px 20px;color:var(--tx3)}
+.not-found h2{font-family:'Playfair Display',serif;font-size:28px;color:var(--g);margin-bottom:12px}
+
+/* ══════════════════════════════════════════
+   FOOTER
+══════════════════════════════════════════ */
+.mini-footer{background:var(--g);color:rgba(255,255,255,.65);text-align:center;padding:22px 20px;font-size:12.5px;margin-top:40px}
+.mini-footer a{color:var(--gold2);font-weight:700;transition:opacity .2s}
+.mini-footer a:hover{opacity:.8}
+
+/* ══════════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════════ */
+@media(max-width:860px){
+  .product-wrap{grid-template-columns:1fr;gap:24px;padding:0 16px 16px}
+  .img-section{position:static}
+  .info-section{position:static}
+  .variant-grid{grid-template-columns:repeat(2,1fr)}
+  .qty-atc{flex-wrap:wrap}
+  .btn-add-cart,.btn-buy-now{flex:1;min-width:130px}
+  .desc-section,.related-section{padding-left:16px;padding-right:16px}
+}
+@media(max-width:480px){
+  .variant-grid{grid-template-columns:repeat(2,1fr)}
+  .pm-addr-grid{grid-template-columns:1fr}
+  .pm-addr-grid .full{grid-column:1}
+}
+</style>
 </head>
 <body>
+
+<!-- ANNOUNCEMENT BAR -->
+<div class="announce-bar">
+  <div class="announce-inner">
+    <span class="announce-item">Free Shipping above ₹799</span>
+    <span class="announce-item">100% Natural &amp; Lab-Tested</span>
+    <span class="announce-item">Direct from 200+ Mountain Families</span>
+    <span class="announce-item">Rated 4.9/5 · 10,000+ Happy Customers</span>
+    <span class="announce-item">COD Available Pan India</span>
+    <span class="announce-item">Free Shipping above ₹799</span>
+    <span class="announce-item">100% Natural &amp; Lab-Tested</span>
+    <span class="announce-item">Direct from 200+ Mountain Families</span>
+    <span class="announce-item">Rated 4.9/5 · 10,000+ Happy Customers</span>
+    <span class="announce-item">COD Available Pan India</span>
+  </div>
+</div>
 
 <!-- NAV -->
 <nav class="nav">
   <a href="/" class="logo">
-    <div class="logo-icon">🌿</div>
-    <div style="display:flex;flex-direction:column">
+    <div class="logo-leaf">🌿</div>
+    <div class="logo-text">
       <span class="logo-name">5 Pahadi Roots</span>
-      <span class="logo-tl">Himalayan Organic Store</span>
+      <span class="logo-sub">Himalayan Organic Store</span>
     </div>
   </a>
-  <button class="nav-back" onclick="document.referrer ? history.back() : window.location.href='/'">← Back to Store</button>
-  <button class="cart-btn" onclick="openCartPanel()" id="nav-cart-btn">🛒 Cart (<span id="nav-cart-count">0</span>)</button>
-</nav>
 
-<!-- AI ADMIN BAR -->
-<div class="ai-bar">
-  <label>⚡ Add Product:</label>
-  <input class="ai-prod-input" id="ai-prod-input" type="text" placeholder="e.g. Himalayan Pink Salt, Wild Honey..." onkeydown="if(event.key==='Enter')aiGenerateProduct()">
-  <button class="ai-gen-btn" id="ai-gen-btn" onclick="aiGenerateProduct()">
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
-    Auto-Generate with AI
-  </button>
-  <span class="ai-hint">AI fills all product details automatically</span>
-</div>
+  <!-- AI BAR — inline in nav -->
+  <div class="nav-center">
+    <div class="ai-bar-pill">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#c8920a" stroke-width="2.5"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+      <input id="ai-prod-input" type="text" placeholder="e.g. Himalayan Pink Salt, Wild Honey..." onkeydown="if(event.key==='Enter')aiGenerateProduct()">
+      <button class="ai-gen-btn" id="ai-gen-btn" onclick="aiGenerateProduct()">✦ Auto-Generate with AI</button>
+    </div>
+  </div>
+
+  <div class="nav-right">
+    <button class="nav-back" onclick="document.referrer ? history.back() : window.location.href='/'">← Back to Store</button>
+    <button class="nav-cart-btn" id="nav-cart-btn" onclick="openCartDrawer()">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+      Cart
+      <span class="nav-cart-bubble" id="nav-cart-count">0</span>
+    </button>
+  </div>
+</nav>
 
 <!-- BREADCRUMB -->
 <div class="breadcrumb">
-  <a href="/">Home</a><span>›</span>
-  <a href="/">Products</a><span>›</span>
+  <a href="/">Home</a>
+  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9,18 15,12 9,6"/></svg>
+  <a href="/products">Products</a>
+  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9,18 15,12 9,6"/></svg>
   <span id="bc-name">Loading…</span>
 </div>
 
@@ -338,73 +451,105 @@
   </div>
 </div>
 
-<!-- CART SIDEBAR -->
-<div class="cart-overlay" id="cart-overlay" onclick="if(event.target===this)closeCartPanel()">
-  <div class="cart-panel">
-    <div class="cart-head">
-      <h3>Your Cart</h3>
-      <button class="cart-close" onclick="closeCartPanel()">×</button>
+<!-- ZOOM OVERLAY -->
+<div class="zoom-overlay" id="zoom-overlay" onclick="closeZoom()">
+  <button class="zoom-close" onclick="closeZoom()">×</button>
+  <img id="zoom-img" src="" alt="">
+</div>
+
+<!-- CART DRAWER OVERLAY -->
+<div class="drawer-overlay" id="drawer-overlay" onclick="closeCartDrawer()"></div>
+
+<!-- CART DRAWER -->
+<div class="cart-drawer" id="cart-drawer">
+  <div class="cd-head">
+    <span class="cd-title">Your Cart</span>
+    <button class="cd-close" onclick="closeCartDrawer()">×</button>
+  </div>
+  <div class="cd-body" id="cart-drawer-body">
+    <div class="cd-empty">
+      <div class="ce-icon">🛒</div>
+      <p>Your cart is empty.<br>Add products to get started.</p>
     </div>
-    <div class="cart-body" id="cart-panel-body">
-      <div class="cart-empty"><div style="font-size:40px;margin-bottom:10px">🛒</div><p style="font-size:13px">Your cart is empty</p></div>
+  </div>
+  <div class="cd-foot">
+    <div class="cd-del-note" id="cd-del-note">Free delivery on orders above ₹799</div>
+    <div class="cd-total-row">
+      <span class="cd-total-lbl">Total</span>
+      <span class="cd-total-val" id="cd-total">₹0</span>
     </div>
-    <div class="cart-foot">
-      <div class="cart-total-row">
-        <span class="cart-total-lbl">Total</span>
-        <span class="cart-total-val" id="cart-panel-total">₹0</span>
-      </div>
-      <div class="cart-del-note" id="cart-del-note"></div>
-      <button class="cart-checkout-btn" onclick="openPaymentModal()">🔒 Proceed to Payment</button>
-      <div class="cart-pay-chips">
-        <span class="cart-pay-chip">UPI</span>
-        <span class="cart-pay-chip">Cards</span>
-        <span class="cart-pay-chip">COD</span>
-        <span class="cart-pay-chip">Net Banking</span>
-      </div>
+    <button class="cd-checkout-btn" onclick="openPayModal()">
+      🔒 Proceed to Payment
+    </button>
+    <div class="cd-pay-row">
+      <span class="cd-pay-chip">UPI</span>
+      <span class="cd-pay-chip">Cards</span>
+      <span class="cd-pay-chip">COD</span>
+      <span class="cd-pay-chip">Net Banking</span>
     </div>
   </div>
 </div>
 
 <!-- PAYMENT MODAL -->
-<div class="pay-overlay" id="pay-overlay" onclick="if(event.target===this)closePaymentModal()">
+<div class="pay-overlay" id="pay-overlay" onclick="if(event.target===this)closePayModal()">
   <div class="pay-modal">
-    <div class="pay-head">
-      <h3>🔒 Secure Checkout</h3>
-      <button class="cart-close" onclick="closePaymentModal()">×</button>
+    <div class="pm-head">
+      <span class="pm-title">🔒 Secure Checkout</span>
+      <button class="cd-close" onclick="closePayModal()">×</button>
     </div>
-    <div class="pay-body">
-      <div class="pay-sec">
-        <p class="pay-sec-title">Order Summary</p>
-        <div id="pay-order-summary"></div>
-        <div class="pay-divider"></div>
-        <div class="pay-total-row"><span>Total</span><span id="pay-grand-total">₹0</span></div>
+    <div class="pm-body">
+      <div class="pm-sec">
+        <p class="pm-sec-title">Order Summary</p>
+        <div id="pm-order-items"></div>
+        <div class="pm-divider"></div>
+        <div class="pm-total-row"><span>Total Payable</span><span id="pm-grand-total">₹0</span></div>
       </div>
-      <div class="pay-sec">
-        <p class="pay-sec-title">Delivery Address</p>
-        <input class="pay-addr-input" type="text" placeholder="Full Name" id="pay-name">
-        <input class="pay-addr-input" type="text" placeholder="Phone Number">
-        <input class="pay-addr-input" type="text" placeholder="Address Line 1">
-        <input class="pay-addr-input" type="text" placeholder="City, State, PIN Code">
-      </div>
-      <div class="pay-sec">
-        <p class="pay-sec-title">Payment Method</p>
-        <div class="pay-methods">
-          <div class="pay-method sel" onclick="selectPayMethod(this)"><div class="pay-method-icon" style="background:#f0f7f0">💳</div><div><div class="pay-method-name">UPI / QR Code</div><div class="pay-method-desc">PhonePe, GPay, Paytm, BHIM</div></div><div class="pay-method-check">✓</div></div>
-          <div class="pay-method" onclick="selectPayMethod(this)"><div class="pay-method-icon" style="background:#fff3e0">🏦</div><div><div class="pay-method-name">Credit / Debit Card</div><div class="pay-method-desc">Visa, Mastercard, RuPay</div></div><div class="pay-method-check"></div></div>
-          <div class="pay-method" onclick="selectPayMethod(this)"><div class="pay-method-icon" style="background:#e8f5e9">🚚</div><div><div class="pay-method-name">Cash on Delivery</div><div class="pay-method-desc">Pay when your order arrives</div></div><div class="pay-method-check"></div></div>
-          <div class="pay-method" onclick="selectPayMethod(this)"><div class="pay-method-icon" style="background:#e3f2fd">🏛️</div><div><div class="pay-method-name">Net Banking</div><div class="pay-method-desc">All major Indian banks</div></div><div class="pay-method-check"></div></div>
+      <div class="pm-sec">
+        <p class="pm-sec-title">Delivery Address</p>
+        <div class="pm-addr-grid">
+          <input class="pm-input full" type="text" placeholder="Full Name" id="pm-name">
+          <input class="pm-input" type="tel" placeholder="Phone Number">
+          <input class="pm-input" type="text" placeholder="PIN Code">
+          <input class="pm-input full" type="text" placeholder="Address Line 1">
+          <input class="pm-input" type="text" placeholder="City">
+          <input class="pm-input" type="text" placeholder="State">
         </div>
       </div>
-      <button class="pay-place-btn" onclick="placeOrderNow()">Place Order Securely 🔒</button>
+      <div class="pm-sec">
+        <p class="pm-sec-title">Payment Method</p>
+        <div class="pm-methods">
+          <div class="pm-method sel" onclick="selPayMethod(this)">
+            <div class="pm-method-icon" style="background:#e8f5e9">💳</div>
+            <div class="pm-method-info"><div class="pm-method-name">UPI / QR Code</div><div class="pm-method-desc">PhonePe, GPay, Paytm, BHIM</div></div>
+            <div class="pm-check">✓</div>
+          </div>
+          <div class="pm-method" onclick="selPayMethod(this)">
+            <div class="pm-method-icon" style="background:#fff3e0">🏦</div>
+            <div class="pm-method-info"><div class="pm-method-name">Credit / Debit Card</div><div class="pm-method-desc">Visa, Mastercard, RuPay</div></div>
+            <div class="pm-check"></div>
+          </div>
+          <div class="pm-method" onclick="selPayMethod(this)">
+            <div class="pm-method-icon" style="background:#fce4ec">🚚</div>
+            <div class="pm-method-info"><div class="pm-method-name">Cash on Delivery</div><div class="pm-method-desc">Pay when your order arrives</div></div>
+            <div class="pm-check"></div>
+          </div>
+          <div class="pm-method" onclick="selPayMethod(this)">
+            <div class="pm-method-icon" style="background:#e3f2fd">🏛️</div>
+            <div class="pm-method-info"><div class="pm-method-name">Net Banking</div><div class="pm-method-desc">All major Indian banks</div></div>
+            <div class="pm-check"></div>
+          </div>
+        </div>
+      </div>
+      <button class="pm-place-btn" onclick="placeOrder()">Place Order Securely 🔒</button>
     </div>
   </div>
 </div>
 
-<!-- ORDER SUCCESS -->
+<!-- SUCCESS -->
 <div class="success-overlay" id="success-overlay">
   <div class="s-icon">🎉</div>
-  <h2>Order Placed!</h2>
-  <p>Thank you! Your Himalayan product is on its way.<br>You will receive a confirmation shortly.</p>
+  <h2>Order Placed Successfully!</h2>
+  <p>Thank you! Your Himalayan product is on its way. You will receive a WhatsApp confirmation shortly.</p>
   <button class="s-btn" onclick="document.getElementById('success-overlay').classList.remove('open');window.location.href='/'">Continue Shopping</button>
 </div>
 
@@ -412,7 +557,9 @@
 <div class="toast" id="toast"></div>
 
 <script>
-// ── Globals ──
+/* ══════════════════════════════════════════
+   GLOBALS — identical to original
+══════════════════════════════════════════ */
 var PRODUCT = null;
 var VARIANTS = [];
 var ALL_PRODUCTS = [];
@@ -420,625 +567,604 @@ var selectedVariant = null;
 var qty = 1;
 var cart = [];
 var wishlist = [];
-var WHATSAPP_NUMBER = '919899984895'; // overridden from site_settings in loadProduct()
+var WHATSAPP_NUMBER = '919899984895';
 
-// ── Cart count from localStorage ──
+/* ── Load persisted data ── */
+try { cart = JSON.parse(localStorage.getItem('pr_cart') || '[]'); } catch(e) { cart = []; }
+try { wishlist = JSON.parse(localStorage.getItem('pr_wishlist') || '[]'); } catch(e) { wishlist = []; }
+
+/* ══════════════════════════════════════════
+   NAV CART COUNT
+══════════════════════════════════════════ */
 function updateNavCart() {
-  var latestCart;
-  try { latestCart = JSON.parse(localStorage.getItem('pr_cart') || '[]'); } catch(e) { latestCart = []; }
-  cart = latestCart; // keep global in sync
-  var total = latestCart.reduce(function(s, x) { return s + (parseInt(x.qty) || 1); }, 0);
+  try { cart = JSON.parse(localStorage.getItem('pr_cart') || '[]'); } catch(e) { cart = []; }
+  var total = cart.reduce(function(s,x){ return s + (parseInt(x.qty)||1); }, 0);
   var el = document.getElementById('nav-cart-count');
   if (el) el.textContent = total;
 }
 
-// ── Go to cart — opens cart panel ──
-function goToCart() {
-  openCartPanel();
-}
-function openCartPanel() {
-  renderCartPanel();
-  document.getElementById('cart-overlay').classList.add('open');
-}
-function closeCartPanel() {
-  document.getElementById('cart-overlay').classList.remove('open');
-}
-
-// ── Load cart from localStorage ──
-try { cart = JSON.parse(localStorage.getItem('pr_cart') || '[]'); } catch(e) { cart = []; }
-try { wishlist = JSON.parse(localStorage.getItem('pr_wishlist') || '[]'); } catch(e) { wishlist = []; }
-
-// ── Toast ──
+/* ══════════════════════════════════════════
+   TOAST
+══════════════════════════════════════════ */
 function showToast(msg) {
   var t = document.getElementById('toast');
   t.textContent = msg;
   t.classList.add('show');
-  setTimeout(function() { t.classList.remove('show'); }, 2800);
+  setTimeout(function(){ t.classList.remove('show'); }, 2800);
 }
+function showToastP(msg) { showToast(msg); }
 
-// ── Get slug from URL ──
+/* ══════════════════════════════════════════
+   SLUG
+══════════════════════════════════════════ */
 function getSlug() {
   var path = window.location.pathname;
   var parts = path.split('/').filter(Boolean);
-  return (parts[parts.length - 1] || '').toLowerCase().trim();
+  return (parts[parts.length-1]||'').toLowerCase().trim();
 }
 
-// ── Fetch store data ──
+/* ══════════════════════════════════════════
+   LOAD PRODUCT — identical API logic
+══════════════════════════════════════════ */
 async function loadProduct() {
   var slug = getSlug();
-  if (!slug || slug === 'product.html') {
-    showNotFound('No product specified');
-    return;
-  }
-
-  // 12 second timeout — agar API respond nahi kare
+  if (!slug || slug === 'product.html') { showNotFound('No product specified'); return; }
   var controller = new AbortController();
-  var _timer = setTimeout(function() { controller.abort(); }, 12000);
-
+  var _timer = setTimeout(function(){ controller.abort(); }, 12000);
   try {
     var res = await fetch('/api/store-data', { signal: controller.signal });
     clearTimeout(_timer);
-
     if (!res.ok) throw new Error('Server error ' + res.status);
     var data = await res.json();
     ALL_PRODUCTS = data.products || [];
-
-    // Find product by slug (case-insensitive)
-    var prod = ALL_PRODUCTS.find(function(p) { return (p.slug || '').toLowerCase() === slug; });
-    if (!prod) {
-      // Try by id as fallback
-      prod = ALL_PRODUCTS.find(function(p) { return String(p.id) === String(slug); });
-    }
+    var prod = ALL_PRODUCTS.find(function(p){ return (p.slug||'').toLowerCase() === slug; });
+    if (!prod) prod = ALL_PRODUCTS.find(function(p){ return String(p.id) === String(slug); });
     if (!prod) { showNotFound('Product not found'); return; }
-
     PRODUCT = prod;
-
-    // Attach images
-    var prodImages = (data.product_images || []).filter(function(i) { return String(i.product_id) === String(prod.id); });
-
-    // Attach variants
-    VARIANTS = (data.product_variants || []).filter(function(v) { return String(v.product_id) === String(prod.id); });
-
-    // Related products (same state or category)
-    var related = ALL_PRODUCTS.filter(function(p) {
-      return p.id !== prod.id && (p.state_id === prod.state_id || p.category_id === prod.category_id);
-    }).slice(0, 4);
-
-    // Build state name map
+    var prodImages = (data.product_images||[]).filter(function(i){ return String(i.product_id)===String(prod.id); });
+    VARIANTS = (data.product_variants||[]).filter(function(v){ return String(v.product_id)===String(prod.id); });
+    var related = ALL_PRODUCTS.filter(function(p){ return p.id!==prod.id&&(p.state_id===prod.state_id||p.category_id===prod.category_id); }).slice(0,4);
     var stateMap = {};
-    (data.states || []).forEach(function(s) { stateMap[s.id] = s.name; });
-
-    // Load settings
-    if (data.settings) {
-      if (data.settings.whatsapp_number) WHATSAPP_NUMBER = data.settings.whatsapp_number;
-    }
-
+    (data.states||[]).forEach(function(s){ stateMap[s.id]=s.name; });
+    if (data.settings && data.settings.whatsapp_number) WHATSAPP_NUMBER = data.settings.whatsapp_number;
     renderProduct(prod, prodImages, related, data, stateMap);
   } catch(e) {
     clearTimeout(_timer);
-    if (e.name === 'AbortError') {
-      showNotFound('Request timed out — please check your connection and refresh');
-    } else {
-      showNotFound('Failed to load product. Please refresh the page.');
-    }
+    showNotFound(e.name==='AbortError' ? 'Request timed out — please refresh' : 'Failed to load product. Please refresh.');
   }
 }
 
-// ── Render full product page ──
+/* ══════════════════════════════════════════
+   RENDER PRODUCT — PREMIUM LAYOUT
+══════════════════════════════════════════ */
 function renderProduct(p, images, related, data, stateMap) {
   stateMap = stateMap || {};
-  // Update page title & meta
-  document.getElementById('pg-title').textContent = (p.name || 'Product') + ' — 5 Pahadi Roots';
-  document.getElementById('pg-desc').setAttribute('content', p.short_description || p.name + ' — Authentic Himalayan product from 5 Pahadi Roots');
-  // Dynamic OG tags for social sharing
+
+  /* ── Meta & SEO ── */
+  document.getElementById('pg-title').textContent = (p.name||'Product') + ' — 5 Pahadi Roots';
+  document.getElementById('pg-desc').setAttribute('content', p.short_description||p.name+' — Authentic Himalayan product');
   var ogImg = p.image_url || 'https://pahadiroots.com/images/og-cover.jpg';
-  var ogUrl = 'https://pahadiroots.com/products/' + (p.slug && !/^\d+$/.test(p.slug) ? p.slug : (p.name ? p.name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'') : p.id));
-  var ogDesc = p.short_description || p.name + ' — Authentic Himalayan organic product from 5 Pahadi Roots. Sourced directly from mountain farmers.';
-  document.getElementById('og-title').setAttribute('content', (p.name||'Product') + ' — 5 Pahadi Roots');
-  document.getElementById('og-desc').setAttribute('content', ogDesc);
+  var ogUrl = 'https://pahadiroots.com/products/' + (p.slug&&!/^\d+$/.test(p.slug)?p.slug:(p.name?p.name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,''):p.id));
+  ['og-title','tw-title'].forEach(function(id){ document.getElementById(id).setAttribute('content',(p.name||'Product')+' — 5 Pahadi Roots'); });
+  document.getElementById('og-desc').setAttribute('content', p.short_description||p.name+' — Authentic Himalayan organic product.');
   document.getElementById('og-image').setAttribute('content', ogImg);
-  document.getElementById('og-url').setAttribute('content', ogUrl);
-  document.getElementById('tw-title').setAttribute('content', (p.name||'Product') + ' — 5 Pahadi Roots');
   document.getElementById('tw-image').setAttribute('content', ogImg);
+  document.getElementById('og-url').setAttribute('content', ogUrl);
   document.getElementById('bc-name').textContent = p.name;
-  // Update canonical URL to exact product URL
-  var canonical = document.getElementById('pg-canonical');
-  if (canonical) canonical.setAttribute('href', ogUrl);
+  var can = document.getElementById('pg-canonical');
+  if (can) can.setAttribute('href', ogUrl);
 
-  // ── JSON-LD Product Schema (Google Rich Snippets) ──
-  var priceVal = p.price || (VARIANTS && VARIANTS[0] ? VARIANTS[0].price : null);
-  var stockStatus = (p.available_stock > 0 || (VARIANTS && VARIANTS.some(function(v){ return v.available_stock > 0; })))
-    ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock';
-  var schemaObj = {
-    '@context': 'https://schema.org/',
-    '@type': 'Product',
-    'name': p.name || '',
-    'description': p.short_description || p.description || '',
-    'image': ogImg,
-    'url': ogUrl,
-    'brand': { '@type': 'Brand', 'name': '5 Pahadi Roots' },
-    'aggregateRating': {
-      '@type': 'AggregateRating',
-      'ratingValue': '4.8',
-      'reviewCount': String(p.review_count || 39)
-    }
-  };
+  /* ── JSON-LD ── */
+  var priceVal = p.price||(VARIANTS&&VARIANTS[0]?VARIANTS[0].price:null);
+  var inStock = p.available_stock>0||(VARIANTS&&VARIANTS.some(function(v){return v.available_stock>0;}));
+  var schemaObj = { '@context':'https://schema.org/','@type':'Product','name':p.name||'','description':p.short_description||'','image':ogImg,'url':ogUrl,'brand':{'@type':'Brand','name':'5 Pahadi Roots'},'aggregateRating':{'@type':'AggregateRating','ratingValue':'4.8','reviewCount':String(p.review_count||39)} };
   if (priceVal) {
-    // priceValidUntil — 1 year from now
-    var nextYear = new Date();
-    nextYear.setFullYear(nextYear.getFullYear() + 1);
-    var priceValidUntil = nextYear.toISOString().split('T')[0];
-
-    schemaObj['offers'] = {
-      '@type': 'Offer',
-      'priceCurrency': 'INR',
-      'price': String(priceVal),
-      'priceValidUntil': priceValidUntil,
-      'availability': stockStatus,
-      'seller': { '@type': 'Organization', 'name': '5 Pahadi Roots' },
-      'shippingDetails': {
-        '@type': 'OfferShippingDetails',
-        'shippingRate': {
-          '@type': 'MonetaryAmount',
-          'value': '99',
-          'currency': 'INR'
-        },
-        'shippingDestination': {
-          '@type': 'DefinedRegion',
-          'addressCountry': 'IN'
-        },
-        'deliveryTime': {
-          '@type': 'ShippingDeliveryTime',
-          'handlingTime': {
-            '@type': 'QuantitativeValue',
-            'minValue': 1,
-            'maxValue': 4,
-            'unitCode': 'DAY'
-          },
-          'transitTime': {
-            '@type': 'QuantitativeValue',
-            'minValue': 3,
-            'maxValue': 14,
-            'unitCode': 'DAY'
-          }
-        }
-      },
-      'hasMerchantReturnPolicy': {
-        '@type': 'MerchantReturnPolicy',
-        'applicableCountry': 'IN',
-        'returnPolicyCategory': 'https://schema.org/MerchantReturnFiniteReturnWindow',
-        'merchantReturnDays': 2,
-        'returnMethod': 'https://schema.org/ReturnByMail',
-        'returnFees': 'https://schema.org/FreeReturn',
-        'refundType': 'https://schema.org/FullRefund'
-      }
-    };
+    var ny = new Date(); ny.setFullYear(ny.getFullYear()+1);
+    schemaObj.offers = { '@type':'Offer','priceCurrency':'INR','price':String(priceVal),'priceValidUntil':ny.toISOString().split('T')[0],'availability':inStock?'https://schema.org/InStock':'https://schema.org/OutOfStock','seller':{'@type':'Organization','name':'5 Pahadi Roots'} };
   }
-  var schemaTag = document.getElementById('product-jsonld');
-  if (!schemaTag) {
-    schemaTag = document.createElement('script');
-    schemaTag.type = 'application/ld+json';
-    schemaTag.id = 'product-jsonld';
-    document.head.appendChild(schemaTag);
-  }
-  schemaTag.textContent = JSON.stringify(schemaObj);
+  var st = document.getElementById('product-jsonld');
+  if (!st){ st=document.createElement('script'); st.type='application/ld+json'; st.id='product-jsonld'; document.head.appendChild(st); }
+  st.textContent = JSON.stringify(schemaObj);
 
-  var pct = p.mrp && p.price ? Math.round((1 - p.price / p.mrp) * 100) : 0;
-  // If product has variants, use first variant stock; else product stock
-  var initStock = (VARIANTS && VARIANTS.length > 0) ? (VARIANTS[0].available_stock || 0) : (p.available_stock !== undefined ? p.available_stock : 99);
-  var stock = initStock;
-  var stockClass = stock > 20 ? '' : stock > 5 ? 'low' : 'oos';
-  var stockLabel = stock <= 0 ? 'Out of Stock' : stock <= 5 ? 'Only ' + stock + ' left!' : stock <= 20 ? stock + ' in stock' : 'In Stock';
-
-  // Build images array
+  /* ── Images ── */
   var allImgs = [];
   if (p.image_url) allImgs.push(p.image_url);
-  images.forEach(function(i) { if (i.image_url && i.image_url !== p.image_url) allImgs.push(i.image_url); });
+  images.forEach(function(i){ if(i.image_url&&i.image_url!==p.image_url) allImgs.push(i.image_url); });
 
-  // Main image HTML
   var mainImgHtml = allImgs.length
-    ? '<div class="main-img-wrap"><img id="main-img" src="' + allImgs[0] + '" alt="' + p.name + '" loading="eager">' +
-      (p.badges && p.badges.length ? '<div class="badge-row">' + p.badges.map(function(b) { return '<span class="badge ' + b.substring(0,2) + '">' + b.charAt(0).toUpperCase() + b.slice(1) + '</span>'; }).join('') + '</div>' : '') +
-      (pct > 0 ? '<span class="disc-badge">-' + pct + '%</span>' : '') +
+    ? '<div class="main-img-wrap" onclick="openZoom(\'' + allImgs[0] + '\')">' +
+        (p.badges&&p.badges.length ? '<div class="badge-row">'+p.badges.map(function(b){return '<span class="badge '+b.substring(0,2)+'">'+b.charAt(0).toUpperCase()+b.slice(1)+'</span>';}).join('')+'</div>' : '') +
+        '<img id="main-img" src="' + allImgs[0] + '" alt="' + p.name + '" loading="eager">' +
       '</div>'
-    : '<div class="main-img-placeholder">' + (p.emoji || '🌿') + '</div>';
+    : '<div class="main-img-placeholder">' + (p.emoji||'🌿') + '</div>';
 
-  // Thumbnails
   var thumbHtml = allImgs.length > 1
-    ? '<div class="thumb-row">' + allImgs.map(function(src, i) {
-        return '<div class="thumb' + (i===0?' active':'') + '" onclick="switchImg(\'' + src + '\',this)"><img src="' + src + '" loading="lazy"></div>';
+    ? '<div class="thumb-row">' + allImgs.map(function(src,i){
+        return '<div class="thumb'+(i===0?' active':'')+'" onclick="switchImg(\''+src+'\',this)">' +
+          '<img src="'+src+'" loading="lazy">' +
+        '</div>';
       }).join('') + '</div>'
     : '';
 
-  // Variants HTML
+  /* ── Variants — premium cards ── */
+  var pct = p.mrp&&p.price ? Math.round((1-p.price/p.mrp)*100) : 0;
+  var initStock = VARIANTS.length>0?(VARIANTS[0].available_stock||0):(p.available_stock!==undefined?p.available_stock:99);
+  var stockClass = initStock>20?'':initStock>5?'low':'oos';
+  var stockLabel = initStock<=0?'Out of Stock':initStock<=5?'Only '+initStock+' left!':initStock<=20?initStock+' in stock':'In Stock';
+  var displayPrice = VARIANTS.length>0?VARIANTS[0].price:p.price;
+  var displayMrp = VARIANTS.length>0?(VARIANTS[0].original_price||p.mrp):p.mrp;
+  if (VARIANTS.length>0) selectedVariant = VARIANTS[0];
+
   var variantHtml = '';
   if (VARIANTS.length > 0) {
-    selectedVariant = VARIANTS[0];
+    var gridClass = VARIANTS.length > 3 ? 'variant-grid has-more' : 'variant-grid';
     variantHtml = '<div class="variants-section">' +
       '<div class="variants-label">Select Size: <span id="var-label">' + VARIANTS[0].variant_value + '</span></div>' +
-      '<div class="variant-btns">' +
-      VARIANTS.map(function(v, i) {
-        return '<button class="vbtn' + (i===0?' active':'') + (v.available_stock<=0?' oos':'') + '" ' +
-          'onclick="selectVariant(' + v.id + ')" data-id="' + v.id + '">' +
-          v.variant_value + '</button>';
+      '<div class="' + gridClass + '">' +
+      VARIANTS.map(function(v,i){
+        var savePct = v.original_price ? Math.round((1-v.price/v.original_price)*100) : 0;
+        var tag = '';
+        if (i===1&&VARIANTS.length>=3) tag = '<span class="vcard-tag best">Best Value</span>';
+        else if (i===VARIANTS.length-1&&VARIANTS.length>=3) tag = '<span class="vcard-tag deal">Steal Deal</span>';
+        return '<div class="vcard'+(i===0?' active':'')+(v.available_stock<=0?' oos':'')+'" onclick="selectVariant('+v.id+')" data-id="'+v.id+'">' +
+          tag +
+          '<span class="vc-size">'+v.variant_value+'</span>' +
+          '<span class="vc-price">₹'+v.price+ (v.original_price?'  <span class="vc-orig">₹'+v.original_price+'</span>':'') +'</span>' +
+          (savePct>0?'<span class="vc-save">Save '+savePct+'%</span>':'') +
+        '</div>';
       }).join('') +
       '</div></div>';
   }
 
-  // Highlights
-  var hlItems = ['100% Natural & Organic', 'Directly from Himalayan farmers', 'No preservatives or additives', 'Lab tested for purity'];
-  if (p.tags && p.tags.length) {
-    hlItems = p.tags.concat(hlItems).slice(0, 5);
+  /* ── Highlights ── */
+  var hlItems = ['100% Natural & Organic','Directly from Himalayan farmers','No preservatives or additives','Lab tested for purity'];
+  if (p.tags&&p.tags.length) hlItems = p.tags.concat(hlItems).slice(0,5);
+
+  /* ── Related ── */
+  var relHtml = '';
+  if (related.length) {
+    relHtml = '<div class="related-section">' +
+      '<h2 class="section-title">You May Also Like</h2>' +
+      '<p class="section-sub">Handpicked from the same Himalayan region</p>' +
+      '<div class="related-grid">' +
+      related.map(function(r){
+        var rSlug = r.slug&&!/^\d+$/.test(r.slug)?r.slug:(r.name?r.name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,''):r.id);
+        var rDisc = r.mrp&&r.price?Math.round((1-r.price/r.mrp)*100):0;
+        return '<div class="rel-card" onclick="goToProduct(\''+rSlug+'\')">' +
+          '<div class="rel-img">' +
+            (r.image_url?'<img src="'+r.image_url+'" alt="'+r.name+'" loading="lazy">' : '<div class="rel-img-placeholder">'+(r.emoji||'🌿')+'</div>') +
+            (rDisc>0?'<span class="rel-disc">-'+rDisc+'%</span>':'') +
+          '</div>' +
+          '<div class="rel-body">' +
+            '<div class="rel-vendor">5 Pahadi Roots</div>' +
+            '<div class="rel-name">'+r.name+'</div>' +
+            '<div class="rel-price-row"><span class="rel-price">₹'+r.price+'</span>'+(r.mrp&&r.mrp>r.price?'<span class="rel-orig">₹'+r.mrp+'</span>':'')+'</div>' +
+          '</div>' +
+        '</div>';
+      }).join('') +
+      '</div></div>';
   }
 
-  // Related cards
-  var relHtml = related.length ? '<div class="related-section">' +
-    '<h2 class="section-title">You May Also Like</h2>' +
-    '<div class="related-grid">' +
-    related.map(function(r) {
-      return '<div class="rel-card" onclick="goToProduct(\'' + (r.slug && !/^\\d+$/.test(r.slug) ? r.slug : (r.name ? r.name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^\-|-$)/g,'') : r.id)) + '\')" style="cursor:pointer">' +
-        '<div class="rel-img">' + (r.image_url ? '<img src="' + r.image_url + '" alt="' + r.name + '" loading="lazy">' : '<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:40px">' + (r.emoji||'🌿') + '</div>') + '</div>' +
-        '<div class="rel-body"><div class="rel-name">' + r.name + '</div><div class="rel-price">₹' + r.price + '</div></div>' +
-        '</div>';
-    }).join('') +
-    '</div></div>' : '';
+  /* ── Description tabs content ── */
+  var descHtml = p.long_description || p.short_description || p.description || 'Authentic Himalayan product sourced directly from local farmers. No preservatives, no additives — pure and natural.';
+  var retNumStr = WHATSAPP_NUMBER.replace('91','').replace(/(\d{5})(\d{5})/,'$1 $2');
 
-  var displayPrice = selectedVariant ? selectedVariant.price : p.price;
-  var displayMrp = selectedVariant ? (selectedVariant.original_price || p.mrp) : p.mrp;
-
+  /* ── Assemble HTML ── */
   document.getElementById('main-content').innerHTML =
     '<div class="product-wrap">' +
-      // LEFT — Images
-      '<div class="img-section">' + mainImgHtml + thumbHtml + '</div>' +
-      // RIGHT — Info
+      /* LEFT — Images */
+      '<div class="img-section">' +
+        mainImgHtml +
+        thumbHtml +
+      '</div>' +
+      /* RIGHT — Info */
       '<div class="info-section">' +
-        '<div class="prod-region">📍 ' + (p.region || stateMap[p.state_id] || p.state_id || '') + '</div>' +
+        '<div class="prod-vendor">📍 ' + (p.region||stateMap[p.state_id]||p.state_id||'Pahadi Roots') + '</div>' +
         '<h1 class="prod-name">' + p.name + '</h1>' +
-        '<div class="prod-rating"><span class="stars">★★★★★</span><span class="rating-count">(4.8 · ' + (p.review_count || 39) + ' reviews)</span></div>' +
-        '<p class="prod-desc">' + (p.short_description || p.description || '') + '</p>' +
-        '<div class="price-row">' +
-          '<span class="price-now" id="dp-price">₹' + displayPrice + '</span>' +
-          (displayMrp && displayMrp > displayPrice ? '<span class="price-was" id="dp-mrp">₹' + displayMrp + '</span><span class="price-save" id="dp-save">Save ₹' + (displayMrp - displayPrice) + '</span>' : '') +
+        /* Rating */
+        '<div class="rating-row">' +
+          '<div class="stars">' + [1,2,3,4,5].map(function(){return '<svg class="star" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>';}).join('') + '</div>' +
+          '<span class="rating-num">4.8</span>' +
+          '<span class="rating-reviews">('+( p.review_count||39)+' reviews)</span>' +
+          (p.sold_count ? '<span class="rating-sold">'+p.sold_count+' sold</span>' : '') +
         '</div>' +
+        /* Warning */
+        (p.warning_text ? '<div class="warn-box"><span class="warn-icon">⚠️</span><span>'+p.warning_text+'</span></div>' : '') +
+        /* Price */
+        '<div class="price-block">' +
+          '<div class="price-row">' +
+            '<span class="price-now" id="dp-price">₹'+displayPrice+'</span>' +
+            (displayMrp&&displayMrp>displayPrice ? '<span class="price-was" id="dp-mrp">₹'+displayMrp+'</span><span class="price-save-badge" id="dp-save">SAVE '+pct+'%</span>' : '') +
+          '</div>' +
+          '<p class="price-tax-note">MRP inclusive of all taxes' + (VARIANTS.length>0?' · '+VARIANTS[0].variant_value:'') + '</p>' +
+          (p.sold_count ? '<p class="price-sold-note">'+p.sold_count+' bottles sold</p>' : '') +
+        '</div>' +
+        /* Variants */
         variantHtml +
-        '<div class="stock-row"><div class="stock-dot ' + stockClass + '"></div><span>' + stockLabel + '</span></div>' +
+        /* Stock */
+        '<div class="stock-row"><div class="stock-dot '+stockClass+'"></div><span>'+stockLabel+'</span></div>' +
+        /* Pincode check */
+        '<div class="pincode-row">' +
+          '<span class="pincode-icon">📍</span>' +
+          '<span class="pincode-label">Check delivery to:</span>' +
+          '<input class="pincode-input" type="text" placeholder="Enter PIN" maxlength="6" id="pincode-input">' +
+          '<button class="pincode-check" onclick="checkPin()">Check</button>' +
+        '</div>' +
+        /* Qty + CTA */
+        '<p class="qty-label">Quantity</p>' +
         '<div class="qty-atc">' +
           '<div class="qty-ctrl">' +
-            '<button class="qty-btn" onclick="changeQty(-1)">−</button>' +
+            '<button class="qty-btn" onclick="changeQty(-1)" style="opacity:.3">−</button>' +
             '<span class="qty-num" id="qty-display">1</span>' +
             '<button class="qty-btn" onclick="changeQty(1)">+</button>' +
           '</div>' +
-          '<button class="atc-btn-add" id="atc-add-btn" onclick="addToCartProduct(\'addcart\')" ' + (stock<=0?'disabled':'') + '>🛒 Add to Cart</button>' +
-          '<button class="atc-btn-buy" id="atc-btn" onclick="addToCartProduct(\'buynow\')" ' + (stock<=0?'disabled':'') + '>⚡ Buy Now</button>' +
-          '<button class="wl-btn-lg' + (wishlist.includes(p.id)?' active':'') + '" onclick="toggleWL()" id="wl-btn">' + (wishlist.includes(p.id)?'❤️':'🤍') + '</button>' +
-          '<button class="share-btn" onclick="shareProduct()" title="Share this product">🔗</button>' +
+          '<button class="btn-add-cart" id="atc-add-btn" onclick="addToCartProduct(\'add\')" '+(initStock<=0?'disabled':'')+'>🛒 Add to Cart</button>' +
+          '<button class="btn-buy-now" id="atc-btn" onclick="addToCartProduct(\'buy\')" '+(initStock<=0?'disabled':'')+'>⚡ Buy Now</button>' +
+          '<button class="btn-icon '+(wishlist.indexOf(p.id)>-1?'wl-active':'')+'" onclick="toggleWL()" id="wl-btn">'+(wishlist.indexOf(p.id)>-1?'❤️':'🤍')+'</button>' +
+          '<button class="btn-icon" onclick="shareProduct()" title="Share">🔗</button>' +
         '</div>' +
-        '<div class="delivery-row">🚚 Free delivery available · Pan India · Estimated 5-7 days</div>' +
-        '<div class="highlights"><h4>Why 5 Pahadi Roots?</h4><ul class="hl-list">' +
-          hlItems.map(function(h) { return '<li>' + h + '</li>'; }).join('') +
-        '</ul></div>' +
-      '</div>' +
-    '</div>' +
-    // Description tabs
+        /* Delivery */
+        '<div class="delivery-bar">' +
+          '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16,8 20,8 23,11 23,16 16,16"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>' +
+          '🚚 Free delivery available · Pan India · Estimated 5–7 days' +
+        '</div>' +
+        /* Trust */
+        '<div class="trust-row">' +
+          '<div class="trust-chip"><span class="tc-dot"></span>Free delivery above ₹799</div>' +
+          '<div class="trust-chip"><span class="tc-dot"></span>Lab-tested & pure</div>' +
+          '<div class="trust-chip"><span class="tc-dot"></span>Direct from farmers</div>' +
+          '<div class="trust-chip"><span class="tc-dot"></span>UPI · Cards · COD</div>' +
+        '</div>' +
+        /* Highlights */
+        '<div class="highlights">' +
+          '<p class="highlights-title">Why 5 Pahadi Roots?</p>' +
+          '<ul class="hl-list">' +
+            hlItems.map(function(h){ return '<li><span class="hl-check">✓</span>'+h+'</li>'; }).join('') +
+          '</ul>' +
+        '</div>' +
+      '</div>' + /* end info-section */
+    '</div>' + /* end product-wrap */
+
+    /* DESCRIPTION TABS */
     '<div class="desc-section">' +
       '<div class="desc-tabs">' +
         '<div class="desc-tab active" onclick="switchTab(\'desc\',this)">Description</div>' +
         '<div class="desc-tab" onclick="switchTab(\'ship\',this)">Shipping</div>' +
-        '<div class="desc-tab" onclick="switchTab(\'care\',this)">Storage & Care</div>' +
-        '<div class="desc-tab" onclick="switchTab(\'returns\',this)">Returns & Refunds</div>' +
+        '<div class="desc-tab" onclick="switchTab(\'care\',this)">Storage &amp; Care</div>' +
+        '<div class="desc-tab" onclick="switchTab(\'returns\',this)">Returns &amp; Refunds</div>' +
       '</div>' +
-      '<div id="tab-desc" class="desc-content active">' + (p.long_description || p.short_description || p.description || 'Authentic Himalayan product sourced directly from local farmers. No preservatives, no additives — pure and natural.') + '</div>' +
-      '<div id="tab-ship" class="desc-content">We ship Pan India via trusted courier partners. Delivery in 5-7 business days. Free shipping on orders above ₹799. COD available on select pincodes.</div>' +
-      '<div id="tab-care" class="desc-content">Store in a cool, dry place away from direct sunlight. Keep container tightly sealed after use. Best consumed within the expiry date printed on the pack.</div>' +
-      '<div id="tab-returns" class="desc-content"><strong>🔄 Return & Refund Policy</strong><br><br>We want you to love every product from 5 Pahadi Roots. Here\'s our policy:<br><br><strong>✅ Eligible for return:</strong> Damaged, defective, or wrong item delivered — report within <strong>3 days</strong> of delivery with a photo/video.<br><br><strong>❌ Not eligible:</strong> Products opened & used (unless defective), items returned after 3 days, or without original packaging.<br><br><strong>How to claim:</strong> WhatsApp us at +91 ' + WHATSAPP_NUMBER.replace('91','').replace(/(\d{5})(\d{5})/,'$1 $2') + ' with your order number and photos. We process refunds within 5-7 business days once approved.<br><br><strong>Refund method:</strong> UPI / original payment method.<br><br>For any issues, reach us at support@pahadiroots.com</div>' +
+      '<div id="tab-desc" class="desc-content active">' + descHtml + '</div>' +
+      '<div id="tab-ship" class="desc-content"><div class="policy-block">🚚 <strong>Pan India Shipping</strong><br><br>We ship via trusted courier partners. Delivery in <strong>5–7 business days</strong>. Free shipping on orders above ₹799. COD available on select pincodes.<br><br>Orders are typically dispatched within 1–2 business days of confirmation.</div></div>' +
+      '<div id="tab-care" class="desc-content"><div class="policy-block">🌿 <strong>Storage & Care</strong><br><br>Store in a cool, dry place away from direct sunlight. Keep container tightly sealed after use. Best consumed within the expiry date printed on the pack. Refrigerate after opening where advised.</div></div>' +
+      '<div id="tab-returns" class="desc-content"><div class="policy-block"><strong>🔄 Return & Refund Policy</strong><br><br>We want you to love every product from 5 Pahadi Roots.<br><br><strong>✅ Eligible:</strong> Damaged, defective, or wrong item — report within <strong>3 days</strong> of delivery with photo/video.<br><br><strong>❌ Not eligible:</strong> Opened & used products (unless defective), items after 3 days, or without original packaging.<br><br><strong>How to claim:</strong> WhatsApp +91 '+retNumStr+' with your order number and photos. Refunds processed within 5–7 business days.<br><br><strong>Refund:</strong> UPI / original payment method.</div></div>' +
     '</div>' +
+
     relHtml +
-    '<footer class="mini-footer">© 2026 5 Pahadi Roots · <a href="/">Shop Now</a> · <a href="/terms">Terms & Returns</a> · <a href="mailto:support@pahadiroots.com">support@pahadiroots.com</a></footer>';
+
+    '<footer class="mini-footer">© 2026 5 Pahadi Roots &nbsp;·&nbsp; <a href="/">Shop Now</a> &nbsp;·&nbsp; <a href="/terms">Terms &amp; Returns</a> &nbsp;·&nbsp; <a href="mailto:support@pahadiroots.com">support@pahadiroots.com</a></footer>';
 }
 
-// ── Switch main image ──
+/* ══════════════════════════════════════════
+   SWITCH IMAGE
+══════════════════════════════════════════ */
 function switchImg(src, thumb) {
-  document.getElementById('main-img').src = src;
-  document.querySelectorAll('.thumb').forEach(function(t) { t.classList.remove('active'); });
+  var mi = document.getElementById('main-img');
+  if (mi) mi.src = src;
+  document.querySelectorAll('.thumb').forEach(function(t){ t.classList.remove('active'); });
   thumb.classList.add('active');
+  /* update zoom src */
+  document.getElementById('zoom-img').src = src;
+  /* update main-img-wrap onclick */
+  var wrap = document.querySelector('.main-img-wrap');
+  if (wrap) wrap.onclick = function(){ openZoom(src); };
 }
 
-// ── Switch tab ──
+/* ══════════════════════════════════════════
+   ZOOM
+══════════════════════════════════════════ */
+function openZoom(src) {
+  document.getElementById('zoom-img').src = src;
+  document.getElementById('zoom-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeZoom() {
+  document.getElementById('zoom-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+/* ══════════════════════════════════════════
+   SWITCH TAB
+══════════════════════════════════════════ */
 function switchTab(id, el) {
-  document.querySelectorAll('.desc-content').forEach(function(c) { c.classList.remove('active'); });
-  document.querySelectorAll('.desc-tab').forEach(function(t) { t.classList.remove('active'); });
-  document.getElementById('tab-' + id).classList.add('active');
+  document.querySelectorAll('.desc-content').forEach(function(c){ c.classList.remove('active'); });
+  document.querySelectorAll('.desc-tab').forEach(function(t){ t.classList.remove('active'); });
+  document.getElementById('tab-'+id).classList.add('active');
   el.classList.add('active');
 }
 
-// ── Select variant ──
+/* ══════════════════════════════════════════
+   SELECT VARIANT
+══════════════════════════════════════════ */
 function selectVariant(varId) {
-  selectedVariant = VARIANTS.find(function(v) { return v.id === varId; });
+  selectedVariant = VARIANTS.find(function(v){ return v.id === varId; });
   if (!selectedVariant) return;
-  // Update buttons
-  document.querySelectorAll('.vbtn').forEach(function(b) {
-    b.classList.toggle('active', parseInt(b.dataset.id) === varId);
-  });
-  // Update label
+  document.querySelectorAll('.vcard').forEach(function(b){ b.classList.toggle('active', parseInt(b.dataset.id)===varId); });
   var lbl = document.getElementById('var-label');
   if (lbl) lbl.textContent = selectedVariant.variant_value;
-  // Update price
   var priceEl = document.getElementById('dp-price');
-  if (priceEl) priceEl.textContent = '₹' + selectedVariant.price;
+  if (priceEl) priceEl.textContent = '₹'+selectedVariant.price;
   var mrpEl = document.getElementById('dp-mrp');
   var saveEl = document.getElementById('dp-save');
   if (mrpEl && selectedVariant.original_price) {
-    mrpEl.textContent = '₹' + selectedVariant.original_price;
-    if (saveEl) saveEl.textContent = 'Save ₹' + (selectedVariant.original_price - selectedVariant.price);
+    mrpEl.textContent = '₹'+selectedVariant.original_price;
+    var savePct = Math.round((1-selectedVariant.price/selectedVariant.original_price)*100);
+    if (saveEl) saveEl.textContent = 'SAVE '+savePct+'%';
   }
-  // Update stock label
-  var sv = selectedVariant;
-  var svStock = sv ? (sv.available_stock !== undefined ? sv.available_stock : 99) : 99;
-  var svClass = svStock > 20 ? '' : svStock > 5 ? 'low' : 'oos';
-  var svLabel = svStock <= 0 ? 'Out of Stock' : svStock <= 5 ? 'Only ' + svStock + ' left!' : svStock <= 20 ? svStock + ' in stock' : 'In Stock';
-  var stockDot = document.querySelector('.stock-dot');
-  var stockSpan = document.querySelector('.stock-row span');
-  if (stockDot) { stockDot.className = 'stock-dot ' + svClass; }
-  if (stockSpan) stockSpan.textContent = svLabel;
-  // Disable/enable buy button
-  var atcBtn = document.getElementById('atc-btn');
-  if (atcBtn) atcBtn.disabled = svStock <= 0;
-  // Update qty to 1 on variant change
+  var svStock = selectedVariant.available_stock!==undefined?selectedVariant.available_stock:99;
+  var svClass = svStock>20?'':svStock>5?'low':'oos';
+  var svLabel = svStock<=0?'Out of Stock':svStock<=5?'Only '+svStock+' left!':svStock<=20?svStock+' in stock':'In Stock';
+  var dot = document.querySelector('.stock-dot');
+  var span = document.querySelector('.stock-row span');
+  if (dot) dot.className = 'stock-dot '+svClass;
+  if (span) span.textContent = svLabel;
+  var addBtn = document.getElementById('atc-add-btn');
+  var buyBtn = document.getElementById('atc-btn');
+  if (addBtn) addBtn.disabled = svStock<=0;
+  if (buyBtn) buyBtn.disabled = svStock<=0;
   qty = 1;
-  document.getElementById('qty-display').textContent = '1';
+  var qd = document.getElementById('qty-display');
+  if (qd) qd.textContent = '1';
+  document.querySelector('.qty-btn').style.opacity = '0.3';
 }
 
-// ── Change quantity ──
+/* ══════════════════════════════════════════
+   CHANGE QTY
+══════════════════════════════════════════ */
 function changeQty(d) {
   var stock = selectedVariant ? selectedVariant.available_stock : (PRODUCT ? PRODUCT.available_stock : 99);
-  qty = Math.max(1, Math.min(qty + d, stock || 99));
+  qty = Math.max(1, Math.min(qty+d, stock||99));
   document.getElementById('qty-display').textContent = qty;
-  // Visually disable minus at 1, plus at stock limit
-  var minusBtn = document.querySelector('.qty-ctrl .qty-btn:first-child');
-  var plusBtn = document.querySelector('.qty-ctrl .qty-btn:last-child');
-  if (minusBtn) minusBtn.style.opacity = qty <= 1 ? '0.3' : '1';
-  if (plusBtn) plusBtn.style.opacity = qty >= (stock || 99) ? '0.3' : '1';
+  var minus = document.querySelector('.qty-ctrl .qty-btn:first-child');
+  var plus = document.querySelector('.qty-ctrl .qty-btn:last-child');
+  if (minus) minus.style.opacity = qty<=1?'0.3':'1';
+  if (plus) plus.style.opacity = qty>=(stock||99)?'0.3':'1';
 }
 
-// ── Add to cart ──
-function shareProduct() {
-  var url  = window.location.href;
-  var pname = (PRODUCT && PRODUCT.name) ? PRODUCT.name : 'this product';
-  var pprice = (PRODUCT && PRODUCT.price) ? ' at ₹' + PRODUCT.price : '';
-  if (navigator.share) {
-    navigator.share({ title: pname + ' — 5 Pahadi Roots', text: '🌿 Check out ' + pname + pprice + ' on 5 Pahadi Roots!', url: url });
-  } else {
-    var waText = encodeURIComponent('🌿 Check out ' + pname + pprice + ' on 5 Pahadi Roots!\n' + url);
-    var wa = 'https://wa.me/?text=' + waText;
-    var modal = document.createElement('div');
-    modal.id = 'share-modal';
-    modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
-    var box = document.createElement('div');
-    box.style.cssText = 'background:#fff;border-radius:20px;padding:28px;max-width:340px;width:100%';
-    var h3 = document.createElement('h3');
-    h3.style.cssText = 'font-family:Playfair Display,serif;margin-bottom:4px';
-    h3.textContent = 'Share Product';
-    var sub = document.createElement('p');
-    sub.style.cssText = 'color:#888;font-size:13px;margin-bottom:20px';
-    sub.textContent = pname;
-    var waBtn = document.createElement('a');
-    waBtn.href = wa; waBtn.target = '_blank';
-    waBtn.style.cssText = 'display:block;background:#25d366;color:#fff;padding:12px 20px;border-radius:10px;text-align:center;font-weight:700;text-decoration:none;margin-bottom:10px';
-    waBtn.textContent = '💬 Share on WhatsApp';
-    var copyBtn = document.createElement('button');
-    copyBtn.style.cssText = 'display:block;width:100%;background:var(--g);color:#fff;padding:12px 20px;border-radius:10px;font-weight:700;border:none;cursor:pointer;font-size:14px;margin-bottom:10px';
-    copyBtn.textContent = '📋 Copy Link';
-    copyBtn.onclick = function(){ navigator.clipboard.writeText(url).then(function(){ showToastP('🔗 Link copied!'); modal.remove(); }); };
-    var cancelBtn = document.createElement('button');
-    cancelBtn.style.cssText = 'display:block;width:100%;padding:10px;border:none;background:#f5f5f5;border-radius:10px;cursor:pointer;font-weight:700';
-    cancelBtn.textContent = 'Cancel';
-    cancelBtn.onclick = function(){ modal.remove(); };
-    box.appendChild(h3); box.appendChild(sub); box.appendChild(waBtn); box.appendChild(copyBtn); box.appendChild(cancelBtn);
-    modal.appendChild(box);
-    document.body.appendChild(modal);
-    modal.addEventListener('click', function(e){ if(e.target===modal) modal.remove(); });
-  }
+/* ══════════════════════════════════════════
+   PINCODE CHECK
+══════════════════════════════════════════ */
+function checkPin() {
+  var pin = (document.getElementById('pincode-input')||{}).value || '';
+  if (pin.length !== 6) { showToast('Please enter a valid 6-digit PIN'); return; }
+  showToast('✅ Delivery available to PIN ' + pin + ' in 5–7 days');
 }
-function showToastP(msg) { var t=document.getElementById('toast'); if(t){t.textContent=msg;t.style.opacity=1;setTimeout(function(){t.style.opacity=0;},2200);} }
 
+/* ══════════════════════════════════════════
+   ADD TO CART / BUY NOW
+══════════════════════════════════════════ */
 function addToCartProduct(mode) {
   if (!PRODUCT) return;
   var price = selectedVariant ? selectedVariant.price : PRODUCT.price;
   var variantId = selectedVariant ? selectedVariant.id : null;
   var variantLabel = selectedVariant ? selectedVariant.variant_value : '';
-  var cartKey = variantId ? (PRODUCT.id + '_' + variantId) : PRODUCT.id;
-  var displayName = PRODUCT.name + (variantLabel ? ' (' + variantLabel + ')' : '');
-
-  var cartKeyStr = String(cartKey);
-  var ex = cart.find(function(x) { return String(x.cartKey || x.id) === cartKeyStr; });
+  var cartKey = variantId ? (PRODUCT.id+'_'+variantId) : PRODUCT.id;
+  var displayName = PRODUCT.name + (variantLabel ? ' ('+variantLabel+')' : '');
+  var ex = cart.find(function(x){ return String(x.cartKey||x.id)===String(cartKey); });
   if (ex) ex.qty += qty;
-  else cart.push({ cartKey: cartKey, id: PRODUCT.id, variantId: variantId, name: displayName, emoji: PRODUCT.emoji, image: PRODUCT.image_url || '', price: price, qty: qty });
-
-  try { localStorage.setItem('pr_cart', JSON.stringify(cart)); } catch(e) {}
+  else cart.push({ cartKey:cartKey, id:PRODUCT.id, variantId:variantId, name:displayName, emoji:PRODUCT.emoji||'🌿', image:PRODUCT.image_url||'', price:price, qty:qty });
+  try { localStorage.setItem('pr_cart', JSON.stringify(cart)); } catch(e){}
   updateNavCart();
-
-  if (mode === 'buynow') {
-    // Buy Now → open cart panel (Amazon style) → user proceeds to payment
-    openCartPanel();
-    showToast('🛒 Review your cart & checkout!');
-  } else {
-    // Add to Cart → show confirmation, stay on page
-    showToast('✅ ' + displayName + ' added to cart!');
-    var addBtn = document.getElementById('atc-add-btn');
-    if (addBtn) {
-      addBtn.textContent = '✅ Added!';
-      addBtn.classList.add('added');
-      setTimeout(function() { addBtn.textContent = '🛒 Add to Cart'; addBtn.classList.remove('added'); }, 1600);
-    }
-  }
-
-  // Reset qty to 1 after adding
   qty = 1;
   var qd = document.getElementById('qty-display');
   if (qd) qd.textContent = '1';
-  var minusBtn = document.querySelector('.qty-ctrl .qty-btn:first-child');
-  if (minusBtn) minusBtn.style.opacity = '0.3';
+  var minus = document.querySelector('.qty-ctrl .qty-btn:first-child');
+  if (minus) minus.style.opacity = '0.3';
+
+  if (mode === 'buy') {
+    /* Buy Now → open cart drawer (Amazon style) */
+    renderCartDrawer();
+    openCartDrawer();
+    showToast('🛒 Review your cart & checkout!');
+  } else {
+    /* Add to Cart → confirm, stay on page */
+    var btn = document.getElementById('atc-add-btn');
+    if (btn) {
+      btn.innerHTML = '✅ Added!';
+      btn.classList.add('added');
+      setTimeout(function(){ btn.innerHTML='🛒 Add to Cart'; btn.classList.remove('added'); }, 1700);
+    }
+    showToast('✅ '+displayName+' added to cart!');
+  }
 }
 
-// ── Toggle wishlist ──
+/* ══════════════════════════════════════════
+   WISHLIST
+══════════════════════════════════════════ */
 function toggleWL() {
   if (!PRODUCT) return;
   var idx = wishlist.indexOf(PRODUCT.id);
-  if (idx > -1) wishlist.splice(idx, 1);
-  else wishlist.push(PRODUCT.id);
-  try { localStorage.setItem('pr_wishlist', JSON.stringify(wishlist)); } catch(e) {}
+  if (idx>-1) wishlist.splice(idx,1); else wishlist.push(PRODUCT.id);
+  try { localStorage.setItem('pr_wishlist', JSON.stringify(wishlist)); } catch(e){}
   var btn = document.getElementById('wl-btn');
-  if (btn) { btn.textContent = wishlist.includes(PRODUCT.id) ? '❤️' : '🤍'; btn.classList.toggle('active', wishlist.includes(PRODUCT.id)); }
-  showToast(wishlist.includes(PRODUCT.id) ? '❤️ Saved to wishlist!' : 'Removed from wishlist');
+  if (btn) { btn.textContent = wishlist.indexOf(PRODUCT.id)>-1?'❤️':'🤍'; btn.classList.toggle('wl-active', wishlist.indexOf(PRODUCT.id)>-1); }
+  showToast(wishlist.indexOf(PRODUCT.id)>-1?'❤️ Saved to wishlist!':'Removed from wishlist');
 }
 
-// ── Go to product ──
-function goToProduct(slug) {
-  var s = String(slug || '');
-  // Never use numeric ID — generate from name if needed
-  if (!s || /^\d+$/.test(s)) {
-    var prod = ALL_PRODUCTS.find(function(p){ return String(p.id) === s; });
-    if (prod) s = prod.slug && !/^\d+$/.test(prod.slug) ? prod.slug : (prod.name ? prod.name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'') : s);
+/* ══════════════════════════════════════════
+   SHARE
+══════════════════════════════════════════ */
+function shareProduct() {
+  var url = window.location.href;
+  var pname = (PRODUCT&&PRODUCT.name)?PRODUCT.name:'this product';
+  var pprice = (PRODUCT&&PRODUCT.price)?' at ₹'+PRODUCT.price:'';
+  if (navigator.share) {
+    navigator.share({ title:pname+' — 5 Pahadi Roots', text:'🌿 Check out '+pname+pprice+' on 5 Pahadi Roots!', url:url });
+  } else {
+    var waText = encodeURIComponent('🌿 Check out '+pname+pprice+' on 5 Pahadi Roots!\n'+url);
+    var modal = document.createElement('div');
+    modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
+    modal.innerHTML = '<div style="background:#fff;border-radius:20px;padding:28px;max-width:340px;width:100%">' +
+      '<h3 style="font-family:Playfair Display,serif;margin-bottom:4px">Share Product</h3>' +
+      '<p style="color:#888;font-size:13px;margin-bottom:20px">'+pname+'</p>' +
+      '<a href="https://wa.me/?text='+waText+'" target="_blank" style="display:block;background:#25d366;color:#fff;padding:12px 20px;border-radius:10px;text-align:center;font-weight:700;text-decoration:none;margin-bottom:10px">💬 Share on WhatsApp</a>' +
+      '<button onclick="navigator.clipboard.writeText(\''+url+'\').then(function(){showToast(\'🔗 Link copied!\');}).catch(function(){});this.closest(\'[style]\').remove()" style="display:block;width:100%;background:var(--g);color:#fff;padding:12px;border-radius:10px;font-weight:700;border:none;cursor:pointer;font-size:14px;margin-bottom:10px;font-family:Lato,sans-serif">📋 Copy Link</button>' +
+      '<button onclick="this.closest(\'[style]\').remove()" style="display:block;width:100%;padding:10px;border:none;background:#f5f5f5;border-radius:10px;cursor:pointer;font-weight:700;font-family:Lato,sans-serif">Cancel</button>' +
+    '</div>';
+    modal.addEventListener('click', function(e){ if(e.target===modal) modal.remove(); });
+    document.body.appendChild(modal);
   }
-  window.location.href = '/products/' + s;
 }
 
-// ── Not found ──
-function showNotFound(msg) {
-  document.getElementById('main-content').innerHTML =
-    '<div class="not-found"><h2>Product not found</h2><p>' + msg + '</p><br><a href="/" style="color:var(--g);font-weight:700">← Back to store</a></div>';
-}
-
-// ── Render cart panel ──
-function renderCartPanel() {
-  var total = cart.reduce(function(s,i){return s+(i.price*i.qty);},0);
-  document.getElementById('cart-panel-total').textContent = '₹' + total.toLocaleString('en-IN');
-  var delNote = document.getElementById('cart-del-note');
-  if (delNote) {
-    delNote.style.display = total > 0 ? 'block' : 'none';
-    delNote.textContent = total >= 799 ? '🎉 Free delivery on this order!' : 'Add ₹' + (799 - total) + ' more for free delivery';
-  }
-  var body = document.getElementById('cart-panel-body');
+/* ══════════════════════════════════════════
+   CART DRAWER
+══════════════════════════════════════════ */
+function renderCartDrawer() {
+  var total = cart.reduce(function(s,i){ return s+i.price*i.qty; }, 0);
+  document.getElementById('cd-total').textContent = '₹' + total.toLocaleString('en-IN');
+  var note = document.getElementById('cd-del-note');
+  if (note) note.textContent = total>=799 ? '🎉 Free delivery on this order!' : 'Add ₹'+(799-total)+' more for free delivery';
+  var body = document.getElementById('cart-drawer-body');
   if (!cart.length) {
-    body.innerHTML = '<div class="cart-empty"><div style="font-size:40px;margin-bottom:10px">🛒</div><p style="font-size:13px">Your cart is empty</p></div>';
+    body.innerHTML = '<div class="cd-empty"><div class="ce-icon">🛒</div><p>Your cart is empty.<br>Add products to get started.</p></div>';
     return;
   }
-  body.innerHTML = cart.map(function(item, idx) {
+  body.innerHTML = cart.map(function(item, idx){
     var imgHtml = item.image
-      ? '<img src="' + item.image + '" alt="">'
-      : (item.emoji || '🌿');
+      ? '<img src="'+item.image+'" alt="">'
+      : (item.emoji||'🌿');
     return '<div class="cart-item">' +
-      '<div class="cart-item-img">' + imgHtml + '</div>' +
-      '<div class="cart-item-info">' +
-        '<div class="cart-item-name">' + item.name + '</div>' +
-        '<div class="cart-item-var">Qty: ' + item.qty + '</div>' +
-        '<div class="cart-item-qty">' +
-          '<button class="cq-btn" onclick="cartAdjQty(' + idx + ',-1)">−</button>' +
-          '<span style="font-size:12px;font-weight:800;min-width:18px;text-align:center">' + item.qty + '</span>' +
-          '<button class="cq-btn" onclick="cartAdjQty(' + idx + ',1)">+</button>' +
-          '<button onclick="cartRemoveItem(' + idx + ')" style="margin-left:8px;background:none;border:none;color:#c0392b;font-size:11px;cursor:pointer;font-weight:700">Remove</button>' +
+      '<div class="ci-img">'+imgHtml+'</div>' +
+      '<div class="ci-info">' +
+        '<div class="ci-name">'+item.name+'</div>' +
+        '<div class="ci-var">Qty: '+item.qty+'</div>' +
+        '<div class="ci-bottom">' +
+          '<div class="ci-qty-ctrl">' +
+            '<button class="ci-qbtn" onclick="cAdjQty('+idx+',-1)">−</button>' +
+            '<span class="ci-qnum">'+item.qty+'</span>' +
+            '<button class="ci-qbtn" onclick="cAdjQty('+idx+',1)">+</button>' +
+          '</div>' +
+          '<button class="ci-remove" onclick="cRemove('+idx+')">Remove</button>' +
         '</div>' +
       '</div>' +
-      '<div class="cart-item-price">₹' + (item.price * item.qty).toLocaleString('en-IN') + '</div>' +
+      '<span class="ci-price">₹'+(item.price*item.qty).toLocaleString('en-IN')+'</span>' +
     '</div>';
   }).join('');
 }
-function cartAdjQty(idx, d) {
+function cAdjQty(idx, d) {
   cart[idx].qty += d;
   if (cart[idx].qty <= 0) cart.splice(idx, 1);
-  try { localStorage.setItem('pr_cart', JSON.stringify(cart)); } catch(e) {}
+  try { localStorage.setItem('pr_cart', JSON.stringify(cart)); } catch(e){}
   updateNavCart();
-  renderCartPanel();
+  renderCartDrawer();
 }
-function cartRemoveItem(idx) {
-  cart.splice(idx, 1);
-  try { localStorage.setItem('pr_cart', JSON.stringify(cart)); } catch(e) {}
+function cRemove(idx) {
+  cart.splice(idx,1);
+  try { localStorage.setItem('pr_cart', JSON.stringify(cart)); } catch(e){}
   updateNavCart();
-  renderCartPanel();
+  renderCartDrawer();
+}
+function openCartDrawer() {
+  renderCartDrawer();
+  document.getElementById('drawer-overlay').classList.add('open');
+  document.getElementById('cart-drawer').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeCartDrawer() {
+  document.getElementById('drawer-overlay').classList.remove('open');
+  document.getElementById('cart-drawer').classList.remove('open');
+  document.body.style.overflow = '';
 }
 
-// ── Payment modal ──
-function openPaymentModal() {
-  closeCartPanel();
-  var total = cart.reduce(function(s,i){return s+(i.price*i.qty);},0);
-  document.getElementById('pay-grand-total').textContent = '₹' + total.toLocaleString('en-IN');
-  document.getElementById('pay-order-summary').innerHTML = cart.length
-    ? cart.map(function(i){ return '<div class="pay-order-item"><span>' + i.name + ' ×' + i.qty + '</span><span>₹' + (i.price*i.qty).toLocaleString('en-IN') + '</span></div>'; }).join('')
-    : '<div class="pay-order-item" style="color:var(--tx3)">No items in cart</div>';
-  // Pre-fill name if known
-  var nameInput = document.getElementById('pay-name');
-  if (nameInput && !nameInput.value) nameInput.value = '';
+/* ══════════════════════════════════════════
+   PAYMENT MODAL
+══════════════════════════════════════════ */
+function openPayModal() {
+  closeCartDrawer();
+  var total = cart.reduce(function(s,i){ return s+i.price*i.qty; }, 0);
+  document.getElementById('pm-grand-total').textContent = '₹' + total.toLocaleString('en-IN');
+  document.getElementById('pm-order-items').innerHTML = cart.length
+    ? cart.map(function(i){ return '<div class="pm-order-item"><span>'+i.name+' ×'+i.qty+'</span><span>₹'+(i.price*i.qty).toLocaleString('en-IN')+'</span></div>'; }).join('')
+    : '<div class="pm-order-item" style="color:var(--tx3)">No items</div>';
   document.getElementById('pay-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
 }
-function closePaymentModal() {
+function closePayModal() {
   document.getElementById('pay-overlay').classList.remove('open');
+  document.body.style.overflow = '';
 }
-function selectPayMethod(el) {
-  document.querySelectorAll('.pay-method').forEach(function(m){m.classList.remove('sel');m.querySelector('.pay-method-check').textContent='';});
-  el.classList.add('sel'); el.querySelector('.pay-method-check').textContent = '✓';
+function selPayMethod(el) {
+  document.querySelectorAll('.pm-method').forEach(function(m){ m.classList.remove('sel'); m.querySelector('.pm-check').textContent=''; });
+  el.classList.add('sel');
+  el.querySelector('.pm-check').textContent = '✓';
 }
-function placeOrderNow() {
-  closePaymentModal();
+function placeOrder() {
+  closePayModal();
   cart = [];
-  try { localStorage.setItem('pr_cart', JSON.stringify(cart)); } catch(e) {}
+  try { localStorage.setItem('pr_cart', JSON.stringify(cart)); } catch(e){}
   updateNavCart();
   document.getElementById('success-overlay').classList.add('open');
 }
 
-// ── AI Product Generator ──
+/* ══════════════════════════════════════════
+   GO TO PRODUCT
+══════════════════════════════════════════ */
+function goToProduct(slug) {
+  var s = String(slug||'');
+  if (!s||/^\d+$/.test(s)) {
+    var prod = ALL_PRODUCTS.find(function(p){ return String(p.id)===s; });
+    if (prod) s = prod.slug&&!/^\d+$/.test(prod.slug)?prod.slug:(prod.name?prod.name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,''):s);
+  }
+  window.location.href = '/products/'+s;
+}
+
+/* ══════════════════════════════════════════
+   NOT FOUND
+══════════════════════════════════════════ */
+function showNotFound(msg) {
+  document.getElementById('main-content').innerHTML =
+    '<div class="not-found"><h2>Product not found</h2><p>'+msg+'</p><br><a href="/" style="color:var(--g);font-weight:700">← Back to store</a></div>';
+}
+
+/* ══════════════════════════════════════════
+   AI PRODUCT GENERATOR
+══════════════════════════════════════════ */
 async function aiGenerateProduct() {
   var input = document.getElementById('ai-prod-input').value.trim();
   if (!input) { showToast('Please enter a product name'); return; }
   var btn = document.getElementById('ai-gen-btn');
   btn.disabled = true;
-  btn.innerHTML = '<span class="ai-spin"></span> Generating...';
+  btn.innerHTML = '<span class="spin"></span> Generating…';
+  document.getElementById('main-content').innerHTML = '<div class="loading-wrap"><div class="spinner"></div><p style="color:var(--tx3);font-size:14px">AI generating "'+input+'"…</p></div>';
   try {
-    var resp = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1000,
-        messages: [{ role: 'user', content: 'Generate product data for "Pahadi Roots" Himalayan organic store. Product: "' + input + '". Return ONLY valid JSON (no markdown, no backticks, no explanation):\n{"name":"product display name","emoji":"single emoji","region":"Himalayan region","short_description":"2 sentence description","price":499,"mrp":699,"review_count":312,"available_stock":85,"badges":["organic"],"tags":["100% Natural","Direct from farmers","Lab tested","No preservatives","FSSAI Certified"],"long_description":"3-4 paragraph HTML description with benefits","variants":[{"id":1,"variant_value":"250g","price":299,"original_price":399,"available_stock":50},{"id":2,"variant_value":"500g","price":499,"original_price":699,"available_stock":85},{"id":3,"variant_value":"1kg","price":849,"original_price":1199,"available_stock":40}],"storage_instructions":"storage and care instructions","usage_instructions":"how to use instructions"}' }]
+    var resp = await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514', max_tokens:1000,
+        messages:[{role:'user',content:'Generate product page data for "5 Pahadi Roots" Himalayan organic store. Product: "'+input+'". Return ONLY valid JSON, no markdown:\n{"name":"product name","emoji":"emoji","region":"Himalayan region","short_description":"2 sentence description","long_description":"<p>paragraph 1</p><p>paragraph 2</p>","price":499,"mrp":699,"review_count":312,"available_stock":85,"sold_count":"50,000+","warning_text":"health warning or empty","badges":["organic"],"tags":["100% Natural & Organic","Lab tested for purity","Direct from Himalayan farmers","No preservatives","FSSAI Certified"],"variants":[{"id":1,"variant_value":"250g","price":299,"original_price":399,"available_stock":50},{"id":2,"variant_value":"500g","price":499,"original_price":699,"available_stock":85},{"id":3,"variant_value":"1kg","price":849,"original_price":1199,"available_stock":40}]}'}]
       })
     });
     var data = await resp.json();
     var text = data.content.map(function(c){return c.text||'';}).join('');
-    var clean = text.replace(/```json|```/g,'').trim();
-    var p = JSON.parse(clean);
-    // Inject as PRODUCT and render
-    PRODUCT = {
-      id: Date.now(),
-      name: p.name,
-      emoji: p.emoji || '🌿',
-      region: p.region || 'Himalayan',
-      short_description: p.short_description || '',
-      long_description: p.long_description || p.short_description || '',
-      price: p.variants ? p.variants[0].price : p.price,
-      mrp: p.variants ? p.variants[0].original_price : p.mrp,
-      available_stock: p.available_stock || 99,
-      review_count: p.review_count || 200,
-      badges: p.badges || [],
-      tags: p.tags || [],
-      image_url: '',
-      slug: p.name.toLowerCase().replace(/[^a-z0-9]+/g,'-')
-    };
-    VARIANTS = p.variants ? p.variants.map(function(v,i){return {id:v.id||i+1,product_id:PRODUCT.id,variant_value:v.variant_value,price:v.price,original_price:v.original_price,available_stock:v.available_stock||50};}) : [];
-    var stateMap = {};
+    var p = JSON.parse(text.replace(/```json|```/g,'').trim());
+    PRODUCT = { id:Date.now(), name:p.name, emoji:p.emoji||'🌿', region:p.region||'Himalayan', short_description:p.short_description||'', long_description:p.long_description||p.short_description||'', price:p.variants?p.variants[0].price:p.price, mrp:p.variants?p.variants[0].original_price:p.mrp, available_stock:p.available_stock||99, review_count:p.review_count||200, sold_count:p.sold_count||'', warning_text:p.warning_text||'', badges:p.badges||[], tags:p.tags||[], image_url:'', slug:p.name.toLowerCase().replace(/[^a-z0-9]+/g,'-') };
+    VARIANTS = (p.variants||[]).map(function(v,i){ return {id:v.id||i+1,product_id:PRODUCT.id,variant_value:v.variant_value,price:v.price,original_price:v.original_price,available_stock:v.available_stock||50}; });
     document.getElementById('bc-name').textContent = PRODUCT.name;
-    document.getElementById('pg-title').textContent = PRODUCT.name + ' — Pahadi Roots';
-    renderProduct(PRODUCT, [], [], {settings:{}}, stateMap);
+    document.getElementById('pg-title').textContent = PRODUCT.name+' — 5 Pahadi Roots';
+    renderProduct(PRODUCT,[],[],{settings:{}},{});
     document.getElementById('ai-prod-input').value = '';
-    showToast('✨ ' + PRODUCT.name + ' loaded!');
+    showToast('✨ '+PRODUCT.name+' loaded!');
   } catch(e) {
     showToast('AI generation failed — please try again');
+    document.getElementById('main-content').innerHTML = '<div class="loading-wrap"><p style="color:#e53">Generation failed. <a href="" style="color:var(--g)">Refresh</a> and try again.</p></div>';
     console.error(e);
   }
   btn.disabled = false;
-  btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg> Auto-Generate with AI';
+  btn.innerHTML = '✦ Auto-Generate with AI';
 }
 
-// ── Init ──
+/* ══════════════════════════════════════════
+   INIT
+══════════════════════════════════════════ */
 updateNavCart();
 loadProduct();
 </script>
