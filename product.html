@@ -480,28 +480,7 @@ button{font-family:'Lato',sans-serif}
   </div>
 </div>
 
-<!-- AI BENEFITS SECTION (populated after product loads) -->
-<div id="benefits-outer" style="display:none">
-  <div class="benefits-section">
-    <h2 class="benefits-heading" id="benefits-heading">Health Benefits</h2>
-    <p class="benefits-sub" id="benefits-sub">Loading product benefits…</p>
-    <div class="benefits-grid" id="benefits-grid">
-      <!-- skeleton -->
-      <div class="ben-skeleton"><div class="sk-line sk-icon"></div><div class="sk-line sk-title"></div><div class="sk-line sk-d1"></div><div class="sk-line sk-d2"></div></div>
-      <div class="ben-skeleton"><div class="sk-line sk-icon"></div><div class="sk-line sk-title"></div><div class="sk-line sk-d1"></div><div class="sk-line sk-d2"></div></div>
-      <div class="ben-skeleton"><div class="sk-line sk-icon"></div><div class="sk-line sk-title"></div><div class="sk-line sk-d1"></div><div class="sk-line sk-d2"></div></div>
-      <div class="ben-skeleton"><div class="sk-line sk-icon"></div><div class="sk-line sk-title"></div><div class="sk-line sk-d1"></div><div class="sk-line sk-d2"></div></div>
-    </div>
-  </div>
-  <!-- USAGE + STORAGE + WHO SHOULD BUY -->
-  <div class="usage-section" id="usage-section">
-    <div class="usage-grid" id="usage-grid">
-      <div class="usage-card"><div class="usage-card-head">🍽️ How to Use</div><div class="sk-usage sk-line" style="height:80px;border-radius:0"></div></div>
-      <div class="usage-card"><div class="usage-card-head">📦 Storage Tips</div><div class="sk-usage sk-line" style="height:80px;border-radius:0"></div></div>
-      <div class="usage-card"><div class="usage-card-head">👤 Who Should Buy</div><div class="sk-usage sk-line" style="height:80px;border-radius:0"></div></div>
-    </div>
-  </div>
-</div>
+<!-- benefits injected dynamically inside renderProduct -->
 
 <!-- ZOOM OVERLAY -->
 <div class="zoom-overlay" id="zoom-overlay" onclick="closeZoom()">
@@ -859,6 +838,27 @@ function renderProduct(p, images, related, data, stateMap) {
       '<div id="tab-ship" class="desc-content"><div class="policy-block">🚚 <strong>Pan India Shipping</strong><br><br>We ship via trusted courier partners. Delivery in <strong>5–7 business days</strong>. Free shipping on orders above ₹799. COD available on select pincodes.<br><br>Orders are dispatched within 1–2 business days of confirmation.</div></div>' +
       '<div id="tab-returns" class="desc-content"><div class="policy-block">🔄 <strong>Return & Refund Policy</strong><br><br>We want you to love every product.<br><br>✅ <strong>Eligible:</strong> Damaged, defective, or wrong item — report within <strong>3 days</strong> of delivery with photo/video.<br><br>❌ <strong>Not eligible:</strong> Opened & used products, items after 3 days, or without original packaging.<br><br><strong>How to claim:</strong> WhatsApp +91 '+retNumStr+' with order number and photos. Refunds within 5–7 business days.</div></div>' +
     '</div>' +
+    /* ── AI BENEFITS skeleton — injected inline, right order guaranteed ── */
+    '<div id="benefits-outer" style="background:var(--bg2);padding:40px 0 8px;margin-top:8px">' +
+      '<div class="benefits-section">' +
+        '<h2 class="benefits-heading" id="benefits-heading">Health Benefits</h2>' +
+        '<p class="benefits-sub" id="benefits-sub">Discovering benefits of '+p.name+'…</p>' +
+        '<div class="benefits-grid" id="benefits-grid">' +
+          '<div class="ben-skeleton"><div class="sk-line sk-icon"></div><div class="sk-line sk-title"></div><div class="sk-line sk-d1"></div><div class="sk-line sk-d2"></div></div>' +
+          '<div class="ben-skeleton"><div class="sk-line sk-icon"></div><div class="sk-line sk-title"></div><div class="sk-line sk-d1"></div><div class="sk-line sk-d2"></div></div>' +
+          '<div class="ben-skeleton"><div class="sk-line sk-icon"></div><div class="sk-line sk-title"></div><div class="sk-line sk-d1"></div><div class="sk-line sk-d2"></div></div>' +
+          '<div class="ben-skeleton"><div class="sk-line sk-icon"></div><div class="sk-line sk-title"></div><div class="sk-line sk-d1"></div><div class="sk-line sk-d2"></div></div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="usage-section" id="usage-section">' +
+        '<div class="usage-grid" id="usage-grid">' +
+          '<div class="usage-card"><div class="usage-card-head">🍽️ How to Use</div><div class="usage-card-body"><div class="sk-line" style="height:12px;border-radius:6px;margin-bottom:8px;background:linear-gradient(90deg,var(--bg3) 25%,var(--bd) 50%,var(--bg3) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite"></div><div class="sk-line" style="height:12px;border-radius:6px;margin-bottom:8px;width:80%;background:linear-gradient(90deg,var(--bg3) 25%,var(--bd) 50%,var(--bg3) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite"></div><div class="sk-line" style="height:12px;border-radius:6px;width:60%;background:linear-gradient(90deg,var(--bg3) 25%,var(--bd) 50%,var(--bg3) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite"></div></div></div>' +
+          '<div class="usage-card"><div class="usage-card-head">📦 Storage Tips</div><div class="usage-card-body"><div class="sk-line" style="height:12px;border-radius:6px;margin-bottom:8px;background:linear-gradient(90deg,var(--bg3) 25%,var(--bd) 50%,var(--bg3) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite"></div><div class="sk-line" style="height:12px;border-radius:6px;margin-bottom:8px;width:75%;background:linear-gradient(90deg,var(--bg3) 25%,var(--bd) 50%,var(--bg3) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite"></div><div class="sk-line" style="height:12px;border-radius:6px;width:55%;background:linear-gradient(90deg,var(--bg3) 25%,var(--bd) 50%,var(--bg3) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite"></div></div></div>' +
+          '<div class="usage-card"><div class="usage-card-head">👤 Who Should Buy</div><div class="usage-card-body"><div class="sk-line" style="height:12px;border-radius:6px;margin-bottom:8px;background:linear-gradient(90deg,var(--bg3) 25%,var(--bd) 50%,var(--bg3) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite"></div><div class="sk-line" style="height:12px;border-radius:6px;width:85%;background:linear-gradient(90deg,var(--bg3) 25%,var(--bd) 50%,var(--bg3) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite"></div></div></div>' +
+        '</div>' +
+      '</div>' +
+    '</div>' +
+
     relHtml +
     '<footer class="mini-footer">© 2026 5 Pahadi Roots &nbsp;·&nbsp; <a href="/">Shop Now</a> &nbsp;·&nbsp; <a href="/terms">Terms &amp; Returns</a> &nbsp;·&nbsp; <a href="mailto:support@pahadiroots.com">support@pahadiroots.com</a></footer>';
 
@@ -891,10 +891,6 @@ function setupStickyCtaScroll() {
 async function triggerAiBenefits(productName, productDesc) {
   if (!productName) return;
 
-  /* Show the benefits outer section with skeleton */
-  document.getElementById('benefits-outer').style.display = 'block';
-
-  /* Scroll-reveal the section after a moment */
   var cacheKey = AI_BENEFITS_CACHE_KEY + productName.toLowerCase().replace(/\s+/g,'_');
 
   /* Check localStorage cache first — avoids repeated API calls */
@@ -939,8 +935,11 @@ async function triggerAiBenefits(productName, productDesc) {
 
     renderAiBenefits(parsed);
   } catch(e) {
-    /* Silently hide on error — customer doesn't see failure */
-    document.getElementById('benefits-outer').style.display = 'none';
+    /* Silently show empty state on error */
+    var bg = document.getElementById('benefits-grid');
+    if (bg) bg.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--tx3);font-size:13px">Benefits unavailable right now. Please refresh.</div>';
+    var ug = document.getElementById('usage-grid');
+    if (ug) ug.innerHTML = '';
     console.warn('AI benefits generation failed:', e);
   }
 }
@@ -984,8 +983,6 @@ function renderAiBenefits(data) {
 async function aiGenerateProduct(input, isAuto) {
   if (!input) return;
   document.getElementById('main-content').innerHTML = '<div class="loading-wrap"><div class="spinner"></div><p style="color:var(--tx3);font-size:14px">Generating "'+input+'"…</p></div>';
-  /* Show benefits skeleton immediately */
-  document.getElementById('benefits-outer').style.display = 'block';
   try {
     var resp = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -1018,7 +1015,6 @@ async function aiGenerateProduct(input, isAuto) {
     if (!isAuto) showToast('✨ '+PRODUCT.name+' loaded!');
   } catch(e) {
     document.getElementById('main-content').innerHTML = '<div class="loading-wrap"><p style="color:#e53">Generation failed. <a href="" style="color:var(--g)">Refresh</a> and try again.</p></div>';
-    document.getElementById('benefits-outer').style.display = 'none';
     console.error(e);
   }
 }
