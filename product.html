@@ -21,23 +21,26 @@
   <script type="application/ld+json" id="product-jsonld">{"@context":"https://schema.org/","@type":"Product","name":"5 Pahadi Roots Product","brand":{"@type":"Brand","name":"5 Pahadi Roots"}}</script>
 
 <style>
-/* ══ TOKENS ══ */
+/* ══ TOKENS — PREMIUM PALETTE ══ */
 :root{
-  --g:#1a3a1e;--g2:#2d5233;--g3:#3d6b42;--g-pale:#f0f7f0;--g-light:#e8f5e9;
-  --gold:#c8920a;--gold2:#e8b84b;--gold-pale:#fff8e8;
-  --red:#e53;--red-pale:#fff0f0;
-  --tx:#1a1a1a;--tx2:#4a4a4a;--tx3:#7a7a7a;
-  --bd:rgba(26,58,30,.12);--bd2:rgba(26,58,30,.22);
-  --bg:#fff;--bg2:#f8f9f5;--bg3:#f3f5f0;
-  --radius:14px;--radius-sm:9px;
-  --shadow:0 2px 16px rgba(0,0,0,.08);
-  --shadow-lg:0 8px 40px rgba(0,0,0,.13);
+  --g:#0f2d13;--g2:#1a4a1e;--g3:#2d6b35;--g4:#3d8b45;
+  --g-pale:#f0f7f0;--g-light:#e4f2e6;--g-mid:#c8e6cc;
+  --gold:#b8820a;--gold2:#d4a832;--gold3:#f0c84a;--gold-pale:#fdf5e0;
+  --cream:#faf8f4;--cream2:#f4f0e8;
+  --red:#c0392b;--red-pale:#fdecea;
+  --tx:#0f1a10;--tx2:#3a4a3c;--tx3:#7a8a7c;
+  --bd:rgba(15,45,19,.1);--bd2:rgba(15,45,19,.2);--bd3:rgba(15,45,19,.35);
+  --bg:#fff;--bg2:#f8faf6;--bg3:#f0f5f0;
+  --radius:14px;--radius-sm:9px;--radius-lg:20px;
+  --shadow:0 2px 16px rgba(0,0,0,.07);
+  --shadow-md:0 4px 24px rgba(0,0,0,.1);
+  --shadow-lg:0 12px 48px rgba(0,0,0,.14);
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Lato',sans-serif;color:var(--tx);background:var(--bg);overflow-x:hidden;-webkit-font-smoothing:antialiased}
 a{text-decoration:none;color:inherit}
 img{max-width:100%;display:block}
-button{font-family:'Lato',sans-serif}
+button{font-family:'Lato',sans-serif;cursor:pointer}
 
 /* ══ ANNOUNCEMENT BAR ══ */
 .announce-bar{background:var(--g);color:rgba(255,255,255,.9);font-size:11.5px;font-weight:700;padding:7px 20px;letter-spacing:.3px;overflow:hidden;white-space:nowrap}
@@ -72,20 +75,24 @@ button{font-family:'Lato',sans-serif}
 #acctHoverZone{position:relative}
 
 /* ══ BREADCRUMB ══ */
-.breadcrumb{padding:10px 28px;font-size:12px;color:var(--tx3);max-width:1280px;margin:0 auto;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-.breadcrumb a{color:var(--g);font-weight:700;transition:opacity .2s}
-.breadcrumb a:hover{opacity:.7}
+.breadcrumb{padding:12px 32px;font-size:12px;color:var(--tx3);max-width:1280px;margin:0 auto;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.breadcrumb a{color:var(--g3,#2d6b35);font-weight:700}
 
 /* ══ PRODUCT LAYOUT ══ */
-.product-wrap{max-width:1200px;margin:0 auto;padding:0 28px 28px;display:grid;grid-template-columns:1.05fr 1fr;gap:56px;align-items:start}
-@media(max-width:880px){.product-wrap{grid-template-columns:1fr;gap:24px;padding:0 16px 16px}}
+.product-wrap{max-width:1200px;margin:0 auto;padding:0 32px 32px;display:grid;grid-template-columns:1fr 1fr;gap:52px;align-items:start;width:100%}
+@media(max-width:900px){.product-wrap{grid-template-columns:1fr;gap:24px;padding:0 16px 16px}}
 
-/* ══ IMAGE GALLERY — BIGGER, PREMIUM ══ */
-.img-section{position:sticky;top:80px}
-.main-img-wrap{position:relative;border-radius:20px;overflow:hidden;background:var(--bg2);aspect-ratio:4/5;cursor:zoom-in;box-shadow:0 6px 32px rgba(0,0,0,.11)}
+/* ══ IMAGE GALLERY ══ */
+.img-section{position:sticky;top:80px;width:100%}
+.main-img-wrap{position:relative;border-radius:20px;overflow:hidden;background:var(--bg2);aspect-ratio:4/5;cursor:zoom-in;box-shadow:0 8px 40px rgba(0,0,0,.14)}
 .main-img-wrap img{width:100%;height:100%;object-fit:cover;transition:transform .5s cubic-bezier(.25,.46,.45,.94)}
-.main-img-wrap:hover img{transform:scale(1.05)}
+.main-img-wrap:hover img{transform:scale(1.04)}
 .main-img-placeholder{width:100%;aspect-ratio:4/5;display:flex;align-items:center;justify-content:center;font-size:120px;background:linear-gradient(135deg,var(--g),var(--g2));border-radius:20px}
+/* LEFT/RIGHT IMAGE ARROWS */
+.img-arrow{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:44px;background:rgba(255,255,255,.92);border:none;border-radius:50%;font-size:18px;display:flex;align-items:center;justify-content:center;z-index:5;transition:all .2s;box-shadow:0 2px 14px rgba(0,0,0,.18);backdrop-filter:blur(6px)}
+.img-arrow:hover{background:#fff;transform:translateY(-50%) scale(1.1);box-shadow:0 4px 20px rgba(0,0,0,.25)}
+.img-arrow.prev{left:12px}
+.img-arrow.next{right:12px}
 /* Badge row */
 .badge-row{position:absolute;top:16px;left:16px;display:flex;flex-direction:column;gap:6px;z-index:2}
 .badge{padding:5px 12px;border-radius:20px;font-size:11px;font-weight:800;letter-spacing:.3px;backdrop-filter:blur(8px)}
@@ -180,8 +187,8 @@ button{font-family:'Lato',sans-serif}
 .btn-add-cart{flex:1;min-width:145px;height:52px;background:#fff;color:var(--g);border:2.5px solid var(--g);border-radius:13px;font-size:14.5px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .22s}
 .btn-add-cart:hover,.btn-add-cart.added{background:var(--g);color:#fff}
 .btn-add-cart:disabled{opacity:.5;cursor:not-allowed}
-.btn-buy-now{flex:1;min-width:145px;height:52px;background:var(--gold);color:#fff;border:2.5px solid var(--gold);border-radius:13px;font-size:14.5px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .22s}
-.btn-buy-now:hover{background:#a87000;border-color:#a87000}
+.btn-buy-now{flex:1;min-width:145px;height:52px;background:linear-gradient(135deg,var(--gold,#b8820a) 0%,var(--gold2,#d4a832) 100%);color:#fff;border:none;border-radius:13px;font-size:14.5px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .22s;box-shadow:0 4px 14px rgba(184,130,10,.3)}
+.btn-buy-now:hover{filter:brightness(1.08);transform:translateY(-1px);box-shadow:0 6px 22px rgba(184,130,10,.45)}
 .btn-buy-now:disabled{opacity:.5;cursor:not-allowed}
 .btn-icon{width:52px;height:52px;border:2px solid var(--bd);border-radius:13px;background:#fff;cursor:pointer;font-size:20px;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
 .btn-icon:hover{border-color:var(--g2)}
@@ -670,12 +677,27 @@ function renderProduct(p, images, related, data, stateMap) {
   (images||[]).forEach(function(i){ if(i.image_url&&i.image_url!==p.image_url) allImgs.push(i.image_url); });
   var imgIdx = 0;
 
+  var allImgsSrc = allImgs; /* keep reference for arrow navigation */
+  var imgIdx = 0;
+  function goImg(dir) {
+    imgIdx = (imgIdx + dir + allImgsSrc.length) % allImgsSrc.length;
+    var mi = document.getElementById('main-img');
+    if (mi) mi.src = allImgsSrc[imgIdx];
+    document.getElementById('zoom-img').src = allImgsSrc[imgIdx];
+    var ctr = document.getElementById('img-counter');
+    if (ctr) ctr.textContent = (imgIdx+1)+' / '+allImgsSrc.length;
+    document.querySelectorAll('.thumb').forEach(function(t,i){ t.classList.toggle('active', i===imgIdx); });
+  }
+  window._goImg = goImg;
+
   var mainImgHtml = allImgs.length
     ? '<div class="main-img-wrap" id="main-img-wrap" onclick="openZoom(\''+allImgs[0]+'\')">' +
         (p.badges&&p.badges.length?'<div class="badge-row">'+p.badges.map(function(b){return '<span class="badge '+b.substring(0,2)+'">'+b.charAt(0).toUpperCase()+b.slice(1)+'</span>';}).join('')+'</div>':'') +
         (p.limited_batch?'<div class="ribbon">🏔️ Limited Batch</div>':'') +
         (p.mrp&&p.price&&p.mrp>p.price?'<div class="disc-badge">-'+Math.round((1-p.price/p.mrp)*100)+'%</div>':'') +
+        (allImgs.length>1?'<button class="img-arrow prev" onclick="event.stopPropagation();_goImg(-1)">&#8249;</button>':'') +
         '<img id="main-img" src="'+allImgs[0]+'" alt="'+p.name+'" loading="eager">' +
+        (allImgs.length>1?'<button class="img-arrow next" onclick="event.stopPropagation();_goImg(1)">&#8250;</button>':'') +
         (allImgs.length>1?'<div class="img-counter" id="img-counter">1 / '+allImgs.length+'</div>':'') +
       '</div>'
     : '<div class="main-img-placeholder">'+(p.emoji||'🌿')+'</div>';
@@ -805,8 +827,24 @@ function renderProduct(p, images, related, data, stateMap) {
           '<div class="trust-badge"><div class="tb-icon">🚚</div><div class="tb-label">Free Delivery ₹799+</div></div>' +
         '</div>' +
         '<div class="highlights"><p class="highlights-title">Why 5 Pahadi Roots?</p><ul class="hl-list">'+hlItems.map(function(h){return '<li><span class="hl-check">✓</span>'+h+'</li>';}).join('')+'</ul></div>' +
+
+        /* ── INLINE BENEFITS (right column, like My Pahadi Dukan) ── */
+        (p.show_benefits !== false ?
+        '<div id="inline-benefits" style="margin-top:18px">' +
+          '<div style="font-size:12px;font-weight:900;color:var(--g);text-transform:uppercase;letter-spacing:.6px;margin-bottom:12px;display:flex;align-items:center;gap:8px">' +
+            '<span style="width:20px;height:2px;background:var(--g);display:inline-block"></span>' +
+            'Top Benefits' +
+            '<span style="flex:1;height:1px;background:var(--bd)"></span>' +
+          '</div>' +
+          '<div id="inline-benefits-list">' +
+            /* skeleton lines */
+            [1,2,3,4].map(function(){ return '<div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px"><div style="width:20px;height:20px;border-radius:50%;flex-shrink:0;background:linear-gradient(90deg,var(--bg2) 25%,var(--bg3) 50%,var(--bg2) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite"></div><div style="flex:1"><div style="height:11px;border-radius:4px;margin-bottom:5px;background:linear-gradient(90deg,var(--bg2) 25%,var(--bg3) 50%,var(--bg2) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite"></div><div style="height:11px;border-radius:4px;width:75%;background:linear-gradient(90deg,var(--bg2) 25%,var(--bg3) 50%,var(--bg2) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite"></div></div></div>'; }).join('') +
+          '</div>' +
+        '</div>'
+        : '') +
+
         /* ORIGIN CARD */
-        '<div class="origin-card">' +
+        '<div class="origin-card" style="margin-top:18px">' +
           '<div class="origin-header">'+regionEmoji+' Himalayan Origin Story</div>' +
           '<div class="origin-body">' +
             '<div class="origin-map">'+regionEmoji+'</div>' +
@@ -908,9 +946,16 @@ async function triggerAiBenefits(productName, productDesc) {
 
   /* Call AI */
   try {
+    /* API key: injected by server as window.ANTHROPIC_API_KEY, or empty (Claude.ai handles it) */
+    var apiKey = (typeof window !== 'undefined' && window.ANTHROPIC_API_KEY) ? window.ANTHROPIC_API_KEY : '';
+    var headers = { 'Content-Type': 'application/json' };
+    if (apiKey) headers['x-api-key'] = apiKey;
+    headers['anthropic-version'] = '2023-06-01';
+    headers['anthropic-dangerous-direct-browser-access'] = 'true';
+
     var resp = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: headers,
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 800,
@@ -945,12 +990,26 @@ async function triggerAiBenefits(productName, productDesc) {
 }
 
 function renderAiBenefits(data) {
-  /* Benefits grid */
-  if (data.benefits && data.benefits.length) {
-    var pName = PRODUCT ? PRODUCT.name : 'this product';
+  var pName = PRODUCT ? PRODUCT.name : 'this product';
+
+  /* ── 1. INLINE LIST in right column (like My Pahadi Dukan) ── */
+  var inlineList = document.getElementById('inline-benefits-list');
+  if (inlineList && data.benefits && data.benefits.length) {
+    inlineList.innerHTML = data.benefits.map(function(b) {
+      return '<div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:11px">' +
+        '<div style="width:22px;height:22px;border-radius:50%;background:var(--g-light);border:1px solid var(--bd2);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;margin-top:1px">' + (b.icon||'✓') + '</div>' +
+        '<div><div style="font-size:13px;font-weight:800;color:var(--tx);margin-bottom:2px">' + (b.title||'') + '</div>' +
+        '<div style="font-size:12px;color:var(--tx3);line-height:1.5">' + (b.desc||'') + '</div></div>' +
+      '</div>';
+    }).join('');
+  }
+
+  /* ── 2. FULL BENEFIT CARDS below tabs ── */
+  var benefitsGrid = document.getElementById('benefits-grid');
+  if (benefitsGrid && data.benefits && data.benefits.length) {
     document.getElementById('benefits-heading').textContent = 'Benefits of ' + pName;
     document.getElementById('benefits-sub').textContent = 'Why thousands of customers love this product';
-    document.getElementById('benefits-grid').innerHTML = data.benefits.map(function(b) {
+    benefitsGrid.innerHTML = data.benefits.map(function(b) {
       return '<div class="benefit-card">' +
         '<div class="bc-icon">' + (b.icon||'🌿') + '</div>' +
         '<div class="bc-title">' + (b.title||'') + '</div>' +
@@ -959,7 +1018,7 @@ function renderAiBenefits(data) {
     }).join('');
   }
 
-  /* Usage + Storage + Who Should Buy */
+  /* ── 3. Usage + Storage + Who Should Buy ── */
   var usageHtml = '';
   if (data.how_to_use && data.how_to_use.length) {
     usageHtml += '<div class="usage-card"><div class="usage-card-head">🍽️ How to Use</div><div class="usage-card-body"><ul>' +
@@ -975,7 +1034,8 @@ function renderAiBenefits(data) {
     usageHtml += '<div class="usage-card"><div class="usage-card-head">👤 Who Should Buy</div><div class="usage-card-body">' + data.who_should_buy + '</div></div>';
   }
   if (usageHtml) {
-    document.getElementById('usage-grid').innerHTML = usageHtml;
+    var ug = document.getElementById('usage-grid');
+    if (ug) ug.innerHTML = usageHtml;
   }
 }
 
@@ -984,9 +1044,14 @@ async function aiGenerateProduct(input, isAuto) {
   if (!input) return;
   document.getElementById('main-content').innerHTML = '<div class="loading-wrap"><div class="spinner"></div><p style="color:var(--tx3);font-size:14px">Generating "'+input+'"…</p></div>';
   try {
+    var apiKey2 = (typeof window !== 'undefined' && window.ANTHROPIC_API_KEY) ? window.ANTHROPIC_API_KEY : '';
+    var headers2 = { 'Content-Type': 'application/json' };
+    if (apiKey2) headers2['x-api-key'] = apiKey2;
+    headers2['anthropic-version'] = '2023-06-01';
+    headers2['anthropic-dangerous-direct-browser-access'] = 'true';
     var resp = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: headers2,
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 1200,
