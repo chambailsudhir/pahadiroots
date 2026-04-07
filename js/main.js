@@ -445,6 +445,7 @@ function mkProd(p) {
   var sPct   = Math.min(100, Math.round(stock / 50 * 100));
   var sLbl   = stock <= 0 ? 'Out of Stock' : stock > 20 ? 'In Stock' : ('Only ' + stock + ' left');
   var inWL   = wishlist.includes(p.id);
+  var slug   = getProductSlug(p);
   var imgHtml = p.image_url
     ? '<img src="' + p.image_url + '" alt="' + p.name + '" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1" onerror="this.style.display=\'none\'">'
     : '';
@@ -456,7 +457,12 @@ function mkProd(p) {
   var notifyBtn = stock <= 0 ? '<button class="notify-btn" onclick="event.stopPropagation();openNotify(' + p.id + ')">🔔 Notify Me</button>' : '';
   var checkoutTag = p.checkout_offer ? '<div class="pcard-checkout-tag">10% Off At Checkout</div>' : '';
   var hoverOverlay = '<div class="piw-hover-overlay" onclick="event.stopPropagation();openQV(' + p.id + ')"><span class="piw-hover-cta">👁 Quick View</span></div>';
-  return '<div class="pcard" style="position:relative" onclick="goToProductPage(\'' + getProductSlug(p) + '\')">' +
+  var footerBtns = stock <= 0 ? notifyBtn :
+    '<div class="pcard-actions">' +
+      '<button class="atc" onclick="event.stopPropagation();quickAddToCart(' + p.id + ')" id="atcBtn-' + p.id + '">🛒 Add to Cart</button>' +
+      '<span class="atc-hint view-details-link" data-slug="' + slug + '" onclick="event.stopPropagation();goToProductPage(this.dataset.slug)">View Details →</span>' +
+    '</div>';
+  return '<div class="pcard" data-slug="' + slug + '" style="position:relative" onclick="goToProductPage(this.dataset.slug)">' +
     '<span class="pbadge b' + bc + '">' + (p.badge_label||'') + '</span>' +
     '<button class="wl-btn' + (inWL?' active':'') + '" data-id="' + p.id + '" onclick="event.stopPropagation();toggleWishlist(' + p.id + ')" title="Wishlist mein save karo">' + (inWL ? '❤️ Saved' : '🤍 Save') + '</button>' +
     img + discBadge + hoverOverlay + checkoutTag +
@@ -471,7 +477,7 @@ function mkProd(p) {
         '<div class="prow"><span class="pnow" id="pnow-' + p.id + '">₹' + p.price + '</span>' +
           (p.original_price ? '<span class="pwas">₹' + p.original_price + '</span>' : '') +
           '<span class="punt">' + (p.unit||'') + '</span></div>' +
-        (stock <= 0 ? notifyBtn : '<div class="pcard-actions"><button class="atc" onclick="event.stopPropagation();quickAddToCart(' + p.id + ')" id="atcBtn-' + p.id + '">🛒 Add to Cart</button><span class="atc-hint" onclick="event.stopPropagation();goToProductPage(\'' + getProductSlug(p) + \')">View Details →</span></div>') +
+        footerBtns +
       '</div>' +
     '</div>' +
     (p.checkout_offer ? '<div class="checkout-strip">🏷️ 10% off applied at checkout</div>' : '') +
