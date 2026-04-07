@@ -127,7 +127,7 @@
 <!-- ══ FONTS ═════════════════════════════════════════════════════════════ -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Lato:wght@300;400;700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
   <link rel="stylesheet" href="/css/main.css">
@@ -185,7 +185,7 @@
 }
 </script>
 </head>
-<body>
+<body data-theme="pahadi">
 <script>
 // Cart opens as overlay - no need to hide main content
 </script>
@@ -235,6 +235,30 @@
       </div>
     </div>
     <button class="dark-btn" onclick="toggleDark()" id="darkBtn" title="Toggle dark mode">🌙</button>
+    <div class="theme-switcher-wrap">
+      <button class="theme-btn" onclick="openThemeSwitcher()" title="Switch colour theme">🎨 Theme</button>
+      <div class="theme-panel" id="themeSwitcherPanel">
+        <div class="theme-panel-title">Choose Theme</div>
+        <div class="theme-opts">
+          <button class="theme-opt active" data-theme="pahadi" onclick="applyTheme('pahadi');closeThemeSwitcher()">
+            <div class="theme-swatch swatch-pahadi"></div>
+            <div class="theme-opt-info">
+              <div class="theme-opt-label">Pahadi Roots</div>
+              <div class="theme-opt-sub">Forest green · Gold · Serif</div>
+            </div>
+            <span class="theme-check">✓</span>
+          </button>
+          <button class="theme-opt" data-theme="dukan" onclick="applyTheme('dukan');closeThemeSwitcher()">
+            <div class="theme-swatch swatch-dukan"></div>
+            <div class="theme-opt-info">
+              <div class="theme-opt-label">Pahadi Dukan</div>
+              <div class="theme-opt-sub">Ocean teal · Warm orange</div>
+            </div>
+            <span class="theme-check">✓</span>
+          </button>
+        </div>
+      </div>
+    </div>
     <button class="cart-btn" onclick="openCart()">🛒 Cart <span class="cbadge" id="cartCount">0</span></button>
     <button class="mob-menu-btn" onclick="openMobNav()" aria-label="Menu">☰</button>
   </div>
@@ -1011,5 +1035,27 @@
 
 <script src="/js/auth-frontend.js"></script>
 
+
+<!-- QUICK VIEW MODAL -->
+<div id="qvOverlay" style="position:fixed;inset:0;z-index:1100;background:rgba(0,0,0,.65);display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(5px)" onclick="if(event.target===this)closeQV()">
+  <div class="qv-box">
+    <div class="qv-inner">
+      <div class="qv-img-col" id="qvImgCol" style="position:relative"></div>
+      <div class="qv-content" id="qvContent"></div>
+    </div>
+    <button class="qv-close" onclick="closeQV()">✕</button>
+  </div>
+</div>
+
+<!-- THEME CLOSE ON OUTSIDE CLICK -->
+<script>
+document.addEventListener('click', function(e) {
+  var wrap = e.target.closest('.theme-switcher-wrap');
+  if (!wrap) {
+    var panel = document.getElementById('themeSwitcherPanel');
+    if (panel) panel.classList.remove('open');
+  }
+});
+</script>
 </body>
 </html>
