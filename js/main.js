@@ -203,6 +203,7 @@ function toggleDark() {
   darkMode = !darkMode;
   try { localStorage.setItem('pr_dark', darkMode ? '1' : '0'); } catch(e){}
   applyDark();
+applyTheme(currentTheme);
 }
 
 // ── API BASE ───────────────────────────────────────────────────────
@@ -444,6 +445,7 @@ function mkProd(p) {
   var sPct   = Math.min(100, Math.round(stock / 50 * 100));
   var sLbl   = stock <= 0 ? 'Out of Stock' : stock > 20 ? 'In Stock' : ('Only ' + stock + ' left');
   var inWL   = wishlist.includes(p.id);
+  var slug   = getProductSlug(p);
   var imgHtml = p.image_url
     ? '<img src="' + p.image_url + '" alt="' + p.name + '" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1" onerror="this.style.display=\'none\'">'
     : '';
@@ -453,10 +455,17 @@ function mkProd(p) {
     '</div>';
   var discBadge = pct ? '<span style="position:absolute;top:8px;right:36px;background:#e53;color:#fff;font-size:9px;font-weight:800;padding:2px 7px;border-radius:10px;z-index:2">-' + pct + '%</span>' : '';
   var notifyBtn = stock <= 0 ? '<button class="notify-btn" onclick="event.stopPropagation();openNotify(' + p.id + ')">🔔 Notify Me</button>' : '';
-  return '<div class="pcard" style="position:relative" onclick="goToProductPage(\'' + getProductSlug(p) + '\')">' +
+  var checkoutTag = p.checkout_offer ? '<div class="pcard-checkout-tag">10% Off At Checkout</div>' : '';
+  var hoverOverlay = '<div class="piw-hover-overlay" onclick="event.stopPropagation();openQV(' + p.id + ')"><span class="piw-hover-cta">👁 Quick View</span></div>';
+  var footerBtns = stock <= 0 ? notifyBtn :
+    '<div class="pcard-actions">' +
+      '<button class="atc" onclick="event.stopPropagation();quickAddToCart(' + p.id + ')" id="atcBtn-' + p.id + '">🛒 Add to Cart</button>' +
+      '<span class="atc-hint view-details-link" data-slug="' + slug + '" onclick="event.stopPropagation();goToProductPage(this.dataset.slug)">View Details →</span>' +
+    '</div>';
+  return '<div class="pcard" data-slug="' + slug + '" style="position:relative" onclick="goToProductPage(this.dataset.slug)">' +
     '<span class="pbadge b' + bc + '">' + (p.badge_label||'') + '</span>' +
     '<button class="wl-btn' + (inWL?' active':'') + '" data-id="' + p.id + '" onclick="event.stopPropagation();toggleWishlist(' + p.id + ')" title="Wishlist mein save karo">' + (inWL ? '❤️ Saved' : '🤍 Save') + '</button>' +
-    img + discBadge +
+    img + discBadge + hoverOverlay + checkoutTag +
     '<div class="pbody">' +
       '<div class="pregion">📍 ' + (p.region||'') + '</div>' +
       '<div class="pname">' + p.name + '</div>' +
@@ -468,9 +477,10 @@ function mkProd(p) {
         '<div class="prow"><span class="pnow" id="pnow-' + p.id + '">₹' + p.price + '</span>' +
           (p.original_price ? '<span class="pwas">₹' + p.original_price + '</span>' : '') +
           '<span class="punt">' + (p.unit||'') + '</span></div>' +
-        (stock <= 0 ? notifyBtn : '<div class="atc-hint">View Details →</div>') +
+        footerBtns +
       '</div>' +
     '</div>' +
+    (p.checkout_offer ? '<div class="checkout-strip">🏷️ 10% off applied at checkout</div>' : '') +
   '</div>';
 }
 
@@ -761,6 +771,100 @@ function updateCardPrice(prodId, sel) {
   var price = parseFloat(opt.dataset.price);
   var priceEl = document.getElementById('pnow-' + prodId);
   if (priceEl && price) priceEl.textContent = '₹' + price;
+}
+
+
+// ── QUICK ADD TO CART (with button feedback) ─────────────────────
+function quickAddToCart(id) {
+  addToCart(id);
+  var btn = document.getElementById('atcBtn-' + id);
+  if (btn) {
+    var orig = btn.innerHTML;
+    btn.innerHTML = '✓ Added!';
+    btn.style.background = 'var(--g2)';
+    setTimeout(function() { btn.innerHTML = orig; btn.style.background = ''; }, 1800);
+  }
+}
+
+// ── QUICK VIEW MODAL ───────────────────────────────────────
+function openQV(id) {
+  var p = PRODUCTS.find(function(x) { return x.id === id; });
+  if (!p) return;
+  var pct = p.original_price ? Math.round((1 - p.price / p.original_price) * 100) : 0;
+  var stock = p.stock || 99;
+  var sClass = stock > 20 ? 'in' : 'low';
+  var sLbl   = stock <= 0 ? 'Out of Stock' : stock > 20 ? 'In Stock' : 'Only ' + stock + ' left!';
+  var ov = document.getElementById('qvOverlay');
+  if (!ov) return;
+  var imgHtml = p.image_url
+    ? '<img src="' + p.image_url + '" alt="' + p.name + '" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:20px 0 0 20px" onerror="this.style.display=\'none\'">'
+    : '<span style="font-size:72px">' + (p.emoji || '🌿') + '</span>';
+  document.getElementById('qvImgCol').innerHTML = imgHtml +
+    (pct ? '<span style="position:absolute;top:14px;right:14px;background:var(--g);color:#fff;font-size:10px;font-weight:800;padding:4px 10px;border-radius:8px">-' + pct + '% OFF</span>' : '') +
+    (p.checkout_offer ? '<span style="position:absolute;top:14px;left:14px;background:#bc4749;color:#fff;font-size:9px;font-weight:800;padding:4px 10px;border-radius:20px;text-transform:uppercase;letter-spacing:.4px">10% Off At Checkout</span>' : '');
+  document.getElementById('qvContent').innerHTML =
+    '<div class="qv-region">📍 ' + (p.region || '') + '</div>' +
+    '<div class="qv-name">' + p.name + '</div>' +
+    '<div class="qv-stars">★★★★★ <span style="font-size:12px;color:var(--tx3)">(' + (12 + (p.id || 1) * 7) + ' reviews)</span></div>' +
+    '<div class="qv-price-row">' +
+      '<span class="qv-price">₹' + p.price + '</span>' +
+      (p.original_price ? '<span class="qv-was">₹' + p.original_price + '</span>' : '') +
+      (pct ? '<span class="qv-save">Save ' + pct + '%</span>' : '') +
+    '</div>' +
+    '<div class="qv-unit">' + (p.unit || '') + '</div>' +
+    (p.checkout_offer ? '<div style="font-size:11.5px;color:#bc4749;font-weight:700;margin-bottom:10px;padding:6px 12px;background:rgba(188,71,73,.08);border-radius:8px">🏷️ Extra 10% off automatically applied at checkout</div>' : '') +
+    '<div class="qv-desc">' + (p.description || '') + '</div>' +
+    '<div class="qv-stock ' + sClass + '">' + sLbl + '</div>' +
+    '<div class="qv-qty-row">' +
+      '<button class="qv-qb" onclick="qvQty(-1)">−</button>' +
+      '<span class="qv-qn" id="qvQtyNum">1</span>' +
+      '<button class="qv-qb" onclick="qvQty(1)">+</button>' +
+    '</div>' +
+    '<div style="display:flex;gap:8px;flex-wrap:wrap">' +
+      '<button class="qv-atc" onclick="addToCartFromQV(' + id + ')">🛒 Add to Cart</button>' +
+      '<button class="qv-wl" onclick="toggleWishlist(' + id + ')">🤍</button>' +
+      '<button style="background:none;border:1.5px solid var(--bd);border-radius:12px;padding:10px 14px;font-size:12px;font-weight:700;color:var(--g);cursor:pointer;font-family:inherit" onclick="closeQV();goToProductPage(\'' + getProductSlug(p) + '\')">Full Details →</button>' +
+    '</div>';
+  ov.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+  window._qvId  = id;
+  window._qvQty = 1;
+}
+function qvQty(d) {
+  window._qvQty = Math.max(1, (window._qvQty || 1) + d);
+  var el = document.getElementById('qvQtyNum');
+  if (el) el.textContent = window._qvQty;
+}
+function addToCartFromQV(id) {
+  var qty = window._qvQty || 1;
+  for (var i = 0; i < qty; i++) addToCart(id);
+  closeQV();
+}
+function closeQV() {
+  var ov = document.getElementById('qvOverlay');
+  if (ov) ov.style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+// ── THEME SWITCHER ───────────────────────────────────────────────
+var currentTheme = 'pahadi';
+try { currentTheme = localStorage.getItem('pr_theme') || 'pahadi'; } catch(e) {}
+
+function applyTheme(theme) {
+  currentTheme = theme;
+  document.body.setAttribute('data-theme', theme);
+  try { localStorage.setItem('pr_theme', theme); } catch(e) {}
+  document.querySelectorAll('.theme-opt').forEach(function(btn) {
+    btn.classList.toggle('active', btn.dataset.theme === theme);
+  });
+}
+function openThemeSwitcher() {
+  var panel = document.getElementById('themeSwitcherPanel');
+  if (panel) panel.classList.toggle('open');
+}
+function closeThemeSwitcher() {
+  var panel = document.getElementById('themeSwitcherPanel');
+  if (panel) panel.classList.remove('open');
 }
 
 function addToCart(id) {

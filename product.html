@@ -285,8 +285,6 @@ button{font-family:'Lato',sans-serif;cursor:pointer}
 .rel-price-row{display:flex;align-items:baseline;gap:7px}
 .rel-price{font-size:15px;font-weight:900;color:var(--g)}
 .rel-orig{font-size:12px;color:var(--tx3);text-decoration:line-through}
-.rel-atc-btn{width:100%;margin-top:10px;padding:9px 0;background:var(--g);color:#fff;border:none;border-radius:9px;font-size:12.5px;font-weight:800;cursor:pointer;font-family:'Lato',sans-serif;transition:all .2s;letter-spacing:.2px}
-.rel-atc-btn:hover{background:var(--g2);transform:translateY(-1px);box-shadow:0 4px 12px rgba(15,45,19,.25)}
 
 /* ══ STICKY MOBILE CTA ══ */
 .sticky-cta{display:none;position:fixed;bottom:0;left:0;right:0;z-index:400;background:#fff;border-top:1px solid var(--bd);padding:12px 16px;box-shadow:0 -4px 20px rgba(0,0,0,.1)}
@@ -636,13 +634,9 @@ async function loadProduct() {
     VARIANTS = (data.product_variants||[]).filter(function(v){ return String(v.product_id)===String(prod.id); });
     var related = ALL_PRODUCTS.filter(function(p){ return p.id!==prod.id&&(p.state_id===prod.state_id||p.category_id===prod.category_id); }).slice(0,4);
     var stateMap = {};
-    var stateImageMap = {};
     (data.states||[]).forEach(function(s){ stateMap[s.id]=s.name; });
-    (data.state_images||[]).forEach(function(si){ 
-      if (!stateImageMap[si.state_id]) stateImageMap[si.state_id] = si.image_url; 
-    });
     if (data.settings && data.settings.whatsapp_number) WHATSAPP_NUMBER = data.settings.whatsapp_number;
-    renderProduct(prod, prodImages, related, data, stateMap, stateImageMap);
+    renderProduct(prod, prodImages, related, data, stateMap);
     /* Silently trigger AI benefits after product renders */
     triggerAiBenefits(prod.name, prod.short_description || prod.name);
   } catch(e) {
@@ -652,9 +646,8 @@ async function loadProduct() {
 }
 
 /* ══ RENDER PRODUCT ══ */
-function renderProduct(p, images, related, data, stateMap, stateImageMap) {
+function renderProduct(p, images, related, data, stateMap) {
   stateMap = stateMap || {};
-  stateImageMap = stateImageMap || {};
   /* SEO */
   document.getElementById('pg-title').textContent = (p.name||'Product') + ' — 5 Pahadi Roots';
   document.getElementById('pg-desc').setAttribute('content', p.short_description||p.name+' — Authentic Himalayan product');
@@ -756,9 +749,8 @@ function renderProduct(p, images, related, data, stateMap, stateImageMap) {
   var hlItems = ['100% Natural & Organic','Directly from Himalayan farmers','No preservatives or additives','Lab tested for purity','FSSAI Certified'];
   if (p.tags&&p.tags.length) hlItems = p.tags.concat(hlItems).slice(0,5);
 
-  /* Region info — use real state image from DB */
+  /* Region info */
   var regionName = p.region || stateMap[p.state_id] || p.state_id || 'Himalayan Region';
-  var stateImgUrl = stateImageMap[p.state_id] || '';
   var regionEmoji = {'Assam':'🌿','Himachal Pradesh':'🏔️','Uttarakhand':'🌲','Jammu & Kashmir':'❄️','Sikkim':'🌸','Nagaland':'🌿','Meghalaya':'☁️','Ladakh':'⛰️'}[regionName] || '🏔️';
 
   /* WhatsApp number formatted */
@@ -767,7 +759,7 @@ function renderProduct(p, images, related, data, stateMap, stateImageMap) {
   /* Description */
   var descHtml = p.long_description || p.short_description || p.description || 'Authentic Himalayan product sourced directly from local farmers. No preservatives, no additives — pure and natural.';
 
-  /* Related — with Add to Cart */
+  /* Related */
   var relHtml = '';
   if (related && related.length) {
     relHtml = '<div class="related-section">' +
@@ -777,18 +769,9 @@ function renderProduct(p, images, related, data, stateMap, stateImageMap) {
       related.map(function(r){
         var rSlug = r.slug&&!/^\d+$/.test(r.slug)?r.slug:(r.name?r.name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,''):r.id);
         var rDisc = r.mrp&&r.price?Math.round((1-r.price/r.mrp)*100):0;
-        var rPrice = r.price || 0;
-        return '<div class="rel-card">' +
-          '<div class="rel-img" onclick="goToProduct(\''+rSlug+'\')" style="cursor:pointer">'+(r.image_url?'<img src="'+r.image_url+'" alt="'+r.name+'" loading="lazy">':'<div class="rel-img-placeholder">'+(r.emoji||'🌿')+'</div>')+(rDisc>0?'<span class="rel-disc">-'+rDisc+'%</span>':'')+'</div>'+
-          '<div class="rel-body">' +
-            '<div class="rel-vendor">5 PAHADI ROOTS</div>' +
-            '<div class="rel-name" onclick="goToProduct(\''+rSlug+'\')" style="cursor:pointer">'+r.name+'</div>' +
-            '<div class="rel-price-row">' +
-              '<span class="rel-price">₹'+rPrice+'</span>'+(r.mrp&&r.mrp>rPrice?'<span class="rel-orig">₹'+r.mrp+'</span>':'')+
-            '</div>' +
-            '<button class="rel-atc-btn" onclick="relAddToCart('+JSON.stringify(r.id)+',' +
-              JSON.stringify(r.name)+','+rPrice+','+JSON.stringify(r.image_url||'')+','+JSON.stringify(r.emoji||'🌿')+')">+ Add to Cart</button>' +
-          '</div>'+
+        return '<div class="rel-card" onclick="goToProduct(\''+rSlug+'\')">' +
+          '<div class="rel-img">'+(r.image_url?'<img src="'+r.image_url+'" alt="'+r.name+'" loading="lazy">':'<div class="rel-img-placeholder">'+(r.emoji||'🌿')+'</div>')+(rDisc>0?'<span class="rel-disc">-'+rDisc+'%</span>':'')+'</div>'+
+          '<div class="rel-body"><div class="rel-vendor">5 Pahadi Roots</div><div class="rel-name">'+r.name+'</div><div class="rel-price-row"><span class="rel-price">₹'+r.price+'</span>'+(r.mrp&&r.mrp>r.price?'<span class="rel-orig">₹'+r.mrp+'</span>':'')+'</div></div>'+
         '</div>';
       }).join('')+'</div></div>';
   }
@@ -860,15 +843,11 @@ function renderProduct(p, images, related, data, stateMap, stateImageMap) {
         '</div>'
         : '') +
 
-        /* ORIGIN CARD — real state image from DB */
+        /* ORIGIN CARD */
         '<div class="origin-card" style="margin-top:18px">' +
-          '<div class="origin-header">🏔️ Himalayan Origin Story</div>' +
+          '<div class="origin-header">'+regionEmoji+' Himalayan Origin Story</div>' +
           '<div class="origin-body">' +
-            '<div class="origin-map">' +
-              (stateImgUrl
-                ? '<img src="'+stateImgUrl+'" alt="'+regionName+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%">'
-                : '<span style="font-size:28px">'+regionEmoji+'</span>') +
-            '</div>' +
+            '<div class="origin-map">'+regionEmoji+'</div>' +
             '<div class="origin-text"><div class="origin-region">'+regionName+'</div><p>This product is sourced directly from farming families in '+regionName+', nestled in the pristine Himalayan region. Grown at altitude, harvested with traditional methods — pure as the mountains themselves.</p></div>' +
           '</div>' +
         '</div>' +
@@ -897,6 +876,27 @@ function renderProduct(p, images, related, data, stateMap, stateImageMap) {
       '<div id="tab-ship" class="desc-content"><div class="policy-block">🚚 <strong>Pan India Shipping</strong><br><br>We ship via trusted courier partners. Delivery in <strong>5–7 business days</strong>. Free shipping on orders above ₹799. COD available on select pincodes.<br><br>Orders are dispatched within 1–2 business days of confirmation.</div></div>' +
       '<div id="tab-returns" class="desc-content"><div class="policy-block">🔄 <strong>Return & Refund Policy</strong><br><br>We want you to love every product.<br><br>✅ <strong>Eligible:</strong> Damaged, defective, or wrong item — report within <strong>3 days</strong> of delivery with photo/video.<br><br>❌ <strong>Not eligible:</strong> Opened & used products, items after 3 days, or without original packaging.<br><br><strong>How to claim:</strong> WhatsApp +91 '+retNumStr+' with order number and photos. Refunds within 5–7 business days.</div></div>' +
     '</div>' +
+    /* ── AI BENEFITS skeleton — injected inline, right order guaranteed ── */
+    '<div id="benefits-outer" style="background:var(--bg2);padding:40px 0 8px;margin-top:8px">' +
+      '<div class="benefits-section">' +
+        '<h2 class="benefits-heading" id="benefits-heading">Health Benefits</h2>' +
+        '<p class="benefits-sub" id="benefits-sub">Discovering benefits of '+p.name+'…</p>' +
+        '<div class="benefits-grid" id="benefits-grid">' +
+          '<div class="ben-skeleton"><div class="sk-line sk-icon"></div><div class="sk-line sk-title"></div><div class="sk-line sk-d1"></div><div class="sk-line sk-d2"></div></div>' +
+          '<div class="ben-skeleton"><div class="sk-line sk-icon"></div><div class="sk-line sk-title"></div><div class="sk-line sk-d1"></div><div class="sk-line sk-d2"></div></div>' +
+          '<div class="ben-skeleton"><div class="sk-line sk-icon"></div><div class="sk-line sk-title"></div><div class="sk-line sk-d1"></div><div class="sk-line sk-d2"></div></div>' +
+          '<div class="ben-skeleton"><div class="sk-line sk-icon"></div><div class="sk-line sk-title"></div><div class="sk-line sk-d1"></div><div class="sk-line sk-d2"></div></div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="usage-section" id="usage-section">' +
+        '<div class="usage-grid" id="usage-grid">' +
+          '<div class="usage-card"><div class="usage-card-head">🍽️ How to Use</div><div class="usage-card-body"><div class="sk-line" style="height:12px;border-radius:6px;margin-bottom:8px;background:linear-gradient(90deg,var(--bg3) 25%,var(--bd) 50%,var(--bg3) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite"></div><div class="sk-line" style="height:12px;border-radius:6px;margin-bottom:8px;width:80%;background:linear-gradient(90deg,var(--bg3) 25%,var(--bd) 50%,var(--bg3) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite"></div><div class="sk-line" style="height:12px;border-radius:6px;width:60%;background:linear-gradient(90deg,var(--bg3) 25%,var(--bd) 50%,var(--bg3) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite"></div></div></div>' +
+          '<div class="usage-card"><div class="usage-card-head">📦 Storage Tips</div><div class="usage-card-body"><div class="sk-line" style="height:12px;border-radius:6px;margin-bottom:8px;background:linear-gradient(90deg,var(--bg3) 25%,var(--bd) 50%,var(--bg3) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite"></div><div class="sk-line" style="height:12px;border-radius:6px;margin-bottom:8px;width:75%;background:linear-gradient(90deg,var(--bg3) 25%,var(--bd) 50%,var(--bg3) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite"></div><div class="sk-line" style="height:12px;border-radius:6px;width:55%;background:linear-gradient(90deg,var(--bg3) 25%,var(--bd) 50%,var(--bg3) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite"></div></div></div>' +
+          '<div class="usage-card"><div class="usage-card-head">👤 Who Should Buy</div><div class="usage-card-body"><div class="sk-line" style="height:12px;border-radius:6px;margin-bottom:8px;background:linear-gradient(90deg,var(--bg3) 25%,var(--bd) 50%,var(--bg3) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite"></div><div class="sk-line" style="height:12px;border-radius:6px;width:85%;background:linear-gradient(90deg,var(--bg3) 25%,var(--bd) 50%,var(--bg3) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite"></div></div></div>' +
+        '</div>' +
+      '</div>' +
+    '</div>' +
+
     relHtml +
     '<footer class="mini-footer">© 2026 5 Pahadi Roots &nbsp;·&nbsp; <a href="/">Shop Now</a> &nbsp;·&nbsp; <a href="/terms">Terms &amp; Returns</a> &nbsp;·&nbsp; <a href="mailto:support@pahadiroots.com">support@pahadiroots.com</a></footer>';
 
@@ -944,22 +944,35 @@ async function triggerAiBenefits(productName, productDesc) {
     }
   } catch(e) {}
 
-  /* Call YOUR SERVER proxy — API key stays safe on server */
+  /* Call AI */
   try {
-    var resp = await fetch('/api/benefits?product=' + encodeURIComponent(productName));
-    if (!resp.ok) {
-      /* If admin disabled (503) → hide sections silently */
-      if (resp.status === 503) {
-        var bo = document.getElementById('benefits-outer');
-        if (bo) bo.style.display = 'none';
-        var ib = document.getElementById('inline-benefits');
-        if (ib) ib.style.display = 'none';
-        return;
-      }
-      throw new Error('Server error ' + resp.status);
-    }
-    var parsed = await resp.json();
+    /* API key: injected by server as window.ANTHROPIC_API_KEY, or empty (Claude.ai handles it) */
+    var apiKey = (typeof window !== 'undefined' && window.ANTHROPIC_API_KEY) ? window.ANTHROPIC_API_KEY : '';
+    var headers = { 'Content-Type': 'application/json' };
+    if (apiKey) headers['x-api-key'] = apiKey;
+    headers['anthropic-version'] = '2023-06-01';
+    headers['anthropic-dangerous-direct-browser-access'] = 'true';
 
+    var resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: headers,
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 800,
+        messages: [{
+          role: 'user',
+          content: 'You are a Himalayan organic product expert. Generate structured data for a product page. Product: "' + productName + '". Return ONLY valid JSON, no markdown, no explanation:\n' +
+            '{"benefits":[{"icon":"emoji","title":"short title 3-4 words","desc":"one sentence benefit description, 12-15 words"}],' +
+            '"how_to_use":["step 1","step 2","step 3"],' +
+            '"storage_tips":["tip 1","tip 2","tip 3"],' +
+            '"who_should_buy":"2 sentence description of ideal customer"}' +
+            '\nGenerate exactly 4 benefits. Icons must be relevant health/wellness emojis. Make it specific to ' + productName + ', not generic.'
+        }]
+      })
+    });
+    var data = await resp.json();
+    var text = (data.content||[]).map(function(c){ return c.text||''; }).join('');
+    var parsed = JSON.parse(text.replace(/```json|```/g,'').trim());
     parsed.ts = Date.now();
 
     /* Cache it */
@@ -977,18 +990,52 @@ async function triggerAiBenefits(productName, productDesc) {
 }
 
 function renderAiBenefits(data) {
-  /* Populate inline benefits list in right column */
+  var pName = PRODUCT ? PRODUCT.name : 'this product';
+
+  /* ── 1. INLINE LIST in right column (like My Pahadi Dukan) ── */
   var inlineList = document.getElementById('inline-benefits-list');
   if (inlineList && data.benefits && data.benefits.length) {
     inlineList.innerHTML = data.benefits.map(function(b) {
-      return '<div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:12px">' +
-        '<div style="width:24px;height:24px;border-radius:50%;background:var(--g-light);border:1px solid var(--g-mid);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;margin-top:1px">' + (b.icon||'✓') + '</div>' +
-        '<div>' +
-          '<div style="font-size:13px;font-weight:800;color:var(--tx);margin-bottom:2px;line-height:1.3">' + (b.title||'') + '</div>' +
-          '<div style="font-size:12px;color:var(--tx3);line-height:1.55">' + (b.desc||'') + '</div>' +
-        '</div>' +
+      return '<div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:11px">' +
+        '<div style="width:22px;height:22px;border-radius:50%;background:var(--g-light);border:1px solid var(--bd2);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;margin-top:1px">' + (b.icon||'✓') + '</div>' +
+        '<div><div style="font-size:13px;font-weight:800;color:var(--tx);margin-bottom:2px">' + (b.title||'') + '</div>' +
+        '<div style="font-size:12px;color:var(--tx3);line-height:1.5">' + (b.desc||'') + '</div></div>' +
       '</div>';
     }).join('');
+  }
+
+  /* ── 2. FULL BENEFIT CARDS below tabs ── */
+  var benefitsGrid = document.getElementById('benefits-grid');
+  if (benefitsGrid && data.benefits && data.benefits.length) {
+    document.getElementById('benefits-heading').textContent = 'Benefits of ' + pName;
+    document.getElementById('benefits-sub').textContent = 'Why thousands of customers love this product';
+    benefitsGrid.innerHTML = data.benefits.map(function(b) {
+      return '<div class="benefit-card">' +
+        '<div class="bc-icon">' + (b.icon||'🌿') + '</div>' +
+        '<div class="bc-title">' + (b.title||'') + '</div>' +
+        '<div class="bc-desc">' + (b.desc||'') + '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  /* ── 3. Usage + Storage + Who Should Buy ── */
+  var usageHtml = '';
+  if (data.how_to_use && data.how_to_use.length) {
+    usageHtml += '<div class="usage-card"><div class="usage-card-head">🍽️ How to Use</div><div class="usage-card-body"><ul>' +
+      data.how_to_use.map(function(s){ return '<li>'+s+'</li>'; }).join('') +
+    '</ul></div></div>';
+  }
+  if (data.storage_tips && data.storage_tips.length) {
+    usageHtml += '<div class="usage-card"><div class="usage-card-head">📦 Storage Tips</div><div class="usage-card-body"><ul>' +
+      data.storage_tips.map(function(s){ return '<li>'+s+'</li>'; }).join('') +
+    '</ul></div></div>';
+  }
+  if (data.who_should_buy) {
+    usageHtml += '<div class="usage-card"><div class="usage-card-head">👤 Who Should Buy</div><div class="usage-card-body">' + data.who_should_buy + '</div></div>';
+  }
+  if (usageHtml) {
+    var ug = document.getElementById('usage-grid');
+    if (ug) ug.innerHTML = usageHtml;
   }
 }
 
@@ -1195,17 +1242,6 @@ function openPayModal(){ closeCartDrawer();var total=cart.reduce(function(s,i){r
 function closePayModal(){ document.getElementById('pay-overlay').classList.remove('open');document.body.style.overflow=''; }
 function selPayMethod(el){ document.querySelectorAll('.pm-method').forEach(function(m){m.classList.remove('sel');m.querySelector('.pm-check').textContent='';});el.classList.add('sel');el.querySelector('.pm-check').textContent='✓'; }
 function placeOrder(){ closePayModal();cart=[];try{localStorage.setItem('pr_cart',JSON.stringify(cart));}catch(e){}updateNavCart();document.getElementById('success-overlay').classList.add('open'); }
-
-/* ══ RELATED PRODUCT ADD TO CART ══ */
-function relAddToCart(id, name, price, image, emoji) {
-  var cartKey = 'rel_' + id;
-  var ex = cart.find(function(x){ return String(x.cartKey)===String(cartKey); });
-  if (ex) ex.qty += 1;
-  else cart.push({cartKey:cartKey,id:id,name:name,emoji:emoji||'🌿',image:image||'',price:price,qty:1});
-  try { localStorage.setItem('pr_cart', JSON.stringify(cart)); } catch(e){}
-  updateNavCart();
-  showToast('✅ '+name+' added to cart!');
-}
 
 /* ══ GO TO PRODUCT ══ */
 function goToProduct(slug){ var s=String(slug||'');if(!s||/^\d+$/.test(s)){var prod=ALL_PRODUCTS.find(function(p){return String(p.id)===s;});if(prod)s=prod.slug&&!/^\d+$/.test(prod.slug)?prod.slug:(prod.name?prod.name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,''):s);}window.location.href='/products/'+s; }
