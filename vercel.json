@@ -1,9 +1,4 @@
 {
-  "functions": {
-    "api/benefits.js": {
-      "maxDuration": 15
-    }
-  },
   "rewrites": [
     { "source": "/reset-password", "destination": "/reset-password.html" },
     { "source": "/terms", "destination": "/terms.html" },

@@ -944,22 +944,35 @@ async function triggerAiBenefits(productName, productDesc) {
     }
   } catch(e) {}
 
-  /* Call YOUR SERVER proxy — API key stays safe on server */
+  /* Call AI */
   try {
-    var resp = await fetch('/api/benefits?product=' + encodeURIComponent(productName));
-    if (!resp.ok) {
-      /* If admin disabled (503) → hide sections silently */
-      if (resp.status === 503) {
-        var bo = document.getElementById('benefits-outer');
-        if (bo) bo.style.display = 'none';
-        var ib = document.getElementById('inline-benefits');
-        if (ib) ib.style.display = 'none';
-        return;
-      }
-      throw new Error('Server error ' + resp.status);
-    }
-    var parsed = await resp.json();
+    /* API key: injected by server as window.ANTHROPIC_API_KEY, or empty (Claude.ai handles it) */
+    var apiKey = (typeof window !== 'undefined' && window.ANTHROPIC_API_KEY) ? window.ANTHROPIC_API_KEY : '';
+    var headers = { 'Content-Type': 'application/json' };
+    if (apiKey) headers['x-api-key'] = apiKey;
+    headers['anthropic-version'] = '2023-06-01';
+    headers['anthropic-dangerous-direct-browser-access'] = 'true';
 
+    var resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: headers,
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 800,
+        messages: [{
+          role: 'user',
+          content: 'You are a Himalayan organic product expert. Generate structured data for a product page. Product: "' + productName + '". Return ONLY valid JSON, no markdown, no explanation:\n' +
+            '{"benefits":[{"icon":"emoji","title":"short title 3-4 words","desc":"one sentence benefit description, 12-15 words"}],' +
+            '"how_to_use":["step 1","step 2","step 3"],' +
+            '"storage_tips":["tip 1","tip 2","tip 3"],' +
+            '"who_should_buy":"2 sentence description of ideal customer"}' +
+            '\nGenerate exactly 4 benefits. Icons must be relevant health/wellness emojis. Make it specific to ' + productName + ', not generic.'
+        }]
+      })
+    });
+    var data = await resp.json();
+    var text = (data.content||[]).map(function(c){ return c.text||''; }).join('');
+    var parsed = JSON.parse(text.replace(/```json|```/g,'').trim());
     parsed.ts = Date.now();
 
     /* Cache it */
