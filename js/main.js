@@ -452,20 +452,23 @@ function mkProd(p) {
   var img = '<div class="piw" style="background:' + (p.card_bg||'#f9f4ec') + '">' +
     imgHtml +
     '<span class="pemo" style="position:relative;z-index:0">' + (p.emoji||'🌿') + '</span>' +
+    '<div class="piw-hover-overlay">' +
+      '<button class="piw-qv-btn" onclick="event.stopPropagation();openQV(' + p.id + ')">👁 Quick View</button>' +
+    '</div>' +
+    '<button class="piw-wl-btn' + (inWL?' active':'') + '" onclick="event.stopPropagation();toggleWishlist(' + p.id + ')">' + (inWL ? '❤️' : '❤') + '</button>' +
     '</div>';
-  var discBadge = pct ? '<span style="position:absolute;top:8px;right:36px;background:#e53;color:#fff;font-size:9px;font-weight:800;padding:2px 7px;border-radius:10px;z-index:2">-' + pct + '%</span>' : '';
+  var badgePart = p.badge_label ? '<div class="pbadge-wrap"><span class="pbadge-dot pbd-' + bc + '"></span><span class="pbadge-text">' + p.badge_label + '</span></div>' : '';
+  var ctTagPart = p.checkout_offer ? '<div class="pcard-checkout-tag">10% Off At Checkout</div>' : '';
+  var discBadge = pct ? '<div class="pdisc-ribbon">-' + pct + '%</div>' : '';
   var notifyBtn = stock <= 0 ? '<button class="notify-btn" onclick="event.stopPropagation();openNotify(' + p.id + ')">🔔 Notify Me</button>' : '';
-  var checkoutTag = p.checkout_offer ? '<div class="pcard-checkout-tag">10% Off At Checkout</div>' : '';
-  var hoverOverlay = '<div class="piw-hover-overlay" onclick="event.stopPropagation();openQV(' + p.id + ')"><span class="piw-hover-cta">👁 Quick View</span></div>';
   var footerBtns = stock <= 0 ? notifyBtn :
     '<div class="pcard-actions">' +
       '<button class="atc" onclick="event.stopPropagation();quickAddToCart(' + p.id + ')" id="atcBtn-' + p.id + '">🛒 Add to Cart</button>' +
       '<span class="atc-hint view-details-link" data-slug="' + slug + '" onclick="event.stopPropagation();goToProductPage(this.dataset.slug)">View Details →</span>' +
     '</div>';
   return '<div class="pcard" data-slug="' + slug + '" style="position:relative" onclick="goToProductPage(this.dataset.slug)">' +
-    '<span class="pbadge b' + bc + '">' + (p.badge_label||'') + '</span>' +
-    '<button class="wl-btn' + (inWL?' active':'') + '" data-id="' + p.id + '" onclick="event.stopPropagation();toggleWishlist(' + p.id + ')" title="Wishlist mein save karo">' + (inWL ? '❤️ Saved' : '🤍 Save') + '</button>' +
-    img + discBadge + hoverOverlay + checkoutTag +
+    badgePart + ctTagPart + discBadge +
+    img +
     '<div class="pbody">' +
       '<div class="pregion">📍 ' + (p.region||'') + '</div>' +
       '<div class="pname">' + p.name + '</div>' +
@@ -483,6 +486,7 @@ function mkProd(p) {
     (p.checkout_offer ? '<div class="checkout-strip">🏷️ 10% off applied at checkout</div>' : '') +
   '</div>';
 }
+
 
 function renderProds() {
   var g  = document.getElementById('pgrid');

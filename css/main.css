@@ -1106,3 +1106,295 @@ body.dark .qv-open-btn { border-color: rgba(255,255,255,.15); color: rgba(255,25
 }
 .spgrid .pcard-actions .atc-hint { color: rgba(255,255,255,.55); }
 .spgrid .pcard:hover .pcard-actions .atc-hint { color: rgba(255,255,255,.9); }
+
+/* ═══════════════════════════════════════════════════════════════════
+   PREMIUM CARD REDESIGN v3
+   Fix 1: hover overlay pointer-events:none — never blocks clicks
+   Fix 2: QV + WL only visible on hover
+   Fix 3: Premium badge — dot + text style, not chunky pill
+   Fix 4: Discount ribbon — clean right-corner tuck
+   Plus: premium micro-details across the card
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── CARD BASE ───────────────────────────────────────────────────── */
+.pcard {
+  border-radius: 18px !important;
+  border: 1px solid rgba(0,0,0,.07) !important;
+  box-shadow: 0 1px 4px rgba(0,0,0,.06) !important;
+  transition: transform .3s ease, box-shadow .3s ease !important;
+  overflow: visible !important; /* allow ribbon to clip outside */
+}
+.pcard:hover {
+  transform: translateY(-7px) !important;
+  box-shadow: 0 20px 48px rgba(26,58,30,.13) !important;
+}
+/* Clip inner content (image) but allow badges outside */
+.pcard > .piw { border-radius: 18px 18px 0 0; overflow: hidden; }
+
+/* ── IMAGE WRAPPER ───────────────────────────────────────────────── */
+.piw { position: relative; aspect-ratio: 4/5; width: 100%; background: #f5f0e8; }
+.piw img { transition: transform .5s ease; }
+.pcard:hover .piw img { transform: scale(1.06); }
+
+/* ── HOVER OVERLAY — pointer-events:none so it NEVER intercepts clicks ── */
+.piw-hover-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(15,40,18,0);
+  transition: background .3s ease;
+  pointer-events: none;   /* KEY FIX: overlay itself never catches clicks */
+  z-index: 4;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 14px;
+}
+.pcard:hover .piw-hover-overlay { background: rgba(15,40,18,.45); }
+
+/* QV button — re-enables pointer events only on itself */
+.piw-qv-btn {
+  pointer-events: all;    /* only this button is clickable inside overlay */
+  background: rgba(255,255,255,.18);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid rgba(255,255,255,.35);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .3px;
+  padding: 7px 18px;
+  border-radius: 22px;
+  cursor: pointer;
+  font-family: 'Lato', sans-serif;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity .25s ease, transform .25s ease, background .2s;
+}
+.pcard:hover .piw-qv-btn { opacity: 1; transform: translateY(0); }
+.piw-qv-btn:hover { background: rgba(255,255,255,.28); }
+
+/* WL button — heart, bottom-right of image, hover-only */
+.piw-wl-btn {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  z-index: 5;
+  pointer-events: all;
+  background: rgba(255,255,255,.9);
+  backdrop-filter: blur(4px);
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,.15);
+  opacity: 0;
+  transform: scale(.8);
+  transition: opacity .22s ease, transform .22s ease, background .2s;
+}
+.pcard:hover .piw-wl-btn { opacity: 1; transform: scale(1); }
+.piw-wl-btn:hover { background: #fff; transform: scale(1.12) !important; }
+.piw-wl-btn.active { opacity: 1 !important; transform: scale(1) !important; }
+
+/* ── PREMIUM BADGE — dot + text, top-left, minimal ───────────────── */
+.pbadge-wrap {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(255,255,255,.92);
+  backdrop-filter: blur(4px);
+  border-radius: 20px;
+  padding: 4px 10px 4px 7px;
+  box-shadow: 0 1px 6px rgba(0,0,0,.12);
+}
+.pbadge-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.pbd-bs { background: #22c55e; }   /* Bestseller — green */
+.pbd-og { background: #16a34a; }   /* Organic — deep green */
+.pbd-pm { background: #f59e0b; }   /* Premium — amber */
+.pbd-nw { background: #3b82f6; }   /* New — blue */
+.pbadge-text {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .5px;
+  text-transform: uppercase;
+  color: #1a1a1a;
+  line-height: 1;
+}
+
+/* ── DISCOUNT RIBBON — top-right corner tuck ─────────────────────── */
+.pdisc-ribbon {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 6;
+  background: #1b4332;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 5px 10px 5px 12px;
+  border-radius: 0 18px 0 12px;
+  letter-spacing: .3px;
+  box-shadow: -2px 2px 6px rgba(0,0,0,.15);
+}
+
+/* Checkout offer tag — also top-left below badge */
+.pcard-checkout-tag {
+  position: absolute;
+  top: 44px;   /* below badge */
+  left: 12px;
+  z-index: 6;
+  background: #bc4749;
+  color: #fff;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .5px;
+  padding: 3px 9px;
+  border-radius: 20px;
+  text-transform: uppercase;
+  box-shadow: 0 1px 4px rgba(188,71,73,.3);
+}
+/* If no badge, checkout tag sits at top */
+.pcard:not(:has(.pbadge-wrap)) .pcard-checkout-tag { top: 12px; }
+
+/* ── CARD BODY POLISH ────────────────────────────────────────────── */
+.pbody { padding: 14px 15px 16px; }
+.pregion {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .7px;
+  text-transform: uppercase;
+  color: var(--gd);
+  margin-bottom: 4px;
+  opacity: .85;
+}
+.pname {
+  font-family: 'Playfair Display', serif;
+  font-size: 15.5px;
+  font-weight: 700;
+  color: var(--g);
+  line-height: 1.28;
+  margin-bottom: 5px;
+}
+.prating { display: flex; align-items: center; gap: 4px; margin-bottom: 6px; }
+.pstars { font-size: 11px; color: #f59e0b; letter-spacing: -.5px; }
+.prc { font-size: 10.5px; color: var(--tx3); }
+
+/* Stock bar */
+.stock-bar {
+  height: 2px;
+  background: rgba(0,0,0,.07);
+  border-radius: 2px;
+  margin-bottom: 3px;
+  overflow: hidden;
+}
+.stock-fill { height: 100%; border-radius: 2px; transition: width .4s; }
+.stock-fill.high { background: #22c55e; }
+.stock-fill.mid  { background: #f59e0b; }
+.stock-fill.low  { background: #ef4444; }
+.stock-label { font-size: 10px; font-weight: 700; margin-bottom: 8px; }
+.stock-label.high { color: #16a34a; }
+.stock-label.mid  { color: #d97706; }
+.stock-label.low  { color: #dc2626; }
+
+/* Price row */
+.pnow { font-size: 17px; font-weight: 900; color: var(--g); }
+.pwas { font-size: 11.5px; color: var(--tx3); text-decoration: line-through; }
+.punt { font-size: 10.5px; color: var(--tx3); }
+
+/* ATC button */
+.atc {
+  background: var(--g) !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: 22px !important;
+  padding: 8px 15px !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+  cursor: pointer;
+  font-family: 'Lato', sans-serif !important;
+  transition: background .2s, transform .15s !important;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+.atc:hover { background: var(--g2) !important; transform: scale(1.04) !important; }
+
+/* View Details link */
+.atc-hint {
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  color: var(--g) !important;
+  opacity: .65 !important;
+  cursor: pointer;
+  transition: opacity .2s !important;
+  white-space: nowrap;
+  margin-top: 0 !important;
+}
+.pcard:hover .atc-hint { opacity: 1 !important; }
+
+/* pfoot and pcard-actions layout */
+.pfoot {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 6px !important;
+  flex-wrap: nowrap !important;
+}
+.prow { display: flex; align-items: baseline; gap: 5px; flex-shrink: 0; }
+.pcard-actions { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; flex-shrink: 0; }
+
+/* ── DARK SECTION (spgrid) overrides ────────────────────────────── */
+.spgrid .pbadge-wrap { background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.15); }
+.spgrid .pbadge-text { color: rgba(255,255,255,.9); }
+.spgrid .pdisc-ribbon { background: rgba(255,255,255,.15); color: #fff; }
+.spgrid .piw-wl-btn { background: rgba(255,255,255,.15); color: rgba(255,255,255,.8); }
+.spgrid .piw-wl-btn:hover { background: rgba(255,255,255,.25); }
+.spgrid .pname { color: #fff; }
+.spgrid .pregion { color: var(--gd2); }
+.spgrid .pnow { color: var(--gd2); }
+.spgrid .pwas { color: rgba(255,255,255,.3); }
+.spgrid .prc { color: rgba(255,255,255,.35); }
+.spgrid .atc-hint { color: rgba(255,255,255,.55) !important; }
+.spgrid .pcard:hover .atc-hint { color: rgba(255,255,255,.9) !important; }
+.spgrid .pcard { background: rgba(255,255,255,.05) !important; border-color: rgba(255,255,255,.08) !important; }
+.spgrid .pcard:hover { background: rgba(255,255,255,.09) !important; box-shadow: 0 14px 40px rgba(0,0,0,.35) !important; }
+.spgrid .pcard-checkout-tag { background: rgba(255,255,255,.15); color: rgba(255,255,255,.9); }
+.spgrid .checkout-strip { background: rgba(255,255,255,.05); border-top-color: rgba(255,255,255,.1); color: rgba(255,200,200,.7); }
+
+/* ── DUKAN THEME overrides ──────────────────────────────────────── */
+body[data-theme="dukan"] .pdisc-ribbon { background: #006d77; }
+body[data-theme="dukan"] .pbd-bs { background: #0a8f9c; }
+body[data-theme="dukan"] .pbd-og { background: #006d77; }
+body[data-theme="dukan"] .pbd-pm { background: #e29578; }
+body[data-theme="dukan"] .atc { background: #e29578 !important; }
+body[data-theme="dukan"] .atc:hover { background: #cc7a5e !important; }
+body[data-theme="dukan"] .pcard:hover { box-shadow: 0 20px 48px rgba(0,109,119,.14) !important; }
+body[data-theme="dukan"] .pname { color: #006d77; }
+body[data-theme="dukan"] .pnow { color: #006d77; }
+body[data-theme="dukan"] .pregion { color: #e29578; }
+body[data-theme="dukan"] .atc-hint { color: #006d77 !important; }
+
+/* ── DARK MODE overrides ────────────────────────────────────────── */
+body.dark .pbadge-wrap { background: rgba(30,40,30,.9); border: 1px solid rgba(255,255,255,.1); }
+body.dark .pbadge-text { color: rgba(255,255,255,.85); }
+body.dark .pdisc-ribbon { background: rgba(255,255,255,.12); }
+body.dark .pcard { background: #1a2b1c !important; border-color: rgba(255,255,255,.06) !important; }
+
+/* Hide old wl-btn and pbadge — replaced by new elements */
+.wl-btn { display: none !important; }
+.pbadge { display: none !important; }
