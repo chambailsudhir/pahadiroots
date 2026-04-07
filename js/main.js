@@ -471,7 +471,7 @@ function mkProd(p) {
         '<div class="prow"><span class="pnow" id="pnow-' + p.id + '">₹' + p.price + '</span>' +
           (p.original_price ? '<span class="pwas">₹' + p.original_price + '</span>' : '') +
           '<span class="punt">' + (p.unit||'') + '</span></div>' +
-        (stock <= 0 ? notifyBtn : '<button class="atc" onclick="event.stopPropagation();quickAddToCart(' + p.id + ')" id="atcBtn-' + p.id + '">🛒 Add to Cart</button><button class="qv-open-btn" onclick="event.stopPropagation();openQV(' + p.id + ')">👁 Quick View</button>') +
+        (stock <= 0 ? notifyBtn : '<div class="pcard-actions"><button class="atc" onclick="event.stopPropagation();quickAddToCart(' + p.id + ')" id="atcBtn-' + p.id + '">🛒 Add to Cart</button><span class="atc-hint" onclick="event.stopPropagation();goToProductPage(\'' + getProductSlug(p) + \')">View Details →</span></div>') +
       '</div>' +
     '</div>' +
     (p.checkout_offer ? '<div class="checkout-strip">🏷️ 10% off applied at checkout</div>' : '') +
