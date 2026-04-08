@@ -337,16 +337,17 @@ footer{background:#0b160d url("data:image/svg+xml,%3Csvg viewBox='0 0 1440 480' 
 .f-grievance-label{font-size:9.5px;font-weight:800;letter-spacing:1px;color:var(--gd2);text-transform:uppercase;margin-bottom:4px}
 .f-grievance-name{font-size:12.5px;color:rgba(255,255,255,.7);font-weight:700}
 .f-grievance-email{font-size:11.5px;color:rgba(255,255,255,.4)}
-.f-divider{max-width:1200px;margin:0 40px;border:none;border-top:1px solid rgba(255,255,255,.05);position:relative;z-index:2}
-.f-bot{max-width:1200px;margin:0 auto;padding:18px 40px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;position:relative;z-index:2}
-.f-bot-left{font-size:12px;color:rgba(255,255,255,.28)}
-.f-bot-links{display:flex;gap:20px;flex-wrap:wrap}
-.f-bot-links a{font-size:11.5px;color:rgba(255,255,255,.35);transition:color .2s;text-decoration:none}
-.f-bot-links a:hover{color:rgba(255,255,255,.8)}
-.f-bot-tag{font-size:11.5px;color:rgba(255,255,255,.22);font-style:italic}
+.f-divider{max-width:1200px;margin:0 40px;border:none;border-top:1px solid rgba(255,255,255,.07);position:relative;z-index:2}
+.f-bot{max-width:1200px;margin:0 auto;padding:20px 40px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;position:relative;z-index:2}
+.f-bot-left{font-size:12px;color:rgba(255,255,255,.32);font-family:'Lato',sans-serif;white-space:nowrap}
+.f-bot-left .fd{color:rgba(255,255,255,.7);font-weight:700}
+.f-bot-links{display:flex;gap:22px;flex-wrap:wrap;align-items:center}
+.f-bot-links a{font-size:12px;color:rgba(255,255,255,.38);transition:color .2s;text-decoration:none;white-space:nowrap}
+.f-bot-links a:hover{color:rgba(255,255,255,.9)}
+.f-bot-tag{font-size:11.5px;color:rgba(255,255,255,.25);font-style:italic;white-space:nowrap}
 .fd{color:var(--gd);font-weight:700}
 @media(max-width:900px){.f-main{grid-template-columns:1fr 1fr;gap:28px}.f-nl-inner{flex-direction:column;align-items:flex-start}.f-nl-form{min-width:100%;width:100%}}
-@media(max-width:560px){.f-main{grid-template-columns:1fr;padding:32px 20px 24px}.f-newsletter{padding:28px 20px}.f-bot{padding:16px 20px;flex-direction:column;text-align:center}.f-divider{margin:0 20px}}
+@media(max-width:560px){.f-main{grid-template-columns:1fr;padding:32px 20px 24px}.f-newsletter{padding:28px 20px}.f-bot{padding:16px 20px;flex-direction:column;text-align:center;gap:10px}.f-bot-links{justify-content:center;gap:14px}.f-divider{margin:0 20px}}
 
 /* SEARCH */
 .srch-overlay{position:fixed;inset:0;z-index:1200;background:rgba(0,0,0,.65);display:none;align-items:flex-start;justify-content:center;padding-top:80px;backdrop-filter:blur(4px)}
@@ -491,8 +492,12 @@ footer{background:#0b160d url("data:image/svg+xml,%3Csvg viewBox='0 0 1440 480' 
 .toast.show{opacity:1;transform:translateX(-50%) translateY(-4px)}
 
 /* WA FLOAT & BTT */
-.wa-float{position:fixed;bottom:24px;right:24px;z-index:800;background:#25d366;color:#fff;width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:26px;box-shadow:0 4px 16px rgba(37,211,102,.4);transition:transform .25s}
-.wa-float:hover{transform:scale(1.1)}
+.wa-float{position:fixed;bottom:28px;right:24px;z-index:800;background:#25d366;color:#fff;width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 18px rgba(37,211,102,.45),0 2px 8px rgba(0,0,0,.18);transition:transform .25s, box-shadow .25s;text-decoration:none}
+.wa-float::before{content:'';position:absolute;inset:-4px;border-radius:50%;border:2px solid rgba(37,211,102,.5);animation:wa-pulse 2.2s ease-out infinite;pointer-events:none}
+@keyframes wa-pulse{0%{transform:scale(1);opacity:.6}70%{transform:scale(1.25);opacity:0}100%{transform:scale(1.25);opacity:0}}
+.wa-float:hover{transform:scale(1.1);box-shadow:0 8px 28px rgba(37,211,102,.5),0 4px 12px rgba(0,0,0,.2)}
+.wa-tooltip{position:absolute;right:64px;background:#1a1a1a;color:#fff;font-size:12.5px;font-weight:700;font-family:'Lato',sans-serif;white-space:nowrap;padding:6px 14px;border-radius:20px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;transform:translateX(6px);letter-spacing:0.2px}
+.wa-float:hover .wa-tooltip{opacity:1;transform:translateX(0)}
 .btt{position:fixed;bottom:84px;right:26px;z-index:800;width:38px;height:38px;border-radius:50%;background:var(--g);color:#fff;border:none;font-size:18px;display:none;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 3px 10px rgba(0,0,0,.2)}
 .btt.show{display:flex}
 
@@ -573,7 +578,8 @@ footer{background:#0b160d url("data:image/svg+xml,%3Csvg viewBox='0 0 1440 480' 
   .stab-thumb{height:56px}
   .trust{grid-template-columns:1fr 1fr}
   .nlf{flex-direction:column}
-  .f-bot{flex-direction:column;gap:8px;text-align:center}
+  .f-bot{flex-direction:column;gap:10px;text-align:center}
+  .f-bot-links{justify-content:center;gap:14px}
   .hstats{gap:0}
   .hstat{padding:0 12px}
 }
@@ -1055,41 +1061,49 @@ body.dark .qv-open-btn { border-color: rgba(255,255,255,.15); color: rgba(255,25
    3) Stock bar layout fixed — pfoot back to row layout
    ════════════════════════════════════════════════════ */
 
-/* Fix 3: Restore pfoot to row layout (was broken by column override) */
+/* Fix 3: Restore pfoot to column layout — price row then ATC below */
 .pfoot {
   display: flex !important;
-  flex-direction: row !important;
-  align-items: center !important;
-  justify-content: space-between !important;
-  gap: 8px !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  gap: 10px !important;
 }
-.prow { width: auto !important; }
+.prow { width: auto !important; display: flex; align-items: baseline; gap: 6px; }
 
-/* Fix 1+2: pcard-actions — stacks ATC + View Details cleanly */
+/* Fix 1+2: pcard-actions — full-width ATC + View Details below */
 .pcard-actions {
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
-  gap: 4px;
-  flex-shrink: 0;
+  align-items: stretch;
+  gap: 6px;
+  width: 100%;
 }
 
-/* ATC button — keep existing style, just reset the layout */
-.pcard-actions .atc {
-  display: block;
-  white-space: nowrap;
+/* ATC full width */
+.pcard-atc-full {
+  display: flex !important;
+  width: 100% !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 7px !important;
+  padding: 11px 16px !important;
+  font-size: 14px !important;
+  font-weight: 800 !important;
+  font-family: 'Nunito', 'Lato', sans-serif !important;
+  border-radius: 28px !important;
+  letter-spacing: 0.2px !important;
 }
 
-/* View Details link — styled like old atc-hint */
+/* View Details link — centered below ATC */
 .pcard-actions .atc-hint {
-  font-size: 11.5px;
+  font-size: 12px;
   font-weight: 700;
   color: var(--g);
-  opacity: 0.75;
+  opacity: 0.65;
   cursor: pointer;
   transition: opacity .2s;
   white-space: nowrap;
-  text-align: right;
+  text-align: center;
   display: block;
   margin-top: 0;
 }
@@ -1098,11 +1112,10 @@ body.dark .qv-open-btn { border-color: rgba(255,255,255,.15); color: rgba(255,25
 /* Quick view open btn — HIDE from footer entirely, it only lives on image */
 .qv-open-btn { display: none !important; }
 
-/* spgrid dark section — same layout fixes */
+/* spgrid dark section — same column layout */
 .spgrid .pfoot {
-  flex-direction: row !important;
-  align-items: center !important;
-  justify-content: space-between !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
 }
 .spgrid .pcard-actions .atc-hint { color: rgba(255,255,255,.55); }
 .spgrid .pcard:hover .pcard-actions .atc-hint { color: rgba(255,255,255,.9); }

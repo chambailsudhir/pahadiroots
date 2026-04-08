@@ -474,10 +474,10 @@ function mkProd(p) {
   var badgePart = p.badge_label ? '<div class="pbadge-wrap"><span class="pbadge-dot pbd-' + bc + '"></span><span class="pbadge-text">' + p.badge_label + '</span></div>' : '';
   var ctTagPart = p.checkout_offer ? '<div class="pcard-checkout-tag">10% Off At Checkout</div>' : '';
   var discBadge = pct ? '<div class="pdisc-ribbon">-' + pct + '%</div>' : '';
-  var notifyBtn = stock <= 0 ? '<button class="notify-btn" onclick="event.stopPropagation();openNotify(' + p.id + ')">🔔 Notify Me</button>' : '';
+  var notifyBtn = stock <= 0 ? '<button class="notify-btn pcard-atc-full" onclick="event.stopPropagation();openNotify(' + p.id + ')">🔔 Notify Me</button>' : '';
   var footerBtns = stock <= 0 ? notifyBtn :
     '<div class="pcard-actions">' +
-      '<button class="atc" onclick="event.stopPropagation();quickAddToCart(' + p.id + ')" id="atcBtn-' + p.id + '">🛒 Add to Cart</button>' +
+      '<button class="atc pcard-atc-full" onclick="event.stopPropagation();quickAddToCart(' + p.id + ')" id="atcBtn-' + p.id + '">🛒 Add to Cart</button>' +
       '<span class="atc-hint view-details-link" data-slug="' + slug + '" onclick="event.stopPropagation();goToProductPage(this.dataset.slug)">View Details →</span>' +
     '</div>';
   return '<div class="pcard" data-slug="' + slug + '" style="position:relative" onclick="goToProductPage(this.dataset.slug)">' +
@@ -494,8 +494,8 @@ function mkProd(p) {
         '<div class="prow"><span class="pnow" id="pnow-' + p.id + '">₹' + p.price + '</span>' +
           (p.original_price ? '<span class="pwas">₹' + p.original_price + '</span>' : '') +
           '<span class="punt">' + (p.unit||'') + '</span></div>' +
-        footerBtns +
       '</div>' +
+      footerBtns +
     '</div>' +
     (p.checkout_offer ? '<div class="checkout-strip">🏷️ 10% off applied at checkout</div>' : '') +
   '</div>';
