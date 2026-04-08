@@ -467,17 +467,17 @@ function mkProd(p) {
     imgHtml +
     '<span class="pemo" style="position:relative;z-index:0">' + (p.emoji||'🌿') + '</span>' +
     '<div class="piw-hover-overlay">' +
-      '<button class="piw-qv-btn" onclick="event.stopPropagation();openQV(' + p.id + ')">👁 Quick View</button>' +
+      '<button class="piw-qv-btn" onclick="event.stopPropagation();openQV(\'' + p.id + '\')">👁 Quick View</button>' +
     '</div>' +
-    '<button class="piw-wl-btn' + (inWL?' active':'') + '" onclick="event.stopPropagation();toggleWishlist(' + p.id + ')">' + (inWL ? '❤️' : '❤') + '</button>' +
+    '<button class="piw-wl-btn' + (inWL?' active':'') + '" onclick="event.stopPropagation();toggleWishlist(\'' + p.id + '\')">' + (inWL ? '❤️' : '❤') + '</button>' +
     '</div>';
   var badgePart = p.badge_label ? '<div class="pbadge-wrap"><span class="pbadge-dot pbd-' + bc + '"></span><span class="pbadge-text">' + p.badge_label + '</span></div>' : '';
   var ctTagPart = p.checkout_offer ? '<div class="pcard-checkout-tag">10% Off At Checkout</div>' : '';
   var discBadge = pct ? '<div class="pdisc-ribbon">-' + pct + '%</div>' : '';
-  var notifyBtn = stock <= 0 ? '<button class="notify-btn pcard-atc-full" onclick="event.stopPropagation();openNotify(' + p.id + ')">🔔 Notify Me</button>' : '';
+  var notifyBtn = stock <= 0 ? '<button class="notify-btn pcard-atc-full" onclick="event.stopPropagation();openNotify(\'' + p.id + '\')">🔔 Notify Me</button>' : '';
   var footerBtns = stock <= 0 ? notifyBtn :
     '<div class="pcard-actions">' +
-      '<button class="atc pcard-atc-full" onclick="event.stopPropagation();quickAddToCart(' + p.id + ')" id="atcBtn-' + p.id + '">🛒 Add to Cart</button>' +
+      '<button class="atc pcard-atc-full" onclick="event.stopPropagation();quickAddToCart(\'' + p.id + '\')" id="atcBtn-' + p.id + '">🛒 Add to Cart</button>' +
       '<span class="atc-hint view-details-link" data-slug="' + slug + '" onclick="event.stopPropagation();goToProductPage(this.dataset.slug)">View Details →</span>' +
     '</div>';
   return '<div class="pcard" data-slug="' + slug + '" style="position:relative" onclick="goToProductPage(this.dataset.slug)">' +
@@ -806,7 +806,8 @@ function quickAddToCart(id) {
 
 // ── QUICK VIEW MODAL ───────────────────────────────────────
 function openQV(id) {
-  var p = PRODUCTS.find(function(x) { return x.id === id; });
+  var sid = String(id);
+  var p = PRODUCTS.find(function(x) { return String(x.id) === sid; });
   if (!p) return;
   var pct = p.original_price ? Math.round((1 - p.price / p.original_price) * 100) : 0;
   var stock = p.stock || 99;
@@ -886,7 +887,8 @@ function closeThemeSwitcher() {
 }
 
 function addToCart(id) {
-  var p = PRODUCTS.find(function(x) { return x.id === id; });
+  var sid = String(id);
+  var p = PRODUCTS.find(function(x) { return String(x.id) === sid; });
   if (!p) return;
   // Check if variant selected
   var varSel = document.getElementById('vs-' + id);
@@ -899,8 +901,8 @@ function addToCart(id) {
     stock = parseInt(opt.dataset.stock);
   }
   // Unique cart key = productId + variantId
-  var cartKey = variantId ? (id + '_' + variantId) : id;
-  var ex = cart.find(function(x) { return x.cartKey === cartKey; });
+  var cartKey = variantId ? (sid + '_' + variantId) : sid;
+  var ex = cart.find(function(x) { return String(x.cartKey) === String(cartKey); });
   var currentQty = ex ? ex.qty : 0;
   // Stock check
   if (stock !== undefined && stock !== null && currentQty >= stock) {
@@ -1690,9 +1692,10 @@ function onSearch(q) {
 
 // ── WISHLIST ─────────────────────────────────────────────────────────
 function toggleWishlist(id) {
-  var idx = wishlist.indexOf(id);
+  var sid = String(id);
+  var idx = wishlist.findIndex(function(x){ return String(x) === sid; });
   if (idx > -1) { wishlist.splice(idx, 1); showToast('💔 Removed from wishlist'); }
-  else { wishlist.push(id); showToast('❤️ Added to wishlist!'); }
+  else { wishlist.push(sid); showToast('❤️ Added to wishlist!'); }
   svWL(); updateWLBadge(); updateAllWLButtons();
 }
 function updateWLBadge() {
@@ -1738,7 +1741,8 @@ function renderWishlist() {
 // ── QUICK VIEW ────────────────────────────────────────────────────────
 var qvQty = 1;
 function openQV(id) {
-  var p = PRODUCTS.find(function(x) { return x.id === id; });
+  var sid = String(id);
+  var p = PRODUCTS.find(function(x) { return String(x.id) === sid; });
   if (!p) return;
   qvQty = 1;
   addToRecent(p);
