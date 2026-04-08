@@ -695,9 +695,11 @@ async function loadProduct() {
     VARIANTS = (data.product_variants||[]).filter(function(v){ return String(v.product_id)===String(prod.id); });
     var related = ALL_PRODUCTS.filter(function(p){ return p.id!==prod.id&&(p.state_id===prod.state_id||p.category_id===prod.category_id); }).slice(0,4);
     var stateMap = {};
+    var stateImgMap = {};
     (data.states||[]).forEach(function(s){ stateMap[s.id]=s.name; });
+    (data.state_images||[]).forEach(function(si){ if(!stateImgMap[si.state_id]) stateImgMap[si.state_id]=si.image_url; });
     if (data.settings && data.settings.whatsapp_number) WHATSAPP_NUMBER = data.settings.whatsapp_number;
-    renderProduct(prod, prodImages, related, data, stateMap);
+    renderProduct(prod, prodImages, related, data, stateMap, stateImgMap);
     /* Silently trigger AI benefits after product renders */
     triggerAiBenefits(prod.name, prod.short_description || prod.name);
   } catch(e) {
@@ -707,8 +709,9 @@ async function loadProduct() {
 }
 
 /* ══ RENDER PRODUCT ══ */
-function renderProduct(p, images, related, data, stateMap) {
+function renderProduct(p, images, related, data, stateMap, stateImgMap) {
   stateMap = stateMap || {};
+  stateImgMap = stateImgMap || {};
   /* SEO */
   document.getElementById('pg-title').textContent = (p.name||'Product') + ' — 5 Pahadi Roots';
   document.getElementById('pg-desc').setAttribute('content', p.short_description||p.name+' — Authentic Himalayan product');
@@ -813,6 +816,7 @@ function renderProduct(p, images, related, data, stateMap) {
   /* Region info */
   var regionName = p.region || stateMap[p.state_id] || p.state_id || 'Himalayan Region';
   var regionEmoji = {'Assam':'🌿','Himachal Pradesh':'🏔️','Uttarakhand':'🌲','Jammu & Kashmir':'❄️','Sikkim':'🌸','Nagaland':'🌿','Meghalaya':'☁️','Ladakh':'⛰️'}[regionName] || '🏔️';
+  var stateImg = stateImgMap[p.state_id] || '';
 
   /* WhatsApp number formatted */
   var retNumStr = WHATSAPP_NUMBER.replace('91','').replace(/(\d{5})(\d{5})/,'$1 $2');
@@ -904,15 +908,18 @@ function renderProduct(p, images, related, data, stateMap) {
         '<div class="highlights"><p class="highlights-title">Why 5 Pahadi Roots?</p><ul class="hl-list">'+hlItems.map(function(h){return '<li><span class="hl-check">✓</span>'+h+'</li>';}).join('')+'</ul></div>' +
 
         /* ── INLINE BENEFITS (right column, like My Pahadi Dukan) ── */
-        (p.show_benefits !== false && !(p.tags && p.tags.includes('no-benefits')) ?
-/* benefits moved above variants */''
-        : '') +
+        (showBenefits ?
+        '<div class="inline-benefits" id="inline-benefits">' +
+          '<div class="inline-ben-title">Key Benefits</div>' +
+          '<div id="inline-benefits-list">' +
+            [1,2,3,4].map(function(){ return '<div class="ben-item"><div style="width:26px;height:26px;border-radius:50%;background:linear-gradient(90deg,#f2ede4 25%,#e8e2d8 50%,#f2ede4 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;flex-shrink:0;margin-top:1px"></div><div style="flex:1"><div style="height:12px;border-radius:4px;margin-bottom:6px;background:linear-gradient(90deg,#f2ede4 25%,#e8e2d8 50%,#f2ede4 75%);background-size:200% 100%;animation:shimmer 1.5s infinite"></div><div style="height:11px;border-radius:4px;width:75%;background:linear-gradient(90deg,#f2ede4 25%,#e8e2d8 50%,#f2ede4 75%);background-size:200% 100%;animation:shimmer 1.5s infinite"></div></div></div>'; }).join('') +
+          '</div>' +
+        '</div>' : '') +
 
-        /* ORIGIN CARD */
         '<div class="origin-card" style="margin-top:18px">' +
           '<div class="origin-header">'+regionEmoji+' Himalayan Origin Story</div>' +
           '<div class="origin-body">' +
-            '<div class="origin-map">'+regionEmoji+'</div>' +
+            '<div class="origin-img">'+(stateImg?'<img src="'+stateImg+'" alt="'+regionName+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%">':(regionEmoji?'<span style="font-size:26px;line-height:1">'+regionEmoji+'</span>':'<span style="font-size:26px">🏔️</span>'))+'</div>' +
             '<div class="origin-text"><div class="origin-region">'+regionName+'</div><p>This product is sourced directly from farming families in '+regionName+', nestled in the pristine Himalayan region. Grown at altitude, harvested with traditional methods — pure as the mountains themselves.</p></div>' +
           '</div>' +
         '</div>' +
@@ -1097,7 +1104,7 @@ async function aiGenerateProduct(input, isAuto) {
     VARIANTS = (p.variants||[]).map(function(v,i){ return {id:v.id||i+1,product_id:PRODUCT.id,variant_value:v.variant_value,price:v.price,original_price:v.original_price,available_stock:v.available_stock||50}; });
     document.getElementById('bc-name').textContent = PRODUCT.name;
     document.getElementById('pg-title').textContent = PRODUCT.name+' — 5 Pahadi Roots';
-    renderProduct(PRODUCT,[],[],{settings:{}},{});
+    renderProduct(PRODUCT,[],[],{settings:{}},{},{});
     /* Now trigger benefits AI call */
     triggerAiBenefits(PRODUCT.name, PRODUCT.short_description);
     if (!isAuto) showToast('✨ '+PRODUCT.name+' loaded!');
