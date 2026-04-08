@@ -127,7 +127,7 @@ section.sec{padding:52px 40px}
 .filter-btn.active{background:var(--g);color:#fff;border-color:var(--g)}
 .filter-sort{border:1.5px solid var(--bd);border-radius:20px;padding:7px 14px;font-size:12.5px;font-weight:700;color:var(--tx2);background:#fff;font-family:'Lato',sans-serif}
 .pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:28px;max-width:1400px;margin:0 auto}
-.pcard{background:#fff;border:1px solid #e8e0d0;border-radius:16px;overflow:hidden;transition:transform .3s,box-shadow .3s;position:relative;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.pcard{background:#fff;border:1px solid #e8e0d0;border-radius:16px;overflow:hidden;transition:transform .3s,box-shadow .3s;position:relative;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.06);display:flex;flex-direction:column}
 .pcard:hover{transform:translateY(-6px);box-shadow:0 16px 40px rgba(0,0,0,.14)}
 .piw{position:relative;aspect-ratio:4/5;width:100%;overflow:hidden;background:#f5f0e8}
 .pemo{font-size:54px;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:0}
@@ -136,19 +136,19 @@ section.sec{padding:52px 40px}
 .bbs{background:#e8f5e8;color:#1a5c1a}.bog{background:#e8f5e8;color:#1a5c1a}.bpm{background:#fff0d0;color:#8a5a00}.bnw{background:#e8f0ff;color:#1a3a8a}
 .wl-btn{position:absolute;top:8px;right:8px;background:rgba(255,255,255,.95);border:none;border-radius:20px;padding:4px 8px;font-size:13px;display:flex;align-items:center;gap:3px;z-index:3;transition:transform .2s;box-shadow:0 1px 4px rgba(0,0,0,.15);color:#888;font-weight:500;cursor:pointer}
 .wl-btn:hover{transform:scale(1.08);background:#fff}.wl-btn.active{color:#e74c3c;background:#fff5f5}
-.pbody{padding:16px 16px 18px}
+.pbody{padding:16px 16px 18px;display:flex;flex-direction:column;flex:1}
 .pregion{font-size:10.5px;color:var(--gd);font-weight:700;letter-spacing:.5px;margin-bottom:4px}
 .pname{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:var(--g);margin-bottom:4px;line-height:1.3}
 .prating{display:flex;align-items:center;gap:5px;margin-bottom:5px}
 .pstars{font-size:11px;color:var(--gd)}
 .prc{font-size:10.5px;color:var(--tx3)}
-.pdesc{font-size:11.5px;color:var(--tx2);line-height:1.5;margin-bottom:8px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.pdesc{font-size:11.5px;color:var(--tx2);line-height:1.5;margin-bottom:8px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;flex-grow:1}
 .stock-bar{height:3px;background:rgba(0,0,0,.08);border-radius:2px;margin-bottom:3px}
 .stock-fill{height:100%;border-radius:2px;transition:width .4s}
 .stock-fill.high{background:#4caf50}.stock-fill.mid{background:#ff9800}.stock-fill.low{background:#f44336}
 .stock-label{font-size:10px;font-weight:700;margin-bottom:7px}
 .stock-label.high{color:#4caf50}.stock-label.mid{color:#ff9800}.stock-label.low{color:#f44336}
-.pfoot{display:flex;align-items:center;justify-content:space-between}
+.pfoot{display:flex;flex-direction:column;align-items:stretch;gap:10px;margin-top:8px}
 .prow{display:flex;align-items:baseline;gap:6px}
 .pnow{font-size:18px;font-weight:900;color:var(--g)}
 .pwas{font-size:12px;color:var(--tx3);text-decoration:line-through}
@@ -761,9 +761,7 @@ footer{background:#0b160d url("data:image/svg+xml,%3Csvg viewBox='0 0 1440 480' 
 }
 .qv-open-btn:hover { background: rgba(26,58,30,.14); }
 
-/* Stack ATC + QV btn vertically */
-.pfoot { flex-direction: column; align-items: flex-start; gap: 5px; }
-.prow { width: 100%; }
+/* ATC + QV layout */
 
 /* ── IMAGE HOVER OVERLAY ──────────────────────────────────────────── */
 .piw img { transition: transform .45s ease; }
@@ -1061,15 +1059,7 @@ body.dark .qv-open-btn { border-color: rgba(255,255,255,.15); color: rgba(255,25
    3) Stock bar layout fixed — pfoot back to row layout
    ════════════════════════════════════════════════════ */
 
-/* Fix 3: Restore pfoot to column layout — price row then ATC below */
-.pfoot {
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: stretch !important;
-  gap: 10px !important;
-}
-.prow { width: auto !important; display: flex; align-items: baseline; gap: 6px; }
-
+/* Fix 3: pfoot column layout — defined at base level above */
 /* Fix 1+2: pcard-actions — full-width ATC + View Details below */
 .pcard-actions {
   display: flex;
@@ -1092,6 +1082,7 @@ body.dark .qv-open-btn { border-color: rgba(255,255,255,.15); color: rgba(255,25
   font-family: 'Nunito', 'Lato', sans-serif !important;
   border-radius: 28px !important;
   letter-spacing: 0.2px !important;
+  box-sizing: border-box !important;
 }
 
 /* View Details link — centered below ATC */
@@ -1116,6 +1107,7 @@ body.dark .qv-open-btn { border-color: rgba(255,255,255,.15); color: rgba(255,25
 .spgrid .pfoot {
   flex-direction: column !important;
   align-items: stretch !important;
+  justify-content: flex-start !important;
 }
 .spgrid .pcard-actions .atc-hint { color: rgba(255,255,255,.55); }
 .spgrid .pcard:hover .pcard-actions .atc-hint { color: rgba(255,255,255,.9); }
@@ -1283,7 +1275,7 @@ body.dark .qv-open-btn { border-color: rgba(255,255,255,.15); color: rgba(255,25
 .pcard:not(:has(.pbadge-wrap)) .pcard-checkout-tag { top: 12px; }
 
 /* ── CARD BODY POLISH ────────────────────────────────────────────── */
-.pbody { padding: 14px 15px 16px; }
+.pbody { padding: 14px 15px 16px; display: flex; flex-direction: column; flex: 1; }
 .pregion {
   font-size: 10px;
   font-weight: 700;
@@ -1359,17 +1351,10 @@ body.dark .qv-open-btn { border-color: rgba(255,255,255,.15); color: rgba(255,25
 }
 .pcard:hover .atc-hint { opacity: 1 !important; }
 
-/* pfoot and pcard-actions layout */
-.pfoot {
-  display: flex !important;
-  flex-direction: row !important;
-  align-items: center !important;
-  justify-content: space-between !important;
-  gap: 6px !important;
-  flex-wrap: nowrap !important;
-}
-.prow { display: flex; align-items: baseline; gap: 5px; flex-shrink: 0; }
-.pcard-actions { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; flex-shrink: 0; }
+/* pfoot and pcard-actions layout — defined at base, inherited here */
+.pfoot { margin-top: 4px !important; }
+.prow { display: flex; align-items: baseline; gap: 5px; }
+.pcard-actions { display: flex; flex-direction: column; align-items: stretch; gap: 6px; width: 100%; }
 
 /* ── DARK SECTION (spgrid) overrides ────────────────────────────── */
 .spgrid .pbadge-wrap { background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.15); }
