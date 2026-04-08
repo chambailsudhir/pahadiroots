@@ -834,14 +834,31 @@ function renderProduct(p, images, related, data, stateMap, stateImgMap) {
       related.map(function(r){
         var rSlug = r.slug&&!/^\d+$/.test(r.slug)?r.slug:(r.name?r.name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,''):r.id);
         var rDisc = r.mrp&&r.price?Math.round((1-r.price/r.mrp)*100):0;
+        var rId = String(r.id);
+        var rNameSafe = (r.name||'').replace(/"/g,'&quot;');
+        var rImgSafe = (r.image_url||'');
+        var rEmojiSafe = (r.emoji||'🌿');
+        var rPrice = Number(r.price)||0;
         return '<div class="rel-card">' +
-          '<div class="rel-img">'+(r.image_url?'<img src="'+r.image_url+'" alt="'+r.name+'" loading="lazy">':'<div class="rel-img-placeholder">'+(r.emoji||'🌿')+'</div>')+(rDisc>0?'<span class="rel-disc">-'+rDisc+'%</span>':'')+'</div>'+
-          '<div class="rel-body">'+
-            '<div class="rel-vendor" onclick="goToProduct(\''+rSlug+'\')">5 PAHADI ROOTS</div>'+
-            '<div class="rel-name" onclick="goToProduct(\''+rSlug+'\')">'+r.name+'</div>'+
-            '<div class="rel-price-row"><span class="rel-price">₹'+r.price+'</span>'+(r.mrp&&r.mrp>r.price?'<span class="rel-orig">₹'+r.mrp+'</span>':'')+'</div>'+
-            '<button class="rel-atc" onclick="relATC(''+r.id+'',''+r.name.replace(/'/g,"\'")+'',' +r.price+',''+( r.image_url||'')+'',''+( r.emoji||'🌿')+'')">+ Add to Cart</button>'+
-          '</div>'+
+          '<div class="rel-img" onclick="goToProduct(\'' + rSlug + '\')" style="cursor:pointer">' +
+            (r.image_url ? '<img src="' + r.image_url + '" alt="' + rNameSafe + '" loading="lazy">' : '<div class="rel-img-placeholder">' + rEmojiSafe + '</div>') +
+            (rDisc > 0 ? '<span class="rel-disc">-' + rDisc + '%</span>' : '') +
+          '</div>' +
+          '<div class="rel-body">' +
+            '<div class="rel-vendor" onclick="goToProduct(\'' + rSlug + '\')" style="cursor:pointer">5 PAHADI ROOTS</div>' +
+            '<div class="rel-name" onclick="goToProduct(\'' + rSlug + '\')" style="cursor:pointer">' + r.name + '</div>' +
+            '<div class="rel-price-row">' +
+              '<span class="rel-price">&#8377;' + rPrice + '</span>' +
+              (r.mrp && r.mrp > rPrice ? '<span class="rel-orig">&#8377;' + r.mrp + '</span>' : '') +
+            '</div>' +
+            '<button class="rel-atc" ' +
+              'data-id="' + rId + '" ' +
+              'data-name="' + rNameSafe + '" ' +
+              'data-price="' + rPrice + '" ' +
+              'data-img="' + rImgSafe + '" ' +
+              'data-emoji="' + rEmojiSafe + '" ' +
+              'onclick="relATCBtn(this)">+ Add to Cart</button>' +
+          '</div>' +
         '</div>';
       }).join('')+'</div></div>';
   }
@@ -1275,11 +1292,24 @@ function selPayMethod(el){ document.querySelectorAll('.pm-method').forEach(funct
 function placeOrder(){ closePayModal();cart=[];try{localStorage.setItem('pr_cart',JSON.stringify(cart));}catch(e){}updateNavCart();document.getElementById('success-overlay').classList.add('open'); }
 
 /* ══ GO TO PRODUCT ══ */
-function relATC(id,name,price,image,emoji){
-  var cKey='rel_'+id;var ex=cart.find(function(x){return String(x.cartKey)===String(cKey);});
-  if(ex)ex.qty+=1;else cart.push({cartKey:cKey,id:id,name:name,emoji:emoji||'🌿',image:image||'',price:price,qty:1});
+function relATCBtn(btn){
+  var id=btn.getAttribute('data-id');
+  var name=btn.getAttribute('data-name')||'Product';
+  var price=parseFloat(btn.getAttribute('data-price'))||0;
+  var image=btn.getAttribute('data-img')||'';
+  var emoji=btn.getAttribute('data-emoji')||'🌿';
+  var cKey='rel_'+id;
+  var ex=cart.find(function(x){return String(x.cartKey)===String(cKey);});
+  if(ex)ex.qty+=1;
+  else cart.push({cartKey:cKey,id:id,name:name,emoji:emoji,image:image,price:price,qty:1});
   try{localStorage.setItem('pr_cart',JSON.stringify(cart));}catch(e){}
-  updateCartCount();showToast('✅ '+name+' added!');
+  updateNavCart();
+  showToast('✅ '+name+' added!');
+  btn.textContent='✅ Added!';
+  setTimeout(function(){btn.textContent='+ Add to Cart';},1500);
+}
+function relATC(id,name,price,image,emoji){
+  relATCBtn({getAttribute:function(k){return{id:id,name:name,price:price,img:image,emoji:emoji}[k];}});
 }
 function goToProduct(slug){ var s=String(slug||'');if(!s||/^\d+$/.test(s)){var prod=ALL_PRODUCTS.find(function(p){return String(p.id)===s;});if(prod)s=prod.slug&&!/^\d+$/.test(prod.slug)?prod.slug:(prod.name?prod.name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,''):s);}window.location.href='/products/'+s; }
 
