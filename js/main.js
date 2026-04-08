@@ -220,14 +220,33 @@ function getStoreApiBase() {
 // ── HERO BACKGROUND — static single image (no slideshow) ──
 var _heroFallback = 'https://images.unsplash.com/photo-1587049352846-4a222e784d38?w=1600&q=80';
 
-function initHeroSlideshow(productImageUrls) {
-  var container = document.getElementById('heroSlides');
-  if (!container) return;
-  var url = (productImageUrls && productImageUrls.length)
-    ? productImageUrls[0]
-    : _heroFallback;
-  container.innerHTML = '<img class="hero-slide-img active" src="' + url + '" loading="eager" onerror="this.src=\'' + _heroFallback + '\'">';
+function initHeroPanel(settings) {
+  var grid = document.getElementById('heroProdGrid');
+  var saleBadge = document.getElementById('heroSaleBadge');
+  if (!grid) return;
+  var rawUrls = (settings && settings.hero_images) ? settings.hero_images : '';
+  var urls = rawUrls.split(',').map(function(u){ return u.trim(); }).filter(Boolean).slice(0, 4);
+  if (!urls.length && PRODUCTS && PRODUCTS.length) {
+    urls = PRODUCTS.slice(0, 4).map(function(p){ return p.image_url; }).filter(Boolean);
+  }
+  if (urls.length) {
+    grid.innerHTML = urls.map(function(url, i) {
+      return '<div class="hero-prod-card" style="animation-delay:' + (i * 0.12) + 's">'
+           + '<img src="' + url + '" alt="Product" loading="' + (i===0?'eager':'lazy') + '">'
+           + '</div>';
+    }).join('');
+  }
+  if (settings && settings.hero_sale_text && saleBadge) {
+    var st = document.getElementById('heroSaleText');
+    var sd = document.getElementById('heroSaleDiscount');
+    var sc = document.getElementById('heroSaleCode');
+    if (st) st.textContent = settings.hero_sale_text || '';
+    if (sd) sd.textContent = settings.hero_sale_discount || '';
+    if (sc) sc.textContent = settings.hero_sale_code ? ('USE CODE: ' + settings.hero_sale_code) : '';
+    saleBadge.style.display = 'flex';
+  }
 }
+function initHeroSlideshow() { initHeroPanel(null); }
 
 async function loadData() {
   // Step 1: render states fallback only — skip fake products to avoid price flash
@@ -281,6 +300,7 @@ async function loadData() {
       if (data.settings.whatsapp_number)      WHATSAPP_NUMBER     = data.settings.whatsapp_number;
       updateShipAmountDisplays();
       uCart(); // Recalculate cart total with correct shipping settings from DB
+      initHeroPanel(data.settings); // Hero panel images + sale badge
     }
     var updated  = false;
 
@@ -370,13 +390,7 @@ async function loadData() {
     }
 
     // ── Hero slideshow — use product images ──
-    if (Array.isArray(data.product_images) && data.product_images.length) {
-      var heroImgs = data.product_images
-        .filter(function(r){ return r.image_url; })
-        .map(function(r){ return r.image_url; })
-        .slice(0, 6);
-      if (heroImgs.length) initHeroSlideshow(heroImgs);
-    }
+    // Hero panel loaded from settings below
 
     // ── Apply product_images from store-data response ──
     if (Array.isArray(data.product_images) && data.product_images.length) {

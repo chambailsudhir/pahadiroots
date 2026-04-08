@@ -1398,3 +1398,221 @@ body.dark .pcard { background: #1a2b1c !important; border-color: rgba(255,255,25
 /* Hide old wl-btn and pbadge — replaced by new elements */
 .wl-btn { display: none !important; }
 .pbadge { display: none !important; }
+
+/* ═══════════════════════════════════════════════════════════════════
+   HERO v2 — Split layout, shorter height, admin-uploadable images
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Override old hero min-height */
+.hero-v2 {
+  min-height: 0 !important;
+  height: auto !important;
+  background: linear-gradient(150deg, #071a09 0%, #0d2410 30%, #1a3a1e 65%, #2d5233 100%) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  justify-content: flex-start !important;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Inner split grid: 55% text | 45% images */
+.hero-inner {
+  display: grid;
+  grid-template-columns: 55% 45%;
+  align-items: center;
+  min-height: 420px;
+  max-height: 520px;
+  position: relative;
+  z-index: 3;
+  padding: 0 0 0 48px;
+  gap: 0;
+}
+
+/* Text column */
+.hero-text {
+  text-align: left !important;
+  padding: 52px 40px 40px 0 !important;
+  max-width: none !important;
+}
+.hero-text .hbtns { justify-content: flex-start !important; }
+.hero-text h1 { font-size: clamp(28px, 4vw, 58px) !important; margin-bottom: 14px !important; }
+.hero-text .hsub { margin: 0 0 24px !important; max-width: 440px; font-size: clamp(12px, 1.4vw, 15px) !important; }
+
+/* Trust pills row */
+.hero-trust-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+.hero-trust-pill {
+  font-size: 11px;
+  font-weight: 700;
+  color: rgba(255,255,255,.65);
+  letter-spacing: .3px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.hero-trust-pill::after { content: '·'; margin-left: 8px; opacity: .4; }
+.hero-trust-pill:last-child::after { display: none; }
+
+/* Product images panel */
+.hero-products-panel {
+  position: relative;
+  height: 100%;
+  min-height: 420px;
+  max-height: 520px;
+  overflow: hidden;
+}
+
+/* 2×2 grid of product images */
+.hero-prod-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 8px;
+  height: 100%;
+  padding: 20px 0 20px 12px;
+}
+
+.hero-prod-card {
+  border-radius: 16px;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(18px);
+  animation: heroProdIn .55s ease forwards;
+  position: relative;
+  background: rgba(255,255,255,.06);
+  box-shadow: 0 4px 20px rgba(0,0,0,.25);
+}
+@keyframes heroProdIn {
+  to { opacity: 1; transform: translateY(0); }
+}
+.hero-prod-card:nth-child(1) { animation-delay: .05s; border-radius: 20px 8px 8px 8px; }
+.hero-prod-card:nth-child(2) { animation-delay: .15s; border-radius: 8px 20px 8px 8px; transform: translateY(10px); }
+.hero-prod-card:nth-child(3) { animation-delay: .25s; border-radius: 8px 8px 8px 20px; transform: translateY(-10px); }
+.hero-prod-card:nth-child(4) { animation-delay: .35s; border-radius: 8px 8px 20px 8px; }
+
+.hero-prod-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform .6s ease;
+}
+.hero-prod-card:hover img { transform: scale(1.06); }
+
+/* Placeholder shimmer when no images loaded */
+.hero-prod-placeholder {
+  background: linear-gradient(110deg, rgba(255,255,255,.04) 25%, rgba(255,255,255,.08) 50%, rgba(255,255,255,.04) 75%);
+  background-size: 200% 100%;
+  animation: heroProdIn .4s ease forwards, shimmer 1.8s ease infinite !important;
+}
+@keyframes shimmer { to { background-position: -200% 0; } }
+
+/* Sale badge overlay */
+.hero-sale-badge {
+  position: absolute;
+  bottom: 24px;
+  right: 16px;
+  background: rgba(255,255,255,.97);
+  border-radius: 14px;
+  padding: 10px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  box-shadow: 0 8px 32px rgba(0,0,0,.25);
+  z-index: 5;
+  min-width: 140px;
+  animation: heroProdIn .5s ease .4s forwards;
+  opacity: 0;
+}
+#heroSaleText {
+  font-size: 10px;
+  font-weight: 700;
+  color: #888;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+#heroSaleDiscount {
+  font-size: 17px;
+  font-weight: 900;
+  color: #1b4332;
+  letter-spacing: -.3px;
+}
+#heroSaleCode {
+  font-size: 10px;
+  font-weight: 700;
+  color: #bc4749;
+  letter-spacing: .5px;
+}
+
+/* Right edge decorative gradient */
+.hero-products-panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 40px;
+  height: 100%;
+  background: linear-gradient(to right, #0d2410, transparent);
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* Stats bar stays same */
+.hero-v2 .hstats {
+  position: relative;
+  z-index: 3;
+  margin-top: 0 !important;
+}
+
+/* ── FIX: Discount ribbon — visible against any image background ── */
+.pdisc-ribbon {
+  background: #e53 !important;
+  color: #fff !important;
+  font-size: 10px !important;
+  font-weight: 800 !important;
+  padding: 5px 11px 5px 12px !important;
+  border-radius: 0 18px 0 12px !important;
+  letter-spacing: .3px !important;
+  box-shadow: -2px 2px 8px rgba(229,51,51,.35) !important;
+}
+
+/* ── FIX: Filter bar overlap — proper spacing from heading ── */
+.filter-bar {
+  margin-top: 20px !important;
+  margin-bottom: 24px !important;
+  padding: 0 !important;
+}
+#products .ct { margin-bottom: 0 !important; }
+#products { padding-top: 44px !important; }
+
+/* ── DUKAN theme hero override ── */
+body[data-theme="dukan"] .hero-v2 {
+  background: linear-gradient(150deg, #001f26 0%, #003040 30%, #006d77 65%, #0a8f9c 100%) !important;
+}
+body[data-theme="dukan"] .pdisc-ribbon { background: #e29578 !important; box-shadow: -2px 2px 8px rgba(226,149,120,.35) !important; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 860px) {
+  .hero-inner {
+    grid-template-columns: 1fr;
+    min-height: 0;
+    max-height: none;
+    padding: 0 20px;
+  }
+  .hero-products-panel {
+    height: 220px;
+    min-height: 0;
+    max-height: 220px;
+  }
+  .hero-prod-grid { padding: 8px 0; gap: 6px; }
+  .hero-sale-badge { bottom: 10px; right: 8px; padding: 8px 12px; }
+  .hero-text { padding: 36px 0 24px !important; text-align: center !important; }
+  .hero-text .hbtns { justify-content: center !important; }
+  .hero-trust-row { justify-content: center; }
+}

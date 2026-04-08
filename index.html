@@ -276,22 +276,38 @@
   <a href="#contact" onclick="closeMobNav()">Contact</a>
   </div>
 </div>
-<section class="hero" id="home">
-  <div class="hmtn"><svg viewBox="0 0 1440 500" preserveAspectRatio="none"><path d="M0 500L90 380L170 420L280 290L380 360L480 230L560 310L660 180L740 260L840 140L940 210L1020 160L1110 240L1200 190L1310 260L1440 210L1440 500Z" fill="#071a09" opacity=".7"/><path d="M0 500L120 400L220 440L320 320L430 390L530 270L620 340L720 200L820 280L920 170L1020 240L1100 190L1200 270L1300 220L1400 280L1440 250L1440 500Z" fill="#050f06" opacity=".85"/></svg></div>
+<section class="hero hero-v2" id="home">
   <div class="hov"></div>
   <div class="lw">
-    <span class="lf" style="left:6%;font-size:16px;animation-duration:14s;animation-delay:0s">🍃</span>
+    <span class="lf" style="left:6%;font-size:14px;animation-duration:14s;animation-delay:0s">🍃</span>
     <span class="lf" style="left:18%;animation-duration:17s;animation-delay:3s">🌿</span>
-    <span class="lf" style="left:38%;font-size:14px;animation-duration:12s;animation-delay:6s">🍃</span>
-    <span class="lf" style="left:62%;animation-duration:15s;animation-delay:1s">🌱</span>
-    <span class="lf" style="left:78%;font-size:20px;animation-duration:13s;animation-delay:4s">🌿</span>
-    <span class="lf" style="left:88%;font-size:15px;animation-duration:16s;animation-delay:2s">🍃</span>
+    <span class="lf" style="left:38%;font-size:12px;animation-duration:12s;animation-delay:6s">🍃</span>
   </div>
-  <div class="hc">
-    <div class="eyebrow">🌿 Pure · Himalayan · Organic</div>
-    <h1>Born in the<br><em>Himalayas,</em><br>For Your Table</h1>
-    <p class="hsub">Handpicked from the purest altitudes across India's mountain ranges —<br>where clean air, ancient soil, and tradition create nature's finest.</p>
-    <div class="hbtns"><a href="#shop" class="btn-g">Explore Our Store</a><a href="/our-story" class="btn-w">Our Story</a></div>
+  <div class="hero-inner">
+    <div class="hc hero-text">
+      <div class="eyebrow">🌿 Pure · Himalayan · Organic</div>
+      <h1>Born in the<br><em>Himalayas,</em><br>For Your Table</h1>
+      <p class="hsub">Handpicked from the purest altitudes — where clean air, ancient soil, and tradition create nature's finest.</p>
+      <div class="hbtns"><a href="#shop" class="btn-g">Explore Our Store</a><a href="/our-story" class="btn-w">Our Story</a></div>
+      <div class="hero-trust-row">
+        <span class="hero-trust-pill">✔ Lab Tested</span>
+        <span class="hero-trust-pill">✔ Direct from Farmers</span>
+        <span class="hero-trust-pill">✔ Free Shipping ₹799+</span>
+      </div>
+    </div>
+    <div class="hero-products-panel" id="heroProdPanel">
+      <div class="hero-prod-grid" id="heroProdGrid">
+        <div class="hero-prod-card hero-prod-placeholder"></div>
+        <div class="hero-prod-card hero-prod-placeholder"></div>
+        <div class="hero-prod-card hero-prod-placeholder"></div>
+        <div class="hero-prod-card hero-prod-placeholder"></div>
+      </div>
+      <div class="hero-sale-badge" id="heroSaleBadge" style="display:none">
+        <span id="heroSaleText">Summer Sale</span>
+        <strong id="heroSaleDiscount">FLAT 10% OFF</strong>
+        <span id="heroSaleCode">USE CODE: SUMMER10</span>
+      </div>
+    </div>
   </div>
   <div class="hstats" id="hstats">
     <div class="hstat"><div class="hstat-num" data-target="500">0<em>+</em></div><div class="hstat-lbl">Farmer Families</div></div>
@@ -302,8 +318,8 @@
     <div class="hstat-div"></div>
     <div class="hstat"><div class="hstat-num" data-target="48">0<em>hr</em></div><div class="hstat-lbl">Avg Dispatch</div></div>
   </div>
-  <div class="sca"><span style="font-size:16px">↓</span>Scroll</div>
 </section>
+
 <div class="trust">
   <div class="tc"><span class="tico">🌿</span><div><div class="tlb">100% Natural</div><div class="tds">No chemicals, no preservatives</div></div></div>
   <div class="tc"><span class="tico">🏔️</span><div><div class="tlb">Himalayan Sourced</div><div class="tds">Directly from mountain farms</div></div></div>
@@ -321,7 +337,7 @@
     <a href="#products" class="cc rv" style="transition-delay:.33s" onclick="setTimeout(function(){setFilter('all',document.querySelector('[onclick*=all]'))},50)"><span class="cemo">🌰</span><div class="cname">Dry Fruits</div><div class="cnum">Sun-dried & Pure</div></a>
   </div>
 </section>
-<section class="sec" id="products" style="background:#fff;padding:28px 40px 36px">
+<section class="sec" id="products" style="background:#fff;padding:36px 40px 48px">
   <div class="ct rv"><div class="chip">Bestsellers</div><h2 class="sh2">Our Finest Offerings</h2><p class="ssub">Curated from 10 Himalayan states — the products our customers love most.</p></div>
   <!-- Filter bar -->
   <div class="filter-bar" id="filterBar">
