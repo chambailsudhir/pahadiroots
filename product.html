@@ -83,7 +83,7 @@ button{font-family:'Lato',sans-serif;cursor:pointer}
 .breadcrumb a{color:var(--g3,#2d6b35);font-weight:700}
 
 /* ══ PRODUCT LAYOUT ══ */
-.product-page-bg{background:#faf6ee}.product-wrap{max-width:1200px;margin:0 auto;padding:0 32px 32px;display:grid;grid-template-columns:1fr 1fr;gap:52px;align-items:start;width:100%}
+.product-page-bg{background:#faf6ee}.product-wrap{max-width:1260px;margin:0 auto;padding:0 32px 32px;display:grid;grid-template-columns:1.18fr 1fr;gap:48px;align-items:start;width:100%}
 @media(max-width:900px){.product-wrap{grid-template-columns:1fr;gap:24px;padding:0 16px 16px}}
 
 /* ══ IMAGE GALLERY ══ */
@@ -135,7 +135,7 @@ button{font-family:'Lato',sans-serif;cursor:pointer}
 /* Warning */
 .warn-box{background:#fff8e8;border:1.5px solid #ffe0a0;border-radius:11px;padding:11px 14px;font-size:12.5px;color:#7a5a00;line-height:1.6;margin-bottom:16px;display:flex;gap:8px}
 /* Price */
-.price-block{margin-bottom:20px;padding:16px 18px;background:#fff;border-radius:var(--radius);border:1px solid var(--warm-bd,#e8e0d0)}
+.price-block{margin-bottom:20px;padding:0;background:transparent;border:none;border-radius:0}
 .price-row{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:4px}
 .price-now{font-family:'Playfair Display',serif;font-size:38px;font-weight:900;color:var(--g);line-height:1}
 .price-was{font-size:20px;color:var(--tx3);text-decoration:line-through;font-weight:400}
@@ -277,7 +277,7 @@ button{font-family:'Lato',sans-serif;cursor:pointer}
 .related-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
 @media(max-width:880px){.related-grid{grid-template-columns:repeat(2,1fr)}}
 .rel-card{border:1.5px solid var(--bd);border-radius:var(--radius);overflow:hidden;cursor:pointer;transition:all .25s;background:#fff}
-.rel-card:hover{border-color:var(--g);box-shadow:var(--shadow-lg);transform:translateY(-3px)}
+.rel-card:hover{border-color:var(--g3,#3d6b42);box-shadow:var(--shadow-lg);transform:translateY(-4px)}
 .rel-img{position:relative;aspect-ratio:1;overflow:hidden;background:var(--bg2)}
 .rel-img img{width:100%;height:100%;object-fit:cover;transition:transform .4s}
 .rel-card:hover .rel-img img{transform:scale(1.07)}
@@ -289,6 +289,11 @@ button{font-family:'Lato',sans-serif;cursor:pointer}
 .rel-price-row{display:flex;align-items:baseline;gap:7px}
 .rel-price{font-size:15px;font-weight:900;color:var(--g)}
 .rel-orig{font-size:12px;color:var(--tx3);text-decoration:line-through}
+.rel-body{padding:13px}
+.rel-brand{font-size:10px;font-weight:900;color:var(--gd,#c8920a);letter-spacing:.6px;text-transform:uppercase;margin-bottom:3px}
+.rel-name{font-size:13px;font-weight:800;color:var(--tx);margin-bottom:8px;line-height:1.35;cursor:pointer}
+.rel-atc{width:100%;padding:9px 0;background:var(--g);color:#fff;border:none;border-radius:9px;font-size:12.5px;font-weight:800;cursor:pointer;transition:all .2s;letter-spacing:.2px;font-family:'Lato',sans-serif}
+.rel-atc:hover{background:var(--g2);transform:translateY(-1px);box-shadow:0 4px 12px rgba(26,58,30,.25)}
 
 /* ══ STICKY MOBILE CTA ══ */
 .sticky-cta{display:none;position:fixed;bottom:0;left:0;right:0;z-index:400;background:#fff;border-top:1px solid var(--bd);padding:12px 16px;box-shadow:0 -4px 20px rgba(0,0,0,.1)}
@@ -825,12 +830,19 @@ function renderProduct(p, images, related, data, stateMap) {
       related.map(function(r){
         var rSlug = r.slug&&!/^\d+$/.test(r.slug)?r.slug:(r.name?r.name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,''):r.id);
         var rDisc = r.mrp&&r.price?Math.round((1-r.price/r.mrp)*100):0;
-        return '<div class="rel-card" onclick="goToProduct(\''+rSlug+'\')">' +
+        return '<div class="rel-card">' +
           '<div class="rel-img">'+(r.image_url?'<img src="'+r.image_url+'" alt="'+r.name+'" loading="lazy">':'<div class="rel-img-placeholder">'+(r.emoji||'🌿')+'</div>')+(rDisc>0?'<span class="rel-disc">-'+rDisc+'%</span>':'')+'</div>'+
-          '<div class="rel-body"><div class="rel-vendor">5 Pahadi Roots</div><div class="rel-name">'+r.name+'</div><div class="rel-price-row"><span class="rel-price">₹'+r.price+'</span>'+(r.mrp&&r.mrp>r.price?'<span class="rel-orig">₹'+r.mrp+'</span>':'')+'</div></div>'+
+          '<div class="rel-body">'+
+            '<div class="rel-vendor" onclick="goToProduct(\''+rSlug+'\')">5 PAHADI ROOTS</div>'+
+            '<div class="rel-name" onclick="goToProduct(\''+rSlug+'\')">'+r.name+'</div>'+
+            '<div class="rel-price-row"><span class="rel-price">₹'+r.price+'</span>'+(r.mrp&&r.mrp>r.price?'<span class="rel-orig">₹'+r.mrp+'</span>':'')+'</div>'+
+            '<button class="rel-atc" onclick="relATC(''+r.id+'',''+r.name.replace(/'/g,"\'")+'',' +r.price+',''+( r.image_url||'')+'',''+( r.emoji||'🌿')+'')">+ Add to Cart</button>'+
+          '</div>'+
         '</div>';
       }).join('')+'</div></div>';
   }
+
+  var showBenefits = p.show_benefits !== false && !(p.tags && p.tags.includes('no-benefits'));
 
   /* Assemble HTML */
   document.getElementById('main-content').innerHTML =
@@ -855,6 +867,13 @@ function renderProduct(p, images, related, data, stateMap) {
           (p.sold_count?'<p class="sold-note">'+p.sold_count+' bottles sold across India</p>':'') +
           urgencyHtml +
         '</div>' +
+        (showBenefits ?
+        '<div class="inline-benefits" id="inline-benefits">' +
+          '<div class="inline-ben-title">Key Benefits</div>' +
+          '<div id="inline-benefits-list">' +
+            [1,2,3,4].map(function(){ return '<div class="ben-item"><div style="width:26px;height:26px;border-radius:50%;background:linear-gradient(90deg,#f2ede4 25%,#e8e2d8 50%,#f2ede4 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;flex-shrink:0"></div><div style="flex:1"><div style="height:12px;border-radius:4px;margin-bottom:6px;background:linear-gradient(90deg,#f2ede4 25%,#e8e2d8 50%,#f2ede4 75%);background-size:200% 100%;animation:shimmer 1.5s infinite"></div><div style="height:11px;border-radius:4px;width:75%;background:linear-gradient(90deg,#f2ede4 25%,#e8e2d8 50%,#f2ede4 75%);background-size:200% 100%;animation:shimmer 1.5s infinite"></div></div></div>'; }).join('') +
+          '</div>' +
+        '</div>' : '') +
         variantHtml +
         '<div class="stock-row"><div class="stock-dot '+stockClass+'"></div><span>'+stockLabel+'</span></div>' +
         '<div class="pincode-row">' +
@@ -886,12 +905,7 @@ function renderProduct(p, images, related, data, stateMap) {
 
         /* ── INLINE BENEFITS (right column, like My Pahadi Dukan) ── */
         (p.show_benefits !== false && !(p.tags && p.tags.includes('no-benefits')) ?
-        '<div class="inline-benefits" id="inline-benefits">' +
-          '<div class="inline-ben-title">Top Benefits</div>' +
-          '<div id="inline-benefits-list">' +
-            [1,2,3,4].map(function(){ return '<div class="ben-item"><div style="width:26px;height:26px;border-radius:50%;background:linear-gradient(90deg,#f2ede4 25%,#e8e2d8 50%,#f2ede4 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;flex-shrink:0"></div><div style="flex:1"><div style="height:12px;border-radius:4px;margin-bottom:6px;background:linear-gradient(90deg,#f2ede4 25%,#e8e2d8 50%,#f2ede4 75%);background-size:200% 100%;animation:shimmer 1.5s infinite"></div><div style="height:11px;border-radius:4px;width:75%;background:linear-gradient(90deg,#f2ede4 25%,#e8e2d8 50%,#f2ede4 75%);background-size:200% 100%;animation:shimmer 1.5s infinite"></div></div></div>'; }).join('') +
-          '</div>' +
-        '</div>'
+/* benefits moved above variants */''
         : '') +
 
         /* ORIGIN CARD */
@@ -917,41 +931,8 @@ function renderProduct(p, images, related, data, stateMap) {
         makeAcc('🔄 Returns & Refunds', '✅ <strong>Eligible:</strong> Damaged or wrong item — within <strong>3 days</strong> of delivery with photo.<br><br>❌ <strong>Not eligible:</strong> Opened products or after 3 days.<br><br>WhatsApp +91 '+retNumStr+' with order number. Refunds in 5–7 days.', false) +
       '</div>' +
     '</div>' +
-    /* WHY PAHADI ROOTS section */
-    '<section class="why-section">' +
-      '<div class="why-head">' +
-        '<div class="why-chip">Our Promise</div>' +
-        '<h2 class="why-title">Why 5 Pahadi Roots</h2>' +
-        '<p class="why-sub">Four pillars that define everything we do — mountain to doorstep.</p>' +
-      '</div>' +
-      '<div class="pgr">' +
-        '<div class="pillar"><div class="pnum">01</div><svg viewBox="0 0 148 148" xmlns="http://www.w3.org/2000/svg" style="width:110px;height:110px;margin-bottom:10px"><defs><radialGradient id="lt1p" cx="45%" cy="35%" r="65%"><stop offset="0%" stop-color="#f0f8e8"/><stop offset="100%" stop-color="#4a9858"/></radialGradient></defs><circle cx="74" cy="74" r="74" fill="url(#lt1p)"/><rect x="54" y="112" width="40" height="6" rx="3" fill="#1a4828"/><rect x="68" y="90" width="12" height="24" rx="2" fill="#2a6840"/><rect x="68" y="58" width="8" height="36" rx="2" fill="#2a6840"/><rect x="68" y="56" width="30" height="8" rx="2" fill="#1a4828"/><rect x="70" y="44" width="8" height="16" rx="3" fill="#3a7850"/><circle cx="74" cy="42" r="6" fill="#1a4828"/><circle cx="74" cy="42" r="3" fill="#88c8f8" opacity=".8"/><rect x="40" y="86" width="28" height="8" rx="1" fill="#c8e8f8" opacity=".9"/><circle cx="52" cy="90" r="4" fill="#50a840" opacity=".7"/><circle cx="108" cy="44" r="18" fill="#f0c840" opacity=".95"/><circle cx="108" cy="44" r="14" fill="white" opacity=".9"/><polyline points="100,44 106,50 118,36" stroke="#1a4828" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><rect x="88" y="66" width="40" height="12" rx="3" fill="#1a4828" opacity=".85"/><text x="108" y="75" font-size="7" font-weight="700" fill="white" text-anchor="middle">CERTIFIED</text><circle cx="30" cy="44" r="4" fill="#c8920a" opacity=".5"/><circle cx="28" cy="30" r="11" fill="#f0c840" opacity=".88"/><text x="22" y="35" font-size="9" font-weight="700" fill="#7a6000">LAB</text></svg><div class="pt">Lab Tested Purity</div><p class="pd">Every batch tested for heavy metals, pesticides &amp; adulterants. Certificate with every order.</p></div>' +
-        '<div class="pillar"><div class="pnum">02</div><svg viewBox="0 0 148 148" xmlns="http://www.w3.org/2000/svg" style="width:110px;height:110px;margin-bottom:10px"><defs><radialGradient id="fd2p" cx="45%" cy="35%" r="65%"><stop offset="0%" stop-color="#d8f0d8"/><stop offset="100%" stop-color="#4a9858"/></radialGradient></defs><circle cx="74" cy="74" r="74" fill="url(#fd2p)"/><polygon points="0,90 24,52 50,72 74,42 98,68 124,48 148,80 148,148 0,148" fill="#2a6840" opacity=".4"/><polygon points="0,106 20,72 46,88 74,58 102,84 128,66 148,96 148,148 0,148" fill="#1a4828"/><polygon points="74,58 66,72 82,72" fill="white" opacity=".9"/><rect x="8" y="100" width="20" height="16" rx="2" fill="#e8c870"/><polygon points="4,102 18,88 32,102" fill="#c84820"/><path d="M46,92 Q74,64 102,92" stroke="#c8920a" stroke-width="3" fill="none" stroke-linecap="round"/><circle cx="74" cy="80" r="13" fill="white" opacity=".9"/><line x1="66" y1="72" x2="82" y2="88" stroke="#e84848" stroke-width="2.5"/><circle cx="74" cy="76" r="4" fill="#888"/><rect x="108" y="100" width="26" height="22" rx="2" fill="#e8c870"/><polygon points="104,102 121,86 138,102" fill="#c84820"/></svg><div class="pt">Direct from Farmers</div><p class="pd">Zero middlemen. 200+ farming families across 12 Himalayan states — fair wages, always.</p></div>' +
-        '<div class="pillar"><div class="pnum">03</div><svg viewBox="0 0 148 148" xmlns="http://www.w3.org/2000/svg" style="width:110px;height:110px;margin-bottom:10px"><defs><radialGradient id="ed3p" cx="45%" cy="42%" r="65%"><stop offset="0%" stop-color="#c8e8f8"/><stop offset="100%" stop-color="#5890c0"/></radialGradient></defs><circle cx="74" cy="74" r="74" fill="url(#ed3p)"/><circle cx="74" cy="80" r="46" fill="#2878b8" opacity=".7"/><path d="M46,60 Q52,50 64,52 Q70,58 66,68 Q58,72 50,68 Z" fill="#50a840" opacity=".85"/><path d="M70,56 Q80,48 92,52 Q96,62 90,70 Q80,74 72,68 Z" fill="#50a840" opacity=".85"/><line x1="74" y1="34" x2="74" y2="18" stroke="#38b040" stroke-width="3.5" stroke-linecap="round"/><path d="M74,28 Q58,20 60,8 Q70,16 74,28Z" fill="#50c850"/><path d="M74,24 Q90,16 88,4 Q78,12 74,24Z" fill="#60d860"/><circle cx="116" cy="30" r="13" fill="#f0c840" opacity=".9"/><text x="110" y="35" font-size="9" font-weight="700" fill="#7a6000">ECO</text></svg><div class="pt">Eco Packaging</div><p class="pd">Glass jars, recycled cardboard, zero single-use plastic. Packaging as clean as our products.</p></div>' +
-        '<div class="pillar"><div class="pnum">04</div><svg viewBox="0 0 148 148" xmlns="http://www.w3.org/2000/svg" style="width:110px;height:110px;margin-bottom:10px"><defs><radialGradient id="gb3p" cx="45%" cy="35%" r="65%"><stop offset="0%" stop-color="#c8e8f8"/><stop offset="100%" stop-color="#5888b8"/></radialGradient></defs><circle cx="74" cy="74" r="74" fill="url(#gb3p)"/><polygon points="0,90 24,52 50,72 74,42 98,68 124,48 148,80 148,148 0,148" fill="#4a7850" opacity=".4"/><polygon points="0,106 20,72 46,88 74,58 102,84 128,66 148,96 148,148 0,148" fill="#2a5838"/><path d="M0,130 Q20,120 40,128 Q60,136 80,124 Q100,112 120,120 Q134,126 148,118" stroke="#60b8e8" stroke-width="8" fill="none" stroke-linecap="round"/><rect x="54" y="100" width="22" height="18" rx="2" fill="#e8c870"/><polygon points="50,102 65,90 80,102" fill="#c84820"/><circle cx="112" cy="26" r="13" fill="#fde080" opacity=".85"/><circle cx="30" cy="38" r="13" fill="#f0c840" opacity=".88"/><text x="24" y="43" font-size="10" font-weight="700" fill="#7a6000">5%</text></svg><div class="pt">Give-Back Program</div><p class="pd">5% of every order funds Himalayan forest restoration and village school programs.</p></div>' +
-      '</div>' +
-    '</section>' +
+    
     /* ── AI BENEFITS skeleton — injected inline, right order guaranteed ── */
-    '<div id="benefits-outer" style="background:var(--bg2);padding:40px 0 8px;margin-top:8px">' +
-      '<div class="benefits-section">' +
-        '<h2 class="benefits-heading" id="benefits-heading">Health Benefits</h2>' +
-        '<p class="benefits-sub" id="benefits-sub">Discovering benefits of '+p.name+'…</p>' +
-        '<div class="benefits-grid" id="benefits-grid">' +
-          '<div class="ben-skeleton"><div class="sk-line sk-icon"></div><div class="sk-line sk-title"></div><div class="sk-line sk-d1"></div><div class="sk-line sk-d2"></div></div>' +
-          '<div class="ben-skeleton"><div class="sk-line sk-icon"></div><div class="sk-line sk-title"></div><div class="sk-line sk-d1"></div><div class="sk-line sk-d2"></div></div>' +
-          '<div class="ben-skeleton"><div class="sk-line sk-icon"></div><div class="sk-line sk-title"></div><div class="sk-line sk-d1"></div><div class="sk-line sk-d2"></div></div>' +
-          '<div class="ben-skeleton"><div class="sk-line sk-icon"></div><div class="sk-line sk-title"></div><div class="sk-line sk-d1"></div><div class="sk-line sk-d2"></div></div>' +
-        '</div>' +
-      '</div>' +
-      '<div class="usage-section" id="usage-section">' +
-        '<div class="usage-grid" id="usage-grid">' +
-          '<div class="usage-card"><div class="usage-card-head">🍽️ How to Use</div><div class="usage-card-body"><div class="sk-line" style="height:12px;border-radius:6px;margin-bottom:8px;background:linear-gradient(90deg,var(--bg3) 25%,var(--bd) 50%,var(--bg3) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite"></div><div class="sk-line" style="height:12px;border-radius:6px;margin-bottom:8px;width:80%;background:linear-gradient(90deg,var(--bg3) 25%,var(--bd) 50%,var(--bg3) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite"></div><div class="sk-line" style="height:12px;border-radius:6px;width:60%;background:linear-gradient(90deg,var(--bg3) 25%,var(--bd) 50%,var(--bg3) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite"></div></div></div>' +
-          '<div class="usage-card"><div class="usage-card-head">📦 Storage Tips</div><div class="usage-card-body"><div class="sk-line" style="height:12px;border-radius:6px;margin-bottom:8px;background:linear-gradient(90deg,var(--bg3) 25%,var(--bd) 50%,var(--bg3) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite"></div><div class="sk-line" style="height:12px;border-radius:6px;margin-bottom:8px;width:75%;background:linear-gradient(90deg,var(--bg3) 25%,var(--bd) 50%,var(--bg3) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite"></div><div class="sk-line" style="height:12px;border-radius:6px;width:55%;background:linear-gradient(90deg,var(--bg3) 25%,var(--bd) 50%,var(--bg3) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite"></div></div></div>' +
-          '<div class="usage-card"><div class="usage-card-head">👤 Who Should Buy</div><div class="usage-card-body"><div class="sk-line" style="height:12px;border-radius:6px;margin-bottom:8px;background:linear-gradient(90deg,var(--bg3) 25%,var(--bd) 50%,var(--bg3) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite"></div><div class="sk-line" style="height:12px;border-radius:6px;width:85%;background:linear-gradient(90deg,var(--bg3) 25%,var(--bd) 50%,var(--bg3) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite"></div></div></div>' +
-        '</div>' +
-      '</div>' +
-    '</div>' +
-
     relHtml +
     '<footer class="mini-footer">© 2026 5 Pahadi Roots &nbsp;·&nbsp; <a href="/">Shop Now</a> &nbsp;·&nbsp; <a href="/terms">Terms &amp; Returns</a> &nbsp;·&nbsp; <a href="mailto:support@pahadiroots.com">support@pahadiroots.com</a></footer>';
 
@@ -1287,6 +1268,12 @@ function selPayMethod(el){ document.querySelectorAll('.pm-method').forEach(funct
 function placeOrder(){ closePayModal();cart=[];try{localStorage.setItem('pr_cart',JSON.stringify(cart));}catch(e){}updateNavCart();document.getElementById('success-overlay').classList.add('open'); }
 
 /* ══ GO TO PRODUCT ══ */
+function relATC(id,name,price,image,emoji){
+  var cKey='rel_'+id;var ex=cart.find(function(x){return String(x.cartKey)===String(cKey);});
+  if(ex)ex.qty+=1;else cart.push({cartKey:cKey,id:id,name:name,emoji:emoji||'🌿',image:image||'',price:price,qty:1});
+  try{localStorage.setItem('pr_cart',JSON.stringify(cart));}catch(e){}
+  updateCartCount();showToast('✅ '+name+' added!');
+}
 function goToProduct(slug){ var s=String(slug||'');if(!s||/^\d+$/.test(s)){var prod=ALL_PRODUCTS.find(function(p){return String(p.id)===s;});if(prod)s=prod.slug&&!/^\d+$/.test(prod.slug)?prod.slug:(prod.name?prod.name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,''):s);}window.location.href='/products/'+s; }
 
 /* ══ NOT FOUND ══ */
