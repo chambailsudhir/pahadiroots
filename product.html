@@ -922,17 +922,9 @@ function renderProduct(p, images, related, data, stateMap, stateImgMap) {
           '<div class="trust-badge"><div class="tb-icon">🏔️</div><div class="tb-label">Direct from Farmers</div></div>' +
           '<div class="trust-badge"><div class="tb-icon">🚚</div><div class="tb-label">Free Delivery ₹799+</div></div>' +
         '</div>' +
-        '<div class="highlights"><p class="highlights-title">Why 5 Pahadi Roots?</p><ul class="hl-list">'+hlItems.map(function(h){return '<li><span class="hl-check">✓</span>'+h+'</li>';}).join('')+'</ul></div>' +
+        /* WHY 5 PAHADI ROOTS removed */ '' +
 
-        /* ── INLINE BENEFITS (right column, like My Pahadi Dukan) ── */
-        (showBenefits ?
-        '<div class="inline-benefits" id="inline-benefits">' +
-          '<div class="inline-ben-title">Key Benefits</div>' +
-          '<div id="inline-benefits-list">' +
-            [1,2,3,4].map(function(){ return '<div class="ben-item"><div style="width:26px;height:26px;border-radius:50%;background:linear-gradient(90deg,#f2ede4 25%,#e8e2d8 50%,#f2ede4 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;flex-shrink:0;margin-top:1px"></div><div style="flex:1"><div style="height:12px;border-radius:4px;margin-bottom:6px;background:linear-gradient(90deg,#f2ede4 25%,#e8e2d8 50%,#f2ede4 75%);background-size:200% 100%;animation:shimmer 1.5s infinite"></div><div style="height:11px;border-radius:4px;width:75%;background:linear-gradient(90deg,#f2ede4 25%,#e8e2d8 50%,#f2ede4 75%);background-size:200% 100%;animation:shimmer 1.5s infinite"></div></div></div>'; }).join('') +
-          '</div>' +
-        '</div>' : '') +
-
+        
         '<div class="origin-card" style="margin-top:18px">' +
           '<div class="origin-header">'+regionEmoji+' Himalayan Origin Story</div>' +
           '<div class="origin-body">' +
@@ -945,11 +937,11 @@ function renderProduct(p, images, related, data, stateMap, stateImgMap) {
 
     '<div class="desc-section">' +
       '<div class="acc-list">' +
-        makeAcc('📄 Description', descHtml, true) +
-        makeAcc('✅ Top Benefits', '<div id="acc-benefits"><div class="acc-hl-item"><div class="sk-line" style="width:20px;height:20px;border-radius:50%;background:linear-gradient(90deg,#f2ede4 25%,#e8e2d8 50%,#f2ede4 75%);background-size:200% 100%;animation:shimmer 1.5s infinite"></div><div class="sk-line" style="height:12px;flex:1;border-radius:4px;background:linear-gradient(90deg,#f2ede4 25%,#e8e2d8 50%,#f2ede4 75%);background-size:200% 100%;animation:shimmer 1.5s infinite"></div></div></div>', false) +
+        makeAcc('📄 Description', '<div id="acc-desc">' + descHtml + '</div>', true) +
+        /* Top Benefits accordion removed - shown as Key Benefits above */ '' +
         makeAcc('🍽️ How to Use', '<div id="acc-howto"><div class="sk-line" style="height:12px;border-radius:4px;margin-bottom:8px;background:linear-gradient(90deg,#f2ede4 25%,#e8e2d8 50%,#f2ede4 75%);background-size:200% 100%;animation:shimmer 1.5s infinite"></div></div>', false) +
         makeAcc('📦 Storage Tips', '<div id="acc-storage"><div class="sk-line" style="height:12px;border-radius:4px;background:linear-gradient(90deg,#f2ede4 25%,#e8e2d8 50%,#f2ede4 75%);background-size:200% 100%;animation:shimmer 1.5s infinite"></div></div>', false) +
-        makeAcc('🌱 Ingredients', (p.ingredients||'<span style="color:var(--tx3)">Ingredient list will be updated shortly.</span>'), false) +
+        makeAcc('🌱 Ingredients', '<div id="acc-ingredients">'+(p.ingredients||'<span style="color:var(--tx3)">Loading ingredient information…</span>')+'</div>', false) +
         makeAcc('🏛️ Certifications', '<div class="cert-badges"><div class="cert-badge">🔬 Lab Tested for Purity</div><div class="cert-badge">🌿 100% Natural & Organic</div><div class="cert-badge">🏛️ FSSAI Licensed</div><div class="cert-badge">✅ No Adulterants</div></div>', false) +
         makeAcc('🚚 Shipping', '🚚 <strong>Pan India Shipping</strong><br><br>Delivery in <strong>5–7 business days</strong>. Free shipping above ₹799. COD available. Dispatched within 1–2 business days.', false) +
         makeAcc('🔄 Returns & Refunds', '✅ <strong>Eligible:</strong> Damaged or wrong item — within <strong>3 days</strong> of delivery with photo.<br><br>❌ <strong>Not eligible:</strong> Opened products or after 3 days.<br><br>WhatsApp +91 '+retNumStr+' with order number. Refunds in 5–7 days.', false) +
