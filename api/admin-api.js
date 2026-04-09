@@ -212,8 +212,9 @@ export default async function handler(req, res) {
           const prod = await sbFetch('GET', 'products',
             `id=eq.${item.id}&select=available_stock,name`
           ).catch(() => []);
-          const available = prod && prod[0] ? (prod[0].available_stock ?? 99) : 99;
-          if (available !== null && available < qty) {
+          const available = prod && prod[0] && prod[0].available_stock !== null
+            ? Number(prod[0].available_stock) : 99;
+          if (available < qty) {
             const label = (prod && prod[0] && prod[0].name) || item.name || 'Item';
             return err(400, `Sorry, "${label}" is out of stock. Only ${available} left.`);
           }
@@ -263,8 +264,9 @@ export default async function handler(req, res) {
               ).catch(() => []);
               const dbProd = prod && prod[0];
               if (dbProd) {
-                const availStock = dbProd.available_stock;
-                if (availStock !== null && availStock !== undefined && Number(availStock) < qty) {
+                const availStock = dbProd.available_stock !== null && dbProd.available_stock !== undefined
+                  ? Number(dbProd.available_stock) : null;
+                if (availStock !== null && availStock < qty) {
                   return err(400, `Sorry, "${item.name || dbProd.name}" is out of stock. Only ${availStock} left.`);
                 }
                 if (dbProd.price && item.price) {

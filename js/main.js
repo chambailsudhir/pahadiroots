@@ -354,7 +354,9 @@ async function loadData() {
           region:         db.region          || loc.region         || '',
           gst_rate:       db.gst_rate        || loc.gst_rate       || 5,
           image_url:      db.image_url       || loc.image_url      || '',
-          stock:          (db.available_stock !== null && db.available_stock !== undefined) ? Number(db.available_stock) : ((db.stock_quantity !== null && db.stock_quantity !== undefined) ? Number(db.stock_quantity) : (loc.stock !== undefined ? loc.stock : 99)),
+          stock:          (db.available_stock !== null && db.available_stock !== undefined)
+                            ? Number(db.available_stock)
+                            : (loc.stock !== undefined ? loc.stock : 99),
           emoji:          db.emoji           || loc.emoji          || '🌿',
           badge_type:     bt,
           badge_label:    loc.badge_label    || badgeMap[bt]       || 'Bestseller',
