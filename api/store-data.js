@@ -13,10 +13,10 @@ const SUPABASE_KEY      = process.env.SUPABASE_SERVICE_KEY;
 const RAZORPAY_KEY_ID   = process.env.RAZORPAY_KEY_ID || ''; // ← from Vercel env, never hardcoded
 
 const CORS = {
-  'Access-Control-Allow-Origin': 'https://pahadiroots.com',
+  'Access-Control-Allow-Origin': process.env.ALLOWED_ORIGIN || 'https://pahadiroots.com',
   'Access-Control-Allow-Methods': 'GET, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type',
-  'Cache-Control': 'public, s-maxage=0, stale-while-revalidate=5',
+  'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
 };
 
 async function sbGet(table, query = '') {

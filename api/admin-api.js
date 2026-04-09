@@ -154,7 +154,7 @@ export default async function handler(req, res) {
   }
 
   const pw = req.headers['x-admin-password'] || '';
-  const isPublicAction = reqBody.action === 'save_order' || reqBody.action === 'public_get_order';
+  const isPublicAction = reqBody.action === 'save_order' || reqBody.action === 'public_get_order' || reqBody.action === 'check_stock';
 
   if (!isPublicAction) {
     // Check login lockout first
@@ -198,15 +198,25 @@ export default async function handler(req, res) {
       const { items } = reqBody;
       if (!items || !items.length) return ok({ available: true });
       for (const item of items) {
-        if (!item.variantId) continue;
         const qty = parseInt(item.qty) || 1;
-        const variant = await sbFetch('GET', 'product_variants',
-          `id=eq.${item.variantId}&select=available_stock,variant_value,sku`
-        ).catch(() => []);
-        const available = variant && variant[0] ? (variant[0].available_stock || 0) : 0;
-        if (available < qty) {
-          const label = variant?.[0]?.variant_value || variant?.[0]?.sku || item.name || 'Item';
-          return err(400, `Sorry, "${label}" is out of stock. Only ${available} left.`);
+        if (item.variantId) {
+          const variant = await sbFetch('GET', 'product_variants',
+            `id=eq.${item.variantId}&select=available_stock,variant_value,sku`
+          ).catch(() => []);
+          const available = variant && variant[0] ? (variant[0].available_stock || 0) : 0;
+          if (available < qty) {
+            const label = variant?.[0]?.variant_value || variant?.[0]?.sku || item.name || 'Item';
+            return err(400, `Sorry, "${label}" is out of stock. Only ${available} left.`);
+          }
+        } else if (item.id) {
+          const prod = await sbFetch('GET', 'products',
+            `id=eq.${item.id}&select=available_stock,name`
+          ).catch(() => []);
+          const available = prod && prod[0] ? (prod[0].available_stock ?? 99) : 99;
+          if (available !== null && available < qty) {
+            const label = (prod && prod[0] && prod[0].name) || item.name || 'Item';
+            return err(400, `Sorry, "${label}" is out of stock. Only ${available} left.`);
+          }
         }
       }
       return ok({ available: true });
@@ -225,26 +235,47 @@ export default async function handler(req, res) {
       // Always validate against DB — never trust frontend values
       if (items && items.length) {
         for (const item of items) {
-          if (!item.variantId) continue;
           const qty = parseInt(item.qty) || 1;
-          const variant = await sbFetch('GET', 'product_variants',
-            `id=eq.${item.variantId}&select=available_stock,sku,variant_value,price`
-          ).catch(() => []);
-          const v = variant && variant[0];
-          if (!v) continue;
-          const available = v.available_stock || 0;
-          if (available < qty) {
-            const label = v.sku || v.variant_value || item.name || `variant #${item.variantId}`;
-            return err(400, `Sorry, "${label}" is out of stock. Only ${available} left.`);
-          }
-          // Issue 20 fix: validate price against DB — prevent price tampering
-          if (v.price && item.price) {
-            const dbPrice = parseFloat(v.price);
-            const sentPrice = parseFloat(item.price);
-            // Allow small rounding difference but reject significant mismatch
-            if (dbPrice > 0 && sentPrice < dbPrice * 0.9) {
-              return err(400, `Price mismatch detected for "${item.name || 'item'}". Please refresh and try again.`);
+          if (item.variantId) {
+            // Validate variant stock + price
+            const variant = await sbFetch('GET', 'product_variants',
+              `id=eq.${item.variantId}&select=available_stock,sku,variant_value,price`
+            ).catch(() => []);
+            const v = variant && variant[0];
+            if (!v) continue;
+            const available = v.available_stock ?? 0;
+            if (available < qty) {
+              const label = v.sku || v.variant_value || item.name || `variant #${item.variantId}`;
+              return err(400, `Sorry, "${label}" is out of stock. Only ${available} left.`);
             }
+            if (v.price && item.price) {
+              const dbPrice = parseFloat(v.price);
+              const sentPrice = parseFloat(item.price);
+              if (dbPrice > 0 && sentPrice < dbPrice * 0.9) {
+                return err(400, `Price mismatch detected for "${item.name || 'item'}". Please refresh and try again.`);
+              }
+            }
+          } else if (item.id) {
+            // Validate base product stock + price
+            try {
+              const prod = await sbFetch('GET', 'products',
+                `id=eq.${item.id}&select=price,name,available_stock`
+              ).catch(() => []);
+              const dbProd = prod && prod[0];
+              if (dbProd) {
+                const availStock = dbProd.available_stock;
+                if (availStock !== null && availStock !== undefined && Number(availStock) < qty) {
+                  return err(400, `Sorry, "${item.name || dbProd.name}" is out of stock. Only ${availStock} left.`);
+                }
+                if (dbProd.price && item.price) {
+                  const dbPrice = parseFloat(dbProd.price);
+                  const sentPrice = parseFloat(item.price);
+                  if (dbPrice > 0 && sentPrice < dbPrice * 0.9) {
+                    return err(400, `Price mismatch for "${item.name || dbProd.name}". Please refresh and try again.`);
+                  }
+                }
+              }
+            } catch(e) { /* non-critical — proceed */ }
           }
         }
       }

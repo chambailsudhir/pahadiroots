@@ -9,7 +9,7 @@ const SUPABASE_KEY  = process.env.SUPABASE_SERVICE_KEY;  // service key for admi
 const SUPABASE_ANON = process.env.SUPABASE_ANON_KEY;     // anon key for auth
 
 const CORS_HEADERS = {
-  'Access-Control-Allow-Origin':  'https://pahadiroots.com',
+  'Access-Control-Allow-Origin':  process.env.ALLOWED_ORIGIN || 'https://pahadiroots.com',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
   'Content-Type':                 'application/json',

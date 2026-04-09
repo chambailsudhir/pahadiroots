@@ -155,10 +155,10 @@ section.sec{padding:52px 40px}
 .variant-sel{border:1.5px solid var(--bd);background:var(--bg);color:var(--tx);border-radius:8px;font-size:12px;cursor:pointer}
 .variant-sel:focus{outline:none;border-color:var(--g)}
 .punt{font-size:11px;color:var(--tx3)}
-.atc{background:var(--g);color:#fff;border:none;border-radius:10px;padding:8px 14px;font-size:13px;font-weight:800;transition:all .2s;font-family:'Lato',sans-serif}
-.atc-hint{font-size:12px;font-weight:700;color:var(--g);margin-top:6px;opacity:.7}
+.atc{background:var(--g);color:#fff;border:none;border-radius:24px;padding:11px 16px;font-size:14px;font-weight:800;transition:background .2s,transform .15s;font-family:'Nunito','Lato',sans-serif;display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;white-space:nowrap;width:100%;box-sizing:border-box}
+.atc:hover{background:var(--g2)}
+.atc-hint{font-size:12px;font-weight:700;color:var(--g);opacity:.7;cursor:pointer;text-align:center;display:block;transition:opacity .2s;white-space:nowrap}
 .pcard:hover .atc-hint{opacity:1}
-.atc:hover{background:var(--g2);transform:translateY(-1px)}
 .cmp-btn{background:none;border:1.5px solid var(--bd);border-radius:10px;padding:5px 10px;font-size:10.5px;font-weight:700;color:var(--tx2);transition:all .2s;font-family:'Lato',sans-serif}
 .cmp-btn:hover,.cmp-btn.active{border-color:var(--g);color:var(--g)}
 .cmp-btn.active{background:rgba(26,58,30,.08)}
@@ -721,24 +721,7 @@ footer{background:#0b160d url("data:image/svg+xml,%3Csvg viewBox='0 0 1440 480' 
    NEW ADDITIONS v2 — ATC, Quick View, Theme Switcher, Checkout Tag
    ================================================================= */
 
-/* ── ATC BUTTON & QUICK VIEW BUTTON (replace atc-hint) ─────────── */
-.atc {
-  background: var(--g);
-  color: #fff;
-  border: none;
-  border-radius: 22px;
-  padding: 9px 16px;
-  font-size: 12.5px;
-  font-weight: 800;
-  transition: background .2s, transform .15s;
-  font-family: 'Lato', sans-serif;
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  white-space: nowrap;
-  cursor: pointer;
-}
-.atc:hover { background: var(--g2); transform: scale(1.03); }
+/* .atc — defined in base styles */
 
 .qv-open-btn {
   background: rgba(26,58,30,.07);
@@ -1055,50 +1038,7 @@ body.dark .qv-open-btn { border-color: rgba(255,255,255,.15); color: rgba(255,25
    3) Stock bar layout fixed — pfoot back to row layout
    ════════════════════════════════════════════════════ */
 
-/* Fix 3: pfoot column layout — defined at base level above */
-/* Fix 1+2: pcard-actions — full-width ATC + View Details below */
-.pcard-actions {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 6px;
-  width: 100%;
-}
-
-/* ATC full width */
-.pcard-atc-full {
-  display: flex !important;
-  width: 100% !important;
-  justify-content: center !important;
-  align-items: center !important;
-  gap: 7px !important;
-  padding: 12px 16px !important;
-  font-size: 14px !important;
-  font-weight: 800 !important;
-  font-family: 'Nunito', 'Lato', sans-serif !important;
-  border-radius: 28px !important;
-  letter-spacing: 0.2px !important;
-  box-sizing: border-box !important;
-  color: #fff !important;
-}
-
-/* View Details link — centered below ATC */
-.pcard-actions .atc-hint {
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--g);
-  opacity: 0.65;
-  cursor: pointer;
-  transition: opacity .2s;
-  white-space: nowrap;
-  text-align: center;
-  display: block;
-  margin-top: 0;
-}
-.pcard:hover .pcard-actions .atc-hint { opacity: 1; }
-
-/* Quick view open btn — HIDE from footer entirely, it only lives on image */
-.qv-open-btn { display: none !important; }
+/* pcard-actions / pcard-atc-full / atc-hint — defined in v3 premium block below */
 
 /* spgrid dark section — same column layout */
 .spgrid .pfoot {
@@ -1106,9 +1046,6 @@ body.dark .qv-open-btn { border-color: rgba(255,255,255,.15); color: rgba(255,25
   align-items: stretch !important;
   justify-content: flex-start !important;
 }
-.spgrid .pcard-actions .atc-hint { color: rgba(255,255,255,.55); }
-.spgrid .pcard:hover .pcard-actions .atc-hint { color: rgba(255,255,255,.9); }
-
 /* ═══════════════════════════════════════════════════════════════════
    PREMIUM CARD REDESIGN v3
    Fix 1: hover overlay pointer-events:none — never blocks clicks
@@ -1316,42 +1253,11 @@ body.dark .qv-open-btn { border-color: rgba(255,255,255,.15); color: rgba(255,25
 .pwas { font-size: 11.5px; color: var(--tx3); text-decoration: line-through; }
 .punt { font-size: 10.5px; color: var(--tx3); }
 
-/* ATC button */
-.atc {
-  background: var(--g) !important;
-  color: #fff !important;
-  border: none !important;
-  border-radius: 22px !important;
-  padding: 8px 15px !important;
-  font-size: 12px !important;
-  font-weight: 800 !important;
-  cursor: pointer;
-  font-family: 'Lato', sans-serif !important;
-  transition: background .2s, transform .15s !important;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  white-space: nowrap;
-}
-.atc:hover { background: var(--g2) !important; transform: scale(1.04) !important; }
+/* .atc — defined in base styles */
 
-/* View Details link */
-.atc-hint {
-  font-size: 11px !important;
-  font-weight: 700 !important;
-  color: var(--g) !important;
-  opacity: .65 !important;
-  cursor: pointer;
-  transition: opacity .2s !important;
-  white-space: nowrap;
-  margin-top: 0 !important;
-}
-.pcard:hover .atc-hint { opacity: 1 !important; }
+/* .atc-hint — defined in base styles */
 
-/* pfoot and pcard-actions layout — defined at base, inherited here */
-.pfoot { margin-top: 4px !important; }
-.prow { display: flex; align-items: baseline; gap: 5px; }
-.pcard-actions { display: flex; flex-direction: column; align-items: stretch; gap: 6px; width: 100%; }
+/* pfoot / prow / pcard-actions — canonical definitions at top of file */
 
 /* ── DARK SECTION (spgrid) overrides ────────────────────────────── */
 .spgrid .pbadge-wrap { background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.15); }

@@ -85,7 +85,7 @@ const sv = () => {
     if (tok && usr && cart.length > 0) {
       var total = cart.reduce(function(s,i){ return s + (i.price||0)*(i.qty||1); }, 0);
       var cartData = cart.map(function(i){
-        var prod = PRODUCTS.find(function(p){ return p.id === i.id; });
+        var prod = PRODUCTS.find(function(p){ return String(p.id) === String(i.id); });
         var freshImage = (prod && prod.image_url) ? prod.image_url : (i.image || '');
         return { id:i.id, name:i.name, price:i.price, qty:i.qty||1, emoji:i.emoji||'🌿', variant:i.variant||'', image:freshImage, gst_rate:i.gst_rate || (prod ? prod.gst_rate : 5) || 5 };
       });
@@ -116,6 +116,7 @@ let _orderProcessing = false;  // prevents double order submission
 var FREE_SHIP_THRESHOLD = 799;   // overridden from DB
 var FLAT_SHIP_CHARGE    = 99;    // overridden from DB
 var WHATSAPP_NUMBER     = '919899984895'; // overridden from DB
+var _RAZORPAY_KEY       = 'rzp_live_SNFVJBHdd3dYRQ'; // overridden from store-data
 
 // ── AUTH STATE ─────────────────────────────────────────────────────
 var _authToken   = null;
@@ -203,7 +204,7 @@ function toggleDark() {
   darkMode = !darkMode;
   try { localStorage.setItem('pr_dark', darkMode ? '1' : '0'); } catch(e){}
   applyDark();
-applyTheme(currentTheme);
+  applyTheme(currentTheme);
 }
 
 // ── API BASE ───────────────────────────────────────────────────────
@@ -298,6 +299,7 @@ async function loadData() {
       if (data.settings.free_shipping_min    !== undefined && data.settings.free_shipping_min    !== null) FREE_SHIP_THRESHOLD = parseInt(data.settings.free_shipping_min,    10);
       if (data.settings.flat_shipping_charge !== undefined && data.settings.flat_shipping_charge !== null) FLAT_SHIP_CHARGE    = parseInt(data.settings.flat_shipping_charge, 10);
       if (data.settings.whatsapp_number)      WHATSAPP_NUMBER     = data.settings.whatsapp_number;
+      if (data.razorpay_key)                  _RAZORPAY_KEY       = data.razorpay_key;
       updateShipAmountDisplays();
       uCart(); // Recalculate cart total with correct shipping settings from DB
       initHeroPanel(data.settings); // Hero panel images + sale badge
@@ -352,7 +354,7 @@ async function loadData() {
           region:         db.region          || loc.region         || '',
           gst_rate:       db.gst_rate        || loc.gst_rate       || 5,
           image_url:      db.image_url       || loc.image_url      || '',
-          stock:          db.available_stock !== undefined ? db.available_stock : (db.stock_quantity !== undefined ? db.stock_quantity : (loc.stock || 99)),
+          stock:          (db.available_stock !== null && db.available_stock !== undefined) ? Number(db.available_stock) : ((db.stock_quantity !== null && db.stock_quantity !== undefined) ? Number(db.stock_quantity) : (loc.stock !== undefined ? loc.stock : 99)),
           emoji:          db.emoji           || loc.emoji          || '🌿',
           badge_type:     bt,
           badge_label:    loc.badge_label    || badgeMap[bt]       || 'Bestseller',
@@ -454,11 +456,11 @@ var FILTER_MAP = {
 function mkProd(p) {
   var pct    = p.original_price ? Math.round((1 - p.price / p.original_price) * 100) : 0;
   var bc     = p.badge_type || 'bs';
-  var stock  = p.stock || 99;
+  var stock  = (p.stock !== undefined && p.stock !== null) ? p.stock : 99;
   var sClass = stock > 20 ? 'high' : stock > 5 ? 'mid' : stock > 0 ? 'low' : 'low';
   var sPct   = Math.min(100, Math.round(stock / 50 * 100));
   var sLbl   = stock <= 0 ? 'Out of Stock' : stock > 20 ? 'In Stock' : ('Only ' + stock + ' left');
-  var inWL   = wishlist.includes(p.id);
+  var inWL   = wishlist.findIndex(function(x){ return String(x) === String(p.id); }) > -1;
   var slug   = getProductSlug(p);
   var imgHtml = p.image_url
     ? '<img src="' + p.image_url + '" alt="' + p.name + '" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1" onerror="this.style.display=\'none\'">'
@@ -486,7 +488,7 @@ function mkProd(p) {
     '<div class="pbody">' +
       '<div class="pregion">📍 ' + (p.region||'') + '</div>' +
       '<div class="pname">' + p.name + '</div>' +
-      '<div class="prating"><span class="pstars">★★★★★</span><span class="prc">(' + (typeof p.id === 'number' ? (12 + p.id * 7) : Math.floor(Math.random()*80+20)) + ')</span></div>' +
+      '<div class="prating"><span class="pstars">★★★★★</span><span class="prc">(' + (Math.floor(Math.random()*80+20)) + ')</span></div>' +
       '<div class="pdesc">' + (p.description||'') + '</div>' +
       '<div class="stock-bar"><div class="stock-fill ' + sClass + '" style="width:' + sPct + '%"></div></div>' +
       '<div class="stock-label ' + sClass + '">' + sLbl + '</div>' +
@@ -723,7 +725,7 @@ function initProductHoverImages() {
     if (!hoverImgs.length) return;
 
     document.querySelectorAll('.pcard').forEach(function(card) {
-      if (card.innerHTML.indexOf('addToCart(' + p.id + ')') === -1) return;
+      if (card.getAttribute('data-slug') !== getProductSlug(p)) return;
       var piw = card.querySelector('.piw');
       if (!piw || piw.querySelector('.phover-img')) return;
 
@@ -794,7 +796,8 @@ function updateCardPrice(prodId, sel) {
 
 // ── QUICK ADD TO CART (with button feedback) ─────────────────────
 function quickAddToCart(id) {
-  addToCart(id);
+  var success = addToCart(id);
+  if (!success) return;
   var btn = document.getElementById('atcBtn-' + id);
   if (btn) {
     var orig = btn.innerHTML;
@@ -804,66 +807,7 @@ function quickAddToCart(id) {
   }
 }
 
-// ── QUICK VIEW MODAL ───────────────────────────────────────
-function openQV(id) {
-  var sid = String(id);
-  var p = PRODUCTS.find(function(x) { return String(x.id) === sid; });
-  if (!p) return;
-  var pct = p.original_price ? Math.round((1 - p.price / p.original_price) * 100) : 0;
-  var stock = p.stock || 99;
-  var sClass = stock > 20 ? 'in' : 'low';
-  var sLbl   = stock <= 0 ? 'Out of Stock' : stock > 20 ? 'In Stock' : 'Only ' + stock + ' left!';
-  var ov = document.getElementById('qvOverlay');
-  if (!ov) return;
-  var imgHtml = p.image_url
-    ? '<img src="' + p.image_url + '" alt="' + p.name + '" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:20px 0 0 20px" onerror="this.style.display=\'none\'">'
-    : '<span style="font-size:72px">' + (p.emoji || '🌿') + '</span>';
-  document.getElementById('qvImgCol').innerHTML = imgHtml +
-    (pct ? '<span style="position:absolute;top:14px;right:14px;background:var(--g);color:#fff;font-size:10px;font-weight:800;padding:4px 10px;border-radius:8px">-' + pct + '% OFF</span>' : '') +
-    (p.checkout_offer ? '<span style="position:absolute;top:14px;left:14px;background:#bc4749;color:#fff;font-size:9px;font-weight:800;padding:4px 10px;border-radius:20px;text-transform:uppercase;letter-spacing:.4px">10% Off At Checkout</span>' : '');
-  document.getElementById('qvContent').innerHTML =
-    '<div class="qv-region">📍 ' + (p.region || '') + '</div>' +
-    '<div class="qv-name">' + p.name + '</div>' +
-    '<div class="qv-stars">★★★★★ <span style="font-size:12px;color:var(--tx3)">(' + (12 + (p.id || 1) * 7) + ' reviews)</span></div>' +
-    '<div class="qv-price-row">' +
-      '<span class="qv-price">₹' + p.price + '</span>' +
-      (p.original_price ? '<span class="qv-was">₹' + p.original_price + '</span>' : '') +
-      (pct ? '<span class="qv-save">Save ' + pct + '%</span>' : '') +
-    '</div>' +
-    '<div class="qv-unit">' + (p.unit || '') + '</div>' +
-    (p.checkout_offer ? '<div style="font-size:11.5px;color:#bc4749;font-weight:700;margin-bottom:10px;padding:6px 12px;background:rgba(188,71,73,.08);border-radius:8px">🏷️ Extra 10% off automatically applied at checkout</div>' : '') +
-    '<div class="qv-desc">' + (p.description || '') + '</div>' +
-    '<div class="qv-stock ' + sClass + '">' + sLbl + '</div>' +
-    '<div class="qv-qty-row">' +
-      '<button class="qv-qb" onclick="qvQty(-1)">−</button>' +
-      '<span class="qv-qn" id="qvQtyNum">1</span>' +
-      '<button class="qv-qb" onclick="qvQty(1)">+</button>' +
-    '</div>' +
-    '<div style="display:flex;gap:8px;flex-wrap:wrap">' +
-      '<button class="qv-atc" onclick="addToCartFromQV(' + id + ')">🛒 Add to Cart</button>' +
-      '<button class="qv-wl" onclick="toggleWishlist(' + id + ')">🤍</button>' +
-      '<button style="background:none;border:1.5px solid var(--bd);border-radius:12px;padding:10px 14px;font-size:12px;font-weight:700;color:var(--g);cursor:pointer;font-family:inherit" onclick="closeQV();goToProductPage(\'' + getProductSlug(p) + '\')">Full Details →</button>' +
-    '</div>';
-  ov.style.display = 'flex';
-  document.body.style.overflow = 'hidden';
-  window._qvId  = id;
-  window._qvQty = 1;
-}
-function qvQty(d) {
-  window._qvQty = Math.max(1, (window._qvQty || 1) + d);
-  var el = document.getElementById('qvQtyNum');
-  if (el) el.textContent = window._qvQty;
-}
-function addToCartFromQV(id) {
-  var qty = window._qvQty || 1;
-  for (var i = 0; i < qty; i++) addToCart(id);
-  closeQV();
-}
-function closeQV() {
-  var ov = document.getElementById('qvOverlay');
-  if (ov) ov.style.display = 'none';
-  document.body.style.overflow = '';
-}
+// ── QUICK VIEW — openQV() / closeQV() / chQvQty() defined below ──
 
 // ── THEME SWITCHER ───────────────────────────────────────────────
 var currentTheme = 'pahadi';
@@ -889,14 +833,14 @@ function closeThemeSwitcher() {
 function addToCart(id) {
   var sid = String(id);
   var p = PRODUCTS.find(function(x) { return String(x.id) === sid; });
-  if (!p) return;
+  if (!p) { showToast('⚠️ Product not found. Please refresh the page.'); return false; }
   // Check if variant selected
   var varSel = document.getElementById('vs-' + id);
   var variantId = null, variantLabel = '', price = p.price, stock = p.stock;
   if (varSel && varSel.options.length > 0) {
     var opt = varSel.options[varSel.selectedIndex];
     variantId = opt.value;
-    variantLabel = opt.text.split(' — ')[0]; // e.g. "250g"
+    variantLabel = opt.text.split(' — ')[0];
     price = parseFloat(opt.dataset.price) || p.price;
     stock = parseInt(opt.dataset.stock);
   }
@@ -904,15 +848,20 @@ function addToCart(id) {
   var cartKey = variantId ? (sid + '_' + variantId) : sid;
   var ex = cart.find(function(x) { return String(x.cartKey) === String(cartKey); });
   var currentQty = ex ? ex.qty : 0;
-  // Stock check
-  if (stock !== undefined && stock !== null && currentQty >= stock) {
-    showToast('⚠️ Only ' + stock + ' in stock!'); return;
+  // Stock check — only block if stock is a real number AND is 0 or exceeded
+  var stockNum = (stock !== undefined && stock !== null) ? Number(stock) : null;
+  if (stockNum !== null && !isNaN(stockNum) && stockNum <= 0) {
+    showToast('⚠️ This product is out of stock!'); return false;
+  }
+  if (stockNum !== null && !isNaN(stockNum) && currentQty >= stockNum) {
+    showToast('⚠️ Only ' + stockNum + ' in stock!'); return false;
   }
   var displayName = p.name + (variantLabel ? ' (' + variantLabel + ')' : '');
   if (ex) ex.qty++;
   else cart.push({cartKey:cartKey, id:p.id, variantId:variantId||null, name:displayName, emoji:p.emoji, image:p.image_url||'', price:price, gst_rate:p.gst_rate||5, qty:1});
   sv(); uCart(); openCart();
   showToast('✅ ' + displayName + ' added!');
+  return true;
 }
 function rmCart(id) { var sid=String(id); cart = cart.filter(function(x) { return String(x.cartKey||x.id) !== sid; }); sv(); uCart(); }
 function chQty(id, d) {
@@ -964,7 +913,7 @@ function uCart() {
   }
 
   var totalSavings = cart.reduce(function(a, i) {
-    var orig = (PRODUCTS.find(function(x) { return x.id === i.id; }) || {original_price: i.price}).original_price || i.price;
+    var orig = (PRODUCTS.find(function(x) { return String(x.id) === String(i.id); }) || {original_price: i.price}).original_price || i.price;
     return a + (orig - i.price) * i.qty;
   }, 0) + discount;
 
@@ -1267,7 +1216,7 @@ async function checkoutRazorpay() {
   } catch(e) { /* network error — proceed, server will validate at save */ }
 
   var options = {
-    key: 'rzp_live_SNFVJBHdd3dYRQ',
+    key: _RAZORPAY_KEY,
     amount: final * 100, // paise
     currency: 'INR',
     name: '5 Pahadi Roots',
@@ -1424,7 +1373,9 @@ async function checkout() {
   var threshold  = (!isNaN(FREE_SHIP_THRESHOLD)) ? FREE_SHIP_THRESHOLD : 799;
   var shipCharge = (subtotal > 0 && threshold > 0 && subtotal < threshold) ? ((!isNaN(FLAT_SHIP_CHARGE)) ? FLAT_SHIP_CHARGE : 99) : 0;
   var final      = subtotal + shipCharge;
-  var gstAmount  = calcGST(cartSnapshot || cart).total; // GST inclusive — for invoice
+  // Snapshot cart BEFORE gstAmount calc — must come first
+  var cartSnapshot = cart.slice();
+  var gstAmount  = calcGST(cartSnapshot).total; // GST inclusive — for invoice
   var couponLine = activeCoupon ? '\n🎟️ Coupon ' + activeCoupon.code + ': -₹' + discount : '';
   var shipLine   = shipCharge > 0 ? '\n🚚 Shipping: ₹' + shipCharge : '\n🚚 Shipping: FREE';
 
@@ -1443,9 +1394,6 @@ async function checkout() {
   // Save customer info locally for repeat use
   try { localStorage.setItem('pr_cust_info', JSON.stringify({name:name.trim(),phone:phone.trim(),addr:addr.trim(),city:city.trim(),state:state.trim(),pin:pin.trim(),email:email.trim()})); } catch(e){}
 
-
-  // Snapshot cart BEFORE clearing (non-blocking save needs items)
-  var cartSnapshot = cart.slice();
 
   // Quick stock check before proceeding — avoids showing success then error
   try {
@@ -1652,7 +1600,7 @@ function renderUpsell() {
   section.style.display = 'block';
   strip.innerHTML = suggestions.map(function(p) {
     var imgHtml = p.image_url ? ('<img src="'+p.image_url+'" loading="lazy" style="width:100%;height:100%;object-fit:cover">') : ('<span style="font-size:28px">'+(p.emoji||'🌿')+'</span>');
-    var addBtn = '<button onclick="addToCart('+JSON.stringify(p.id)+')" style="margin-top:6px;background:var(--g);color:#fff;border:none;border-radius:6px;padding:4px 10px;font-size:11px;font-weight:600;cursor:pointer;width:100%">+ Add</button>';
+    var addBtn = '<button onclick="addToCart(\'' + p.id + '\')" style="margin-top:6px;background:var(--g);color:#fff;border:none;border-radius:6px;padding:4px 10px;font-size:11px;font-weight:600;cursor:pointer;width:100%">+ Add</button>';
     return '<div class="cu-item"><div class="cu-img">'+imgHtml+'</div><div class="cu-name">'+p.name+'</div><div class="cu-price">&#8377;'+p.price+'</div>'+addBtn+'</div>';
   }).join('');
 }
@@ -1706,9 +1654,10 @@ function updateWLBadge() {
 }
 function updateAllWLButtons() {
   document.querySelectorAll('.wl-btn').forEach(function(btn) {
-    var id = parseInt(btn.dataset.id);
-    btn.textContent = wishlist.includes(id) ? '❤️' : '🤍';
-    btn.classList.toggle('active', wishlist.includes(id));
+    var sid = String(btn.dataset.id || '');
+    var inWL = wishlist.findIndex(function(x){ return String(x) === sid; }) > -1;
+    btn.textContent = inWL ? '❤️' : '🤍';
+    btn.classList.toggle('active', inWL);
   });
 }
 function openWishlist() {
@@ -1723,17 +1672,17 @@ function closeWishlist() {
 function renderWishlist() {
   var body = document.getElementById('wlBody');
   if (!body) return;
-  var items = PRODUCTS.filter(function(p) { return wishlist.includes(p.id); });
+  var items = PRODUCTS.filter(function(p) { return wishlist.findIndex(function(x){ return String(x) === String(p.id); }) > -1; });
   if (!items.length) {
     body.innerHTML = '<div class="wl-empty"><span style="font-size:48px;display:block;margin-bottom:12px;opacity:.3">🤍</span><p>Your wishlist is empty</p><p style="font-size:12px;color:var(--tx3);margin-top:6px">Tap 🤍 on any product to save it</p></div>';
     return;
   }
   body.innerHTML = '<div class="wl-grid">' + items.map(function(p) {
     return '<div class="wl-card" onclick="closeWishlist();goToProductPage(\'' + getProductSlug(p) + '\')" style="cursor:pointer">' +
-      '<button class="wl-irm" onclick="event.stopPropagation();toggleWishlist(' + p.id + ');renderWishlist()">✕</button>' +
+      '<button class="wl-irm" onclick="event.stopPropagation();toggleWishlist(\'' + p.id + '\');renderWishlist()">✕</button>' +
       '<div class="wl-img">' + (p.image_url ? '<img src="' + p.image_url + '" alt="' + p.name + '" loading="lazy">' : (p.emoji||'🌿')) + '</div>' +
       '<div class="wl-info"><div class="wl-iname">' + p.name + '</div><div class="wl-iprice">₹' + p.price + '</div>' +
-      '<button class="wl-iadd" onclick="event.stopPropagation();addToCart(' + p.id + ')">Add to Cart</button></div>' +
+      '<button class="wl-iadd" onclick="event.stopPropagation();addToCart(\'' + p.id + '\')" >Add to Cart</button></div>' +
     '</div>';
   }).join('') + '</div>';
 }
@@ -1747,8 +1696,8 @@ function openQV(id) {
   qvQty = 1;
   addToRecent(p);
   var pct = p.original_price ? Math.round((1 - p.price / p.original_price) * 100) : 0;
-  var inWL = wishlist.includes(p.id);
-  var stock = p.stock || 99;
+  var inWL = wishlist.findIndex(function(x){ return String(x) === String(p.id); }) > -1;
+  var stock = (p.stock !== undefined && p.stock !== null) ? p.stock : 99;
   var stockClass = stock <= 0 ? 'out' : stock > 20 ? 'in' : 'low';
   var stockTxt   = stock <= 0 ? '❌ Out of Stock' : stock > 20 ? '✅ In Stock' : ('⚠️ Only ' + stock + ' left');
   var box = document.getElementById('qvBox');
@@ -1773,8 +1722,8 @@ function openQV(id) {
           '<button class="qv-qb" onclick="chQvQty(-1)">−</button>' +
           '<span class="qv-qn" id="qvQtyDisplay">1</span>' +
           '<button class="qv-qb" onclick="chQvQty(1)">+</button>' +
-          '<button class="qv-atc" onclick="addToCartQty(' + p.id + ',qvQty);closeQV()">Add to Cart</button>' +
-          '<button class="qv-wl" onclick="toggleWishlist(' + p.id + ');this.textContent=wishlist.includes(' + p.id + ')?\'❤️\':\'🤍\'" title="Wishlist">' + (inWL?'❤️':'🤍') + '</button>' +
+          '<button class="qv-atc" onclick="addToCartQty(\'' + p.id + '\',qvQty);closeQV()">Add to Cart</button>' +
+          '<button class="qv-wl" onclick="toggleWishlist(\'' + p.id + '\');this.textContent=wishlist.findIndex(function(x){return String(x)===String(\'' + p.id + '\')})>-1?\'❤️\':\'🤍\'" title="Wishlist">' + (inWL?'❤️':'🤍') + '</button>' +
         '</div>' +
         '<div class="pin-row">' +
           '<span style="font-size:12px;color:var(--tx3);white-space:nowrap">📦 Check delivery:</span>' +
@@ -1795,14 +1744,22 @@ function closeQV() { document.getElementById('qvOv').classList.remove('open'); }
 function handleQvClick(e) { if (e.target === document.getElementById('qvOv')) closeQV(); }
 function chQvQty(d) { qvQty = Math.max(1, qvQty + d); var el = document.getElementById('qvQtyDisplay'); if(el) el.textContent = qvQty; }
 function addToCartQty(id, qty) {
-  var p = PRODUCTS.find(function(x) { return x.id === id; });
+  var sid = String(id);
+  var p = PRODUCTS.find(function(x) { return String(x.id) === sid; });
   if (!p) return;
-  for (var i = 0; i < qty; i++) {
-    var ex = cart.find(function(x) { return x.id === id; });
-    if (ex) ex.qty++; else cart.push({id:p.id, name:p.name, emoji:p.emoji, image:p.image_url||'', price:p.price, gst_rate:p.gst_rate||5, qty:1, cartKey:String(p.id)});
+  var stockNum = (p.stock !== undefined && p.stock !== null) ? Number(p.stock) : null;
+  if (stockNum !== null && !isNaN(stockNum) && stockNum <= 0) {
+    showToast('⚠️ This product is out of stock!'); return;
   }
+  var cartKey = sid;
+  var ex = cart.find(function(x) { return String(x.cartKey) === cartKey; });
+  var currentQty = ex ? ex.qty : 0;
+  var addQty = (stockNum !== null && !isNaN(stockNum)) ? Math.min(qty, stockNum - currentQty) : qty;
+  if (addQty <= 0) { showToast('⚠️ Only ' + stockNum + ' in stock!'); return; }
+  if (ex) ex.qty += addQty;
+  else cart.push({id:p.id, name:p.name, emoji:p.emoji, image:p.image_url||'', price:p.price, gst_rate:p.gst_rate||5, qty:addQty, cartKey:cartKey, variantId:null});
   sv(); uCart(); openCart();
-  showToast('✅ ' + p.name + ' × ' + qty + ' added!');
+  showToast('✅ ' + p.name + ' × ' + addQty + ' added!');
 }
 
 // ── PINCODE CHECKER ────────────────────────────────────────────────
@@ -1945,10 +1902,10 @@ function trackOrder() {
   // Fetch real order from DB via store-data or admin-api (public, no password needed)
   fetch('/api/admin-api', {
     method: 'POST',
-    headers: {'Content-Type':'application/json', 'x-admin-password': ''},
-    body: JSON.stringify({method:'GET', table:'orders', query:'order_number=eq.'+id+'&select=order_number,order_status,payment_status,created_at,tracking_number,courier,shipped_at,delivered_at'})
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({action:'public_get_order', order_number: id})
   }).then(function(r){ return r.json(); }).then(function(data) {
-    var order = Array.isArray(data) ? data[0] : null;
+    var order = data && data.order ? data.order : null;
     if (!order) {
       res.innerHTML = '<p style="color:rgba(255,255,255,.6);font-size:13px;margin-top:12px">❌ Order <strong>' + id + '</strong> not found. Please check your order ID.</p>';
       return;
@@ -2023,12 +1980,10 @@ function animateCounters() {
 
 // ── SOCIAL PROOF ──────────────────────────────────────────────────
 function addSocialProof() {
-  document.querySelectorAll('.pcard').forEach(function(card) {
+  document.querySelectorAll('.pcard').forEach(function(card, idx) {
     if (card.querySelector('.soc-proof')) return;
-    // Extract product id from the card's onclick to get a stable count
-    var match = card.getAttribute('onclick') && card.innerHTML.match(/addToCart\((\d+)\)/);
-    var prodId = match ? parseInt(match[1]) : 0;
-    var count = 2 + (prodId * 7) % 11;
+    // Use card index for a stable count that works with any ID type
+    var count = 2 + (idx * 3 + 5) % 11;
     var sp = document.createElement('div');
     sp.className = 'soc-proof';
     sp.innerHTML = '<span class="soc-dot"></span>' + count + ' viewing';
