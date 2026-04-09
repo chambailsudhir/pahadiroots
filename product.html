@@ -457,6 +457,21 @@ button{font-family:'Lato',sans-serif;cursor:pointer}
 .mob-links{list-style:none;padding:16px 0}
 .mob-links li a{display:block;padding:13px 24px;font-size:15px;font-weight:700;color:var(--tx);border-bottom:1px solid var(--bd);transition:background .2s}
 .mob-links li a:hover{background:var(--g-pale);color:var(--g)}
+
+/* ══ WHY 5 PAHADI ROOTS — exact from main.css + index.html ══ */
+.why-bg{background:linear-gradient(180deg,#faf6ee,#f2eadc);padding:52px 40px}
+.why-bg .ct{text-align:center;margin-bottom:28px}
+.why-bg .chip{display:inline-block;font-size:9.5px;font-weight:800;letter-spacing:4px;text-transform:uppercase;color:var(--gd);border:1px solid rgba(200,146,10,.3);padding:5px 14px;border-radius:20px;margin-bottom:10px}
+.why-bg .sh2{font-family:'Playfair Display',serif;font-size:clamp(22px,3.5vw,40px);color:var(--g);font-weight:700;margin-bottom:8px}
+.why-bg .ssub{font-size:14px;color:var(--tx2);max-width:560px;margin:0 auto}
+.pgr{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;max-width:1150px;margin:0 auto}
+.pillar{background:#fff;border-radius:16px;padding:20px 16px 18px;position:relative;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.07);display:flex;flex-direction:column;align-items:center;text-align:center;transition:transform .3s,box-shadow .3s,background .3s;cursor:default}
+.pillar:hover{transform:translateY(-6px);box-shadow:0 12px 32px rgba(26,58,30,.15);background:#f5fcf5}
+.pillar .pnum{font-size:22px;font-weight:900;color:rgba(26,58,30,.07);position:absolute;top:6px;right:10px;font-family:'Playfair Display',serif}
+.pillar .pt{font-size:13px;font-weight:700;color:var(--g);margin-bottom:4px;font-family:'Playfair Display',serif}
+.pillar .pd{font-size:11.5px;color:var(--tx3);line-height:1.6;max-width:180px}
+@media(max-width:760px){.pgr{grid-template-columns:1fr 1fr}.why-bg{padding:32px 16px}}
+
 </style>
 </head>
 <body class="body-pad">
@@ -697,7 +712,7 @@ async function loadProduct() {
     var stateMap = {};
     var stateImgMap = {};
     (data.states||[]).forEach(function(s){ stateMap[s.id]=s.name; });
-    (data.state_images||[]).forEach(function(si){ if(!stateImgMap[si.state_id]) stateImgMap[si.state_id]=si.image_url; });
+    (data.state_images||[]).forEach(function(si){ var sid=String(si.state_id); if(!stateImgMap[sid]) stateImgMap[sid]=si.image_url; });
     if (data.settings && data.settings.whatsapp_number) WHATSAPP_NUMBER = data.settings.whatsapp_number;
     renderProduct(prod, prodImages, related, data, stateMap, stateImgMap);
     /* Silently trigger AI benefits after product renders */
@@ -816,7 +831,7 @@ function renderProduct(p, images, related, data, stateMap, stateImgMap) {
   /* Region info */
   var regionName = p.region || stateMap[p.state_id] || p.state_id || 'Himalayan Region';
   var regionEmoji = {'Assam':'🌿','Himachal Pradesh':'🏔️','Uttarakhand':'🌲','Jammu & Kashmir':'❄️','Sikkim':'🌸','Nagaland':'🌿','Meghalaya':'☁️','Ladakh':'⛰️'}[regionName] || '🏔️';
-  var stateImg = stateImgMap[p.state_id] || '';
+  var stateImg = stateImgMap[String(p.state_id)] || '';
 
   /* WhatsApp number formatted */
   var retNumStr = WHATSAPP_NUMBER.replace('91','').replace(/(\d{5})(\d{5})/,'$1 $2');
@@ -926,7 +941,7 @@ function renderProduct(p, images, related, data, stateMap, stateImgMap) {
 
         
         '<div class="origin-card" style="margin-top:18px">' +
-          '<div class="origin-header">'+regionEmoji+' Himalayan Origin Story</div>' +
+          '<div class="origin-header"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="vertical-align:middle;margin-right:6px"><path d="M3 18L8 8l4 6 3-4 6 8H3z" fill="rgba(255,255,255,.9)"/><path d="M8 5a1 1 0 100-2 1 1 0 000 2z" fill="#f0c840"/></svg>Himalayan Origin Story</div>' +
           '<div class="origin-body">' +
             '<div class="origin-img">'+(stateImg?'<img src="'+stateImg+'" alt="'+regionName+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%">':(regionEmoji?'<span style="font-size:26px;line-height:1">'+regionEmoji+'</span>':'<span style="font-size:26px">🏔️</span>'))+'</div>' +
             '<div class="origin-text"><div class="origin-region">'+regionName+'</div><p>This product is sourced directly from farming families in '+regionName+', nestled in the pristine Himalayan region. Grown at altitude, harvested with traditional methods — pure as the mountains themselves.</p></div>' +
@@ -950,6 +965,19 @@ function renderProduct(p, images, related, data, stateMap, stateImgMap) {
     
     /* ── AI BENEFITS skeleton — injected inline, right order guaranteed ── */
     relHtml +
+    '<section class="why-bg">' +
+      '<div class="ct">' +
+        '<div class="chip">Our Promise</div>' +
+        '<h2 class="sh2">Why 5 Pahadi Roots</h2>' +
+        '<p class="ssub">Four pillars that define everything we do — mountain to doorstep.</p>' +
+      '</div>' +
+      '<div class="pgr">' +
+        '<div class="pillar"><div class="pnum">01</div><svg viewBox="0 0 148 148" xmlns="http://www.w3.org/2000/svg" style="width:110px;height:110px;margin-bottom:10px"><defs><radialGradient id="lt1x" cx="45%" cy="35%" r="65%"><stop offset="0%" stop-color="#f0f8e8"/><stop offset="100%" stop-color="#4a9858"/></radialGradient></defs><circle cx="74" cy="74" r="74" fill="url(#lt1x)"/><rect x="54" y="112" width="40" height="6" rx="3" fill="#1a4828"/><rect x="68" y="90" width="12" height="24" rx="2" fill="#2a6840"/><rect x="68" y="56" width="30" height="8" rx="2" fill="#1a4828"/><rect x="70" y="44" width="8" height="16" rx="3" fill="#3a7850"/><circle cx="74" cy="42" r="6" fill="#1a4828"/><circle cx="74" cy="42" r="3" fill="#88c8f8" opacity=".8"/><circle cx="108" cy="44" r="18" fill="#f0c840" opacity=".95"/><circle cx="108" cy="44" r="14" fill="white" opacity=".9"/><polyline points="100,44 106,50 118,36" stroke="#1a4828" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><rect x="88" y="66" width="40" height="12" rx="3" fill="#1a4828" opacity=".85"/><text x="108" y="75" font-size="7" font-weight="700" fill="white" text-anchor="middle">CERTIFIED</text><circle cx="28" cy="30" r="11" fill="#f0c840" opacity=".88"/><text x="22" y="35" font-size="9" font-weight="700" fill="#7a6000">LAB</text></svg><div class="pt">Lab Tested Purity</div><p class="pd">Every batch tested for heavy metals, pesticides &amp; adulterants. Certificate with every order.</p></div>' +
+        '<div class="pillar"><div class="pnum">02</div><svg viewBox="0 0 148 148" xmlns="http://www.w3.org/2000/svg" style="width:110px;height:110px;margin-bottom:10px"><defs><radialGradient id="fd2x" cx="45%" cy="35%" r="65%"><stop offset="0%" stop-color="#d8f0d8"/><stop offset="100%" stop-color="#4a9858"/></radialGradient></defs><circle cx="74" cy="74" r="74" fill="url(#fd2x)"/><polygon points="0,90 24,52 50,72 74,42 98,68 124,48 148,80 148,148 0,148" fill="#2a6840" opacity=".4"/><polygon points="0,106 20,72 46,88 74,58 102,84 128,66 148,96 148,148 0,148" fill="#1a4828"/><rect x="8" y="100" width="20" height="16" rx="2" fill="#e8c870"/><polygon points="4,102 18,88 32,102" fill="#c84820"/><path d="M46,92 Q74,64 102,92" stroke="#c8920a" stroke-width="3" fill="none" stroke-linecap="round"/><circle cx="74" cy="80" r="13" fill="white" opacity=".9"/><line x1="66" y1="72" x2="82" y2="88" stroke="#e84848" stroke-width="2.5"/><circle cx="74" cy="76" r="4" fill="#888"/></svg><div class="pt">Direct from Farmers</div><p class="pd">Zero middlemen. 200+ farming families across 12 Himalayan states — fair wages, always.</p></div>' +
+        '<div class="pillar"><div class="pnum">03</div><svg viewBox="0 0 148 148" xmlns="http://www.w3.org/2000/svg" style="width:110px;height:110px;margin-bottom:10px"><defs><radialGradient id="ed3x" cx="45%" cy="42%" r="65%"><stop offset="0%" stop-color="#c8e8f8"/><stop offset="100%" stop-color="#5890c0"/></radialGradient></defs><circle cx="74" cy="74" r="74" fill="url(#ed3x)"/><circle cx="74" cy="80" r="46" fill="#2878b8" opacity=".7"/><path d="M46,60 Q52,50 64,52 Q70,58 66,68 Q58,72 50,68 Z" fill="#50a840" opacity=".85"/><path d="M70,56 Q80,48 92,52 Q96,62 90,70 Q80,74 72,68 Z" fill="#50a840" opacity=".85"/><path d="M54,76 Q62,70 70,74 Q72,84 66,90 Q56,88 54,76 Z" fill="#50a840" opacity=".85"/><line x1="74" y1="34" x2="74" y2="18" stroke="#38b040" stroke-width="3.5" stroke-linecap="round"/><path d="M74,28 Q58,20 60,8 Q70,16 74,28Z" fill="#50c850"/><path d="M74,24 Q90,16 88,4 Q78,12 74,24Z" fill="#60d860"/><circle cx="116" cy="30" r="13" fill="#f0c840" opacity=".9"/><text x="110" y="35" font-size="9" font-weight="700" fill="#7a6000">ECO</text></svg><div class="pt">Eco Packaging</div><p class="pd">Glass jars, recycled cardboard, zero single-use plastic. Packaging as clean as our products.</p></div>' +
+        '<div class="pillar"><div class="pnum">04</div><svg viewBox="0 0 148 148" xmlns="http://www.w3.org/2000/svg" style="width:110px;height:110px;margin-bottom:10px"><defs><radialGradient id="gb3x" cx="45%" cy="35%" r="65%"><stop offset="0%" stop-color="#c8e8f8"/><stop offset="100%" stop-color="#5888b8"/></radialGradient></defs><circle cx="74" cy="74" r="74" fill="url(#gb3x)"/><polygon points="0,90 24,52 50,72 74,42 98,68 124,48 148,80 148,148 0,148" fill="#4a7850" opacity=".4"/><polygon points="0,106 20,72 46,88 74,58 102,84 128,66 148,96 148,148 0,148" fill="#2a5838"/><path d="M0,130 Q20,120 40,128 Q60,136 80,124 Q100,112 120,120 Q134,126 148,118" stroke="#60b8e8" stroke-width="8" fill="none" stroke-linecap="round"/><rect x="54" y="100" width="22" height="18" rx="2" fill="#e8c870"/><polygon points="50,102 65,90 80,102" fill="#c84820"/><circle cx="112" cy="26" r="13" fill="#fde080" opacity=".85"/><circle cx="30" cy="38" r="13" fill="#f0c840" opacity=".88"/><text x="24" y="43" font-size="10" font-weight="700" fill="#7a6000">5%</text></svg><div class="pt">Give-Back Program</div><p class="pd">5% of every order funds Himalayan forest restoration and village school programs.</p></div>' +
+      '</div>' +
+    '</section>' +
     '<footer class="mini-footer">© 2026 5 Pahadi Roots &nbsp;·&nbsp; <a href="/">Shop Now</a> &nbsp;·&nbsp; <a href="/terms">Terms &amp; Returns</a> &nbsp;·&nbsp; <a href="mailto:support@pahadiroots.com">support@pahadiroots.com</a></footer>';
 
   /* Sticky CTA update */
