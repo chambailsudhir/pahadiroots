@@ -836,8 +836,11 @@ function renderProduct(p, images, related, data, stateMap, stateImgMap) {
   /* WhatsApp number formatted */
   var retNumStr = WHATSAPP_NUMBER.replace('91','').replace(/(\d{5})(\d{5})/,'$1 $2');
 
-  /* Description */
-  var descHtml = p.long_description || p.short_description || p.description || 'Authentic Himalayan product sourced directly from local farmers. No preservatives, no additives — pure and natural.';
+  /* Description — 3-layer fallback:
+     Layer 1: AI-generated (stored in Supabase, zero latency)
+     Layer 2: Manual long/short description entered by admin
+     Layer 3: Generic brand fallback — page is never blank */
+  var descHtml = p.ai_description || p.long_description || p.short_description || p.description || 'Authentic Himalayan product sourced directly from local farmers. No preservatives, no additives — pure and natural.';
 
   /* Related */
   var relHtml = '';
@@ -1009,22 +1012,45 @@ function setupStickyCtaScroll() {
 async function triggerAiBenefits(productName, productDesc) {
   if (!productName) return;
 
-  var cacheKey = AI_BENEFITS_CACHE_KEY + productName.toLowerCase().replace(/\s+/g,'_');
+  /* ══ LAYER 1: Use stored AI content from Supabase (generated in admin panel)
+        This is zero-latency — no API call needed, already in PRODUCT object.
+        Admin generates once → stored → served to all customers instantly. ══ */
+  var prod = PRODUCT || {};
+  if (prod.ai_health_benefits) {
+    try {
+      var storedBenefits = JSON.parse(prod.ai_health_benefits);
+      var storedData = {
+        benefits:       storedBenefits,
+        how_to_use:     prod.ai_how_to_use    ? JSON.parse(prod.ai_how_to_use)    : [],
+        storage_tips:   prod.ai_storage_tips  ? JSON.parse(prod.ai_storage_tips)  : [],
+        who_should_buy: prod.ai_who_should_buy || '',
+      };
+      if (storedData.benefits && storedData.benefits.length > 0) {
+        renderAiBenefits(storedData);
+        return; /* Done — no API call needed */
+      }
+    } catch(e) {
+      console.warn('Failed to parse stored AI content, falling back to live API:', e);
+    }
+  }
 
-  /* Check localStorage cache first — avoids repeated API calls */
+  /* ══ LAYER 2: Live API fallback — runs only when admin hasn't generated
+        content yet for this product. Once admin generates, this never runs. ══ */
+
+  /* Check localStorage cache first to avoid hitting live API repeatedly */
+  var cacheKey = AI_BENEFITS_CACHE_KEY + productName.toLowerCase().replace(/\s+/g,'_');
   try {
     var cached = localStorage.getItem(cacheKey);
     if (cached) {
-      var parsed = JSON.parse(cached);
-      if (parsed && parsed.benefits && Date.now() - parsed.ts < 7*24*60*60*1000) {
-        /* Cache valid for 7 days */
-        renderAiBenefits(parsed);
+      var parsedCache = JSON.parse(cached);
+      if (parsedCache && parsedCache.benefits && Date.now() - parsedCache.ts < 7*24*60*60*1000) {
+        renderAiBenefits(parsedCache);
         return;
       }
     }
   } catch(e) {}
 
-  /* Call YOUR SERVER proxy — API key stays safe on server */
+  /* Call live /api/benefits — API key safe on server */
   try {
     var resp = await fetch('/api/benefits?product=' + encodeURIComponent(productName));
     if (!resp.ok) {
@@ -1038,21 +1064,18 @@ async function triggerAiBenefits(productName, productDesc) {
       }
       throw new Error('Server error ' + resp.status);
     }
-    var parsed = await resp.json();
-
-    parsed.ts = Date.now();
-
-    /* Cache it */
-    try { localStorage.setItem(cacheKey, JSON.stringify(parsed)); } catch(e) {}
-
-    renderAiBenefits(parsed);
+    var parsedLive = await resp.json();
+    parsedLive.ts = Date.now();
+    /* Cache for 7 days */
+    try { localStorage.setItem(cacheKey, JSON.stringify(parsedLive)); } catch(e) {}
+    renderAiBenefits(parsedLive);
   } catch(e) {
-    /* Silently show empty state on error */
+    /* Silently degrade — never break the product page */
     var bg = document.getElementById('benefits-grid');
     if (bg) bg.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--tx3);font-size:13px">Benefits unavailable right now. Please refresh.</div>';
     var ug = document.getElementById('usage-grid');
     if (ug) ug.innerHTML = '';
-    console.warn('AI benefits generation failed:', e);
+    console.warn('AI benefits fallback also failed:', e);
   }
 }
 
