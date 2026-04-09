@@ -394,33 +394,38 @@ button{font-family:'Lato',sans-serif;cursor:pointer}
 .mini-footer a{color:var(--gold2);font-weight:700}
 
 
-/* ══ ACCORDION TABS ══ */
-.acc-list{background:#fff;border:1px solid var(--warm-bd,#e8e0d0);border-radius:var(--radius);overflow:hidden;margin:0}
-.acc-item{border-bottom:1px solid var(--warm-bd,#e8e0d0)}
-.acc-item:last-child{border-bottom:none}
-.acc-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;cursor:pointer;transition:background .2s;user-select:none}
-.acc-head:hover{background:#faf6ee}
-.acc-title{font-size:14px;font-weight:700;color:var(--tx)}
-.acc-icon{font-size:20px;color:var(--tx3);transition:transform .3s;flex-shrink:0}
-.acc-item.open .acc-icon{transform:rotate(45deg)}
-.acc-body{display:none;padding:4px 20px 18px;font-size:14px;color:var(--tx2);line-height:1.8}
-.acc-item.open .acc-body{display:block}
-.acc-body ul{padding-left:20px}
-.acc-body li{margin-bottom:8px}
-.acc-hl-item{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px}
-.acc-hl-check{width:20px;height:20px;background:rgba(26,58,30,.1);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--g);font-weight:900;flex-shrink:0;margin-top:2px}
+/* ══ ACCORDION TABS — Premium style (Image 3 reference) ══ */
+.acc-list{display:flex;flex-direction:column;gap:10px;margin:0}
+.acc-item{background:#fff;border:1.5px solid #ddd5c4;border-radius:14px;overflow:hidden;transition:border-color .2s,box-shadow .2s}
+.acc-item.open{border-color:#c8920a;box-shadow:0 4px 16px rgba(200,146,10,.1)}
+.acc-head{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;cursor:pointer;transition:background .2s;user-select:none;gap:12px}
+.acc-head:hover{background:#fdf9f2}
+.acc-head-left{display:flex;align-items:center;gap:14px}
+.acc-icon-wrap{width:42px;height:42px;border-radius:50%;background:rgba(200,146,10,.1);border:1.5px solid rgba(200,146,10,.25);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.acc-item.open .acc-icon-wrap{background:rgba(200,146,10,.18);border-color:rgba(200,146,10,.45)}
+.acc-title{font-size:15px;font-weight:800;color:#1a3a1e;letter-spacing:.1px}
+.acc-chevron{width:28px;height:28px;border-radius:50%;background:#f5f0e8;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform .3s,background .2s}
+.acc-chevron svg{width:14px;height:14px;stroke:#7a6a50;stroke-width:2.5;fill:none;transition:stroke .2s}
+.acc-item.open .acc-chevron{transform:rotate(180deg);background:rgba(200,146,10,.15)}
+.acc-item.open .acc-chevron svg{stroke:#c8920a}
+.acc-body{display:none;padding:0 22px 20px;font-size:14px;color:var(--tx2);line-height:1.85}
+.acc-item.open .acc-body{display:block;animation:accFadeIn .22s ease}
+@keyframes accFadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+.acc-body ul{padding-left:0;list-style:none;display:flex;flex-direction:column;gap:10px}
+.acc-body li{display:flex;align-items:flex-start;gap:10px;font-size:14px;color:var(--tx2);line-height:1.6}
+.acc-body li::before{content:'';display:inline-flex;width:20px;height:20px;border-radius:50%;background:rgba(200,146,10,.12);border:1.5px solid rgba(200,146,10,.3);flex-shrink:0;margin-top:1px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2 6l3 3 5-5' stroke='%23c8920a' stroke-width='1.8' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:center;background-size:12px}
+.acc-body-text{font-size:14px;color:var(--tx2);line-height:1.85}
 .cert-badges{display:flex;gap:10px;flex-wrap:wrap;margin-top:4px}
-.cert-badge{display:flex;align-items:center;gap:8px;padding:10px 14px;background:rgba(26,58,30,.06);border:1px solid rgba(26,58,30,.12);border-radius:10px;font-size:13px;font-weight:700;color:var(--g)}
+.cert-badge{display:flex;align-items:center;gap:8px;padding:10px 14px;background:rgba(26,58,30,.05);border:1.5px solid rgba(26,58,30,.12);border-radius:10px;font-size:13px;font-weight:700;color:var(--g)}
 
-/* ══ INLINE BENEFITS ══ */
-.inline-benefits{background:#fff;border:1px solid var(--warm-bd,#e8e0d0);border-radius:var(--radius);padding:18px 20px;margin-top:16px}
-.inline-ben-title{font-size:11px;font-weight:900;color:var(--g);text-transform:uppercase;letter-spacing:.8px;margin-bottom:14px;display:flex;align-items:center;gap:8px}
-.inline-ben-title::before{content:'';display:inline-block;width:18px;height:2px;background:var(--g)}
-.ben-item{display:flex;align-items:flex-start;gap:11px;margin-bottom:11px}
+/* ══ INLINE BENEFITS — Premium amber style (matches brand palette) ══ */
+.inline-benefits{background:#fff;border:1.5px solid #e8a020;border-radius:14px;padding:20px 22px;margin-top:16px}
+.inline-ben-title{font-size:15px;font-weight:900;color:#b86a00;margin-bottom:16px;font-family:'Playfair Display',serif;letter-spacing:.1px}
+.ben-item{display:flex;align-items:flex-start;gap:13px;margin-bottom:14px}
 .ben-item:last-child{margin-bottom:0}
-.ben-icon{width:26px;height:26px;border-radius:50%;background:rgba(26,58,30,.08);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;margin-top:1px}
-.ben-title{font-size:13px;font-weight:800;color:var(--tx);margin-bottom:2px;line-height:1.3}
-.ben-desc{font-size:12px;color:var(--tx3);line-height:1.55}
+.ben-icon{width:28px;height:28px;border-radius:50%;background:rgba(232,160,32,.15);border:1.5px solid rgba(232,160,32,.35);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;margin-top:1px}
+.ben-title{font-size:14px;font-weight:800;color:var(--tx);margin-bottom:3px;line-height:1.3}
+.ben-desc{font-size:13px;color:var(--tx3);line-height:1.6}
 
 /* ══ WHY PAHADI ROOTS (from index.html) ══ */
 .why-section{background:linear-gradient(180deg,#faf6ee,#f2eadc);padding:48px 32px;margin-top:40px}
@@ -836,11 +841,8 @@ function renderProduct(p, images, related, data, stateMap, stateImgMap) {
   /* WhatsApp number formatted */
   var retNumStr = WHATSAPP_NUMBER.replace('91','').replace(/(\d{5})(\d{5})/,'$1 $2');
 
-  /* Description — 3-layer fallback:
-     Layer 1: AI-generated (stored in Supabase, zero latency)
-     Layer 2: Manual long/short description entered by admin
-     Layer 3: Generic brand fallback — page is never blank */
-  var descHtml = p.ai_description || p.long_description || p.short_description || p.description || 'Authentic Himalayan product sourced directly from local farmers. No preservatives, no additives — pure and natural.';
+  /* Description */
+  var descHtml = p.long_description || p.short_description || p.description || 'Authentic Himalayan product sourced directly from local farmers. No preservatives, no additives — pure and natural.';
 
   /* Related */
   var relHtml = '';
@@ -955,14 +957,14 @@ function renderProduct(p, images, related, data, stateMap, stateImgMap) {
 
     '<div class="desc-section">' +
       '<div class="acc-list">' +
-        makeAcc('📄 Description', '<div id="acc-desc">' + descHtml + '</div>', true) +
-        /* Top Benefits accordion removed - shown as Key Benefits above */ '' +
-        makeAcc('🍽️ How to Use', '<div id="acc-howto"><div class="sk-line" style="height:12px;border-radius:4px;margin-bottom:8px;background:linear-gradient(90deg,#f2ede4 25%,#e8e2d8 50%,#f2ede4 75%);background-size:200% 100%;animation:shimmer 1.5s infinite"></div></div>', false) +
-        makeAcc('📦 Storage Tips', '<div id="acc-storage"><div class="sk-line" style="height:12px;border-radius:4px;background:linear-gradient(90deg,#f2ede4 25%,#e8e2d8 50%,#f2ede4 75%);background-size:200% 100%;animation:shimmer 1.5s infinite"></div></div>', false) +
-        makeAcc('🌱 Ingredients', '<div id="acc-ingredients">'+(p.ingredients||'<span style="color:var(--tx3)">Loading ingredient information…</span>')+'</div>', false) +
+        makeAcc('📄 Description', '<div id="acc-desc" class="acc-body-text">' + descHtml + '</div>', true) +
+        makeAcc('🍽️ How to Use', '<div id="acc-howto"><ul><li style="color:var(--tx3);list-style:none">Loading…</li></ul></div>', false) +
+        makeAcc('📦 Storage Tips', '<div id="acc-storage"><ul><li style="color:var(--tx3);list-style:none">Loading…</li></ul></div>', false) +
+        makeAcc('👤 Who Should Buy', '<div id="acc-who-should-buy" class="acc-body-text" style="color:var(--tx3)">Loading…</div>', false) +
+        makeAcc('🌱 Ingredients', '<div id="acc-ingredients" class="acc-body-text">'+(p.ingredients||'<span style="color:var(--tx3)">Natural Himalayan product. No artificial additives or preservatives.</span>')+'</div>', false) +
         makeAcc('🏛️ Certifications', '<div class="cert-badges"><div class="cert-badge">🔬 Lab Tested for Purity</div><div class="cert-badge">🌿 100% Natural & Organic</div><div class="cert-badge">🏛️ FSSAI Licensed</div><div class="cert-badge">✅ No Adulterants</div></div>', false) +
-        makeAcc('🚚 Shipping', '🚚 <strong>Pan India Shipping</strong><br><br>Delivery in <strong>5–7 business days</strong>. Free shipping above ₹799. COD available. Dispatched within 1–2 business days.', false) +
-        makeAcc('🔄 Returns & Refunds', '✅ <strong>Eligible:</strong> Damaged or wrong item — within <strong>3 days</strong> of delivery with photo.<br><br>❌ <strong>Not eligible:</strong> Opened products or after 3 days.<br><br>WhatsApp +91 '+retNumStr+' with order number. Refunds in 5–7 days.', false) +
+        makeAcc('🚚 Shipping', '<div class="acc-body-text">🚚 <strong>Pan India Shipping</strong><br><br>Delivery in <strong>5–7 business days</strong>. Free shipping above ₹799. COD available. Dispatched within 1–2 business days.</div>', false) +
+        makeAcc('🔄 Returns & Refunds', '<div class="acc-body-text">✅ <strong>Eligible:</strong> Damaged or wrong item — within <strong>3 days</strong> of delivery with photo.<br><br>❌ <strong>Not eligible:</strong> Opened products or after 3 days.<br><br>WhatsApp +91 '+retNumStr+' with order number. Refunds in 5–7 days.</div>', false) +
       '</div>' +
     '</div>' +
     
@@ -1012,45 +1014,22 @@ function setupStickyCtaScroll() {
 async function triggerAiBenefits(productName, productDesc) {
   if (!productName) return;
 
-  /* ══ LAYER 1: Use stored AI content from Supabase (generated in admin panel)
-        This is zero-latency — no API call needed, already in PRODUCT object.
-        Admin generates once → stored → served to all customers instantly. ══ */
-  var prod = PRODUCT || {};
-  if (prod.ai_health_benefits) {
-    try {
-      var storedBenefits = JSON.parse(prod.ai_health_benefits);
-      var storedData = {
-        benefits:       storedBenefits,
-        how_to_use:     prod.ai_how_to_use    ? JSON.parse(prod.ai_how_to_use)    : [],
-        storage_tips:   prod.ai_storage_tips  ? JSON.parse(prod.ai_storage_tips)  : [],
-        who_should_buy: prod.ai_who_should_buy || '',
-      };
-      if (storedData.benefits && storedData.benefits.length > 0) {
-        renderAiBenefits(storedData);
-        return; /* Done — no API call needed */
-      }
-    } catch(e) {
-      console.warn('Failed to parse stored AI content, falling back to live API:', e);
-    }
-  }
-
-  /* ══ LAYER 2: Live API fallback — runs only when admin hasn't generated
-        content yet for this product. Once admin generates, this never runs. ══ */
-
-  /* Check localStorage cache first to avoid hitting live API repeatedly */
   var cacheKey = AI_BENEFITS_CACHE_KEY + productName.toLowerCase().replace(/\s+/g,'_');
+
+  /* Check localStorage cache first — avoids repeated API calls */
   try {
     var cached = localStorage.getItem(cacheKey);
     if (cached) {
-      var parsedCache = JSON.parse(cached);
-      if (parsedCache && parsedCache.benefits && Date.now() - parsedCache.ts < 7*24*60*60*1000) {
-        renderAiBenefits(parsedCache);
+      var parsed = JSON.parse(cached);
+      if (parsed && parsed.benefits && Date.now() - parsed.ts < 7*24*60*60*1000) {
+        /* Cache valid for 7 days */
+        renderAiBenefits(parsed);
         return;
       }
     }
   } catch(e) {}
 
-  /* Call live /api/benefits — API key safe on server */
+  /* Call YOUR SERVER proxy — API key stays safe on server */
   try {
     var resp = await fetch('/api/benefits?product=' + encodeURIComponent(productName));
     if (!resp.ok) {
@@ -1064,37 +1043,40 @@ async function triggerAiBenefits(productName, productDesc) {
       }
       throw new Error('Server error ' + resp.status);
     }
-    var parsedLive = await resp.json();
-    parsedLive.ts = Date.now();
-    /* Cache for 7 days */
-    try { localStorage.setItem(cacheKey, JSON.stringify(parsedLive)); } catch(e) {}
-    renderAiBenefits(parsedLive);
+    var parsed = await resp.json();
+
+    parsed.ts = Date.now();
+
+    /* Cache it */
+    try { localStorage.setItem(cacheKey, JSON.stringify(parsed)); } catch(e) {}
+
+    renderAiBenefits(parsed);
   } catch(e) {
-    /* Silently degrade — never break the product page */
+    /* Silently show empty state on error */
     var bg = document.getElementById('benefits-grid');
     if (bg) bg.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--tx3);font-size:13px">Benefits unavailable right now. Please refresh.</div>';
     var ug = document.getElementById('usage-grid');
     if (ug) ug.innerHTML = '';
-    console.warn('AI benefits fallback also failed:', e);
+    console.warn('AI benefits generation failed:', e);
   }
 }
 
 function renderAiBenefits(data) {
   var pName = PRODUCT ? PRODUCT.name : 'this product';
 
-  /* ── 1. INLINE LIST in right column (like My Pahadi Dukan) ── */
+  /* ── 1. INLINE KEY BENEFITS — premium amber card in right column ── */
   var inlineList = document.getElementById('inline-benefits-list');
   if (inlineList && data.benefits && data.benefits.length) {
     inlineList.innerHTML = data.benefits.map(function(b) {
-      return '<div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:11px">' +
-        '<div style="width:22px;height:22px;border-radius:50%;background:var(--g-light);border:1px solid var(--bd2);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;margin-top:1px">' + (b.icon||'✓') + '</div>' +
-        '<div><div style="font-size:13px;font-weight:800;color:var(--tx);margin-bottom:2px">' + (b.title||'') + '</div>' +
-        '<div style="font-size:12px;color:var(--tx3);line-height:1.5">' + (b.desc||'') + '</div></div>' +
+      return '<div class="ben-item">' +
+        '<div class="ben-icon">' + (b.icon||'✓') + '</div>' +
+        '<div><div class="ben-title">' + (b.title||'') + '</div>' +
+        '<div class="ben-desc">' + (b.desc||'') + '</div></div>' +
       '</div>';
     }).join('');
   }
 
-  /* ── 2. FULL BENEFIT CARDS below tabs ── */
+  /* ── 2. FULL BENEFIT CARDS below (existing section) ── */
   var benefitsGrid = document.getElementById('benefits-grid');
   if (benefitsGrid && data.benefits && data.benefits.length) {
     document.getElementById('benefits-heading').textContent = 'Benefits of ' + pName;
@@ -1108,7 +1090,31 @@ function renderAiBenefits(data) {
     }).join('');
   }
 
-  /* ── 3. Usage + Storage + Who Should Buy ── */
+  /* ── 3. How to Use accordion — inject into acc-howto ── */
+  var howtoEl = document.getElementById('acc-howto');
+  if (howtoEl && data.how_to_use && data.how_to_use.length) {
+    howtoEl.innerHTML = '<ul>' +
+      data.how_to_use.map(function(s){ return '<li>' + s + '</li>'; }).join('') +
+    '</ul>';
+  }
+
+  /* ── 4. Storage Tips accordion — inject into acc-storage ── */
+  var storageEl = document.getElementById('acc-storage');
+  if (storageEl && data.storage_tips && data.storage_tips.length) {
+    storageEl.innerHTML = '<ul>' +
+      data.storage_tips.map(function(s){ return '<li>' + s + '</li>'; }).join('') +
+    '</ul>';
+  }
+
+  /* ── 5. Who Should Buy — append as extra accordion if present ── */
+  if (data.who_should_buy) {
+    var wsbEl = document.getElementById('acc-who-should-buy');
+    if (wsbEl) {
+      wsbEl.innerHTML = '<div class="acc-body-text">' + data.who_should_buy + '</div>';
+    }
+  }
+
+  /* ── 6. Usage grid (legacy section) — keep for compatibility ── */
   var usageHtml = '';
   if (data.how_to_use && data.how_to_use.length) {
     usageHtml += '<div class="usage-card"><div class="usage-card-head">🍽️ How to Use</div><div class="usage-card-body"><ul>' +
@@ -1119,9 +1125,6 @@ function renderAiBenefits(data) {
     usageHtml += '<div class="usage-card"><div class="usage-card-head">📦 Storage Tips</div><div class="usage-card-body"><ul>' +
       data.storage_tips.map(function(s){ return '<li>'+s+'</li>'; }).join('') +
     '</ul></div></div>';
-  }
-  if (data.who_should_buy) {
-    usageHtml += '<div class="usage-card"><div class="usage-card-head">👤 Who Should Buy</div><div class="usage-card-body">' + data.who_should_buy + '</div></div>';
   }
   if (usageHtml) {
     var ug = document.getElementById('usage-grid');
@@ -1198,9 +1201,19 @@ function closeZoom() {
 
 /* ══ ACCORDION ══ */
 function makeAcc(title, content, open) {
-  return '<div class="acc-item'+(open?' open':'')+'" onclick="toggleAcc(this)">' +
-    '<div class="acc-head"><span class="acc-title">'+title+'</span><span class="acc-icon">+</span></div>' +
-    '<div class="acc-body">'+content+'</div>' +
+  var parts = title.match(/^(\S+)\s+(.+)$/);
+  var icon  = parts ? parts[1] : '•';
+  var label = parts ? parts[2] : title;
+  var chevSvg = '<svg viewBox="0 0 14 14" xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px;stroke:#7a6a50;stroke-width:2.5;fill:none"><polyline points="2,4 7,10 12,4"/></svg>';
+  return '<div class="acc-item'+(open?' open':'')+'">'+
+    '<div class="acc-head" onclick="toggleAcc(this.parentElement)">'+
+      '<div class="acc-head-left">'+
+        '<div class="acc-icon-wrap">'+icon+'</div>'+
+        '<span class="acc-title">'+label+'</span>'+
+      '</div>'+
+      '<div class="acc-chevron">'+chevSvg+'</div>'+
+    '</div>'+
+    '<div class="acc-body">'+content+'</div>'+
   '</div>';
 }
 function toggleAcc(el){ el.classList.toggle('open'); }
