@@ -17,7 +17,7 @@
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400&family=Lato:wght@300;400;700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400&family=Lato:wght@300;400;700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/main.css">
 <script type="application/ld+json" id="product-jsonld">{"@context":"https://schema.org/","@type":"Product","name":"5 Pahadi Roots Product","brand":{"@type":"Brand","name":"5 Pahadi Roots"}}</script>
 
@@ -41,10 +41,10 @@
   --shadow-lg:0 12px 40px rgba(0,0,0,.14);
 }
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Lato',sans-serif;color:var(--tx);background:#faf6ee;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+body{font-family:'Inter',sans-serif;color:var(--tx);background:#faf6ee;overflow-x:hidden;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility}
 a{text-decoration:none;color:inherit}
 img{max-width:100%;display:block}
-button{font-family:'Lato',sans-serif;cursor:pointer}
+button{font-family:'Inter',sans-serif;cursor:pointer}
 
 /* ══ ANNOUNCEMENT BAR ══ */
 .announce-bar{background:var(--g);color:rgba(255,255,255,.9);font-size:11.5px;font-weight:700;padding:7px 20px;letter-spacing:.3px;overflow:hidden;white-space:nowrap}
@@ -188,18 +188,30 @@ button{font-family:'Lato',sans-serif;cursor:pointer}
 .qty-btn{width:44px;height:50px;border:none;background:#fff;font-size:22px;font-weight:700;cursor:pointer;color:var(--g);transition:background .15s;display:flex;align-items:center;justify-content:center}
 .qty-btn:hover{background:var(--bg2)}
 .qty-num{width:50px;height:50px;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:900;border-left:1.5px solid var(--bd);border-right:1.5px solid var(--bd);user-select:none}
-.btn-add-cart{flex:1;min-width:145px;height:52px;background:#fff;color:var(--g);border:2.5px solid var(--g);border-radius:13px;font-size:14.5px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .22s}
-.btn-add-cart:hover,.btn-add-cart.added{background:var(--g);color:#fff}
-.btn-add-cart:disabled{opacity:.5;cursor:not-allowed}
-.btn-buy-now{flex:1;min-width:145px;height:52px;background:linear-gradient(135deg,var(--gold,#b8820a) 0%,var(--gold2,#d4a832) 100%);color:#fff;border:none;border-radius:13px;font-size:14.5px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .22s;box-shadow:0 4px 14px rgba(184,130,10,.3)}
-.btn-buy-now:hover{filter:brightness(1.08);transform:translateY(-1px);box-shadow:0 6px 22px rgba(184,130,10,.45)}
+.btn-add-cart{flex:1;min-width:145px;height:54px;background:#fff;color:#1a3a1e;border:2px solid #1a3a1e;border-radius:14px;font-size:14px;font-weight:700;letter-spacing:.2px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px;transition:all .25s;box-shadow:0 2px 8px rgba(26,58,30,.08)}
+.btn-add-cart:hover{background:#f0f7f0;border-color:#2d5233;box-shadow:0 4px 14px rgba(26,58,30,.15);transform:translateY(-1px)}
+.btn-add-cart.added{background:#1a3a1e;color:#fff;border-color:#1a3a1e}
+.btn-add-cart:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.btn-buy-now{flex:1;min-width:145px;height:54px;background:linear-gradient(135deg,#1a3a1e 0%,#2d5a32 50%,#1a4a20 100%);color:#fff;border:none;border-radius:14px;font-size:14px;font-weight:700;letter-spacing:.3px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px;transition:all .25s;box-shadow:0 6px 20px rgba(26,58,30,.35),inset 0 1px 0 rgba(255,255,255,.12);position:relative;overflow:hidden}
+.btn-buy-now::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.08) 0%,transparent 60%);pointer-events:none}
+.btn-buy-now:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(26,58,30,.45),inset 0 1px 0 rgba(255,255,255,.15);background:linear-gradient(135deg,#1f4524 0%,#356639 50%,#1f5026 100%)}
+.btn-buy-now:active{transform:translateY(0);box-shadow:0 4px 12px rgba(26,58,30,.3)}
+.btn-buy-now:disabled{opacity:.45;cursor:not-allowed;transform:none}
 .btn-buy-now:disabled{opacity:.5;cursor:not-allowed}
 .btn-icon{width:52px;height:52px;border:2px solid var(--bd);border-radius:13px;background:#fff;cursor:pointer;font-size:20px;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
 .btn-icon:hover{border-color:var(--g2)}
 .btn-icon.wl-active{border-color:#e74c3c;background:#fff5f5}
 /* WhatsApp share */
-.wa-share-btn{display:flex;align-items:center;gap:8px;background:#25d366;color:#fff;border:none;border-radius:11px;padding:10px 16px;font-size:13px;font-weight:800;cursor:pointer;width:100%;margin-top:10px;transition:background .2s;font-family:'Lato',sans-serif;justify-content:center}
-.wa-share-btn:hover{background:#1da851}
+.share-row{display:flex;gap:9px;margin-top:12px;width:100%}
+.share-btn{flex:1;height:44px;border:1.5px solid;border-radius:12px;font-size:12.5px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;transition:all .22s;font-family:'Inter',sans-serif;letter-spacing:.1px}
+.share-btn-wa{background:#f0faf4;color:#1a7a3a;border-color:#a8d8b8}
+.share-btn-wa:hover{background:#25d366;color:#fff;border-color:#25d366;transform:translateY(-1px);box-shadow:0 4px 14px rgba(37,211,102,.3)}
+.share-btn-em{background:#f5f5ff;color:#3a3ab8;border-color:#b8b8e8}
+.share-btn-em:hover{background:#3a3ab8;color:#fff;border-color:#3a3ab8;transform:translateY(-1px);box-shadow:0 4px 14px rgba(58,58,184,.25)}
+.share-btn-cp{background:#fdf8f0;color:#8a5a00;border-color:#d4aa60}
+.share-btn-cp:hover{background:#c8920a;color:#fff;border-color:#c8920a;transform:translateY(-1px);box-shadow:0 4px 14px rgba(200,146,10,.3)}
+/* legacy fallback */
+.wa-share-btn{display:none}
 /* Delivery */
 .delivery-bar{display:flex;align-items:center;gap:10px;padding:13px 16px;background:var(--g-light);border-radius:11px;margin-bottom:16px;font-size:13px;color:var(--g);font-weight:700;border:1px solid rgba(26,58,30,.1)}
 /* Trust badges — visual icons */
@@ -394,38 +406,38 @@ button{font-family:'Lato',sans-serif;cursor:pointer}
 .mini-footer a{color:var(--gold2);font-weight:700}
 
 
-/* ══ ACCORDION TABS — Premium style (Image 3 reference) ══ */
+/* ══ ACCORDION TABS ══ */
 .acc-list{display:flex;flex-direction:column;gap:10px;margin:0}
-.acc-item{background:#fff;border:1.5px solid #ddd5c4;border-radius:14px;overflow:hidden;transition:border-color .2s,box-shadow .2s}
-.acc-item.open{border-color:#c8920a;box-shadow:0 4px 16px rgba(200,146,10,.1)}
-.acc-head{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;cursor:pointer;transition:background .2s;user-select:none;gap:12px}
-.acc-head:hover{background:#fdf9f2}
+.acc-item{background:#fff;border:1.5px solid #e0d8c8;border-radius:14px;overflow:hidden;transition:border-color .25s,box-shadow .25s}
+.acc-item.open{border-color:#c8920a;box-shadow:0 4px 20px rgba(200,146,10,.12)}
+.acc-head{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;cursor:pointer;transition:background .2s;user-select:none;gap:12px}
+.acc-head:hover{background:#fdf9f0}
 .acc-head-left{display:flex;align-items:center;gap:14px}
-.acc-icon-wrap{width:42px;height:42px;border-radius:50%;background:rgba(200,146,10,.1);border:1.5px solid rgba(200,146,10,.25);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
-.acc-item.open .acc-icon-wrap{background:rgba(200,146,10,.18);border-color:rgba(200,146,10,.45)}
-.acc-title{font-size:15px;font-weight:800;color:#1a3a1e;letter-spacing:.1px}
-.acc-chevron{width:28px;height:28px;border-radius:50%;background:#f5f0e8;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform .3s,background .2s}
-.acc-chevron svg{width:14px;height:14px;stroke:#7a6a50;stroke-width:2.5;fill:none;transition:stroke .2s}
-.acc-item.open .acc-chevron{transform:rotate(180deg);background:rgba(200,146,10,.15)}
+.acc-icon-wrap{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#f5ede0,#ede0cc);border:1.5px solid rgba(200,146,10,.2);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;transition:all .25s}
+.acc-item.open .acc-icon-wrap{background:linear-gradient(135deg,#fdf0d8,#f5e0b8);border-color:rgba(200,146,10,.45);transform:scale(1.05)}
+.acc-title{font-size:15px;font-weight:600;color:#1a2a1e;letter-spacing:.1px;font-family:'Inter',sans-serif}
+.acc-chevron{width:30px;height:30px;border-radius:50%;background:#f5ede0;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform .3s,background .25s}
+.acc-chevron svg{width:14px;height:14px;stroke:#8a7060;stroke-width:2.5;fill:none;transition:stroke .25s}
+.acc-item.open .acc-chevron{transform:rotate(180deg);background:#fde8b8}
 .acc-item.open .acc-chevron svg{stroke:#c8920a}
-.acc-body{display:none;padding:0 22px 20px;font-size:14px;color:var(--tx2);line-height:1.85}
+.acc-body{display:none;padding:2px 20px 20px 78px;font-size:14px;color:#4a4a4a;line-height:1.85;font-family:'Inter',sans-serif}
 .acc-item.open .acc-body{display:block;animation:accFadeIn .22s ease}
-@keyframes accFadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+@keyframes accFadeIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
 .acc-body ul{padding-left:0;list-style:none;display:flex;flex-direction:column;gap:10px}
-.acc-body li{display:flex;align-items:flex-start;gap:10px;font-size:14px;color:var(--tx2);line-height:1.6}
-.acc-body li::before{content:'';display:inline-flex;width:20px;height:20px;border-radius:50%;background:rgba(200,146,10,.12);border:1.5px solid rgba(200,146,10,.3);flex-shrink:0;margin-top:1px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2 6l3 3 5-5' stroke='%23c8920a' stroke-width='1.8' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:center;background-size:12px}
-.acc-body-text{font-size:14px;color:var(--tx2);line-height:1.85}
-.cert-badges{display:flex;gap:10px;flex-wrap:wrap;margin-top:4px}
-.cert-badge{display:flex;align-items:center;gap:8px;padding:10px 14px;background:rgba(26,58,30,.05);border:1.5px solid rgba(26,58,30,.12);border-radius:10px;font-size:13px;font-weight:700;color:var(--g)}
+.acc-body li{display:flex;align-items:flex-start;gap:10px;font-size:14px;line-height:1.65}
+.acc-body li::before{content:'';display:inline-flex;min-width:20px;height:20px;border-radius:50%;background:rgba(200,146,10,.1);border:1.5px solid rgba(200,146,10,.3);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpolyline points='2,6 5,9 10,3' stroke='%23c8920a' stroke-width='1.8' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:center;background-size:12px;margin-top:2px;flex-shrink:0}
+.acc-body-text{font-size:14px;line-height:1.85;color:#4a4a4a}
+.cert-badges{display:flex;gap:10px;flex-wrap:wrap}
+.cert-badge{display:flex;align-items:center;gap:8px;padding:10px 14px;background:rgba(26,58,30,.05);border:1.5px solid rgba(26,58,30,.12);border-radius:10px;font-size:13px;font-weight:600;color:#1a3a1e}
 
-/* ══ INLINE BENEFITS — Premium amber style (matches brand palette) ══ */
+/* ══ INLINE BENEFITS ══ */
 .inline-benefits{background:#fff;border:1.5px solid #e8a020;border-radius:14px;padding:20px 22px;margin-top:16px}
-.inline-ben-title{font-size:15px;font-weight:900;color:#b86a00;margin-bottom:16px;font-family:'Playfair Display',serif;letter-spacing:.1px}
+.inline-ben-title{font-size:15px;font-weight:700;color:#8a5800;margin-bottom:16px;font-family:'Cormorant Garamond',serif;font-style:italic;letter-spacing:.2px}
 .ben-item{display:flex;align-items:flex-start;gap:13px;margin-bottom:14px}
 .ben-item:last-child{margin-bottom:0}
-.ben-icon{width:28px;height:28px;border-radius:50%;background:rgba(232,160,32,.15);border:1.5px solid rgba(232,160,32,.35);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;margin-top:1px}
-.ben-title{font-size:14px;font-weight:800;color:var(--tx);margin-bottom:3px;line-height:1.3}
-.ben-desc{font-size:13px;color:var(--tx3);line-height:1.6}
+.ben-icon{width:30px;height:30px;border-radius:50%;background:rgba(232,160,32,.14);border:1.5px solid rgba(232,160,32,.4);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;margin-top:1px}
+.ben-title{font-size:14px;font-weight:700;color:#1a1a1a;margin-bottom:3px;line-height:1.3;letter-spacing:.1px}
+.ben-desc{font-size:13px;color:#6a6a6a;line-height:1.6}
 
 /* ══ WHY PAHADI ROOTS (from index.html) ══ */
 .why-section{background:linear-gradient(180deg,#faf6ee,#f2eadc);padding:48px 32px;margin-top:40px}
@@ -842,7 +854,11 @@ function renderProduct(p, images, related, data, stateMap, stateImgMap) {
   var retNumStr = WHATSAPP_NUMBER.replace('91','').replace(/(\d{5})(\d{5})/,'$1 $2');
 
   /* Description */
-  var descHtml = p.long_description || p.short_description || p.description || 'Authentic Himalayan product sourced directly from local farmers. No preservatives, no additives — pure and natural.';
+  /* Description — 3-layer fallback:
+     Layer 1: AI-generated (stored, zero latency for customer)
+     Layer 2: Manual admin description
+     Layer 3: Generic fallback */
+  var descHtml = p.ai_description || p.long_description || p.short_description || p.description || 'Authentic Himalayan product sourced directly from local farmers. No preservatives, no additives — pure and natural.';
 
   /* Related */
   var relHtml = '';
@@ -933,7 +949,11 @@ function renderProduct(p, images, related, data, stateMap, stateImgMap) {
           '<button class="btn-buy-now" id="atc-btn" onclick="addToCartProduct(\'buy\')" '+(initStock<=0?'disabled':'')+'>⚡ Buy Now</button>' +
           '<button class="btn-icon '+(wishlist.indexOf(p.id)>-1?'wl-active':'')+'" onclick="toggleWL()" id="wl-btn">'+(wishlist.indexOf(p.id)>-1?'❤️':'🤍')+'</button>' +
         '</div>' +
-        '<button class="wa-share-btn" onclick="shareWhatsApp()">💬 Share on WhatsApp</button>' +
+        '<div class="share-row">' +
+          '<button class="share-btn share-btn-wa" onclick="shareWhatsApp()"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12.004 2.003A9.997 9.997 0 002.007 12c0 1.762.461 3.418 1.268 4.861L2.003 22l5.29-1.247A9.952 9.952 0 0012.004 22c5.523 0 9.997-4.477 9.997-9.998A9.997 9.997 0 0012.004 2.003z"/></svg>WhatsApp</button>' +
+          '<button class="share-btn share-btn-em" onclick="shareEmail()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 7 10-7"/></svg>Email</button>' +
+          '<button class="share-btn share-btn-cp" onclick="copyLink(this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>Copy Link</button>' +
+        '</div>' +
         '<div class="delivery-bar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16,8 20,8 23,11 23,16 16,16"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>🚚 Free delivery · Pan India · Estimated 5–7 days</div>' +
         /* VISUAL TRUST BADGES */
         '<div class="trust-badges">' +
@@ -957,14 +977,14 @@ function renderProduct(p, images, related, data, stateMap, stateImgMap) {
 
     '<div class="desc-section">' +
       '<div class="acc-list">' +
-        makeAcc('📄 Description', '<div id="acc-desc" class="acc-body-text">' + descHtml + '</div>', true) +
-        makeAcc('🍽️ How to Use', '<div id="acc-howto"><ul><li style="color:var(--tx3);list-style:none">Loading…</li></ul></div>', false) +
-        makeAcc('📦 Storage Tips', '<div id="acc-storage"><ul><li style="color:var(--tx3);list-style:none">Loading…</li></ul></div>', false) +
-        makeAcc('👤 Who Should Buy', '<div id="acc-who-should-buy" class="acc-body-text" style="color:var(--tx3)">Loading…</div>', false) +
-        makeAcc('🌱 Ingredients', '<div id="acc-ingredients" class="acc-body-text">'+(p.ingredients||'<span style="color:var(--tx3)">Natural Himalayan product. No artificial additives or preservatives.</span>')+'</div>', false) +
-        makeAcc('🏛️ Certifications', '<div class="cert-badges"><div class="cert-badge">🔬 Lab Tested for Purity</div><div class="cert-badge">🌿 100% Natural & Organic</div><div class="cert-badge">🏛️ FSSAI Licensed</div><div class="cert-badge">✅ No Adulterants</div></div>', false) +
-        makeAcc('🚚 Shipping', '<div class="acc-body-text">🚚 <strong>Pan India Shipping</strong><br><br>Delivery in <strong>5–7 business days</strong>. Free shipping above ₹799. COD available. Dispatched within 1–2 business days.</div>', false) +
-        makeAcc('🔄 Returns & Refunds', '<div class="acc-body-text">✅ <strong>Eligible:</strong> Damaged or wrong item — within <strong>3 days</strong> of delivery with photo.<br><br>❌ <strong>Not eligible:</strong> Opened products or after 3 days.<br><br>WhatsApp +91 '+retNumStr+' with order number. Refunds in 5–7 days.</div>', false) +
+        makeAcc('📋 Description', '<div id="acc-desc" class="acc-body-text">'+descHtml+'</div>', true) +
+        makeAcc('🍽️ How to Use', '<div id="acc-howto"><p style="color:#a0a0a0;font-size:13px">Loading…</p></div>', false) +
+        makeAcc('🫙 Storage Tips', '<div id="acc-storage"><p style="color:#a0a0a0;font-size:13px">Loading…</p></div>', false) +
+        makeAcc('🧑‍🌾 Who Should Buy', '<div id="acc-who-should-buy" class="acc-body-text" style="color:#a0a0a0;font-size:13px">Loading…</div>', false) +
+        makeAcc('🌿 Ingredients', '<div id="acc-ingredients" class="acc-body-text">'+(p.ingredients||'Natural Himalayan product. No artificial additives or preservatives.')+'</div>', false) +
+        makeAcc('🏅 Certifications', '<div class="cert-badges"><div class="cert-badge">🔬 Lab Tested</div><div class="cert-badge">🌿 100% Natural</div><div class="cert-badge">🏛️ FSSAI Licensed</div><div class="cert-badge">✅ No Adulterants</div></div>', false) +
+        makeAcc('🚚 Shipping', '<div class="acc-body-text"><strong>Pan India Shipping</strong><br><br>Delivery in <strong>5–7 business days</strong>. Free shipping above ₹799. COD available. Dispatched within 1–2 business days.</div>', false) +
+        makeAcc('🔁 Returns & Refunds', '<div class="acc-body-text">✅ <strong>Eligible:</strong> Damaged or wrong item — within <strong>3 days</strong> of delivery with photo.<br><br>❌ <strong>Not eligible:</strong> Opened products or after 3 days.<br><br>WhatsApp +91 '+retNumStr+' with order number. Refunds in 5–7 days.</div>', false) +
       '</div>' +
     '</div>' +
     
@@ -1014,26 +1034,40 @@ function setupStickyCtaScroll() {
 async function triggerAiBenefits(productName, productDesc) {
   if (!productName) return;
 
-  var cacheKey = AI_BENEFITS_CACHE_KEY + productName.toLowerCase().replace(/\s+/g,'_');
+  /* ══ LAYER 1: Stored AI content from Supabase — zero latency, no API cost ══ */
+  var prod = PRODUCT || {};
+  if (prod.ai_health_benefits) {
+    try {
+      var storedData = {
+        benefits:       JSON.parse(prod.ai_health_benefits),
+        how_to_use:     prod.ai_how_to_use    ? JSON.parse(prod.ai_how_to_use)    : [],
+        storage_tips:   prod.ai_storage_tips  ? JSON.parse(prod.ai_storage_tips)  : [],
+        who_should_buy: prod.ai_who_should_buy || '',
+      };
+      if (storedData.benefits && storedData.benefits.length > 0) {
+        renderAiBenefits(storedData);
+        return;
+      }
+    } catch(e) { console.warn('Stored AI parse failed, using live API:', e); }
+  }
 
-  /* Check localStorage cache first — avoids repeated API calls */
+  /* ══ LAYER 2: localStorage cache ══ */
+  var cacheKey = AI_BENEFITS_CACHE_KEY + productName.toLowerCase().replace(/\s+/g,'_');
   try {
     var cached = localStorage.getItem(cacheKey);
     if (cached) {
-      var parsed = JSON.parse(cached);
-      if (parsed && parsed.benefits && Date.now() - parsed.ts < 7*24*60*60*1000) {
-        /* Cache valid for 7 days */
-        renderAiBenefits(parsed);
+      var parsedCache = JSON.parse(cached);
+      if (parsedCache && parsedCache.benefits && Date.now() - parsedCache.ts < 7*24*60*60*1000) {
+        renderAiBenefits(parsedCache);
         return;
       }
     }
   } catch(e) {}
 
-  /* Call YOUR SERVER proxy — API key stays safe on server */
+  /* ══ LAYER 3: Live /api/benefits — only when no stored content yet ══ */
   try {
     var resp = await fetch('/api/benefits?product=' + encodeURIComponent(productName));
     if (!resp.ok) {
-      /* If admin disabled (503) → hide sections silently */
       if (resp.status === 503) {
         var bo = document.getElementById('benefits-outer');
         if (bo) bo.style.display = 'none';
@@ -1041,30 +1075,23 @@ async function triggerAiBenefits(productName, productDesc) {
         if (ib) ib.style.display = 'none';
         return;
       }
-      throw new Error('Server error ' + resp.status);
+      throw new Error('Server ' + resp.status);
     }
-    var parsed = await resp.json();
-
-    parsed.ts = Date.now();
-
-    /* Cache it */
-    try { localStorage.setItem(cacheKey, JSON.stringify(parsed)); } catch(e) {}
-
-    renderAiBenefits(parsed);
+    var parsedLive = await resp.json();
+    parsedLive.ts = Date.now();
+    try { localStorage.setItem(cacheKey, JSON.stringify(parsedLive)); } catch(e) {}
+    renderAiBenefits(parsedLive);
   } catch(e) {
-    /* Silently show empty state on error */
     var bg = document.getElementById('benefits-grid');
-    if (bg) bg.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--tx3);font-size:13px">Benefits unavailable right now. Please refresh.</div>';
-    var ug = document.getElementById('usage-grid');
-    if (ug) ug.innerHTML = '';
-    console.warn('AI benefits generation failed:', e);
+    if (bg) bg.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:20px;color:#a0a0a0;font-size:13px">Benefits loading…</div>';
+    console.warn('AI benefits failed:', e);
   }
 }
 
 function renderAiBenefits(data) {
   var pName = PRODUCT ? PRODUCT.name : 'this product';
 
-  /* ── 1. INLINE KEY BENEFITS — premium amber card in right column ── */
+  /* ── 1. INLINE KEY BENEFITS — premium amber card ── */
   var inlineList = document.getElementById('inline-benefits-list');
   if (inlineList && data.benefits && data.benefits.length) {
     inlineList.innerHTML = data.benefits.map(function(b) {
@@ -1076,11 +1103,13 @@ function renderAiBenefits(data) {
     }).join('');
   }
 
-  /* ── 2. FULL BENEFIT CARDS below (existing section) ── */
+  /* ── 2. FULL BENEFIT CARDS section ── */
   var benefitsGrid = document.getElementById('benefits-grid');
   if (benefitsGrid && data.benefits && data.benefits.length) {
-    document.getElementById('benefits-heading').textContent = 'Benefits of ' + pName;
-    document.getElementById('benefits-sub').textContent = 'Why thousands of customers love this product';
+    var hEl = document.getElementById('benefits-heading');
+    var sEl = document.getElementById('benefits-sub');
+    if (hEl) hEl.textContent = 'Benefits of ' + pName;
+    if (sEl) sEl.textContent = 'Why thousands of customers love this product';
     benefitsGrid.innerHTML = data.benefits.map(function(b) {
       return '<div class="benefit-card">' +
         '<div class="bc-icon">' + (b.icon||'🌿') + '</div>' +
@@ -1090,46 +1119,33 @@ function renderAiBenefits(data) {
     }).join('');
   }
 
-  /* ── 3. How to Use accordion — inject into acc-howto ── */
+  /* ── 3. How to Use → fill accordion ── */
   var howtoEl = document.getElementById('acc-howto');
   if (howtoEl && data.how_to_use && data.how_to_use.length) {
-    howtoEl.innerHTML = '<ul>' +
-      data.how_to_use.map(function(s){ return '<li>' + s + '</li>'; }).join('') +
-    '</ul>';
+    howtoEl.innerHTML = '<ul>' + data.how_to_use.map(function(s){ return '<li>'+s+'</li>'; }).join('') + '</ul>';
   }
 
-  /* ── 4. Storage Tips accordion — inject into acc-storage ── */
+  /* ── 4. Storage Tips → fill accordion ── */
   var storageEl = document.getElementById('acc-storage');
   if (storageEl && data.storage_tips && data.storage_tips.length) {
-    storageEl.innerHTML = '<ul>' +
-      data.storage_tips.map(function(s){ return '<li>' + s + '</li>'; }).join('') +
-    '</ul>';
+    storageEl.innerHTML = '<ul>' + data.storage_tips.map(function(s){ return '<li>'+s+'</li>'; }).join('') + '</ul>';
   }
 
-  /* ── 5. Who Should Buy — append as extra accordion if present ── */
-  if (data.who_should_buy) {
-    var wsbEl = document.getElementById('acc-who-should-buy');
-    if (wsbEl) {
-      wsbEl.innerHTML = '<div class="acc-body-text">' + data.who_should_buy + '</div>';
-    }
+  /* ── 5. Who Should Buy → fill accordion ── */
+  var wsbEl = document.getElementById('acc-who-should-buy');
+  if (wsbEl && data.who_should_buy) {
+    wsbEl.innerHTML = '<div class="acc-body-text">' + data.who_should_buy + '</div>';
   }
 
-  /* ── 6. Usage grid (legacy section) — keep for compatibility ── */
+  /* ── 6. Legacy usage-grid (keep for compat) ── */
   var usageHtml = '';
   if (data.how_to_use && data.how_to_use.length) {
-    usageHtml += '<div class="usage-card"><div class="usage-card-head">🍽️ How to Use</div><div class="usage-card-body"><ul>' +
-      data.how_to_use.map(function(s){ return '<li>'+s+'</li>'; }).join('') +
-    '</ul></div></div>';
+    usageHtml += '<div class="usage-card"><div class="usage-card-head">🍽️ How to Use</div><div class="usage-card-body"><ul>' + data.how_to_use.map(function(s){ return '<li>'+s+'</li>'; }).join('') + '</ul></div></div>';
   }
   if (data.storage_tips && data.storage_tips.length) {
-    usageHtml += '<div class="usage-card"><div class="usage-card-head">📦 Storage Tips</div><div class="usage-card-body"><ul>' +
-      data.storage_tips.map(function(s){ return '<li>'+s+'</li>'; }).join('') +
-    '</ul></div></div>';
+    usageHtml += '<div class="usage-card"><div class="usage-card-head">📦 Storage Tips</div><div class="usage-card-body"><ul>' + data.storage_tips.map(function(s){ return '<li>'+s+'</li>'; }).join('') + '</ul></div></div>';
   }
-  if (usageHtml) {
-    var ug = document.getElementById('usage-grid');
-    if (ug) ug.innerHTML = usageHtml;
-  }
+  if (usageHtml) { var ug = document.getElementById('usage-grid'); if (ug) ug.innerHTML = usageHtml; }
 }
 
 /* ══ AI PRODUCT GENERATOR (for demo / AI bar) ══ */
@@ -1204,16 +1220,16 @@ function makeAcc(title, content, open) {
   var parts = title.match(/^(\S+)\s+(.+)$/);
   var icon  = parts ? parts[1] : '•';
   var label = parts ? parts[2] : title;
-  var chevSvg = '<svg viewBox="0 0 14 14" xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px;stroke:#7a6a50;stroke-width:2.5;fill:none"><polyline points="2,4 7,10 12,4"/></svg>';
-  return '<div class="acc-item'+(open?' open':'')+'">'+
-    '<div class="acc-head" onclick="toggleAcc(this.parentElement)">'+
-      '<div class="acc-head-left">'+
-        '<div class="acc-icon-wrap">'+icon+'</div>'+
-        '<span class="acc-title">'+label+'</span>'+
-      '</div>'+
-      '<div class="acc-chevron">'+chevSvg+'</div>'+
-    '</div>'+
-    '<div class="acc-body">'+content+'</div>'+
+  var chevSvg = '<svg viewBox="0 0 14 14" xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px;stroke:#8a7060;stroke-width:2.5;fill:none"><polyline points="2,4 7,10 12,4"/></svg>';
+  return '<div class="acc-item'+(open?' open':'')+'">' +
+    '<div class="acc-head" onclick="toggleAcc(this.parentElement)">' +
+      '<div class="acc-head-left">' +
+        '<div class="acc-icon-wrap">'+icon+'</div>' +
+        '<span class="acc-title">'+label+'</span>' +
+      '</div>' +
+      '<div class="acc-chevron">'+chevSvg+'</div>' +
+    '</div>' +
+    '<div class="acc-body">'+content+'</div>' +
   '</div>';
 }
 function toggleAcc(el){ el.classList.toggle('open'); }
@@ -1316,8 +1332,35 @@ function shareWhatsApp() {
   var url = window.location.href;
   var pname = (PRODUCT&&PRODUCT.name)?PRODUCT.name:'this product';
   var pprice = (PRODUCT&&PRODUCT.price)?' at ₹'+PRODUCT.price:'';
-  var waText = encodeURIComponent('🌿 Check out *'+pname+'*'+pprice+' on 5 Pahadi Roots!\n🏔️ Pure Himalayan, directly from farmers.\n👉 '+url);
+  var waText = encodeURIComponent('🌿 Check out *'+pname+'*'+pprice+' on 5 Pahadi Roots!\n🏔️ Pure Himalayan, directly from mountain farmers.\n👉 '+url);
   window.open('https://wa.me/?text='+waText, '_blank');
+}
+function shareEmail() {
+  var url = window.location.href;
+  var pname = (PRODUCT&&PRODUCT.name)?PRODUCT.name:'this product';
+  var pprice = (PRODUCT&&PRODUCT.price)?' at ₹'+PRODUCT.price:'';
+  var subj = encodeURIComponent('Check out '+pname+' on 5 Pahadi Roots');
+  var body = encodeURIComponent('Hi,\n\nI found this amazing Himalayan product and thought you might love it!\n\n'+pname+pprice+'\n\nFrom the mountains, directly to you — 5 Pahadi Roots.\n\n'+url);
+  window.open('mailto:?subject='+subj+'&body='+body);
+}
+function copyLink(btn) {
+  var url = window.location.href;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(url).then(function() {
+      var orig = btn.innerHTML;
+      btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Copied!';
+      btn.style.background = '#c8920a';
+      btn.style.color = '#fff';
+      btn.style.borderColor = '#c8920a';
+      setTimeout(function(){ btn.innerHTML = orig; btn.style.background=''; btn.style.color=''; btn.style.borderColor=''; }, 2000);
+    });
+  } else {
+    var t = document.createElement('textarea');
+    t.value = url; document.body.appendChild(t); t.select();
+    document.execCommand('copy'); document.body.removeChild(t);
+    btn.textContent = 'Copied!';
+    setTimeout(function(){ btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>Copy Link'; }, 2000);
+  }
 }
 
 /* ══ CART DRAWER ══ */
