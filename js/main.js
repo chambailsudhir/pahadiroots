@@ -2137,3 +2137,33 @@ window.addEventListener('DOMContentLoaded', function() {
   loadData();
   initPremium();
 });
+// ── OPENCART URL PARAM — from product page checkout ─────────────────
+// When product.html redirects to /?opencart=1, auto-open cart
+(function() {
+  function checkOpenCart() {
+    try {
+      var params = new URLSearchParams(window.location.search);
+      if (params.get('opencart') === '1') {
+        // Remove param from URL so refresh doesn't re-open
+        var cleanUrl = window.location.pathname;
+        window.history.replaceState({}, '', cleanUrl);
+        // Wait for page to load then open cart
+        var attempts = 0;
+        var tryOpen = setInterval(function() {
+          attempts++;
+          if (typeof openCart === 'function') {
+            clearInterval(tryOpen);
+            openCart();
+          } else if (attempts > 20) {
+            clearInterval(tryOpen);
+          }
+        }, 200);
+      }
+    } catch(e) {}
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', checkOpenCart);
+  } else {
+    checkOpenCart();
+  }
+})();
