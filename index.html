@@ -19,8 +19,8 @@
 <link rel="sitemap" type="application/xml" href="/sitemap.xml">
 
 <!-- ══ FAVICON ═══════════════════════════════════════════════════════════ -->
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>">
-<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>">
+<link rel="icon" type="image/png" href="https://ulyrhnpoiypuvaurlqqi.supabase.co/storage/v1/object/public/pahadi-images/5%20pahadi%20roots.png">
+<link rel="apple-touch-icon" href="https://ulyrhnpoiypuvaurlqqi.supabase.co/storage/v1/object/public/pahadi-images/5%20pahadi%20roots.png">
 
 <!-- ══ GEO META (local SEO — India / Himalayan business) ═════════════════ -->
 <meta name="geo.region" content="IN">
@@ -32,7 +32,7 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="5 Pahadi Roots">
 <meta property="og:title" content="5 Pahadi Roots – Pure Himalayan Natural Products">
-<meta property="og:description" content="Authentic organic products from Himalayan farming communities — wild honey, A2 ghee, Kashmiri saffron, Ladakhi shilajit &amp; more. Delivered across India.">
+<meta property="og:description" content="Authentic natural products from Himalayan farming communities — wild honey, A2 ghee, Kashmiri saffron, Ladakhi shilajit &amp; more. Delivered across India.">
 <meta property="og:url" content="https://pahadiroots.com/">
 <meta property="og:image" content="https://pahadiroots.com/images/og-cover.jpg">
 <meta property="og:image:width" content="1200">
@@ -45,7 +45,7 @@
 <meta name="twitter:site" content="@pahadiroots">
 <meta name="twitter:creator" content="@sudhirchambail">
 <meta name="twitter:title" content="5 Pahadi Roots – Pure Himalayan Natural Products">
-<meta name="twitter:description" content="Authentic organic products from Himalayan farming communities. Wild honey, A2 ghee, saffron &amp; more — delivered across India.">
+<meta name="twitter:description" content="Authentic natural products from Himalayan farming communities. Wild honey, A2 ghee, saffron &amp; more — delivered across India.">
 <meta name="twitter:image" content="https://pahadiroots.com/images/og-cover.jpg">
 <meta name="twitter:image:alt" content="5 Pahadi Roots Himalayan Natural Products">
 
@@ -138,7 +138,7 @@
   "mainEntity": [
     {
       "@type": "Question",
-      "name": "Are 5 Pahadi Roots products organic?",
+      "name": "Are 5 Pahadi Roots products natural?",
       "acceptedAnswer": { "@type": "Answer", "text": "Yes, all our products are sourced directly from Himalayan farmers and are 100% natural with no chemicals or preservatives." }
     },
     {
@@ -185,7 +185,7 @@
 }
 </script>
 </head>
-<body data-theme="pahadi">
+<body data-theme="dukan">
 <script>
 // Cart opens as overlay - no need to hide main content
 </script>
@@ -240,7 +240,15 @@
       <div class="theme-panel" id="themeSwitcherPanel">
         <div class="theme-panel-title">Choose Theme</div>
         <div class="theme-opts">
-          <button class="theme-opt active" data-theme="pahadi" onclick="applyTheme('pahadi');closeThemeSwitcher()">
+          <button class="theme-opt active" data-theme="dukan" onclick="applyTheme('dukan');closeThemeSwitcher()">
+            <div class="theme-swatch swatch-dukan"></div>
+            <div class="theme-opt-info">
+              <div class="theme-opt-label">Pahadi Dukkan ✦</div>
+              <div class="theme-opt-sub">Ocean teal · Warm orange · Default</div>
+            </div>
+            <span class="theme-check">✓</span>
+          </button>
+          <button class="theme-opt" data-theme="pahadi" onclick="applyTheme('pahadi');closeThemeSwitcher()">
             <div class="theme-swatch swatch-pahadi"></div>
             <div class="theme-opt-info">
               <div class="theme-opt-label">Pahadi Roots</div>
@@ -248,11 +256,27 @@
             </div>
             <span class="theme-check">✓</span>
           </button>
-          <button class="theme-opt" data-theme="dukan" onclick="applyTheme('dukan');closeThemeSwitcher()">
-            <div class="theme-swatch swatch-dukan"></div>
+          <button class="theme-opt" data-theme="saffron" onclick="applyTheme('saffron');closeThemeSwitcher()">
+            <div class="theme-swatch swatch-saffron"></div>
             <div class="theme-opt-info">
-              <div class="theme-opt-label">Pahadi Dukan</div>
-              <div class="theme-opt-sub">Ocean teal · Warm orange</div>
+              <div class="theme-opt-label">Saffron Gold ✦ Premium</div>
+              <div class="theme-opt-sub">Deep burgundy · Saffron · Editorial</div>
+            </div>
+            <span class="theme-check">✓</span>
+          </button>
+          <button class="theme-opt" data-theme="midnight" onclick="applyTheme('midnight');closeThemeSwitcher()">
+            <div class="theme-swatch swatch-midnight"></div>
+            <div class="theme-opt-info">
+              <div class="theme-opt-label">Midnight Cedar ✦ Premium</div>
+              <div class="theme-opt-sub">Dark luxury · Gold · Night mode</div>
+            </div>
+            <span class="theme-check">✓</span>
+          </button>
+          <button class="theme-opt" data-theme="valley" onclick="applyTheme('valley');closeThemeSwitcher()">
+            <div class="theme-swatch swatch-valley"></div>
+            <div class="theme-opt-info">
+              <div class="theme-opt-label">Valley Bloom ✦ Premium</div>
+              <div class="theme-opt-sub">Sage green · Blush rose · Airy</div>
             </div>
             <span class="theme-check">✓</span>
           </button>
@@ -285,7 +309,7 @@
   </div>
   <div class="hero-inner">
     <div class="hc hero-text">
-      <div class="eyebrow">🌿 Pure · Himalayan · Organic</div>
+      <div class="eyebrow">🌿 Pure · Himalayan · Natural</div>
       <h1>Born in the<br><em>Himalayas,</em><br>For Your Table</h1>
       <p class="hsub">Handpicked from the purest altitudes — where clean air, ancient soil, and tradition create nature's finest.</p>
       <div class="hbtns"><a href="#shop" class="btn-g">Explore Our Store</a><a href="/our-story" class="btn-w">Our Story</a></div>
@@ -884,7 +908,7 @@
         <img src="https://ulyrhnpoiypuvaurlqqi.supabase.co/storage/v1/object/public/pahadi-images/5%20pahadi%20roots.png" alt="5 Pahadi Roots" style="height:36px;width:36px;object-fit:contain" onerror="this.style.display='none'">
         <div>
           <div style="font-size:15px;font-weight:800;color:#fff;letter-spacing:.2px">5 Pahadi Roots</div>
-          <div style="font-size:11px;color:rgba(255,255,255,.65);margin-top:1px">Himalayan Organic Store</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.65);margin-top:1px">Himalayan Natural Store</div>
         </div>
       </div>
       <button onclick="closeAuth()" style="font-size:20px;color:rgba(255,255,255,.7);background:rgba(255,255,255,.1);border:none;cursor:pointer;line-height:1;padding:5px 8px;border-radius:8px;transition:all .2s" onmouseover="this.style.background='rgba(255,255,255,.2)'" onmouseout="this.style.background='rgba(255,255,255,.1)'">✕</button>
