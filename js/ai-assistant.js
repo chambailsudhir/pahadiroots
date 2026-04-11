@@ -62,8 +62,19 @@ You MUST respond in ${langName} (language code: ${langCode}).
 - If langCode is "kn" → respond in Kannada (ಕನ್ನಡ)
 - If langCode is "ml" → respond in Malayalam (മലയാളം)
 - If langCode is "doi" → respond in Dogri (डोगरी)
-- If langCode is "kngr" → respond in Kangri dialect (कांगड़ी बोली — Himachali Pahari dialect, use Devanagari)
-- If langCode is "garh" → respond in Garhwali dialect (गढ़वाली बोली — Uttarakhand Pahari dialect, use Devanagari)
+- If langCode is "kngr" → respond ONLY in Kangri dialect (कांगड़ी बोली). Use words like: किड़ा, कुसा, छा, ओ, हाँ जी, थुआड़ा, म्हारा. Do NOT use standard Hindi. Use Devanagari script.
+- If langCode is "garh" → respond ONLY in Garhwali dialect (गढ़वाली बोली). Use words like: को, छ, मी, तुम, ह्वेगो, आजा, कख. Use Devanagari script.
+- If langCode is "doi" → respond in Dogri (डोगरी). Use Devanagari script.
+- If langCode is "kum" → respond in Kumaoni dialect (कुमाऊँनी बोली). Use Devanagari script.
+- If langCode is "him" → respond in Himachali Pahari dialect. Use Devanagari script.
+- If langCode is "lad" → respond in Ladakhi language.
+- If langCode is "ur" → respond in Urdu (use Nastaliq script: اردو)
+- If langCode is "mai" → respond in Maithili (मैथिली)
+- If langCode is "kok" → respond in Konkani (कोंकणी)
+- If langCode is "mni" → respond in Manipuri/Meitei
+- If langCode is "si" → respond in Sinhala (සිංහල)
+- If langCode is "ru" → respond in Russian
+- If langCode is "pt" → respond in Portuguese
 - If langCode is "en" → respond in English
 - For any other language → respond in that language
 NEVER mix languages. If user writes in a different language than selected, still respond in the SELECTED language (${langName}).
@@ -181,7 +192,7 @@ USE WEB SEARCH: You have Google Search available. Use it for current weather, te
     padding:11px 14px; display:flex; align-items:center; gap:10px; flex-shrink:0;
     border-bottom:1px solid rgba(200,146,10,.18);
   }
-  .pr-hav { width:56px; height:56px; border-radius:50%; overflow:hidden; flex-shrink:0; }
+  .pr-hav { width:72px; height:72px; border-radius:50%; overflow:hidden; flex-shrink:0; border:2px solid rgba(200,146,10,.5); }
   .pr-hav img { width:100%; height:100%; object-fit:cover }
   .pr-hn { font-size:14px; font-weight:700; color:#f0ede0; line-height:1.2; font-family:inherit }
   .pr-hs { font-size:10px; font-family:inherit }
@@ -335,34 +346,44 @@ USE WEB SEARCH: You have Google Search available. Use it for current weather, te
     + '<div class="pr-lang-wrap" id="pr-lang-wrap">'
     + '<button class="pr-lang-btn" id="pr-lang-btn"><span id="pr-lang-label">English</span><span class="pr-lang-arrow">▼</span></button>'
     + '<div class="pr-lang-menu" id="pr-lang-menu">'
-    + '<div class="pr-lang-group">🇮🇳 Indian</div>'
-    + '<div class="pr-lang-opt active" data-lang="en">English</div>'
-    + '<div class="pr-lang-opt" data-lang="hi">हिंदी</div>'
-    + '<div class="pr-lang-opt" data-lang="pa">ਪੰਜਾਬੀ</div>'
-    + '<div class="pr-lang-opt" data-lang="bn">বাংলা</div>'
-    + '<div class="pr-lang-opt" data-lang="ta">தமிழ்</div>'
-    + '<div class="pr-lang-opt" data-lang="te">తెలుగు</div>'
-    + '<div class="pr-lang-opt" data-lang="mr">मराठी</div>'
-    + '<div class="pr-lang-opt" data-lang="gu">ગુજરાતી</div>'
-    + '<div class="pr-lang-opt" data-lang="kn">ಕನ್ನಡ</div>'
-    + '<div class="pr-lang-opt" data-lang="ml">മലയാളം</div>'
-    + '<div class="pr-lang-opt" data-lang="or">ଓଡ଼ିଆ</div>'
-    + '<div class="pr-lang-opt" data-lang="as">অসমীয়া</div>'
-    + '<div class="pr-lang-opt" data-lang="ne">नेपाली</div>'
-    + '<div class="pr-lang-opt" data-lang="doi">डोगरी</div>'
-    + '<div class="pr-lang-opt" data-lang="kngr">कांगड़ी</div>'
-    + '<div class="pr-lang-opt" data-lang="garh">गढ़वाली</div>'
-    + '<div class="pr-lang-group">🌍 Global</div>'
-    + '<div class="pr-lang-opt" data-lang="zh">中文</div>'
-    + '<div class="pr-lang-opt" data-lang="ja">日本語</div>'
-    + '<div class="pr-lang-opt" data-lang="ko">한국어</div>'
-    + '<div class="pr-lang-opt" data-lang="ar">العربية</div>'
-    + '<div class="pr-lang-opt" data-lang="fr">Français</div>'
-    + '<div class="pr-lang-opt" data-lang="de">Deutsch</div>'
-    + '<div class="pr-lang-opt" data-lang="es">Español</div>'
+    + '<div class="pr-lang-group">🇮🇳 Major Indian Languages</div>'
+    + '<div class="pr-lang-opt active" data-lang="en">🇬🇧 English</div>'
+    + '<div class="pr-lang-opt" data-lang="hi">हिंदी — Hindi</div>'
+    + '<div class="pr-lang-opt" data-lang="pa">ਪੰਜਾਬੀ — Punjabi</div>'
+    + '<div class="pr-lang-opt" data-lang="bn">বাংলা — Bengali</div>'
+    + '<div class="pr-lang-opt" data-lang="ta">தமிழ் — Tamil</div>'
+    + '<div class="pr-lang-opt" data-lang="te">తెలుగు — Telugu</div>'
+    + '<div class="pr-lang-opt" data-lang="mr">मराठी — Marathi</div>'
+    + '<div class="pr-lang-opt" data-lang="gu">ગુજરાતી — Gujarati</div>'
+    + '<div class="pr-lang-opt" data-lang="kn">ಕನ್ನಡ — Kannada</div>'
+    + '<div class="pr-lang-opt" data-lang="ml">മലയാളം — Malayalam</div>'
+    + '<div class="pr-lang-opt" data-lang="or">ଓଡ଼ିଆ — Odia</div>'
+    + '<div class="pr-lang-opt" data-lang="as">অসমীয়া — Assamese</div>'
+    + '<div class="pr-lang-opt" data-lang="ur">اردو — Urdu</div>'
+    + '<div class="pr-lang-opt" data-lang="ne">नेपाली — Nepali</div>'
+    + '<div class="pr-lang-opt" data-lang="mai">मैथिली — Maithili</div>'
+    + '<div class="pr-lang-opt" data-lang="kok">कोंकणी — Konkani</div>'
+    + '<div class="pr-lang-opt" data-lang="mni">মৈতৈ — Manipuri</div>'
+    + '<div class="pr-lang-opt" data-lang="sa">संस्कृत — Sanskrit</div>'
+    + '<div class="pr-lang-opt" data-lang="si">සිංහල — Sinhala</div>'
+    + '<div class="pr-lang-group">🏔️ Pahadi Bolis</div>'
+    + '<div class="pr-lang-opt" data-lang="kngr">कांगड़ी — Kangri (HP)</div>'
+    + '<div class="pr-lang-opt" data-lang="garh">गढ़वाली — Garhwali (UK)</div>'
+    + '<div class="pr-lang-opt" data-lang="doi">डोगरी — Dogri (J&K)</div>'
+    + '<div class="pr-lang-opt" data-lang="kum">कुमाऊँनी — Kumaoni (UK)</div>'
+    + '<div class="pr-lang-opt" data-lang="him">हिमाचली — Himachali Pahari</div>'
+    + '<div class="pr-lang-opt" data-lang="lad">Ladakhi — Ladakhi</div>'
+    + '<div class="pr-lang-group">🌍 Global Languages</div>'
+    + '<div class="pr-lang-opt" data-lang="zh">中文 — Chinese</div>'
+    + '<div class="pr-lang-opt" data-lang="ja">日本語 — Japanese</div>'
+    + '<div class="pr-lang-opt" data-lang="ko">한국어 — Korean</div>'
+    + '<div class="pr-lang-opt" data-lang="ar">العربية — Arabic</div>'
+    + '<div class="pr-lang-opt" data-lang="fr">Français — French</div>'
+    + '<div class="pr-lang-opt" data-lang="de">Deutsch — German</div>'
+    + '<div class="pr-lang-opt" data-lang="es">Español — Spanish</div>'
+    + '<div class="pr-lang-opt" data-lang="ru">Русский — Russian</div>'
+    + '<div class="pr-lang-opt" data-lang="pt">Português — Portuguese</div>'
     + '</div></div></div>'
-    + '<div class="pr-chips" id="pr-chips">'
-    + '<div class="pr-chip" data-q="Best honey recommendation?">🍯 Best honey</div>'
     + '<div class="pr-chip" data-q="Show products under 500 rupees">💰 Under ₹500</div>'
     + '<div class="pr-chip" data-q="Benefits of A2 Bilona Ghee?">🧈 Ghee benefits</div>'
     + '<div class="pr-chip" data-q="How to identify genuine Kashmiri saffron?">🌸 Real saffron?</div>'
@@ -432,14 +453,18 @@ USE WEB SEARCH: You have Google Search available. Use it for current weather, te
   var LANG_NAMES = {
     en:'English', hi:'Hindi', pa:'Punjabi', bn:'Bengali', ta:'Tamil', te:'Telugu',
     mr:'Marathi', gu:'Gujarati', kn:'Kannada', ml:'Malayalam', or:'Odia', as:'Assamese',
-    ne:'Nepali', doi:'Dogri', kngr:'Kangri', garh:'Garhwali', zh:'Chinese', ja:'Japanese', ko:'Korean', ar:'Arabic',
-    fr:'French', de:'German', es:'Spanish',
+    ne:'Nepali', doi:'Dogri', kngr:'Kangri', garh:'Garhwali',
+    kum:'Kumaoni', him:'Himachali Pahari', lad:'Ladakhi',
+    ur:'Urdu', sa:'Sanskrit', mai:'Maithili', kok:'Konkani', mni:'Manipuri', si:'Sinhala',
+    zh:'Chinese', ja:'Japanese', ko:'Korean', ar:'Arabic',
+    fr:'French', de:'German', es:'Spanish', ru:'Russian', pt:'Portuguese',
   };
 
   var VOICE_MAP = {
     en:'en-IN', hi:'hi-IN', pa:'pa-IN', bn:'bn-IN', ta:'ta-IN', te:'te-IN',
     mr:'mr-IN', gu:'gu-IN', kn:'kn-IN', ml:'ml-IN', or:'or-IN', as:'as-IN',
-    ne:'ne-NP', kngr:'hi-IN', garh:'hi-IN', zh:'zh-CN', ja:'ja-JP', ko:'ko-KR', ar:'ar-SA', fr:'fr-FR',
+    ne:'ne-NP', kngr:'hi-IN', garh:'hi-IN', doi:'hi-IN', kum:'hi-IN', him:'hi-IN', lad:'hi-IN',
+    ur:'ur-PK', si:'si-LK', zh:'zh-CN', ru:'ru-RU', pt:'pt-BR', ja:'ja-JP', ko:'ko-KR', ar:'ar-SA', fr:'fr-FR',
     de:'de-DE', es:'es-ES',
   };
 
@@ -523,7 +548,10 @@ USE WEB SEARCH: You have Google Search available. Use it for current weather, te
       ta: '🙏 வணக்கம்! நான் **' + AI_CFG.name + '** — உங்கள் Himalayan வழிகாட்டி!\n\nநான் உதவலாம்:\n• Himalayan தயாரிப்புகள்\n• வானிலை தகவல்\n• பட்ஜெட் பரிந்துரைகள்\n\nஎன்ன தெரிந்துகொள்ள விரும்புகிறீர்கள்?',
       te: '🙏 నమస్కారం! నేను **' + AI_CFG.name + '** — మీ Himalayan గైడ్!\n\nనేను సహాయపడగలను:\n• Himalayan ఉత్పత్తులు\n• వాతావరణ సమాచారం\n• బడ్జెట్ సూచనలు\n\nమీకు ఏమి తెలుసుకోవాలి?',
       mr: '🙏 नमस्कार! मी **' + AI_CFG.name + '** — तुमचा Himalayan मार्गदर्शक!\n\nमी मदत करू शकतो:\n• Himalayan उत्पादने\n• हवामान माहिती\n• Budget नुसार सूचना\n\nकाय जाणून घ्यायचे आहे?',
-      gu: '🙏 નમસ્તે! હું **' + AI_CFG.name + '** — તમારો Himalayan ગાઇડ!\n\nહું મદદ કરી શકું:\n• Himalayan ઉત્પાદનો\n• હવામાનની માહિતી\n• Budget મુજબ સૂચનો\n\nશું જાણવું છે?',
+      gu: '🙏 નમસ્તે! હું **' + AI_CFG.name + '** — તમારો Himalayan ગાઇડ!\n\nહું મદદ કરી શકું:\n• Himalayan ઉત્પાદનો\n• હવામાનની માહિતી\n• Budget મુજબ સૂચनो\n\nशું જаणвू  છे?',
+      kngr: '🙏 राम राम जी! मैं **' + AI_CFG.name + '** छां — थुआड़ा Himalayan गाइड!\n\nमैं इत्थें मदद करी सकदा छां:\n• साड़े शुद्ध Himalayan उत्पाद\n• शिमले, मनाली दा मौसम\n• Budget दे हिसाब नाल सलाह\n• Delivery ते returns\n\nदस्सो, किसी चीज़ दी लोड़ है?',
+      garh: '🙏 नमस्कार! मी **' + AI_CFG.name + '** छूं — तुमारो Himalayan गाइड!\n\nमी यूँ मदद करी सकदूं:\n• हमारा Himalayan उत्पाद\n• शिमला, मनाली को मौसम\n• Budget क हिसाब से सलाह\n• Delivery अर returns\n\nबताओ, क्या जाणनो छ?',
+      doi: '🙏 राम राम! मैं **' + AI_CFG.name + '** आं — तुंदा Himalayan guide!\n\nमैं इत्थें मदद करी सकदा आं:\n• साडे Himalayan उत्पाद\n• मौसम दी जानकारी\n• Budget मताबक सलाह\n\nदस्सो की जानना ऐ?',
     };
     addMsg('bot', w[lang] || w.en, [], true);
   }
