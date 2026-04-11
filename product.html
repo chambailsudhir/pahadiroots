@@ -248,8 +248,8 @@ button{font-family:'Inter',sans-serif;cursor:pointer}
 /* ══ ORIGIN CARD ══ */
 .origin-card{margin-top:16px;border:1px solid var(--bd);border-radius:var(--radius);overflow:hidden;background:#fff}
 .origin-header{background:var(--g);color:#fff;padding:10px 16px;font-size:12px;font-weight:800;display:flex;align-items:center;gap:8px;letter-spacing:.3px}
-.origin-body{padding:14px 16px;display:flex;gap:14px;align-items:center}
-.origin-map{width:60px;height:60px;border-radius:50%;background:var(--g-pale);display:flex;align-items:center;justify-content:center;font-size:32px;flex-shrink:0;border:2px solid var(--bd)}
+.origin-body{padding:14px 16px;display:flex;gap:16px;align-items:center}
+.origin-map{width:90px;height:90px;border-radius:10px;background:var(--g-pale);display:flex;align-items:center;justify-content:center;font-size:32px;flex-shrink:0;border:2px solid var(--bd);overflow:hidden}
 .origin-text .origin-region{font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:var(--g);margin-bottom:3px}
 .origin-text p{font-size:12px;color:var(--tx3);line-height:1.6}
 
@@ -1160,9 +1160,14 @@ function renderProduct(p, images, related, data, stateMap, stateImgMap) {
 
         
         '<div class="origin-card" style="margin-top:18px">' +
-          '<div class="origin-header"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="vertical-align:middle;margin-right:6px"><path d="M3 18L8 8l4 6 3-4 6 8H3z" fill="rgba(255,255,255,.9)"/><path d="M8 5a1 1 0 100-2 1 1 0 000 2z" fill="#f0c840"/></svg>Himalayan Origin Story</div>' +
+          '<div class="origin-header"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.9)" stroke-width="2" stroke-linejoin="round" style="flex-shrink:0"><polygon points="3 20 9 8 13 14 16 10 21 20"/><circle cx="18.5" cy="5.5" r="1.5" fill="#f0c840" stroke="none"/></svg>Himalayan Origin Story</div>' +
           '<div class="origin-body">' +
-            '<div class="origin-img">'+(stateImg?'<img src="'+stateImg+'" alt="'+regionName+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%">':(regionEmoji?'<span style="font-size:26px;line-height:1">'+regionEmoji+'</span>':'<span style="font-size:26px">🏔️</span>'))+'</div>' +
+            '<div class="origin-img" style="width:90px;height:90px;border-radius:10px;overflow:hidden;flex-shrink:0;border:2px solid var(--bd);background:var(--g-pale)">' +
+              (stateImg
+                ? '<img src="'+stateImg+'" alt="'+regionName+'" style="width:100%;height:100%;object-fit:cover;display:block">'
+                : '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#1a3a1e,#2d5a32)"><svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.7)" stroke-width="1.5" stroke-linejoin="round"><polygon points="3 20 9 8 13 14 16 10 21 20"/><circle cx="18.5" cy="5.5" r="1.5" fill="#f0c840" stroke="none"/></svg></div>'
+              ) +
+            '</div>' +
             '<div class="origin-text"><div class="origin-region">'+regionName+'</div><p>This product is sourced directly from farming families in '+regionName+', nestled in the pristine Himalayan region. Grown at altitude, harvested with traditional methods — pure as the mountains themselves.</p></div>' +
           '</div>' +
         '</div>' +
