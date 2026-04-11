@@ -11,26 +11,19 @@
  *
  * USAGE in HTML:
  *   <script src="js/ai-assistant.js"
- *           data-gemini-key="YOUR_GEMINI_API_KEY"
  *           data-whatsapp="919XXXXXXXXX">
  *   </script>
  */
 (function () {
   'use strict';
 
-  // currentScript is null if script is deferred/async — fall back to querySelector
-  const script    = document.currentScript
-                 || document.querySelector('script[data-gemini-key]');
-  const GEMINI_KEY = (script && script.getAttribute('data-gemini-key')) || '';
-  const WA_NUM    = (script && script.getAttribute('data-whatsapp')) || '919000000000';
+  // No API key in frontend — key lives in Vercel environment variable only
+  const script = document.currentScript
+              || document.querySelector('script[data-whatsapp]');
+  const WA_NUM = (script && script.getAttribute('data-whatsapp')) || '919000000000';
 
-  if (!GEMINI_KEY) {
-    console.warn('[Pahadi_AI] No Gemini API key found. Set data-gemini-key on the script tag.');
-  }
-
-  /* ── GEMINI ENDPOINT ─────────────────────────────────── */
-  // Using gemini-2.0-flash — supports Google Search grounding natively
-  const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + GEMINI_KEY;
+  /* ── API ENDPOINT — server proxy, key never exposed to browser ── */
+  const API_URL = '/api/chat';
 
   /* ── THEME from site CSS vars ─────────────────────────── */
   const R = getComputedStyle(document.documentElement);
@@ -557,10 +550,6 @@ USE WEB SEARCH: You have Google Search available. Use it for current weather, te
 
   /* ── GEMINI API CALL ──────────────────────────────────── */
   function callGemini(userMsg) {
-    if(!GEMINI_KEY) {
-      return Promise.reject(new Error('No Gemini API key configured'));
-    }
-
     var systemPrompt = buildSystemPrompt(lang, LANG_NAMES[lang] || 'English');
 
     // Build conversation — last 10 turns for context
@@ -573,16 +562,14 @@ USE WEB SEARCH: You have Google Search available. Use it for current weather, te
         parts: [{ text: systemPrompt }]
       },
       contents: contents,
-      tools: [{
-        google_search: {}
-      }],
       generationConfig: {
         temperature: 0.7,
         maxOutputTokens: 1024,
       }
     };
 
-    return fetch(GEMINI_URL, {
+    // Call our secure server proxy — key never in browser
+    return fetch(API_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
