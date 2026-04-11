@@ -1,5 +1,5 @@
 /**
- * 5 Pahadi Roots — AI Assistant + WhatsApp Widget  v3.0
+ * 5 Pahadi Roots — AI Assistant + WhatsApp Widget  v4.0
  * js/ai-assistant.js
  */
 (function () {
@@ -10,7 +10,7 @@
   const WA_NUM   = script?.getAttribute('data-whatsapp') || '919000000000';
   const DEMO     = !EDGE_URL;
 
-  /* ── THEME — reads site CSS vars ─────────────────────── */
+  /* ── THEME from site CSS vars ────────────────────────── */
   const R = getComputedStyle(document.documentElement);
   const DARK_GREEN = (R.getPropertyValue('--g')  || '#1a3a1e').trim();
   const MID_GREEN  = (R.getPropertyValue('--g2') || '#2d5233').trim();
@@ -28,137 +28,116 @@
   /* ── STYLES ──────────────────────────────────────────── */
   const css = document.createElement('style');
   css.textContent = `
-  /* ── Shared FAB base ── */
-  .pr-fab-base{
-    position:fixed;right:24px;
-    width:54px;height:54px;border-radius:50%;
-    border:none;cursor:pointer;z-index:2147483645;
-    display:flex;align-items:center;justify-content:center;
-    transition:transform .22s cubic-bezier(.34,1.56,.64,1),box-shadow .2s;
+  /* ── Both FABs wrap ── */
+  #pr-fabs{
+    position:fixed;right:24px;bottom:30px;
+    display:flex;flex-direction:row;align-items:flex-end;gap:10px;
+    z-index:2147483645;
   }
-  .pr-fab-base:hover{transform:scale(1.1)}
 
-  /* ── WhatsApp button ── */
+  /* ── WhatsApp FAB ── */
   #pr-wa{
-    bottom:100px;
-    background:#25D366;
-    box-shadow:0 4px 18px rgba(37,211,102,.4);
+    width:52px;height:52px;border-radius:50%;
+    background:#25D366;border:none;cursor:pointer;
+    box-shadow:0 4px 16px rgba(37,211,102,.45);
+    display:flex;align-items:center;justify-content:center;
+    transition:transform .2s cubic-bezier(.34,1.56,.64,1);
+    position:relative;
   }
-  #pr-wa svg{width:28px;height:28px;fill:#fff}
+  #pr-wa:hover{transform:scale(1.1)}
+  #pr-wa svg{width:27px;height:27px;fill:#fff}
   #pr-wa .pr-tip{
-    position:absolute;right:62px;top:50%;transform:translateY(-50%);
+    position:absolute;bottom:60px;left:50%;transform:translateX(-50%);
     background:rgba(0,0,0,.75);color:#fff;font-size:11px;
     padding:4px 10px;border-radius:7px;white-space:nowrap;
-    opacity:0;pointer-events:none;transition:opacity .18s;
-    font-family:inherit;
+    opacity:0;pointer-events:none;transition:opacity .18s;font-family:inherit;
   }
   #pr-wa:hover .pr-tip{opacity:1}
 
-  /* ── AI button ── */
+  /* ── AI FAB ── */
   #pr-ai-fab{
-    bottom:36px;
-    background:${DARK_GREEN};
-    box-shadow:0 6px 22px rgba(26,58,30,.45);
-    overflow:hidden;
-    animation:pr-pulse 3s ease-out infinite;
+    width:56px;height:56px;border-radius:50%;
+    background:${DARK_GREEN};border:none;cursor:pointer;
+    box-shadow:0 6px 22px rgba(26,58,30,.5);
+    display:flex;align-items:center;justify-content:center;overflow:hidden;
+    transition:transform .22s cubic-bezier(.34,1.56,.64,1);
+    animation:pr-pulse 3s ease-out infinite;position:relative;
   }
-  #pr-ai-fab img.pr-fi{width:100%;height:100%;object-fit:cover;border-radius:50%}
-  #pr-ai-fab .pr-fc{display:none;font-size:22px;color:#fff}
+  #pr-ai-fab:hover{transform:scale(1.08)}
   #pr-ai-fab.open{animation:none}
+  #pr-ai-fab img.pr-fi{width:100%;height:100%;object-fit:cover;border-radius:50%}
+  #pr-ai-fab .pr-fc{display:none;font-size:20px;color:#fff}
   #pr-ai-fab.open .pr-fi{display:none}
   #pr-ai-fab.open .pr-fc{display:block}
-  .pr-badge{
-    position:absolute;top:-2px;right:-2px;
-    background:#ff5252;color:#fff;border-radius:50%;
-    width:16px;height:16px;font-size:9px;font-weight:700;
-    display:flex;align-items:center;justify-content:center;border:2px solid #fff;
-  }
+  .pr-badge{position:absolute;top:-2px;right:-2px;background:#ff5252;color:#fff;border-radius:50%;width:16px;height:16px;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid #fff}
   @keyframes pr-pulse{
-    0%{box-shadow:0 0 0 0 rgba(26,58,30,.5),0 6px 22px rgba(26,58,30,.45)}
-    70%{box-shadow:0 0 0 12px rgba(26,58,30,0),0 6px 22px rgba(26,58,30,.45)}
-    100%{box-shadow:0 0 0 0 rgba(26,58,30,0),0 6px 22px rgba(26,58,30,.45)}
+    0%{box-shadow:0 0 0 0 rgba(26,58,30,.55),0 6px 22px rgba(26,58,30,.5)}
+    70%{box-shadow:0 0 0 12px rgba(26,58,30,0),0 6px 22px rgba(26,58,30,.5)}
+    100%{box-shadow:0 0 0 0 rgba(26,58,30,0),0 6px 22px rgba(26,58,30,.5)}
   }
 
   /* ── Panel ── */
   #pr-panel{
-    position:fixed;bottom:100px;right:24px;
-    width:370px;height:540px;
-    min-width:280px;min-height:360px;
-    max-width:min(600px,95vw);max-height:90vh;
+    position:fixed;bottom:105px;right:24px;
+    width:380px;height:560px;
+    /* Allow free resize by dragging — both axes */
+    min-width:300px;min-height:380px;
+    max-width:min(680px,96vw);max-height:92vh;
+    resize:both;overflow:hidden;
     background:#0c1a0e;border-radius:18px;
-    box-shadow:0 24px 72px rgba(0,0,0,.6),0 0 0 1px rgba(45,82,51,.25);
-    display:flex;flex-direction:column;overflow:hidden;
+    box-shadow:0 24px 72px rgba(0,0,0,.65),0 0 0 1px rgba(45,82,51,.3);
+    display:flex;flex-direction:column;
     z-index:2147483644;
     transform:scale(.87) translateY(18px);opacity:0;pointer-events:none;
     transition:transform .28s cubic-bezier(.34,1.2,.64,1),opacity .28s;
-    /* native CSS resize — drag bottom-right corner */
-    resize:both;
   }
   #pr-panel.open{transform:scale(1) translateY(0);opacity:1;pointer-events:all}
-  @media(max-width:440px){
-    #pr-panel{width:calc(100vw - 20px) !important;right:10px;bottom:108px}
-  }
+  @media(max-width:440px){#pr-panel{width:calc(100vw - 16px) !important;right:8px;bottom:108px}}
 
-  /* Drag-handle bar at top */
+  /* Drag bar — top handle */
   #pr-drag{
-    height:18px;background:${DARK_GREEN};
+    height:20px;background:linear-gradient(135deg,${DARK_GREEN},${MID_GREEN});
     display:flex;align-items:center;justify-content:center;
-    cursor:move;flex-shrink:0;user-select:none;
+    cursor:row-resize;flex-shrink:0;user-select:none;
+    border-radius:18px 18px 0 0;
   }
-  #pr-drag::before{
-    content:'';width:36px;height:3px;border-radius:3px;
-    background:rgba(255,255,255,.2);
+  #pr-drag::before{content:'';width:40px;height:3px;border-radius:3px;background:rgba(255,255,255,.22)}
+
+  /* Corner resize hint */
+  #pr-panel::after{
+    content:'⤡';position:absolute;bottom:4px;right:6px;
+    font-size:13px;color:rgba(200,146,10,.3);pointer-events:none;line-height:1;
   }
 
   /* Header */
   .pr-hd{
     background:linear-gradient(135deg,${DARK_GREEN},${MID_GREEN});
-    padding:12px 14px 12px 14px;
-    display:flex;align-items:center;gap:10px;flex-shrink:0;
-    border-bottom:1px solid rgba(200,146,10,.18);position:relative;
+    padding:11px 14px;display:flex;align-items:center;gap:10px;flex-shrink:0;
+    border-bottom:1px solid rgba(200,146,10,.18);
   }
-  .pr-hav{
-    width:40px;height:40px;border-radius:50%;overflow:hidden;flex-shrink:0;
-    border:2px solid ${GOLD};
-  }
+  .pr-hav{width:40px;height:40px;border-radius:50%;overflow:hidden;flex-shrink:0;border:2px solid ${GOLD}}
   .pr-hav img{width:100%;height:100%;object-fit:cover}
-  .pr-hn{font-size:14.5px;font-weight:700;color:#f0ede0;line-height:1.2;font-family:inherit}
+  .pr-hn{font-size:14px;font-weight:700;color:#f0ede0;line-height:1.2;font-family:inherit}
   .pr-hs{font-size:10px;color:${GOLD2};font-family:inherit}
-  .pr-dot{
-    width:7px;height:7px;border-radius:50%;background:#4aad72;
-    display:inline-block;margin-right:4px;
-    animation:pr-blink 2s ease-in-out infinite;
-  }
+  .pr-dot{width:7px;height:7px;border-radius:50%;background:#4aad72;display:inline-block;margin-right:4px;animation:pr-blink 2s ease-in-out infinite}
   @keyframes pr-blink{0%,100%{opacity:1}50%{opacity:.3}}
   .pr-lsel{
-    margin-left:auto;background:rgba(255,255,255,.07);
-    border:1px solid rgba(200,146,10,.25);border-radius:7px;
-    padding:3px 5px;font-size:10px;color:${GOLD2};
-    cursor:pointer;outline:none;max-width:88px;font-family:inherit;
+    margin-left:auto;background:rgba(0,0,0,.3);
+    border:1px solid rgba(200,146,10,.3);border-radius:7px;
+    padding:4px 6px;font-size:10.5px;color:${GOLD2};
+    cursor:pointer;outline:none;max-width:96px;font-family:inherit;
+    flex-shrink:0;
   }
-  .pr-lsel option,.pr-lsel optgroup{background:${DARK_GREEN};color:#f0ede0}
+  .pr-lsel option,.pr-lsel optgroup{background:#1a3a1e;color:#f0ede0}
 
   /* Chips */
-  .pr-chips{
-    padding:7px 10px;display:flex;gap:5px;overflow-x:auto;
-    flex-shrink:0;scrollbar-width:none;
-    border-bottom:1px solid rgba(200,146,10,.1);
-  }
+  .pr-chips{padding:7px 10px;display:flex;gap:5px;overflow-x:auto;flex-shrink:0;scrollbar-width:none;border-bottom:1px solid rgba(200,146,10,.1)}
   .pr-chips::-webkit-scrollbar{display:none}
-  .pr-chip{
-    white-space:nowrap;background:rgba(200,146,10,.1);
-    border:1px solid rgba(200,146,10,.2);border-radius:12px;
-    padding:4px 10px;font-size:11px;color:${GOLD2};
-    cursor:pointer;transition:all .15s;flex-shrink:0;font-family:inherit;
-  }
+  .pr-chip{white-space:nowrap;background:rgba(200,146,10,.1);border:1px solid rgba(200,146,10,.22);border-radius:12px;padding:4px 10px;font-size:11px;color:${GOLD2};cursor:pointer;transition:all .15s;flex-shrink:0;font-family:inherit}
   .pr-chip:hover{background:rgba(200,146,10,.22);color:#f5d98a}
 
   /* Messages */
-  .pr-msgs{
-    flex:1;overflow-y:auto;padding:12px;
-    display:flex;flex-direction:column;gap:10px;
-    scrollbar-width:thin;scrollbar-color:rgba(200,146,10,.15) transparent;
-  }
+  .pr-msgs{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px;scrollbar-width:thin;scrollbar-color:rgba(200,146,10,.15) transparent}
   .pr-msgs::-webkit-scrollbar{width:3px}
   .pr-msgs::-webkit-scrollbar-thumb{background:rgba(200,146,10,.15);border-radius:3px}
   .pr-m{display:flex;gap:7px;align-items:flex-end;animation:pr-in .25s ease-out}
@@ -168,14 +147,14 @@
   .pr-m.b .pr-mav{border:1.5px solid ${GOLD}}
   .pr-m.b .pr-mav img{width:100%;height:100%;object-fit:cover;border-radius:50%}
   .pr-m.u .pr-mav{background:rgba(255,255,255,.1);font-size:13px}
-  .pr-mb{max-width:80%;padding:9px 13px;border-radius:15px;font-size:13px;line-height:1.55;font-family:inherit}
+  .pr-mb{max-width:82%;padding:9px 13px;border-radius:15px;font-size:13px;line-height:1.55;font-family:inherit}
   .pr-m.b .pr-mb{background:#152018;color:#e8edd4;border:1px solid rgba(200,146,10,.1);border-bottom-left-radius:4px}
   .pr-m.u .pr-mb{background:linear-gradient(135deg,${MID_GREEN},#3d6b42);color:#fff;border-bottom-right-radius:4px}
 
   /* Product cards */
   .pr-pcs{display:flex;flex-direction:column;gap:6px;margin-top:8px}
-  .pr-pc{background:rgba(0,0,0,.25);border:1px solid rgba(200,146,10,.18);border-radius:9px;padding:8px 10px;display:flex;align-items:center;gap:8px;cursor:pointer;transition:all .15s}
-  .pr-pc:hover{background:rgba(200,146,10,.08)}
+  .pr-pc{background:rgba(0,0,0,.25);border:1px solid rgba(200,146,10,.18);border-radius:9px;padding:8px 10px;display:flex;align-items:center;gap:8px;transition:all .15s;cursor:default}
+  .pr-pc:hover{background:rgba(200,146,10,.07)}
   .pr-pce{font-size:20px;flex-shrink:0}
   .pr-pcn{font-size:12px;color:#e8edd4;font-weight:600;line-height:1.3}
   .pr-pcp{font-size:11px;color:${GOLD2};margin-top:1px}
@@ -189,7 +168,7 @@
   .pr-fb button.liked{border-color:#4aad72;color:#4aad72}
   .pr-fb button.disliked{border-color:#ff5252;color:#ff5252}
 
-  /* Typing dots */
+  /* Typing */
   .pr-dots{display:flex;gap:4px;padding:2px 0}
   .pr-dots span{width:6px;height:6px;background:${GOLD};border-radius:50%;animation:pr-db .8s ease-in-out infinite}
   .pr-dots span:nth-child(2){animation-delay:.15s}
@@ -199,14 +178,8 @@
   /* Input */
   .pr-ia{padding:10px 12px;border-top:1px solid rgba(200,146,10,.1);background:#0a1209;flex-shrink:0}
   .pr-ir{display:flex;gap:7px;align-items:flex-end}
-  #pr-ti{
-    flex:1;background:rgba(255,255,255,.05);
-    border:1px solid rgba(200,146,10,.2);border-radius:13px;
-    padding:9px 12px;font-size:13px;color:#e8edd4;
-    resize:none;outline:none;font-family:inherit;
-    max-height:100px;line-height:1.4;scrollbar-width:none;transition:border-color .2s;
-  }
-  #pr-ti:focus{border-color:rgba(200,146,10,.45)}
+  #pr-ti{flex:1;background:rgba(255,255,255,.05);border:1px solid rgba(200,146,10,.2);border-radius:13px;padding:9px 12px;font-size:13px;color:#e8edd4;resize:none;outline:none;font-family:inherit;max-height:100px;line-height:1.4;scrollbar-width:none;transition:border-color .2s}
+  #pr-ti:focus{border-color:rgba(200,146,10,.5)}
   #pr-ti::placeholder{color:rgba(255,255,255,.2)}
   #pr-ti::-webkit-scrollbar{display:none}
   #pr-voice{background:none;border:1px solid rgba(200,146,10,.2);border-radius:50%;width:35px;height:35px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s}
@@ -221,36 +194,40 @@
   .pr-ft{text-align:center;font-size:9px;color:rgba(255,255,255,.12);margin-top:6px;font-family:inherit}
 
   /* Cart toast */
-  .pr-toast{position:fixed;bottom:110px;left:50%;transform:translateX(-50%) translateY(14px);background:${MID_GREEN};border:1px solid ${GOLD};color:#f5d98a;border-radius:9px;padding:8px 18px;font-size:12px;font-weight:600;opacity:0;transition:all .28s;z-index:2147483647;pointer-events:none;font-family:inherit}
+  .pr-toast{position:fixed;bottom:115px;left:50%;transform:translateX(-50%) translateY(14px);background:${MID_GREEN};border:1px solid ${GOLD};color:#f5d98a;border-radius:9px;padding:8px 18px;font-size:12px;font-weight:600;opacity:0;transition:all .28s;z-index:2147483647;pointer-events:none;font-family:inherit;white-space:nowrap}
   .pr-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
   `;
   document.head.appendChild(css);
 
-  /* ── BUILD DOM ───────────────────────────────────────── */
+  /* ── DOM — FABs wrapper (side by side) ──────────────── */
+  const fabsWrap = document.createElement('div');
+  fabsWrap.id = 'pr-fabs';
 
-  // WhatsApp FAB
+  // WhatsApp
   const waFab = document.createElement('button');
-  waFab.id='pr-wa'; waFab.className='pr-fab-base';
+  waFab.id = 'pr-wa';
   waFab.setAttribute('aria-label','WhatsApp');
-  waFab.innerHTML=`<span class="pr-tip">Chat on WhatsApp</span>
+  waFab.innerHTML = `<span class="pr-tip">WhatsApp us</span>
     <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>`;
-  waFab.addEventListener('click',()=>{
+  waFab.addEventListener('click', () => {
     window.open(`https://wa.me/${WA_NUM}?text=${encodeURIComponent('Namaste! I want to know more about your Himalayan products 🌿')}`, '_blank');
   });
-  document.body.appendChild(waFab);
 
   // AI FAB
   const fab = document.createElement('button');
-  fab.id='pr-ai-fab'; fab.className='pr-fab-base';
-  fab.setAttribute('aria-label','Chat with Pahadi_AI');
-  fab.innerHTML=`<img class="pr-fi" src="${AI_CFG.avatar}" alt="AI"><span class="pr-fc">✕</span><span class="pr-badge" id="pr-badge">1</span>`;
-  document.body.appendChild(fab);
+  fab.id = 'pr-ai-fab';
+  fab.setAttribute('aria-label', 'Chat with Pahadi_AI');
+  fab.innerHTML = `<img class="pr-fi" src="${AI_CFG.avatar}" alt="AI"><span class="pr-fc">✕</span><span class="pr-badge" id="pr-badge">1</span>`;
 
-  // Panel
+  fabsWrap.appendChild(waFab);
+  fabsWrap.appendChild(fab);
+  document.body.appendChild(fabsWrap);
+
+  /* ── DOM — Panel ─────────────────────────────────────── */
   const panel = document.createElement('div');
-  panel.id='pr-panel';
-  panel.innerHTML=`
-  <div id="pr-drag"></div>
+  panel.id = 'pr-panel';
+  panel.innerHTML = `
+  <div id="pr-drag" title="Drag to resize height"></div>
   <div class="pr-hd">
     <div class="pr-hav"><img src="${AI_CFG.avatar}" alt="AI"></div>
     <div>
@@ -283,13 +260,13 @@
   </div>
   <div class="pr-chips" id="pr-chips">
     <div class="pr-chip" data-q="Best honey recommendation?">🍯 Best honey</div>
-    <div class="pr-chip" data-q="Show me products under ₹500">💰 Under ₹500</div>
+    <div class="pr-chip" data-q="Show products under ₹500">💰 Under ₹500</div>
     <div class="pr-chip" data-q="Benefits of A2 Bilona Ghee?">🧈 Ghee benefits</div>
-    <div class="pr-chip" data-q="How to check if saffron is genuine?">🌸 Real saffron?</div>
-    <div class="pr-chip" data-q="How long does delivery take?">🚚 Delivery?</div>
-    <div class="pr-chip" data-q="Suggest a gift idea under ₹1000">🎁 Gift ideas</div>
-    <div class="pr-chip" data-q="Tell me about Ladakhi Shilajit benefits">⚡ Shilajit</div>
-    <div class="pr-chip" data-q="Why choose 5 Pahadi Roots over others?">🏔️ Why us?</div>
+    <div class="pr-chip" data-q="How to identify genuine Kashmiri saffron?">🌸 Real saffron?</div>
+    <div class="pr-chip" data-q="Delivery time and shipping details?">🚚 Delivery?</div>
+    <div class="pr-chip" data-q="Gift ideas from Himachal Pradesh?">🎁 Gift ideas</div>
+    <div class="pr-chip" data-q="Tell me about Himachal Pradesh and its products">🏔️ Himachal</div>
+    <div class="pr-chip" data-q="What superfoods grow in the Himalayas?">🌿 Superfoods</div>
   </div>
   <div class="pr-msgs" id="pr-msgs"></div>
   <div class="pr-ia">
@@ -297,103 +274,125 @@
       <button id="pr-voice" title="Voice input">
         <svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm-1 1.93c-3.94-.49-7-3.85-7-7.93H2c0 4.57 3.13 8.37 7.26 9.58V21h5.48v-3.42C18.87 16.37 22 12.57 22 8h-2c0 4.08-3.06 7.44-7 7.93V15.93z"/></svg>
       </button>
-      <textarea id="pr-ti" rows="1" placeholder="Ask about our Himalayan products…"></textarea>
+      <textarea id="pr-ti" rows="1" placeholder="Ask anything — products, Himachal, health tips…"></textarea>
       <button id="pr-sb" aria-label="Send">
         <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
       </button>
     </div>
-    <div class="pr-ft">Pahadi Roots AI · Himalayan Shopping Guide</div>
+    <div class="pr-ft">Pahadi Roots AI · Himalayan Guide</div>
   </div>`;
   document.body.appendChild(panel);
 
   const toast = document.createElement('div');
-  toast.className='pr-toast';
+  toast.className = 'pr-toast';
   document.body.appendChild(toast);
 
-  /* ── DRAG TO RESIZE (top bar) ────────────────────────── */
+  /* ── DRAG-TO-RESIZE (top bar — height only) ──────────── */
   const dragBar = document.getElementById('pr-drag');
-  let dragging=false, dStartY=0, dStartH=0, dStartW=0, dStartX=0;
-  dragBar.addEventListener('mousedown', e=>{
-    dragging=true;
-    dStartY=e.clientY; dStartX=e.clientX;
-    dStartH=panel.offsetHeight; dStartW=panel.offsetWidth;
-    document.body.style.userSelect='none';
-    e.preventDefault();
+  let dragging=false, dY0=0, dH0=0;
+  dragBar.addEventListener('mousedown', e => {
+    dragging=true; dY0=e.clientY; dH0=panel.offsetHeight;
+    document.body.style.userSelect='none'; e.preventDefault();
   });
-  // Also allow dragging from bottom-right corner (native resize)
-  document.addEventListener('mousemove', e=>{
+  document.addEventListener('mousemove', e => {
     if(!dragging) return;
-    const dY = dStartY - e.clientY; // drag up → taller
-    const newH = Math.min(Math.max(dStartH + dY, 360), window.innerHeight*0.9);
-    panel.style.height = newH+'px';
+    const newH = Math.min(Math.max(dH0 + (dY0 - e.clientY), 380), window.innerHeight * 0.9);
+    panel.style.height = newH + 'px';
   });
-  document.addEventListener('mouseup', ()=>{
-    if(dragging){ dragging=false; document.body.style.userSelect=''; }
+  document.addEventListener('mouseup', () => { if(dragging){dragging=false; document.body.style.userSelect='';} });
+  // Touch
+  dragBar.addEventListener('touchstart', e => { const t=e.touches[0]; dragging=true; dY0=t.clientY; dH0=panel.offsetHeight; },{passive:true});
+  document.addEventListener('touchmove', e => { if(!dragging) return; const dY=dY0-e.touches[0].clientY; panel.style.height=Math.min(Math.max(dH0+dY,380),window.innerHeight*.9)+'px'; },{passive:true});
+  document.addEventListener('touchend', () => { dragging=false; });
+
+  /* ── STATE ───────────────────────────────────────────── */
+  let isOpen=false, isThinking=false, history=[], lang='en', isRec=false, rec=null;
+  const msgs  = document.getElementById('pr-msgs');
+  const input = document.getElementById('pr-ti');
+  const sb    = document.getElementById('pr-sb');
+  const voice = document.getElementById('pr-voice');
+  const langSel = document.getElementById('pr-lang');
+
+  /* ── LANGUAGE SELECTOR ───────────────────────────────── */
+  // Map language code to BCP-47 for Gemini + voice
+  const LANG_NAMES = {
+    en:'English',hi:'Hindi — हिंदी',pa:'Punjabi — ਪੰਜਾਬੀ',bn:'Bengali — বাংলা',
+    ta:'Tamil — தமிழ்',te:'Telugu — తెలుగు',mr:'Marathi — मराठी',gu:'Gujarati — ગુજરાતી',
+    kn:'Kannada — ಕನ್ನಡ',ml:'Malayalam — മലയാളം',or:'Odia — ଓଡ଼ିଆ',as:'Assamese — অসমীয়া',
+    mai:'Maithili — मैथिली',ne:'Nepali — नेपाली',kok:'Konkani — कोंकणी',doi:'Dogri — डोगरी',sa:'Sanskrit — संस्कृत',
+    zh:'Chinese',ja:'Japanese',ko:'Korean',ar:'Arabic',fr:'French',de:'German',
+    es:'Spanish',pt:'Portuguese',ru:'Russian',it:'Italian',nl:'Dutch',tr:'Turkish',
+    vi:'Vietnamese',th:'Thai',id:'Indonesian',
+  };
+  const VOICE_MAP = {
+    en:'en-IN',hi:'hi-IN',pa:'pa-IN',bn:'bn-IN',ta:'ta-IN',te:'te-IN',
+    mr:'mr-IN',gu:'gu-IN',kn:'kn-IN',ml:'ml-IN',or:'or-IN',as:'as-IN',
+    ne:'ne-NP',zh:'zh-CN',ja:'ja-JP',ko:'ko-KR',ar:'ar-SA',fr:'fr-FR',
+    de:'de-DE',es:'es-ES',pt:'pt-BR',ru:'ru-RU',it:'it-IT',tr:'tr-TR',
+    vi:'vi-VN',th:'th-TH',id:'id-ID',
+  };
+
+  langSel.addEventListener('change', function() {
+    lang = this.value;
+    // Update placeholder based on lang
+    const placeholders = {
+      hi:'कुछ भी पूछें — उत्पाद, हिमाचल, स्वास्थ्य…',
+      pa:'ਕੁਝ ਵੀ ਪੁੱਛੋ — ਉਤਪਾਦ, ਹਿਮਾਚਲ, ਸਿਹਤ…',
+      bn:'যেকোনো কিছু জিজ্ঞেস করুন…',
+      ta:'எதையும் கேளுங்கள்…',
+      te:'ఏమైనా అడగండి…',
+      mr:'काहीही विचारा — उत्पादने, हिमाचल…',
+      gu:'કંઈ પણ પૂછો — ઉત્પાદનો, હિમાચલ…',
+    };
+    input.placeholder = placeholders[lang] || 'Ask anything — products, Himachal, health tips…';
   });
-  // Touch support for drag
-  dragBar.addEventListener('touchstart', e=>{
-    const t=e.touches[0];
-    dragging=true; dStartY=t.clientY; dStartH=panel.offsetHeight;
-  },{passive:true});
-  document.addEventListener('touchmove', e=>{
-    if(!dragging) return;
-    const dY = dStartY - e.touches[0].clientY;
-    panel.style.height = Math.min(Math.max(dStartH+dY,360),window.innerHeight*0.9)+'px';
-  },{passive:true});
-  document.addEventListener('touchend', ()=>{ dragging=false; });
 
   /* ── TOGGLE ──────────────────────────────────────────── */
-  let isOpen=false, isThinking=false, history=[], lang='en', isRec=false, rec=null;
-  const msgs=document.getElementById('pr-msgs');
-  const input=document.getElementById('pr-ti');
-  const sb=document.getElementById('pr-sb');
-  const voice=document.getElementById('pr-voice');
-
-  fab.addEventListener('click',()=>{
-    isOpen=!isOpen;
-    fab.classList.toggle('open',isOpen);
-    panel.classList.toggle('open',isOpen);
-    const b=document.getElementById('pr-badge');
+  fab.addEventListener('click', () => {
+    isOpen = !isOpen;
+    fab.classList.toggle('open', isOpen);
+    panel.classList.toggle('open', isOpen);
+    const b = document.getElementById('pr-badge');
     if(b) b.remove();
     if(isOpen && !msgs.children.length) welcome();
-    if(isOpen) setTimeout(()=>input.focus(),300);
+    if(isOpen) setTimeout(() => input.focus(), 300);
   });
-  document.addEventListener('click',e=>{
-    if(isOpen&&!panel.contains(e.target)&&!fab.contains(e.target)){
+  document.addEventListener('click', e => {
+    if(isOpen && !panel.contains(e.target) && !fab.contains(e.target) && !fabsWrap.contains(e.target)){
       isOpen=false; fab.classList.remove('open'); panel.classList.remove('open');
     }
   });
-  document.getElementById('pr-lang').addEventListener('change',function(){lang=this.value;});
-  panel.querySelectorAll('.pr-chip').forEach(c=>{
-    c.addEventListener('click',()=>{
-      send(c.dataset.q);
-      document.getElementById('pr-chips').style.display='none';
-    });
+  panel.querySelectorAll('.pr-chip').forEach(c => {
+    c.addEventListener('click', () => { send(c.dataset.q); document.getElementById('pr-chips').style.display='none'; });
   });
 
   /* ── WELCOME ─────────────────────────────────────────── */
-  function welcome(){
-    const w={
-      en:`🙏 Namaste! I'm **${AI_CFG.name}** — your Himalayan shopping expert!\n\nTell me your need, budget, or health goal and I'll find the perfect product for you. I can also help add items to your cart!`,
-      hi:`🙏 नमस्ते! मैं **${AI_CFG.name}** हूँ — आपका Himalayan shopping expert!\n\nअपनी ज़रूरत, budget या health goal बताइए, मैं सबसे सही product खोजूँगा।`,
+  function welcome() {
+    const w = {
+      en:`🙏 Namaste! I'm **${AI_CFG.name}** — your Himalayan guide!\n\nI can help you with:\n• Our pure Himalayan products & health benefits\n• Himachal Pradesh, Kashmir & Northeast India info\n• Budget-based product recommendations\n• Stories about mountain farming communities\n\nWhat would you like to know?`,
+      hi:`🙏 नमस्ते! मैं **${AI_CFG.name}** हूँ — आपका Himalayan guide!\n\nमैं इनमें मदद कर सकता हूँ:\n• हमारे शुद्ध Himalayan उत्पाद और उनके फायदे\n• हिमाचल प्रदेश, कश्मीर और पूर्वोत्तर भारत की जानकारी\n• Budget के अनुसार product suggestions\n\nआज क्या जानना है आपको?`,
+      pa:`🙏 ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ! ਮੈਂ **${AI_CFG.name}** ਹਾਂ — ਤੁਹਾਡਾ Himalayan guide!\n\nਦੱਸੋ ਕੀ ਚਾਹੀਦਾ ਹੈ — ਉਤਪਾਦ, ਹਿਮਾਚਲ ਬਾਰੇ ਜਾਣਕਾਰੀ ਜਾਂ ਕੁਝ ਹੋਰ?`,
     };
-    addMsg('bot', w[lang]||w.en, [], true);
+    addMsg('bot', w[lang] || w.en, [], true);
   }
 
   /* ── ADD MESSAGE ─────────────────────────────────────── */
-  function addMsg(role, text, products=[], skipHistory=false){
-    const wrap=document.createElement('div');
-    wrap.className=`pr-m ${role==='user'?'u':'b'}`;
-    const av=document.createElement('div'); av.className='pr-mav';
+  function addMsg(role, text, products=[], skipHistory=false) {
+    const wrap = document.createElement('div');
+    wrap.className = `pr-m ${role==='user'?'u':'b'}`;
+    const av = document.createElement('div'); av.className='pr-mav';
     if(role==='user') av.textContent='👤';
     else av.innerHTML=`<img src="${AI_CFG.avatar}" alt="AI">`;
-    const bbl=document.createElement('div'); bbl.className='pr-mb';
-    bbl.innerHTML=text.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n•/g,'<br>•').replace(/\n/g,'<br>');
+    const bbl = document.createElement('div'); bbl.className='pr-mb';
+    bbl.innerHTML = text
+      .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
+      .replace(/\n•/g,'<br>•')
+      .replace(/\n/g,'<br>');
 
-    if(products.length){
-      const pc=document.createElement('div'); pc.className='pr-pcs';
-      products.forEach(p=>{
-        pc.innerHTML+=`<div class="pr-pc">
+    if(products.length) {
+      const pc = document.createElement('div'); pc.className='pr-pcs';
+      products.forEach(p => {
+        pc.innerHTML += `<div class="pr-pc">
           <span class="pr-pce">${p.emoji||'🌿'}</span>
           <div><div class="pr-pcn">${p.name}</div><div class="pr-pcp">₹${p.price} · ${p.variant}</div></div>
           <button class="pr-pcb" onclick="(function(){window.dispatchEvent(new CustomEvent('pr-add-cart',{detail:{id:'${p.id}',name:'${p.name}'}}));var t=document.querySelector('.pr-toast');t.textContent='✅ Added to cart!';t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);})()">Add</button>
@@ -403,16 +402,17 @@
     }
     wrap.appendChild(av); wrap.appendChild(bbl);
     msgs.appendChild(wrap);
-    if(role==='bot'&&!skipHistory){
-      const fb=document.createElement('div'); fb.className='pr-fb';
+
+    if(role==='bot' && !skipHistory) {
+      const fb = document.createElement('div'); fb.className='pr-fb';
       fb.innerHTML=`<button onclick="this.classList.toggle('liked');this.parentElement.querySelectorAll('button')[1].classList.remove('disliked')">👍</button><button onclick="this.classList.toggle('disliked');this.parentElement.querySelectorAll('button')[0].classList.remove('liked')">👎</button>`;
       msgs.appendChild(fb);
     }
-    msgs.scrollTop=msgs.scrollHeight;
-    if(!skipHistory) history.push({role:role==='user'?'user':'model',parts:[{text}]});
+    msgs.scrollTop = msgs.scrollHeight;
+    if(!skipHistory) history.push({role:role==='user'?'user':'model', parts:[{text}]});
   }
 
-  function showTyping(){
+  function showTyping() {
     const el=document.createElement('div'); el.id='pr-typ'; el.className='pr-m b';
     el.innerHTML=`<div class="pr-mav"><img src="${AI_CFG.avatar}" alt="AI"></div><div class="pr-mb"><div class="pr-dots"><span></span><span></span><span></span></div></div>`;
     msgs.appendChild(el); msgs.scrollTop=msgs.scrollHeight;
@@ -420,85 +420,133 @@
   function hideTyping(){const e=document.getElementById('pr-typ');if(e)e.remove();}
 
   /* ── SEND ────────────────────────────────────────────── */
-  async function send(txt){
-    const t=(txt||input.value).trim();
+  async function send(txt) {
+    const t = (txt||input.value).trim();
     if(!t||isThinking) return;
     input.value=''; input.style.height='auto';
-    addMsg('user',t);
+    addMsg('user', t);
     isThinking=true; sb.disabled=true; showTyping();
-    try{
-      const r=await getReply(t);
-      hideTyping(); addMsg('bot',r.text,r.products||[]);
-    }catch(err){
+    try {
+      const r = await getReply(t);
+      hideTyping(); addMsg('bot', r.text, r.products||[]);
+    } catch(err) {
       hideTyping();
-      // Show actual error in console, friendly message to user
-      console.error('[Pahadi_AI] Error:', err);
-      addMsg('bot','🙏 Ek moment — let me reconnect. Please type your question again!');
+      console.error('[Pahadi_AI]', err);
+      // Fallback to demo on error — never show error to user
+      const dr = getDemoReply(t);
+      addMsg('bot', dr.text, dr.products||[]);
     }
     isThinking=false; sb.disabled=false; input.focus();
   }
 
-  /* ── AI CALL — with retry ────────────────────────────── */
-  async function getReply(msg, attempt=1){
+  /* ── AI CALL ─────────────────────────────────────────── */
+  async function getReply(msg, attempt=1) {
     if(DEMO) return getDemoReply(msg);
-    try{
+    try {
       const ctrl = new AbortController();
-      const timer = setTimeout(()=>ctrl.abort(), 15000); // 15s timeout
-      const res = await fetch(EDGE_URL,{
+      const timer = setTimeout(() => ctrl.abort(), 18000);
+      const res = await fetch(EDGE_URL, {
         method:'POST',
         headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({message:msg, history:history.slice(-10), mode:'customer', language:lang}),
+        body: JSON.stringify({
+          message: msg,
+          history: history.slice(-10),
+          mode: 'customer',
+          language: lang,
+          languageName: LANG_NAMES[lang] || 'English',  // ← send full language name so AI knows exactly
+        }),
         signal: ctrl.signal,
       });
       clearTimeout(timer);
       if(!res.ok) throw new Error('HTTP '+res.status);
-      const d=await res.json();
-      if(!d.reply) throw new Error('Empty response');
-      return {text:d.reply, products:d.products||[]};
-    }catch(e){
-      if(attempt < 2){
-        // Auto-retry once after 1 second
-        await new Promise(r=>setTimeout(r,1000));
-        return getReply(msg, attempt+1);
-      }
-      // If still failing, return demo response as fallback
-      console.warn('[Pahadi_AI] API failed, using demo fallback:', e.message);
-      return getDemoReply(msg);
+      const d = await res.json();
+      if(!d.reply) throw new Error('Empty');
+      return {text: d.reply, products: d.products||[]};
+    } catch(e) {
+      if(attempt < 2) { await new Promise(r=>setTimeout(r,1200)); return getReply(msg, attempt+1); }
+      throw e;
     }
   }
 
   /* ── DEMO / FALLBACK REPLIES ─────────────────────────── */
-  function getDemoReply(t){
-    const l=t.toLowerCase();
-    if(l.match(/honey|शहद/)) return {text:`🍯 **Himalayan Wild Honey** — raw, unprocessed, enzyme-rich.\n\nSourced from wildflower fields in Himachal Pradesh by traditional beekeepers. Never heated. No additives.\n\n**Benefits:** Anti-bacterial · Immunity · Digestive health\n**Free shipping above ₹799** 🚚`,products:[{id:'h1',name:'Wild Honey',price:499,variant:'500g',emoji:'🍯'},{id:'h2',name:'Wild Honey',price:899,variant:'1kg',emoji:'🍯'}]};
-    if(l.match(/ghee|घी/)) return {text:`🧈 **A2 Bilona Ghee** — made the traditional way.\n\nFrom Himalayan desi cow A2 milk, hand-churned from cultured curd. Zero additives, zero preservatives.\n\n**Benefits:** Easy digestion · Vitamins A,D,E,K · Brain health`,products:[{id:'g1',name:'A2 Bilona Ghee',price:749,variant:'500ml',emoji:'🧈'},{id:'g2',name:'A2 Bilona Ghee',price:1399,variant:'1L',emoji:'🧈'}]};
-    if(l.match(/500|budget|under|cheap|affordable/i)) return {text:`💰 **Best products under ₹500:**\n\nAll sourced directly from Himalayan farmers — pure quality, fair price!`,products:[{id:'h1',name:'Wild Honey',price:499,variant:'500g',emoji:'🍯'},{id:'t1',name:'Lakadong Turmeric',price:299,variant:'200g',emoji:'🌿'},{id:'c1',name:'Kangra Green Tea',price:399,variant:'100g',emoji:'🍵'},{id:'c2',name:'Large Cardamom',price:349,variant:'100g',emoji:'🫚'}]};
-    if(l.match(/saffron|kesar|केसर/)) return {text:`🌸 **Kashmiri Saffron** from Pampore — world's finest.\n\n**Authenticity test:** Put a strand in warm water. Real saffron releases golden-yellow slowly. Ours is Grade-A, lab-certified.\n\n**Benefits:** Anti-inflammatory · Mood · Skin glow`,products:[{id:'s1',name:'Kashmiri Saffron',price:599,variant:'1g',emoji:'🌸'},{id:'s2',name:'Kashmiri Saffron',price:1099,variant:'2g',emoji:'🌸'}]};
-    if(l.match(/shilajit|शिलाजीत/)) return {text:`⚡ **Ladakhi Shilajit** from 16,000+ ft altitude.\n\n• 60%+ Fulvic acid\n• Energy & stamina boost\n• Hormonal balance\n• Immunity & anti-aging\n\nPea-sized in warm milk daily. Results in 4-6 weeks. 💪`,products:[{id:'sh1',name:'Ladakhi Shilajit',price:999,variant:'20g resin',emoji:'⚡'}]};
-    if(l.match(/deliver|ship|कब|दिन|time/)) return {text:`🚚 **Delivery Info:**\n\n• Pan India — 4 to 7 business days\n• Free shipping above ₹799\n• Ships in 24hrs of payment\n• SMS + email tracking\n• J&K and Northeast India covered!`,products:[]};
-    if(l.match(/gift|उपहार|तोहफा/)) return {text:`🎁 **Himalayan Gift Ideas:**\n\n🥇 **Premium (₹1500+):** Saffron + Ghee + Honey combo\n🥈 **Mid-range (₹800-1200):** Shilajit + Honey\n🥉 **Budget (under ₹500):** Turmeric + Cardamom + Tea trio\n\nAll come in beautiful packaging. Which budget works for you?`,products:[{id:'h1',name:'Wild Honey',price:499,variant:'500g',emoji:'🍯'},{id:'s1',name:'Kashmiri Saffron',price:599,variant:'1g',emoji:'🌸'},{id:'sh1',name:'Ladakhi Shilajit',price:999,variant:'20g',emoji:'⚡'}]};
-    if(l.match(/why|different|special|unique|better/i)) return {text:`🏔️ **Why 5 Pahadi Roots?**\n\n• **Direct from farmers** — 200+ mountain families, no middlemen\n• **Lab tested** — every batch certified pure\n• **10 Himalayan states** — broadest authentic range\n• **No shortcuts** — no heating, no additives, no processing\n• **Fair trade** — farmers earn more, you pay less\n\nWe're not just a store — we're a movement 🌿`,products:[]};
-    if(l.match(/weather|palampur|himachal|news|cricket|sport/i)) return {text:`🌿 I'm your Himalayan shopping guide, so I'm best at helping with products, health benefits, and orders!\n\nFor weather or news, you can check Google. But can I help you find a Himalayan product today?`,products:[]};
-    return {text:`🌿 Namaste! I can help you with:\n• **Find products** for your health goal or budget\n• **Authenticity checks** — how to verify pure products\n• **Delivery & returns** queries\n• **Gift recommendations**\n• **Product comparisons**\n\nWhat are you looking for today?`,products:[]};
+  // These are the fallback when API is unavailable
+  // They already respond correctly to Himachal/regional queries
+  function getDemoReply(t) {
+    const l = t.toLowerCase();
+
+    // Himachal & regional info — NO restriction now
+    if(l.match(/himachal|shimla|manali|kullu|dharamsala|palampur|kangra|spiti|kinnaur|lahaul/)) return {
+      text:`🏔️ **Himachal Pradesh** — Land of the Gods!\n\n**Famous products from Himachal:**\n• 🍯 Wild Honey — from Kullu & Kangra valley flowers\n• 🍵 Kangra Tea — India's finest green & black tea\n• 🍎 Himachali Apples — world-famous from Kinnaur & Shimla\n• 🌿 Medicinal herbs — Brahmi, Ashwagandha from Spiti\n• 🌰 Chilgoza Pine nuts — rare, from Kinnaur forests\n\n**About Himachal:**\nArea: 55,673 km² · Capital: Shimla · 12 districts\nKnown for Himalayan peaks, Buddhist monasteries, apple orchards, and ancient temples.\n\nWould you like to explore our Himachal products?`,
+      products:[{id:'h1',name:'Wild Honey',price:499,variant:'500g',emoji:'🍯'},{id:'t1',name:'Kangra Green Tea',price:399,variant:'100g',emoji:'🍵'}]
+    };
+
+    if(l.match(/kashmir|saffron|kesar|pampore|dal lake|shikara/)) return {
+      text:`🌸 **Kashmir** — Paradise on Earth!\n\n**Famous Kashmir products:**\n• 🌸 Saffron — Pampore is world's saffron capital\n• 🍎 Kashmiri Apples & Walnuts\n• 🌿 Kashmiri Kahwa tea — with saffron & cardamom\n• 🧣 Pashmina wool — finest in the world\n\n**Saffron authenticity test:**\nReal Kashmiri saffron releases golden-yellow colour slowly in warm water. Never bright red instantly.\n\nOur saffron is Grade-A, lab-tested from Pampore.`,
+      products:[{id:'s1',name:'Kashmiri Saffron',price:599,variant:'1g',emoji:'🌸'},{id:'s2',name:'Kashmiri Saffron',price:1099,variant:'2g',emoji:'🌸'}]
+    };
+
+    if(l.match(/ladakh|leh|shilajit|spiti|zanskar/)) return {
+      text:`⚡ **Ladakh** — The Land of High Passes!\n\n**Famous Ladakh products:**\n• ⚡ Shilajit — the "destroyer of weakness", from 16,000ft rocks\n• 🍑 Sea Buckthorn — superfruit, vitamin C powerhouse\n• 🫐 Ladakhi berries — wild, antioxidant-rich\n• 🌾 Black Barley (Tsamphe) — traditional staple\n\n**About Ladakh:**\nHighest cold desert · Avg altitude 3,500m\nHome to ancient Buddhist culture & pristine Himalayan ecosystem.\n\nOur Shilajit is sourced ethically from 16,000+ feet.`,
+      products:[{id:'sh1',name:'Ladakhi Shilajit',price:999,variant:'20g resin',emoji:'⚡'}]
+    };
+
+    if(l.match(/northeast|assam|meghalaya|nagaland|sikkim|manipur|mizoram|arunachal|tripura/)) return {
+      text:`🌿 **Northeast India** — The Eight Sisters!\n\n**Amazing products from Northeast:**\n• ☕ Assam Tea — world's largest tea growing region\n• 🌶️ Bhut Jolokia — Nagaland's ghost chilli, world's hottest\n• 🌿 Lakadong Turmeric — Meghalaya, highest curcumin in world\n• 🍚 Black Rice — Manipur's ancient superfood\n• 🎋 Bamboo Shoot — Mizoram, probiotic & fibre-rich\n• 🫚 Large Cardamom — Sikkim, premium spice\n• 🍚 Joha Rice — Assam's aromatic heritage rice`,
+      products:[{id:'bt1',name:'Bhut Jolokia',price:299,variant:'50g',emoji:'🌶️'},{id:'lr1',name:'Lakadong Turmeric',price:299,variant:'200g',emoji:'🌿'},{id:'br1',name:'Black Rice',price:349,variant:'500g',emoji:'🍚'}]
+    };
+
+    if(l.match(/honey|शहद/)) return {
+      text:`🍯 **Himalayan Wild Honey** — raw, unprocessed, enzyme-rich.\n\nSourced from wildflower fields in Himachal Pradesh. Never heated. No additives or sugar.\n\n**Benefits:**\n• Anti-bacterial & immunity boosting\n• Rich in antioxidants & enzymes\n• Digestive health & energy\n\nFree shipping above ₹799 🚚`,
+      products:[{id:'h1',name:'Wild Honey',price:499,variant:'500g',emoji:'🍯'},{id:'h2',name:'Wild Honey',price:899,variant:'1kg',emoji:'🍯'}]
+    };
+
+    if(l.match(/ghee|घी/)) return {
+      text:`🧈 **A2 Bilona Ghee** — traditional hand-churned ghee from Himalayan desi cows.\n\nMade from A2 milk using the ancient bilona method — slow-churned from cultured curd.\n\n**Benefits:**\n• Easy to digest (butyric acid)\n• Rich in vitamins A, D, E, K\n• Brain health & joint lubrication`,
+      products:[{id:'g1',name:'A2 Bilona Ghee',price:749,variant:'500ml',emoji:'🧈'},{id:'g2',name:'A2 Bilona Ghee',price:1399,variant:'1L',emoji:'🧈'}]
+    };
+
+    if(l.match(/500|budget|under|cheap|affordable/i)) return {
+      text:`💰 **Best products under ₹500:**\n\nAll sourced directly from Himalayan farmers — pure quality at fair prices!`,
+      products:[{id:'h1',name:'Wild Honey',price:499,variant:'500g',emoji:'🍯'},{id:'t2',name:'Lakadong Turmeric',price:299,variant:'200g',emoji:'🌿'},{id:'t1',name:'Kangra Green Tea',price:399,variant:'100g',emoji:'🍵'},{id:'c1',name:'Large Cardamom',price:349,variant:'100g',emoji:'🫚'}]
+    };
+
+    if(l.match(/deliver|ship|कब|दिन|shipping/)) return {
+      text:`🚚 **Delivery Details:**\n\n• Pan India — 4 to 7 business days\n• Free shipping above ₹799\n• Ships within 24hrs of payment\n• SMS + email tracking provided\n• J&K and Northeast covered!`,
+      products:[]
+    };
+
+    if(l.match(/gift|उपहार/)) return {
+      text:`🎁 **Himalayan Gift Ideas:**\n\n🥇 **Premium (₹1500+):** Saffron + A2 Ghee + Wild Honey\n🥈 **Mid-range (₹800–1200):** Shilajit + Honey set\n🥉 **Budget (under ₹500):** Turmeric + Cardamom + Tea trio`,
+      products:[{id:'h1',name:'Wild Honey',price:499,variant:'500g',emoji:'🍯'},{id:'s1',name:'Kashmiri Saffron',price:599,variant:'1g',emoji:'🌸'},{id:'sh1',name:'Ladakhi Shilajit',price:999,variant:'20g',emoji:'⚡'}]
+    };
+
+    if(l.match(/superfood|healthy|health|immunity|energy|weight/i)) return {
+      text:`🌿 **Top Himalayan Superfoods for Health:**\n\n⚡ **Energy & Stamina:** Shilajit, Wild Honey\n🛡️ **Immunity:** Lakadong Turmeric, Wild Honey, Black Rice\n🧠 **Brain Health:** A2 Ghee, Saffron\n💪 **Strength:** Shilajit, Joha Rice\n🌸 **Skin & Glow:** Kashmiri Saffron, Turmeric\n🔥 **Metabolism:** Bhut Jolokia, Cardamom, Mustard Oil\n\nWhich health goal can I help you with?`,
+      products:[]
+    };
+
+    return {
+      text:`🌿 Namaste! I can help you with:\n• **Himalayan products** — benefits, sourcing, how to use\n• **Regional info** — Himachal, Kashmir, Ladakh, Northeast\n• **Health goals** — immunity, energy, digestion\n• **Budget filters** — best products in your budget\n• **Delivery & returns**\n\nWhat would you like to know?`,
+      products:[]
+    };
   }
 
-  /* ── VOICE INPUT ─────────────────────────────────────── */
-  const vMap={en:'en-IN',hi:'hi-IN',pa:'pa-IN',bn:'bn-IN',ta:'ta-IN',te:'te-IN',mr:'mr-IN',gu:'gu-IN',kn:'kn-IN',ml:'ml-IN',zh:'zh-CN',ja:'ja-JP',ko:'ko-KR',ar:'ar-SA',fr:'fr-FR',de:'de-DE',es:'es-ES',pt:'pt-BR',ru:'ru-RU',it:'it-IT',tr:'tr-TR',vi:'vi-VN',th:'th-TH',id:'id-ID'};
-  voice.addEventListener('click',()=>{
-    if(!('webkitSpeechRecognition' in window||'SpeechRecognition' in window)){
-      addMsg('bot','🎤 Voice input needs Chrome browser. Please type your question!');return;
+  /* ── VOICE ───────────────────────────────────────────── */
+  voice.addEventListener('click', () => {
+    if(!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+      addMsg('bot','🎤 Voice input works in Chrome browser. Please type your question!'); return;
     }
-    if(isRec){rec&&rec.stop();voice.classList.remove('rec');isRec=false;return;}
-    const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-    rec=new SR(); rec.lang=vMap[lang]||'en-IN'; rec.interimResults=false;
-    rec.onresult=e=>{input.value=e.results[0][0].transcript;autoR(input);voice.classList.remove('rec');isRec=false;};
-    rec.onerror=()=>{voice.classList.remove('rec');isRec=false;};
+    if(isRec){ rec&&rec.stop(); voice.classList.remove('rec'); isRec=false; return; }
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    rec = new SR(); rec.lang = VOICE_MAP[lang]||'en-IN'; rec.interimResults=false;
+    rec.onresult = e => { input.value=e.results[0][0].transcript; autoR(input); voice.classList.remove('rec'); isRec=false; };
+    rec.onerror = () => { voice.classList.remove('rec'); isRec=false; };
     rec.start(); voice.classList.add('rec'); isRec=true;
   });
 
-  input.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();}});
-  input.addEventListener('input',()=>autoR(input));
-  sb.addEventListener('click',()=>send());
-  function autoR(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,100)+'px';}
+  input.addEventListener('keydown', e => { if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();} });
+  input.addEventListener('input', () => autoR(input));
+  sb.addEventListener('click', () => send());
+  function autoR(el){ el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,100)+'px'; }
 
 })();
