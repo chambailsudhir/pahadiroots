@@ -131,7 +131,8 @@ button{font-family:'Inter',sans-serif;cursor:pointer}
 .prod-vendor{font-size:10.5px;font-weight:800;color:var(--gd);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:8px;font-family:'Josefin Sans',sans-serif}
 .prod-vendor::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(200,146,10,.3),transparent)}
 .prod-name{font-family:'Playfair Display',serif;font-size:clamp(24px,3.2vw,38px);font-weight:900;color:var(--g);line-height:1.12;margin-bottom:8px;letter-spacing:-.4px}
-.prod-tagline{font-size:16.5px;color:#5a5050;line-height:1.75;margin-bottom:16px;font-family:'Cormorant Garamond',serif;font-weight:500;letter-spacing:.1px;font-style:italic}
+.prod-tagline{font-size:16px;color:#5a5050;line-height:1.75;margin-bottom:16px;font-family:'Cormorant Garamond',serif;font-weight:500;letter-spacing:.1px;font-style:italic;min-height:1.5em}
+.prod-tagline:empty{background:linear-gradient(90deg,#f2ede4 25%,#e8e2d8 50%,#f2ede4 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:6px;height:20px;max-width:85%}
 /* Rating */
 .rating-row{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
 .stars{display:flex;gap:2px}
@@ -1076,7 +1077,19 @@ function renderProduct(p, images, related, data, stateMap, stateImgMap) {
       '<div class="info-section">' +
         '<div class="prod-vendor">📍 '+regionName+'</div>' +
         '<h1 class="prod-name">'+p.name+'</h1>' +
-        (p.short_description ? '<p class="prod-tagline">'+p.short_description+'</p>' : '') +
+        (function(){
+          /* Tagline: short_description → first sentence of ai_description → empty placeholder */
+          var tagline = '';
+          if (p.short_description && p.short_description.trim()) {
+            tagline = p.short_description.trim();
+          } else if (p.ai_description && p.ai_description.trim()) {
+            /* Strip HTML tags, take first sentence */
+            var stripped = p.ai_description.replace(/<[^>]+>/g,'').trim();
+            var firstSentence = stripped.match(/^[^.!?]+[.!?]/);
+            tagline = firstSentence ? firstSentence[0].trim() : stripped.substring(0,120).trim();
+          }
+          return '<p class="prod-tagline" id="prod-tagline">' + (tagline || '') + '</p>';
+        })() +
         '<div class="rating-row">' +
           '<div class="stars">'+[1,2,3,4,5].map(function(){return '<svg class="star" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>';}).join('')+'</div>' +
           '<span class="rating-num">4.8</span>' +
@@ -1347,7 +1360,22 @@ async function triggerAiBenefits(productName, productDesc) {
 function renderAiBenefits(data) {
   var pName = PRODUCT ? PRODUCT.name : 'this product';
 
-  /* ── 0. Update Description accordion if still showing generic text ── */
+  /* ── 0. Update tagline if still empty ── */
+  var taglineEl = document.getElementById('prod-tagline');
+  if (taglineEl && !taglineEl.textContent.trim() && PRODUCT) {
+    var taglineSrc = PRODUCT.short_description || '';
+    if (!taglineSrc && data.benefits && data.benefits.length) {
+      /* Build a tagline from first benefit */
+      var b0 = data.benefits[0];
+      taglineSrc = (b0.title ? b0.title + ' — ' : '') + (b0.desc || '');
+    }
+    if (taglineSrc) {
+      taglineEl.textContent = taglineSrc;
+      console.log('[TAGLINE] Populated from AI benefits ✓');
+    }
+  }
+
+  /* ── 0b. Update Description accordion if still showing generic text ── */
   var descEl = document.getElementById('acc-desc');
   if (descEl) {
     var currentText = descEl.textContent || '';
