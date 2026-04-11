@@ -235,9 +235,19 @@ USE WEB SEARCH: You have Google Search available. Use it for current weather, te
   .pr-lang-opt:hover { background:#d4ecd9; color:#1a3a1e; }
   .pr-lang-opt.active { background:#2d5233; color:#ffffff; }
 
-  .pr-chips { padding:7px 10px; display:flex; flex-direction:row; flex-wrap:nowrap; gap:6px; overflow-x:auto; overflow-y:hidden; flex-shrink:0; scrollbar-width:none; border-bottom:1px solid #f3f4f6; background:#ffffff; white-space:nowrap; }
+  .pr-chips-toggle {
+    padding:5px 12px; display:flex; align-items:center; gap:6px;
+    background:#f0f7f1; border-bottom:1px solid #e5e7eb; flex-shrink:0;
+    cursor:pointer; font-size:11px; font-weight:700; color:#1a3a1e;
+    user-select:none;
+  }
+  .pr-chips-toggle:hover { background:#d4ecd9; }
+  .pr-chips-arrow { font-size:9px; margin-left:auto; transition:transform .2s; }
+  .pr-chips-arrow.open { transform:rotate(180deg); }
+  .pr-chips { padding:7px 10px; display:flex; flex-direction:row; flex-wrap:nowrap; gap:6px; overflow-x:auto; overflow-y:hidden; flex-shrink:0; scrollbar-width:none; border-bottom:1px solid #f3f4f6; background:#ffffff; display:none; }
   .pr-chips::-webkit-scrollbar { display:none }
-  .pr-chip { display:inline-flex; align-items:center; white-space:nowrap; border-radius:20px; padding:5px 12px; font-size:11.5px; cursor:pointer; transition:all .15s; flex-shrink:0; flex-grow:0; font-family:inherit; border:1.5px solid #2d5233; background:#f0f7f1; color:#1a3a1e; font-weight:600; }
+  .pr-chips.open { display:flex; }
+  .pr-chip { display:inline-flex; align-items:center; white-space:nowrap; border-radius:20px; padding:5px 12px; font-size:11px; cursor:pointer; transition:all .15s; flex-shrink:0; flex-grow:0; font-family:inherit; border:1.5px solid #2d5233; background:#f0f7f1; color:#1a3a1e; font-weight:600; }
   .pr-chip:hover { background:#d4ecd9; border-color:#1a3a1e; color:#1a3a1e; }
 
   .pr-msgs { flex:1; overflow-y:auto; padding:12px; display:flex; flex-direction:column; gap:10px; background:#fafafa; scrollbar-width:thin; scrollbar-color:rgba(0,0,0,.1) transparent }
@@ -531,10 +541,20 @@ USE WEB SEARCH: You have Google Search available. Use it for current weather, te
       isOpen=false; fab.classList.remove('open'); panel.classList.remove('open');
     }
   });
+  // Toggle chips
+  var chipsToggle = document.getElementById('pr-chips-toggle');
+  var chipsDiv    = document.getElementById('pr-chips');
+  var chipsArrow  = document.getElementById('pr-chips-arrow');
+  chipsToggle.addEventListener('click', function() {
+    chipsDiv.classList.toggle('open');
+    chipsArrow.classList.toggle('open');
+  });
+
   panel.querySelectorAll('.pr-chip').forEach(function(c) {
     c.addEventListener('click', function() {
       send(c.getAttribute('data-q'));
-      document.getElementById('pr-chips').style.display='none';
+      chipsDiv.classList.remove('open');
+      chipsArrow.classList.remove('open');
     });
   });
 
