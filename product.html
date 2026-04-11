@@ -172,7 +172,7 @@ button{font-family:'Inter',sans-serif;cursor:pointer}
 .vcard .vc-price{font-size:14px;font-weight:900;color:var(--g);display:block}
 .vcard .vc-orig{font-size:11px;color:var(--tx3);text-decoration:line-through;display:inline}
 .vcard .vc-save{font-size:10.5px;color:var(--gd);font-weight:800;display:block;margin-top:2px}
-.vcard-tag{position:absolute;top:-10px;left:10px;font-size:9px;font-weight:900;padding:3px 9px;border-radius:4px;letter-spacing:.5px;color:#fff;font-family:'Josefin Sans',sans-serif;text-transform:uppercase}
+.vcard-tag{position:absolute;top:-8px;left:10px;font-size:9px;font-weight:900;padding:3px 9px;border-radius:4px;letter-spacing:.5px;color:#fff;font-family:'Josefin Sans',sans-serif;text-transform:uppercase;z-index:3}
 .vcard-tag.best{background:var(--g);color:#fff}
 .vcard-tag.deal{background:#b8700a;color:#fff}
 /* Stock */
@@ -537,11 +537,13 @@ body{letter-spacing:.01em}
 .cert-badge{display:flex;align-items:center;gap:7px;padding:9px 13px;background:rgba(26,58,30,.05);border:1.5px solid rgba(26,58,30,.12);border-radius:10px;font-size:13px;font-weight:600;color:#1a3a1e}
 
 /* ══ INLINE BENEFITS ══ */
-.inline-benefits{background:#fff;border:1.5px solid #e8a020;border-radius:14px;padding:20px 22px;margin-top:16px;width:100%}
+.inline-benefits{background:linear-gradient(135deg,#fffdf8,#fff9ee);border:1.5px solid #e8a020;border-radius:16px;padding:22px 24px;margin-top:16px;margin-bottom:0;width:100%;box-shadow:0 2px 12px rgba(232,160,32,.08);position:relative;z-index:1}
 .inline-ben-title{font-size:16px;font-weight:900;color:#7a4400;margin-bottom:16px;font-family:'Playfair Display',serif;letter-spacing:.2px}
 .ben-item{display:flex;align-items:flex-start;gap:13px;margin-bottom:10px}
 .ben-title{font-size:13.5px;font-weight:800;color:#1a1a1a;margin-bottom:2px;line-height:1.3;letter-spacing:.05px}
 .ben-desc{font-size:12.5px;color:#5a5a5a;line-height:1.55}
+/* Ensure vcard tags don't clip outside their container */
+.variants-section{margin-bottom:20px;padding-top:14px}
 .ben-item{display:flex;align-items:flex-start;gap:13px;margin-bottom:10px}
 .ben-item:last-child{margin-bottom:0}
 .ben-icon{width:30px;height:30px;border-radius:50%;background:rgba(232,160,32,.14);border:1.5px solid rgba(232,160,32,.4);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;margin-top:1px}
@@ -879,6 +881,10 @@ async function loadProduct() {
     renderProduct(prod, prodImages, related, data, stateMap, stateImgMap);
     /* Silently trigger AI benefits after product renders */
     triggerAiBenefits(prod.name, prod.short_description || prod.name);
+    /* If description is missing from main data, try dedicated endpoint */
+    if (!prod.ai_description && !prod.long_description && !prod.description) {
+      fetchProductDescription(prod.id, prod.name);
+    }
   } catch(e) {
     clearTimeout(_timer);
     showNotFound(e.name==='AbortError' ? 'Request timed out — please refresh' : 'Failed to load product. Please refresh.');
@@ -999,11 +1005,28 @@ function renderProduct(p, images, related, data, stateMap, stateImgMap) {
   /* WhatsApp number formatted */
   var retNumStr = WHATSAPP_NUMBER.replace('91','').replace(/(\d{5})(\d{5})/,'$1 $2');
 
-  /* Description — 3-layer fallback:
-     Layer 1: AI-generated (stored, zero latency for customer)
-     Layer 2: Manual admin description
-     Layer 3: Generic fallback */
-  var descHtml = p.ai_description || p.long_description || p.short_description || p.description || 'Authentic Himalayan product sourced directly from local farmers. No preservatives, no additives — pure and natural.';
+  /* Description — 4-layer fallback with DB guarantee:
+     Layer 1: ai_description field from products table (stored by AI pipeline)
+     Layer 2: long_description (manual admin)  
+     Layer 3: short_description
+     Layer 4: Generic fallback */
+  var descHtml = '';
+  if (p.ai_description && p.ai_description.trim()) {
+    descHtml = p.ai_description;
+    console.log('[DESC] Using ai_description from DB ✓');
+  } else if (p.long_description && p.long_description.trim()) {
+    descHtml = p.long_description;
+    console.log('[DESC] Using long_description from DB ✓');
+  } else if (p.description && p.description.trim()) {
+    descHtml = p.description;
+    console.log('[DESC] Using description from DB ✓');
+  } else if (p.short_description && p.short_description.trim()) {
+    descHtml = '<p>' + p.short_description + '</p>';
+    console.log('[DESC] Using short_description fallback');
+  } else {
+    descHtml = '<p>Authentic Himalayan product sourced directly from local farmers. No preservatives, no additives — pure and natural.</p>';
+    console.warn('[DESC] No description found in DB for product:', p.id, p.name, '| Fields:', {ai_description: !!p.ai_description, long_description: !!p.long_description, description: !!p.description, short_description: !!p.short_description});
+  }
 
   /* Related */
   var relHtml = '';
@@ -1070,8 +1093,6 @@ function renderProduct(p, images, related, data, stateMap, stateImgMap) {
           (p.sold_count?'<p class="sold-note">'+p.sold_count+' bottles sold across India</p>':'') +
           urgencyHtml +
         '</div>' +
-        variantHtml +
-        '<div class="stock-row"><div class="stock-dot '+stockClass+'"></div><span>'+stockLabel+'</span></div>' +
         (showBenefits ?
         '<div class="inline-benefits" id="inline-benefits">' +
           '<div class="inline-ben-title">✨ Key Benefits</div>' +
@@ -1079,6 +1100,8 @@ function renderProduct(p, images, related, data, stateMap, stateImgMap) {
             [1,2,3,4].map(function(){ return '<div class="ben-item"><div style="width:26px;height:26px;border-radius:50%;background:linear-gradient(90deg,#f2ede4 25%,#e8e2d8 50%,#f2ede4 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;flex-shrink:0"></div><div style="flex:1"><div style="height:12px;border-radius:4px;margin-bottom:6px;background:linear-gradient(90deg,#f2ede4 25%,#e8e2d8 50%,#f2ede4 75%);background-size:200% 100%;animation:shimmer 1.5s infinite"></div><div style="height:11px;border-radius:4px;width:75%;background:linear-gradient(90deg,#f2ede4 25%,#e8e2d8 50%,#f2ede4 75%);background-size:200% 100%;animation:shimmer 1.5s infinite"></div></div></div>'; }).join('') +
           '</div>' +
         '</div>' : '') +
+        '<div style="position:relative;z-index:2;margin-top:20px">'+variantHtml+'</div>' +
+        '<div class="stock-row"><div class="stock-dot '+stockClass+'"></div><span>'+stockLabel+'</span></div>' +
         '<div class="pincode-row">' +
           '<span>📍</span><span style="font-size:12.5px;font-weight:700;color:var(--tx2)">Check delivery:</span>' +
           '<input class="pincode-input" type="text" placeholder="Enter PIN" maxlength="6" id="pincode-input">' +
@@ -1219,7 +1242,51 @@ function setupStickyCtaScroll() {
   document.getElementById('sticky-cta').style.transition = 'opacity .3s';
 }
 
-/* ══ AI BENEFITS — SILENT AUTO TRIGGER ══ */
+/* ══ DESCRIPTION FALLBACK FETCH ══
+   Called only when /api/store-data didn't return ai_description.
+   Tries /api/product-description?id=X, then falls back to /api/benefits
+   which already returns content we can repurpose. ══ */
+async function fetchProductDescription(productId, productName) {
+  var descEl = document.getElementById('acc-desc');
+  if (!descEl) return;
+  /* Check if content is already rich (not the generic fallback text) */
+  if (descEl.textContent && descEl.textContent.length > 120 &&
+      !descEl.textContent.includes('Authentic Himalayan product sourced directly')) return;
+
+  try {
+    /* Try dedicated endpoint first */
+    var r = await fetch('/api/product-description?id=' + encodeURIComponent(productId));
+    if (r.ok) {
+      var d = await r.json();
+      var desc = d.ai_description || d.long_description || d.description || '';
+      if (desc && desc.trim()) {
+        descEl.innerHTML = desc;
+        console.log('[DESC] Loaded from /api/product-description ✓');
+        return;
+      }
+    }
+  } catch(e) { console.warn('[DESC] /api/product-description failed:', e); }
+
+  /* If that fails, build a description from AI benefits data already cached */
+  try {
+    var cacheKey = AI_BENEFITS_CACHE_KEY + (productName||'').toLowerCase().replace(/\s+/g,'_');
+    var cached = localStorage.getItem(cacheKey);
+    if (cached) {
+      var parsedCache = JSON.parse(cached);
+      if (parsedCache && parsedCache.benefits && parsedCache.benefits.length) {
+        /* Build rich description from benefits data */
+        var benefitSummary = parsedCache.benefits.slice(0,3).map(function(b){
+          return '<p><strong>' + (b.title||'') + ':</strong> ' + (b.desc||'') + '</p>';
+        }).join('');
+        descEl.innerHTML = '<p>' + (PRODUCT.short_description||productName) + ' is an authentic Himalayan product sourced directly from mountain farming communities.</p>' + benefitSummary;
+        console.log('[DESC] Built from cached benefits ✓');
+        return;
+      }
+    }
+  } catch(e) {}
+}
+
+
 async function triggerAiBenefits(productName, productDesc) {
   if (!productName) return;
 
@@ -1279,6 +1346,27 @@ async function triggerAiBenefits(productName, productDesc) {
 
 function renderAiBenefits(data) {
   var pName = PRODUCT ? PRODUCT.name : 'this product';
+
+  /* ── 0. Update Description accordion if still showing generic text ── */
+  var descEl = document.getElementById('acc-desc');
+  if (descEl) {
+    var currentText = descEl.textContent || '';
+    var isGeneric = currentText.includes('Authentic Himalayan product sourced directly') ||
+                    currentText.trim().length < 80;
+    if (isGeneric && data.benefits && data.benefits.length) {
+      /* Build a rich description from benefits + short description */
+      var shortDesc = (PRODUCT && PRODUCT.short_description) ? '<p>' + PRODUCT.short_description + '</p>' : '';
+      var benefitDesc = data.benefits.slice(0, 3).map(function(b) {
+        return '<p><strong>' + (b.title||'') + ':</strong> ' + (b.desc||'') + '</p>';
+      }).join('');
+      if (!shortDesc && !benefitDesc) {
+        /* do nothing — leave existing */
+      } else {
+        descEl.innerHTML = shortDesc + benefitDesc;
+        console.log('[DESC] Populated description accordion from AI benefits ✓');
+      }
+    }
+  }
 
   /* ── 1. INLINE KEY BENEFITS — premium amber card ── */
   var inlineList = document.getElementById('inline-benefits-list');
