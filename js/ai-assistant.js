@@ -9,6 +9,9 @@
   const EDGE_URL = script?.getAttribute('data-edge-url') || '';
   const WA_NUM   = script?.getAttribute('data-whatsapp') || '919000000000';
   const DEMO     = !EDGE_URL;
+  // Debug: log to console so we can verify
+  console.log('[Pahadi_AI] Edge URL:', EDGE_URL || 'NOT SET — running in demo mode');
+  console.log('[Pahadi_AI] Demo mode:', DEMO);
 
   /* ── THEME from site CSS vars ────────────────────────── */
   const R = getComputedStyle(document.documentElement);
@@ -80,16 +83,33 @@
   #pr-panel{
     position:fixed;bottom:105px;right:24px;
     width:380px;height:560px;
-    /* Allow free resize by dragging — both axes */
-    min-width:300px;min-height:380px;
-    max-width:min(680px,96vw);max-height:92vh;
-    resize:both;overflow:hidden;
+    min-width:280px;min-height:380px;
+    max-width:min(700px,96vw);max-height:92vh;
+    overflow:hidden;
     background:#0c1a0e;border-radius:18px;
     box-shadow:0 24px 72px rgba(0,0,0,.65),0 0 0 1px rgba(45,82,51,.3);
     display:flex;flex-direction:column;
     z-index:2147483644;
     transform:scale(.87) translateY(18px);opacity:0;pointer-events:none;
     transition:transform .28s cubic-bezier(.34,1.2,.64,1),opacity .28s;
+  }
+  /* Left edge drag handle for width resize */
+  #pr-left-edge{
+    position:absolute;left:0;top:0;bottom:0;width:6px;
+    cursor:ew-resize;z-index:10;
+    background:transparent;border-radius:18px 0 0 18px;
+  }
+  #pr-left-edge:hover{background:rgba(200,146,10,.25)}
+  /* Bottom edge drag handle for height resize */
+  #pr-bottom-edge{
+    position:absolute;left:0;right:0;bottom:0;height:6px;
+    cursor:ns-resize;z-index:10;background:transparent;
+  }
+  #pr-bottom-edge:hover{background:rgba(200,146,10,.2)}
+  /* Corner handle */
+  #pr-corner{
+    position:absolute;left:0;bottom:0;width:16px;height:16px;
+    cursor:sw-resize;z-index:11;background:transparent;
   }
   #pr-panel.open{transform:scale(1) translateY(0);opacity:1;pointer-events:all}
   @media(max-width:440px){#pr-panel{width:calc(100vw - 16px) !important;right:8px;bottom:108px}}
@@ -103,11 +123,7 @@
   }
   #pr-drag::before{content:'';width:40px;height:3px;border-radius:3px;background:rgba(255,255,255,.22)}
 
-  /* Corner resize hint */
-  #pr-panel::after{
-    content:'⤡';position:absolute;bottom:4px;right:6px;
-    font-size:13px;color:rgba(200,146,10,.3);pointer-events:none;line-height:1;
-  }
+
 
   /* Header */
   .pr-hd{
@@ -227,6 +243,9 @@
   const panel = document.createElement('div');
   panel.id = 'pr-panel';
   panel.innerHTML = `
+  <div id="pr-left-edge" title="Drag to resize width"></div>
+  <div id="pr-bottom-edge" title="Drag to resize height"></div>
+  <div id="pr-corner" title="Drag to resize"></div>
   <div id="pr-drag" title="Drag to resize height"></div>
   <div class="pr-hd">
     <div class="pr-hav"><img src="${AI_CFG.avatar}" alt="AI"></div>
@@ -287,23 +306,75 @@
   toast.className = 'pr-toast';
   document.body.appendChild(toast);
 
-  /* ── DRAG-TO-RESIZE (top bar — height only) ──────────── */
-  const dragBar = document.getElementById('pr-drag');
-  let dragging=false, dY0=0, dH0=0;
-  dragBar.addEventListener('mousedown', e => {
-    dragging=true; dY0=e.clientY; dH0=panel.offsetHeight;
-    document.body.style.userSelect='none'; e.preventDefault();
-  });
+  /* ── RESIZE HANDLES — all 4 directions ───────────────── */
+  const dragBar    = document.getElementById('pr-drag');
+  const leftEdge   = document.getElementById('pr-left-edge');
+  const bottomEdge = document.getElementById('pr-bottom-edge');
+  const corner     = document.getElementById('pr-corner');
+
+  let resizing=false, resizeType='', rX0=0, rY0=0, rW0=0, rH0=0;
+
+  function startResize(type, e) {
+    resizing=true; resizeType=type;
+    rX0 = e.clientX; rY0 = e.clientY;
+    rW0 = panel.offsetWidth; rH0 = panel.offsetHeight;
+    document.body.style.userSelect='none';
+    document.body.style.cursor = type==='left'?'ew-resize':type==='bottom'?'ns-resize':type==='top'?'row-resize':'sw-resize';
+    e.preventDefault();
+  }
+
+  dragBar.addEventListener('mousedown',    e => startResize('top', e));
+  leftEdge.addEventListener('mousedown',   e => startResize('left', e));
+  bottomEdge.addEventListener('mousedown', e => startResize('bottom', e));
+  corner.addEventListener('mousedown',     e => startResize('corner', e));
+
   document.addEventListener('mousemove', e => {
-    if(!dragging) return;
-    const newH = Math.min(Math.max(dH0 + (dY0 - e.clientY), 380), window.innerHeight * 0.9);
-    panel.style.height = newH + 'px';
+    if(!resizing) return;
+    const dx = rX0 - e.clientX; // drag left = wider
+    const dy = rY0 - e.clientY; // drag up = taller
+    const maxW = Math.min(700, window.innerWidth * 0.96);
+    const maxH = window.innerHeight * 0.92;
+
+    if(resizeType==='top' || resizeType==='corner') {
+      const newH = Math.min(Math.max(rH0 + dy, 380), maxH);
+      panel.style.height = newH + 'px';
+    }
+    if(resizeType==='left' || resizeType==='corner') {
+      const newW = Math.min(Math.max(rW0 + dx, 280), maxW);
+      panel.style.width = newW + 'px';
+    }
+    if(resizeType==='bottom') {
+      // bottom edge: drag down = taller
+      const newH = Math.min(Math.max(rH0 - dy, 380), maxH);
+      panel.style.height = newH + 'px';
+    }
   });
-  document.addEventListener('mouseup', () => { if(dragging){dragging=false; document.body.style.userSelect='';} });
-  // Touch
-  dragBar.addEventListener('touchstart', e => { const t=e.touches[0]; dragging=true; dY0=t.clientY; dH0=panel.offsetHeight; },{passive:true});
-  document.addEventListener('touchmove', e => { if(!dragging) return; const dY=dY0-e.touches[0].clientY; panel.style.height=Math.min(Math.max(dH0+dY,380),window.innerHeight*.9)+'px'; },{passive:true});
-  document.addEventListener('touchend', () => { dragging=false; });
+
+  document.addEventListener('mouseup', () => {
+    if(resizing){ resizing=false; document.body.style.userSelect=''; document.body.style.cursor=''; }
+  });
+
+  // Touch support for top bar
+  dragBar.addEventListener('touchstart', e => {
+    const t=e.touches[0]; resizing=true; resizeType='top';
+    rY0=t.clientY; rH0=panel.offsetHeight;
+  },{passive:true});
+  leftEdge.addEventListener('touchstart', e => {
+    const t=e.touches[0]; resizing=true; resizeType='left';
+    rX0=t.clientX; rW0=panel.offsetWidth;
+  },{passive:true});
+  document.addEventListener('touchmove', e => {
+    if(!resizing) return;
+    const t=e.touches[0];
+    if(resizeType==='top'){
+      panel.style.height=Math.min(Math.max(rH0+(rY0-t.clientY),380),window.innerHeight*.9)+'px';
+    }
+    if(resizeType==='left'){
+      const newW=Math.min(Math.max(rW0+(rX0-t.clientX),280),700);
+      panel.style.width=newW+'px';
+    }
+  },{passive:true});
+  document.addEventListener('touchend', () => { resizing=false; });
 
   /* ── STATE ───────────────────────────────────────────── */
   let isOpen=false, isThinking=false, history=[], lang='en', isRec=false, rec=null;
@@ -469,14 +540,50 @@
   }
 
   /* ── DEMO / FALLBACK REPLIES ─────────────────────────── */
-  // These are the fallback when API is unavailable
-  // They already respond correctly to Himachal/regional queries
+  // Responds based on selected language
   function getDemoReply(t) {
     const l = t.toLowerCase();
+    const isHindi = lang === 'hi' || lang === 'mai' || lang === 'doi' || lang === 'kok';
+    const isPunjabi = lang === 'pa';
+    const isBengali = lang === 'bn';
+    const isTamil = lang === 'ta';
+    const isTelugu = lang === 'te';
+    const isMarathi = lang === 'mr';
+    const isGujarati = lang === 'gu';
 
-    // Himachal & regional info — NO restriction now
+    // Himachal & regional info
     if(l.match(/himachal|shimla|manali|kullu|dharamsala|palampur|kangra|spiti|kinnaur|lahaul/)) return {
-      text:`🏔️ **Himachal Pradesh** — Land of the Gods!\n\n**Famous products from Himachal:**\n• 🍯 Wild Honey — from Kullu & Kangra valley flowers\n• 🍵 Kangra Tea — India's finest green & black tea\n• 🍎 Himachali Apples — world-famous from Kinnaur & Shimla\n• 🌿 Medicinal herbs — Brahmi, Ashwagandha from Spiti\n• 🌰 Chilgoza Pine nuts — rare, from Kinnaur forests\n\n**About Himachal:**\nArea: 55,673 km² · Capital: Shimla · 12 districts\nKnown for Himalayan peaks, Buddhist monasteries, apple orchards, and ancient temples.\n\nWould you like to explore our Himachal products?`,
+      text: isHindi
+        ? `🏔️ **हिमाचल प्रदेश** — देवताओं की भूमि!
+
+**पालमपुर के बेहतरीन उत्पाद:**
+• 🍵 **कांगड़ा चाय** — पालमपुर भारत की सबसे अच्छी हरी और काली चाय के लिए प्रसिद्ध है
+• 🍯 **जंगली शहद** — कुल्लू और कांगड़ा घाटी के फूलों से
+• 🌿 **जड़ी-बूटियां** — ब्राह्मी, अश्वगंधा, तुलसी
+• 🍎 **पहाड़ी सेब** — किन्नौर और शिमला के प्रसिद्ध सेब
+• 🌰 **चिलगोज़ा** — किन्नौर के जंगलों से दुर्लभ पाइन नट्स
+
+**हिमाचल के बारे में:**
+क्षेत्रफल: 55,673 km² · राजधानी: शिमला · 12 जिले
+हिमालयी चोटियों, बौद्ध मठों और सेब के बगीचों के लिए मशहूर।
+
+क्या आप हमारे हिमाचल उत्पाद देखना चाहते हैं?`
+        : `🏔️ **Himachal Pradesh** — Land of the Gods!
+
+**Best products from Palampur & Himachal:**
+• 🍵 **Kangra Tea** — Palampur is India's finest green & black tea region
+• 🍯 **Wild Honey** — from Kullu & Kangra valley wildflowers
+• 🌿 **Medicinal herbs** — Brahmi, Ashwagandha from Spiti
+• 🍎 **Himachali Apples** — world-famous from Kinnaur & Shimla
+• 🌰 **Chilgoza Pine nuts** — rare, from Kinnaur forests
+
+**About Himachal:**
+Area: 55,673 km² · Capital: Shimla · 12 districts
+Known for Himalayan peaks, Buddhist monasteries & apple orchards.
+
+Would you like to explore our Himachal products?`,
+      products:[{id:'t1',name:'Kangra Green Tea',price:399,variant:'100g',emoji:'🍵'},{id:'h1',name:'Wild Honey',price:499,variant:'500g',emoji:'🍯'}]
+    };\n\n**Famous products from Himachal:**\n• 🍯 Wild Honey — from Kullu & Kangra valley flowers\n• 🍵 Kangra Tea — India's finest green & black tea\n• 🍎 Himachali Apples — world-famous from Kinnaur & Shimla\n• 🌿 Medicinal herbs — Brahmi, Ashwagandha from Spiti\n• 🌰 Chilgoza Pine nuts — rare, from Kinnaur forests\n\n**About Himachal:**\nArea: 55,673 km² · Capital: Shimla · 12 districts\nKnown for Himalayan peaks, Buddhist monasteries, apple orchards, and ancient temples.\n\nWould you like to explore our Himachal products?`,
       products:[{id:'h1',name:'Wild Honey',price:499,variant:'500g',emoji:'🍯'},{id:'t1',name:'Kangra Green Tea',price:399,variant:'100g',emoji:'🍵'}]
     };
 
@@ -495,23 +602,31 @@
       products:[{id:'bt1',name:'Bhut Jolokia',price:299,variant:'50g',emoji:'🌶️'},{id:'lr1',name:'Lakadong Turmeric',price:299,variant:'200g',emoji:'🌿'},{id:'br1',name:'Black Rice',price:349,variant:'500g',emoji:'🍚'}]
     };
 
-    if(l.match(/honey|शहद/)) return {
-      text:`🍯 **Himalayan Wild Honey** — raw, unprocessed, enzyme-rich.\n\nSourced from wildflower fields in Himachal Pradesh. Never heated. No additives or sugar.\n\n**Benefits:**\n• Anti-bacterial & immunity boosting\n• Rich in antioxidants & enzymes\n• Digestive health & energy\n\nFree shipping above ₹799 🚚`,
+    if(l.match(/honey|शहद|madh|मधु/)) return {
+      text: isHindi
+        ? `🍯 **हिमालयी जंगली शहद** — कच्चा, अनप्रोसेस्ड, एंजाइम से भरपूर!\n\nहिमाचल प्रदेश की जंगली फूलों की घाटियों से। कभी गर्म नहीं किया जाता। कोई मिलावट नहीं।\n\n**फायदे:**\n• एंटी-बैक्टीरियल और इम्यूनिटी बूस्टर\n• एंटीऑक्सिडेंट और एंजाइम से भरपूर\n• पाचन और ऊर्जा के लिए बेहतरीन\n\n₹799 से ऊपर free shipping 🚚`
+        : `🍯 **Himalayan Wild Honey** — raw, unprocessed, enzyme-rich!\n\nSourced from wildflower fields in Himachal Pradesh. Never heated. No additives.\n\n**Benefits:**\n• Anti-bacterial & immunity boosting\n• Rich in antioxidants & enzymes\n• Digestive health & energy\n\nFree shipping above ₹799 🚚`,
       products:[{id:'h1',name:'Wild Honey',price:499,variant:'500g',emoji:'🍯'},{id:'h2',name:'Wild Honey',price:899,variant:'1kg',emoji:'🍯'}]
     };
 
     if(l.match(/ghee|घी/)) return {
-      text:`🧈 **A2 Bilona Ghee** — traditional hand-churned ghee from Himalayan desi cows.\n\nMade from A2 milk using the ancient bilona method — slow-churned from cultured curd.\n\n**Benefits:**\n• Easy to digest (butyric acid)\n• Rich in vitamins A, D, E, K\n• Brain health & joint lubrication`,
+      text: isHindi
+        ? `🧈 **A2 बिलोना घी** — पारंपरिक तरीके से हाथ से मथा हुआ घी।\n\nहिमालयी देसी गाय के A2 दूध से बना, पुराने बिलोना तरीके से — दही को धीरे-धीरे मथकर।\n\n**फायदे:**\n• आसान पाचन (ब्यूटिरिक एसिड)\n• विटामिन A, D, E, K से भरपूर\n• दिमाग और जोड़ों के लिए फायदेमंद`
+        : `🧈 **A2 Bilona Ghee** — traditional hand-churned ghee from Himalayan desi cows.\n\nMade from A2 milk, slow-churned from cultured curd using ancient bilona method.\n\n**Benefits:**\n• Easy to digest (butyric acid)\n• Rich in vitamins A, D, E, K\n• Brain health & joint lubrication`,
       products:[{id:'g1',name:'A2 Bilona Ghee',price:749,variant:'500ml',emoji:'🧈'},{id:'g2',name:'A2 Bilona Ghee',price:1399,variant:'1L',emoji:'🧈'}]
     };
 
-    if(l.match(/500|budget|under|cheap|affordable/i)) return {
-      text:`💰 **Best products under ₹500:**\n\nAll sourced directly from Himalayan farmers — pure quality at fair prices!`,
+    if(l.match(/500|budget|under|cheap|affordable|सस्ता|किफायती/i)) return {
+      text: isHindi
+        ? `💰 **₹500 से कम के बेहतरीन उत्पाद:**\n\nसीधे हिमालयी किसानों से — शुद्ध गुणवत्ता, उचित मूल्य!`
+        : `💰 **Best products under ₹500:**\n\nAll sourced directly from Himalayan farmers — pure quality at fair prices!`,
       products:[{id:'h1',name:'Wild Honey',price:499,variant:'500g',emoji:'🍯'},{id:'t2',name:'Lakadong Turmeric',price:299,variant:'200g',emoji:'🌿'},{id:'t1',name:'Kangra Green Tea',price:399,variant:'100g',emoji:'🍵'},{id:'c1',name:'Large Cardamom',price:349,variant:'100g',emoji:'🫚'}]
     };
 
-    if(l.match(/deliver|ship|कब|दिन|shipping/)) return {
-      text:`🚚 **Delivery Details:**\n\n• Pan India — 4 to 7 business days\n• Free shipping above ₹799\n• Ships within 24hrs of payment\n• SMS + email tracking provided\n• J&K and Northeast covered!`,
+    if(l.match(/deliver|ship|कब|दिन|shipping|डिलीवरी/)) return {
+      text: isHindi
+        ? `🚚 **Delivery की जानकारी:**\n\n• पूरे भारत में — 4 से 7 कार्य दिवस\n• ₹799 से ऊपर free shipping\n• Payment के 24 घंटे में ship\n• SMS + email tracking\n• J&K और पूर्वोत्तर भारत में भी delivery!`
+        : `🚚 **Delivery Details:**\n\n• Pan India — 4 to 7 business days\n• Free shipping above ₹799\n• Ships within 24hrs of payment\n• SMS + email tracking\n• J&K and Northeast covered!`,
       products:[]
     };
 
@@ -526,7 +641,11 @@
     };
 
     return {
-      text:`🌿 Namaste! I can help you with:\n• **Himalayan products** — benefits, sourcing, how to use\n• **Regional info** — Himachal, Kashmir, Ladakh, Northeast\n• **Health goals** — immunity, energy, digestion\n• **Budget filters** — best products in your budget\n• **Delivery & returns**\n\nWhat would you like to know?`,
+      text: isHindi
+        ? `🌿 नमस्ते! मैं इनमें मदद कर सकता हूँ:\n• **हिमालयी उत्पाद** — फायदे, sourcing, उपयोग कैसे करें\n• **क्षेत्रीय जानकारी** — हिमाचल, कश्मीर, लद्दाख, पूर्वोत्तर\n• **स्वास्थ्य लक्ष्य** — इम्यूनिटी, ऊर्जा, पाचन\n• **Budget filter** — आपके budget में सबसे अच्छे उत्पाद\n• **Delivery और returns**\n\nआज क्या जानना है आपको?`
+        : isPunjabi
+        ? `🌿 ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ! ਮੈਂ ਇਹਨਾਂ ਵਿੱਚ ਮਦਦ ਕਰ ਸਕਦਾ ਹਾਂ:\n• ਹਿਮਾਲੀਅਨ ਉਤਪਾਦ — ਫਾਇਦੇ ਅਤੇ ਵਰਤੋਂ\n• ਹਿਮਾਚਲ, ਕਸ਼ਮੀਰ, ਲੱਦਾਖ ਦੀ ਜਾਣਕਾਰੀ\n• Budget ਅਨੁਸਾਰ ਸਿਫ਼ਾਰਸ਼ਾਂ\n\nਅੱਜ ਕੀ ਚਾਹੀਦਾ ਹੈ ਤੁਹਾਨੂੰ?`
+        : `🌿 Namaste! I can help you with:\n• **Himalayan products** — benefits, sourcing, how to use\n• **Regional info** — Himachal, Kashmir, Ladakh, Northeast\n• **Health goals** — immunity, energy, digestion\n• **Budget filters** — best products in your budget\n• **Delivery & returns**\n\nWhat would you like to know?`,
       products:[]
     };
   }
