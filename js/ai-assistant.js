@@ -18,9 +18,11 @@
 (function () {
   'use strict';
 
-  const script    = document.currentScript;
-  const GEMINI_KEY = script?.getAttribute('data-gemini-key') || '';
-  const WA_NUM    = script?.getAttribute('data-whatsapp') || '919000000000';
+  // currentScript is null if script is deferred/async — fall back to querySelector
+  const script    = document.currentScript
+                 || document.querySelector('script[data-gemini-key]');
+  const GEMINI_KEY = (script && script.getAttribute('data-gemini-key')) || '';
+  const WA_NUM    = (script && script.getAttribute('data-whatsapp')) || '919000000000';
 
   if (!GEMINI_KEY) {
     console.warn('[Pahadi_AI] No Gemini API key found. Set data-gemini-key on the script tag.');
@@ -152,8 +154,8 @@ USE WEB SEARCH: You have Google Search available. Use it for current weather, te
     width:380px; height:560px;
     min-width:280px; min-height:380px;
     max-width:min(700px,96vw); max-height:92vh;
-    overflow:hidden; background:#0c1a0e; border-radius:18px;
-    box-shadow:0 24px 72px rgba(0,0,0,.65), 0 0 0 1px rgba(45,82,51,.3);
+    overflow:hidden; background:#ffffff; border-radius:18px;
+    box-shadow:0 8px 40px rgba(0,0,0,.18), 0 0 0 1px rgba(0,0,0,.06);
     display:flex; flex-direction:column;
     z-index:2147483644;
     transform:scale(.87) translateY(18px); opacity:0; pointer-events:none;
@@ -195,13 +197,14 @@ USE WEB SEARCH: You have Google Search available. Use it for current weather, te
     max-width:96px; font-family:inherit; flex-shrink:0;
   }
 
-  .pr-chips { padding:7px 10px; display:flex; gap:5px; overflow-x:auto; flex-shrink:0; scrollbar-width:none; border-bottom:1px solid rgba(200,146,10,.1) }
+  .pr-chips { padding:7px 10px; display:flex; gap:5px; overflow-x:auto; flex-shrink:0; scrollbar-width:none; border-bottom:1px solid #f3f4f6; background:#ffffff; }
   .pr-chips::-webkit-scrollbar { display:none }
-  .pr-chip { white-space:nowrap; border-radius:12px; padding:4px 10px; font-size:11px; cursor:pointer; transition:all .15s; flex-shrink:0; font-family:inherit; border:1px solid rgba(200,146,10,.22); background:rgba(200,146,10,.1) }
+  .pr-chip { white-space:nowrap; border-radius:12px; padding:4px 10px; font-size:11px; cursor:pointer; transition:all .15s; flex-shrink:0; font-family:inherit; border:1px solid #e5e7eb; background:#f9fafb; color:#374151; }
+  .pr-chip:hover { background:#f3f4f6; border-color:#d1d5db; }
 
-  .pr-msgs { flex:1; overflow-y:auto; padding:12px; display:flex; flex-direction:column; gap:10px; scrollbar-width:thin; scrollbar-color:rgba(200,146,10,.15) transparent }
+  .pr-msgs { flex:1; overflow-y:auto; padding:12px; display:flex; flex-direction:column; gap:10px; background:#fafafa; scrollbar-width:thin; scrollbar-color:rgba(0,0,0,.1) transparent }
   .pr-msgs::-webkit-scrollbar { width:3px }
-  .pr-msgs::-webkit-scrollbar-thumb { background:rgba(200,146,10,.15); border-radius:3px }
+  .pr-msgs::-webkit-scrollbar-thumb { background:#d1d5db; border-radius:3px }
   .pr-m { display:flex; gap:7px; align-items:flex-end; animation:pr-in .25s ease-out }
   @keyframes pr-in { from{opacity:0;transform:translateY(7px)} to{opacity:1;transform:translateY(0)} }
   .pr-m.u { flex-direction:row-reverse }
@@ -209,19 +212,19 @@ USE WEB SEARCH: You have Google Search available. Use it for current weather, te
   .pr-m.b .pr-mav img { width:100%; height:100%; object-fit:cover; border-radius:50% }
   .pr-m.u .pr-mav { background:rgba(255,255,255,.1); font-size:13px }
   .pr-mb { max-width:82%; padding:9px 13px; border-radius:15px; font-size:13px; line-height:1.55; font-family:inherit }
-  .pr-m.b .pr-mb { background:#152018; color:#e8edd4; border:1px solid rgba(200,146,10,.1); border-bottom-left-radius:4px }
+  .pr-m.b .pr-mb { background:#f3f4f6; color:#1a1a1a; border:1px solid rgba(0,0,0,.06); border-bottom-left-radius:4px }
   .pr-m.u .pr-mb { border-bottom-right-radius:4px; color:#fff }
 
   .pr-pcs { display:flex; flex-direction:column; gap:6px; margin-top:8px }
-  .pr-pc { background:rgba(0,0,0,.25); border:1px solid rgba(200,146,10,.18); border-radius:9px; padding:8px 10px; display:flex; align-items:center; gap:8px }
+  .pr-pc { background:#f9fafb; border:1px solid #e5e7eb; border-radius:9px; padding:8px 10px; display:flex; align-items:center; gap:8px }
   .pr-pce { font-size:20px; flex-shrink:0 }
-  .pr-pcn { font-size:12px; color:#e8edd4; font-weight:600; line-height:1.3 }
+  .pr-pcn { font-size:12px; color:#111827; font-weight:600; line-height:1.3 }
   .pr-pcp { font-size:11px; margin-top:1px }
   .pr-pcb { margin-left:auto; border:none; border-radius:6px; padding:4px 9px; font-size:11px; cursor:pointer; font-weight:700; flex-shrink:0; transition:transform .15s; font-family:inherit }
   .pr-pcb:hover { transform:scale(1.05) }
 
   .pr-fb { display:flex; gap:4px; padding-left:35px; margin-top:2px }
-  .pr-fb button { background:none; border:1px solid rgba(255,255,255,.1); border-radius:5px; padding:2px 7px; font-size:11px; color:rgba(255,255,255,.3); cursor:pointer; transition:all .15s; font-family:inherit }
+  .pr-fb button { background:none; border:1px solid #e5e7eb; border-radius:5px; padding:2px 7px; font-size:11px; color:#9ca3af; cursor:pointer; transition:all .15s; font-family:inherit }
   .pr-fb button.liked { border-color:#4aad72; color:#4aad72 }
   .pr-fb button.disliked { border-color:#ff5252; color:#ff5252 }
 
@@ -231,13 +234,13 @@ USE WEB SEARCH: You have Google Search available. Use it for current weather, te
   .pr-dots span:nth-child(3) { animation-delay:.3s }
   @keyframes pr-db { 0%,80%,100%{transform:scale(.6);opacity:.3} 40%{transform:scale(1);opacity:1} }
 
-  .pr-ia { padding:10px 12px; border-top:1px solid rgba(200,146,10,.1); background:#0a1209; flex-shrink:0 }
+  .pr-ia { padding:10px 12px; border-top:1px solid rgba(0,0,0,.08); background:#ffffff; flex-shrink:0 }
   .pr-ir { display:flex; gap:7px; align-items:flex-end }
-  #pr-ti { flex:1; background:rgba(255,255,255,.05); border:1px solid rgba(200,146,10,.2); border-radius:13px; padding:9px 12px; font-size:13px; color:#e8edd4; resize:none; outline:none; font-family:inherit; max-height:100px; line-height:1.4; scrollbar-width:none; transition:border-color .2s }
-  #pr-ti:focus { border-color:rgba(200,146,10,.5) }
-  #pr-ti::placeholder { color:rgba(255,255,255,.2) }
+  #pr-ti { flex:1; background:#f3f4f6; border:1.5px solid #e5e7eb; border-radius:13px; padding:9px 12px; font-size:13px; color:#1a1a1a; resize:none; outline:none; font-family:inherit; max-height:100px; line-height:1.4; scrollbar-width:none; transition:border-color .2s }
+  #pr-ti:focus { border-color:#2d5233; }
+  #pr-ti::placeholder { color:#9ca3af; }
   #pr-ti::-webkit-scrollbar { display:none }
-  #pr-voice { background:none; border:1px solid rgba(200,146,10,.2); border-radius:50%; width:35px; height:35px; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:all .2s }
+  #pr-voice { background:none; border:1px solid #e5e7eb; border-radius:50%; width:35px; height:35px; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:all .2s }
   #pr-voice svg { width:15px; height:15px }
   #pr-voice.rec { border-color:#ff5252; animation:pr-rec .8s ease-in-out infinite }
   @keyframes pr-rec { 0%,100%{box-shadow:0 0 0 0 rgba(255,82,82,.4)} 50%{box-shadow:0 0 0 7px rgba(255,82,82,0)} }
@@ -245,13 +248,13 @@ USE WEB SEARCH: You have Google Search available. Use it for current weather, te
   #pr-sb:hover:not(:disabled) { transform:scale(1.1) }
   #pr-sb:disabled { opacity:.35; cursor:not-allowed }
   #pr-sb svg { width:15px; height:15px }
-  .pr-ft { text-align:center; font-size:9px; color:rgba(255,255,255,.12); margin-top:6px; font-family:inherit }
+  .pr-ft { text-align:center; font-size:9px; color:#9ca3af; margin-top:6px; font-family:inherit }
 
   .pr-toast { position:fixed; bottom:115px; left:50%; transform:translateX(-50%) translateY(14px); border-radius:9px; padding:8px 18px; font-size:12px; font-weight:600; opacity:0; transition:all .28s; z-index:2147483647; pointer-events:none; font-family:inherit; white-space:nowrap }
   .pr-toast.show { opacity:1; transform:translateX(-50%) translateY(0) }
-  .pr-src { font-size:10px; color:rgba(255,255,255,.25); margin-top:4px; padding-left:35px; }
-  .pr-src a { color:rgba(200,146,10,.5); text-decoration:none }
-  .pr-src a:hover { color:rgba(200,146,10,.8) }
+  .pr-src { font-size:10px; color:#9ca3af; margin-top:4px; padding-left:35px; }
+  .pr-src a { color:#2d5233; text-decoration:none }
+  .pr-src a:hover { color:#1a3a1e; }
   `;
   document.head.appendChild(css);
 
@@ -273,7 +276,7 @@ USE WEB SEARCH: You have Google Search available. Use it for current weather, te
     const sbSvg = sb2 ? sb2.querySelector('svg') : null;
     if(sbSvg) sbSvg.style.fill = '#1a1a0a';
     const vSvg = document.querySelector('#pr-voice svg');
-    if(vSvg) vSvg.style.fill = 'rgba(255,255,255,.35)';
+    if(vSvg) vSvg.style.fill = '#6b7280';
     document.querySelectorAll('.pr-dots span').forEach(s => s.style.background = GOLD);
     document.querySelectorAll('.pr-pcb').forEach(b => { b.style.background=GOLD; b.style.color='#1a1a0a'; });
   }
