@@ -61,6 +61,9 @@ You MUST respond in ${langName} (language code: ${langCode}).
 - If langCode is "gu" → respond in Gujarati (ગુજરાતી)
 - If langCode is "kn" → respond in Kannada (ಕನ್ನಡ)
 - If langCode is "ml" → respond in Malayalam (മലയാളം)
+- If langCode is "doi" → respond in Dogri (डोगरी)
+- If langCode is "kngr" → respond in Kangri dialect (कांगड़ी बोली — Himachali Pahari dialect, use Devanagari)
+- If langCode is "garh" → respond in Garhwali dialect (गढ़वाली बोली — Uttarakhand Pahari dialect, use Devanagari)
 - If langCode is "en" → respond in English
 - For any other language → respond in that language
 NEVER mix languages. If user writes in a different language than selected, still respond in the SELECTED language (${langName}).
@@ -178,22 +181,24 @@ USE WEB SEARCH: You have Google Search available. Use it for current weather, te
     padding:11px 14px; display:flex; align-items:center; gap:10px; flex-shrink:0;
     border-bottom:1px solid rgba(200,146,10,.18);
   }
-  .pr-hav { width:40px; height:40px; border-radius:50%; overflow:hidden; flex-shrink:0; }
+  .pr-hav { width:56px; height:56px; border-radius:50%; overflow:hidden; flex-shrink:0; }
   .pr-hav img { width:100%; height:100%; object-fit:cover }
   .pr-hn { font-size:14px; font-weight:700; color:#f0ede0; line-height:1.2; font-family:inherit }
   .pr-hs { font-size:10px; font-family:inherit }
   .pr-dot { width:7px; height:7px; border-radius:50%; background:#4aad72; display:inline-block; margin-right:4px; animation:pr-blink 2s ease-in-out infinite }
   @keyframes pr-blink { 0%,100%{opacity:1} 50%{opacity:.3} }
   .pr-lsel {
-    margin-left:auto; border-radius:7px; padding:4px 6px;
-    font-size:10.5px; cursor:pointer; outline:none;
-    max-width:96px; font-family:inherit; flex-shrink:0;
+    margin-left:auto; border-radius:7px; padding:5px 8px;
+    font-size:11px; cursor:pointer; outline:none;
+    max-width:110px; font-family:inherit; flex-shrink:0;
+    background:#ffffff; color:#1a3a1e; border:1.5px solid rgba(200,146,10,.6);
+    font-weight:600;
   }
 
   .pr-chips { padding:7px 10px; display:flex; gap:5px; overflow-x:auto; flex-shrink:0; scrollbar-width:none; border-bottom:1px solid #f3f4f6; background:#ffffff; }
   .pr-chips::-webkit-scrollbar { display:none }
-  .pr-chip { white-space:nowrap; border-radius:12px; padding:4px 10px; font-size:11px; cursor:pointer; transition:all .15s; flex-shrink:0; font-family:inherit; border:1px solid #e5e7eb; background:#f9fafb; color:#374151; }
-  .pr-chip:hover { background:#f3f4f6; border-color:#d1d5db; }
+  .pr-chip { white-space:nowrap; border-radius:12px; padding:5px 12px; font-size:11.5px; cursor:pointer; transition:all .15s; flex-shrink:0; font-family:inherit; border:1.5px solid #2d5233; background:#f0f7f1; color:#1a3a1e; font-weight:600; }
+  .pr-chip:hover { background:#d4ecd9; border-color:#1a3a1e; color:#1a3a1e; }
 
   .pr-msgs { flex:1; overflow-y:auto; padding:12px; display:flex; flex-direction:column; gap:10px; background:#fafafa; scrollbar-width:thin; scrollbar-color:rgba(0,0,0,.1) transparent }
   .pr-msgs::-webkit-scrollbar { width:3px }
@@ -259,7 +264,7 @@ USE WEB SEARCH: You have Google Search available. Use it for current weather, te
     if(hd) hd.style.background = 'linear-gradient(135deg,' + DARK_GREEN + ',' + MID_GREEN + ')';
     const drag = document.getElementById('pr-drag');
     if(drag) drag.style.background = 'linear-gradient(135deg,' + DARK_GREEN + ',' + MID_GREEN + ')';
-    document.querySelectorAll('.pr-chip').forEach(c => { c.style.color = GOLD2; });
+    // chip colors handled by CSS — no override needed
     const lsel = document.getElementById('pr-lang');
     if(lsel){ lsel.style.background='rgba(0,0,0,.3)'; lsel.style.border='1px solid '+GOLD+'33'; lsel.style.color=GOLD2; }
     const hs = document.querySelector('.pr-hs');
@@ -315,6 +320,8 @@ USE WEB SEARCH: You have Google Search available. Use it for current weather, te
     + '<option value="as">অসমীয়া</option>'
     + '<option value="ne">नेपाली</option>'
     + '<option value="doi">डोगरी</option>'
+    + '<option value="kngr">कांगड़ी</option>'
+    + '<option value="garh">गढ़वाली</option>'
     + '</optgroup>'
     + '<optgroup label="Global">'
     + '<option value="zh">中文</option>'
@@ -397,14 +404,14 @@ USE WEB SEARCH: You have Google Search available. Use it for current weather, te
   var LANG_NAMES = {
     en:'English', hi:'Hindi', pa:'Punjabi', bn:'Bengali', ta:'Tamil', te:'Telugu',
     mr:'Marathi', gu:'Gujarati', kn:'Kannada', ml:'Malayalam', or:'Odia', as:'Assamese',
-    ne:'Nepali', doi:'Dogri', zh:'Chinese', ja:'Japanese', ko:'Korean', ar:'Arabic',
+    ne:'Nepali', doi:'Dogri', kngr:'Kangri', garh:'Garhwali', zh:'Chinese', ja:'Japanese', ko:'Korean', ar:'Arabic',
     fr:'French', de:'German', es:'Spanish',
   };
 
   var VOICE_MAP = {
     en:'en-IN', hi:'hi-IN', pa:'pa-IN', bn:'bn-IN', ta:'ta-IN', te:'te-IN',
     mr:'mr-IN', gu:'gu-IN', kn:'kn-IN', ml:'ml-IN', or:'or-IN', as:'as-IN',
-    ne:'ne-NP', zh:'zh-CN', ja:'ja-JP', ko:'ko-KR', ar:'ar-SA', fr:'fr-FR',
+    ne:'ne-NP', kngr:'hi-IN', garh:'hi-IN', zh:'zh-CN', ja:'ja-JP', ko:'ko-KR', ar:'ar-SA', fr:'fr-FR',
     de:'de-DE', es:'es-ES',
   };
 
