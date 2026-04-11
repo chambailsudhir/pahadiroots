@@ -187,13 +187,42 @@ USE WEB SEARCH: You have Google Search available. Use it for current weather, te
   .pr-hs { font-size:10px; font-family:inherit }
   .pr-dot { width:7px; height:7px; border-radius:50%; background:#4aad72; display:inline-block; margin-right:4px; animation:pr-blink 2s ease-in-out infinite }
   @keyframes pr-blink { 0%,100%{opacity:1} 50%{opacity:.3} }
-  .pr-lsel {
-    margin-left:auto; border-radius:7px; padding:5px 8px;
-    font-size:11px; cursor:pointer; outline:none;
-    max-width:110px; font-family:inherit; flex-shrink:0;
-    background:#ffffff; color:#1a3a1e; border:1.5px solid rgba(200,146,10,.6);
-    font-weight:600;
+  /* Custom Language Dropdown */
+  .pr-lang-wrap {
+    margin-left:auto; position:relative; flex-shrink:0;
   }
+  .pr-lang-btn {
+    display:flex; align-items:center; gap:5px;
+    background:#ffffff; color:#1a3a1e;
+    border:1.5px solid rgba(200,146,10,.8);
+    border-radius:8px; padding:5px 10px;
+    font-size:11.5px; font-weight:700; cursor:pointer;
+    font-family:inherit; white-space:nowrap;
+    min-width:80px; justify-content:space-between;
+  }
+  .pr-lang-btn:hover { background:#f0f7f1; }
+  .pr-lang-arrow { font-size:9px; opacity:0.7; }
+  .pr-lang-menu {
+    display:none; position:absolute; right:0; top:calc(100% + 4px);
+    background:#ffffff; border:1.5px solid #2d5233;
+    border-radius:10px; overflow:hidden; z-index:99999;
+    box-shadow:0 8px 24px rgba(0,0,0,.18);
+    max-height:260px; overflow-y:auto; min-width:130px;
+    scrollbar-width:thin; scrollbar-color:#2d5233 #f0f7f1;
+  }
+  .pr-lang-menu.open { display:block; }
+  .pr-lang-group {
+    padding:5px 10px 2px; font-size:9.5px; font-weight:800;
+    color:#9ca3af; text-transform:uppercase; letter-spacing:.5px;
+    background:#f9fafb; border-bottom:1px solid #e5e7eb;
+  }
+  .pr-lang-opt {
+    padding:8px 14px; font-size:12px; font-weight:600;
+    color:#1a3a1e; cursor:pointer; transition:all .12s;
+    font-family:inherit;
+  }
+  .pr-lang-opt:hover { background:#d4ecd9; color:#1a3a1e; }
+  .pr-lang-opt.active { background:#2d5233; color:#ffffff; }
 
   .pr-chips { padding:7px 10px; display:flex; gap:5px; overflow-x:auto; flex-shrink:0; scrollbar-width:none; border-bottom:1px solid #f3f4f6; background:#ffffff; }
   .pr-chips::-webkit-scrollbar { display:none }
@@ -265,8 +294,7 @@ USE WEB SEARCH: You have Google Search available. Use it for current weather, te
     const drag = document.getElementById('pr-drag');
     if(drag) drag.style.background = 'linear-gradient(135deg,' + DARK_GREEN + ',' + MID_GREEN + ')';
     // chip colors handled by CSS — no override needed
-    const lsel = document.getElementById('pr-lang');
-    if(lsel){ lsel.style.background='rgba(0,0,0,.3)'; lsel.style.border='1px solid '+GOLD+'33'; lsel.style.color=GOLD2; }
+    // custom dropdown — no override needed
     const hs = document.querySelector('.pr-hs');
     if(hs) hs.style.color = GOLD2;
     const sb2 = document.getElementById('pr-sb');
@@ -304,35 +332,35 @@ USE WEB SEARCH: You have Google Search available. Use it for current weather, te
     + '<div class="pr-hav"><img src="' + AI_CFG.avatar + '" alt="AI"></div>'
     + '<div><div class="pr-hn" id="pr-name">' + AI_CFG.name + '</div>'
     + '<div class="pr-hs"><span class="pr-dot"></span><span id="pr-tagline">' + AI_CFG.tagline + '</span></div></div>'
-    + '<select class="pr-lsel" id="pr-lang">'
-    + '<optgroup label="Indian">'
-    + '<option value="en">English</option>'
-    + '<option value="hi">हिंदी</option>'
-    + '<option value="pa">ਪੰਜਾਬੀ</option>'
-    + '<option value="bn">বাংলা</option>'
-    + '<option value="ta">தமிழ்</option>'
-    + '<option value="te">తెలుగు</option>'
-    + '<option value="mr">मराठी</option>'
-    + '<option value="gu">ગુજરાતી</option>'
-    + '<option value="kn">ಕನ್ನಡ</option>'
-    + '<option value="ml">മലയാളം</option>'
-    + '<option value="or">ଓଡ଼ିଆ</option>'
-    + '<option value="as">অসমীয়া</option>'
-    + '<option value="ne">नेपाली</option>'
-    + '<option value="doi">डोगरी</option>'
-    + '<option value="kngr">कांगड़ी</option>'
-    + '<option value="garh">गढ़वाली</option>'
-    + '</optgroup>'
-    + '<optgroup label="Global">'
-    + '<option value="zh">中文</option>'
-    + '<option value="ja">日本語</option>'
-    + '<option value="ko">한국어</option>'
-    + '<option value="ar">العربية</option>'
-    + '<option value="fr">Français</option>'
-    + '<option value="de">Deutsch</option>'
-    + '<option value="es">Español</option>'
-    + '</optgroup>'
-    + '</select></div>'
+    + '<div class="pr-lang-wrap" id="pr-lang-wrap">'
+    + '<button class="pr-lang-btn" id="pr-lang-btn"><span id="pr-lang-label">English</span><span class="pr-lang-arrow">▼</span></button>'
+    + '<div class="pr-lang-menu" id="pr-lang-menu">'
+    + '<div class="pr-lang-group">🇮🇳 Indian</div>'
+    + '<div class="pr-lang-opt active" data-lang="en">English</div>'
+    + '<div class="pr-lang-opt" data-lang="hi">हिंदी</div>'
+    + '<div class="pr-lang-opt" data-lang="pa">ਪੰਜਾਬੀ</div>'
+    + '<div class="pr-lang-opt" data-lang="bn">বাংলা</div>'
+    + '<div class="pr-lang-opt" data-lang="ta">தமிழ்</div>'
+    + '<div class="pr-lang-opt" data-lang="te">తెలుగు</div>'
+    + '<div class="pr-lang-opt" data-lang="mr">मराठी</div>'
+    + '<div class="pr-lang-opt" data-lang="gu">ગુજરાતી</div>'
+    + '<div class="pr-lang-opt" data-lang="kn">ಕನ್ನಡ</div>'
+    + '<div class="pr-lang-opt" data-lang="ml">മലയാളം</div>'
+    + '<div class="pr-lang-opt" data-lang="or">ଓଡ଼ିଆ</div>'
+    + '<div class="pr-lang-opt" data-lang="as">অসমীয়া</div>'
+    + '<div class="pr-lang-opt" data-lang="ne">नेपाली</div>'
+    + '<div class="pr-lang-opt" data-lang="doi">डोगरी</div>'
+    + '<div class="pr-lang-opt" data-lang="kngr">कांगड़ी</div>'
+    + '<div class="pr-lang-opt" data-lang="garh">गढ़वाली</div>'
+    + '<div class="pr-lang-group">🌍 Global</div>'
+    + '<div class="pr-lang-opt" data-lang="zh">中文</div>'
+    + '<div class="pr-lang-opt" data-lang="ja">日本語</div>'
+    + '<div class="pr-lang-opt" data-lang="ko">한국어</div>'
+    + '<div class="pr-lang-opt" data-lang="ar">العربية</div>'
+    + '<div class="pr-lang-opt" data-lang="fr">Français</div>'
+    + '<div class="pr-lang-opt" data-lang="de">Deutsch</div>'
+    + '<div class="pr-lang-opt" data-lang="es">Español</div>'
+    + '</div></div></div>'
     + '<div class="pr-chips" id="pr-chips">'
     + '<div class="pr-chip" data-q="Best honey recommendation?">🍯 Best honey</div>'
     + '<div class="pr-chip" data-q="Show products under 500 rupees">💰 Under ₹500</div>'
@@ -399,7 +427,7 @@ USE WEB SEARCH: You have Google Search available. Use it for current weather, te
   var input   = document.getElementById('pr-ti');
   var sb      = document.getElementById('pr-sb');
   var voice   = document.getElementById('pr-voice');
-  var langSel = document.getElementById('pr-lang');
+  // langSel removed — using custom dropdown now
 
   var LANG_NAMES = {
     en:'English', hi:'Hindi', pa:'Punjabi', bn:'Bengali', ta:'Tamil', te:'Telugu',
@@ -430,11 +458,33 @@ USE WEB SEARCH: You have Google Search available. Use it for current weather, te
     ja:'何でも聞いてください…',
   };
 
-  /* ── LANGUAGE CHANGE ──────────────────────────────────── */
-  langSel.addEventListener('change', function() {
-    lang = this.value;
+  /* ── CUSTOM LANGUAGE DROPDOWN ─────────────────────────── */
+  var langBtn  = document.getElementById('pr-lang-btn');
+  var langMenu = document.getElementById('pr-lang-menu');
+  var langLabel = document.getElementById('pr-lang-label');
+
+  langBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    langMenu.classList.toggle('open');
+  });
+
+  document.addEventListener('click', function() {
+    langMenu.classList.remove('open');
+  });
+
+  langMenu.addEventListener('click', function(e) {
+    var opt = e.target.closest('.pr-lang-opt');
+    if (!opt) return;
+    var newLang = opt.getAttribute('data-lang');
+    // Update active state
+    langMenu.querySelectorAll('.pr-lang-opt').forEach(function(o) { o.classList.remove('active'); });
+    opt.classList.add('active');
+    // Update button label
+    langLabel.textContent = opt.textContent;
+    langMenu.classList.remove('open');
+    // Apply language
+    lang = newLang;
     input.placeholder = PLACEHOLDERS[lang] || 'Ask anything — products, weather, health…';
-    // Clear history so new language context is fresh
     history = [];
     msgs.innerHTML = '';
     welcome();
