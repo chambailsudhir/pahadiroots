@@ -125,7 +125,7 @@ button{font-family:'Inter',sans-serif;cursor:pointer}
 .prod-vendor{font-size:11.5px;font-weight:800;color:var(--gold);letter-spacing:.8px;text-transform:uppercase;margin-bottom:6px;display:flex;align-items:center;gap:8px}
 .prod-vendor::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--bd),transparent)}
 .prod-name{font-family:'Playfair Display',serif;font-size:clamp(26px,3.5vw,38px);font-weight:900;color:var(--g);line-height:1.15;margin-bottom:6px}
-.prod-tagline{font-size:14px;color:#5a5a5a;line-height:1.65;margin-bottom:12px;font-style:italic;font-family:'Cormorant Garamond',serif;font-weight:400}
+.prod-tagline{font-size:14.5px;color:#5a5a5a;line-height:1.7;margin-bottom:14px;font-style:italic;font-family:'Cormorant Garamond',serif;font-weight:400;letter-spacing:.1px}
 /* Rating */
 .rating-row{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
 .stars{display:flex;gap:2px}
@@ -318,102 +318,31 @@ button{font-family:'Inter',sans-serif;cursor:pointer}
 .sticky-buy{flex:1;height:46px;background:var(--gold);color:#fff;border:none;border-radius:11px;font-size:14px;font-weight:900;cursor:pointer;font-family:'Lato',sans-serif}
 @media(max-width:880px){.sticky-cta{display:block}.body-pad{padding-bottom:80px}}
 
-/* ══ AI ASSISTANT ══ */
-var aiOpen = false;
-function openAiAssistant() {
-  aiOpen = !aiOpen;
-  var panel = document.getElementById('ai-panel');
-  if (aiOpen) {
-    panel.classList.add('open');
-    /* Populate quick chips from product context */
-    var chips = document.getElementById('ai-chips');
-    if (chips && PRODUCT) {
-      var questions = [
-        'Health benefits?',
-        'How to use daily?',
-        'Safe for kids?',
-        'Storage tips?',
-        'Main ingredients?',
-      ];
-      chips.innerHTML = questions.map(function(q){
-        return '<button class="ai-chip" onclick="askAiChip(this)">' + q + '</button>';
-      }).join('');
-    }
-    setTimeout(function(){ var inp = document.getElementById('ai-input'); if(inp) inp.focus(); }, 300);
-  } else {
-    panel.classList.remove('open');
-  }
-}
-function closeAiAssistant() {
-  aiOpen = false;
-  document.getElementById('ai-panel').classList.remove('open');
-}
-function askAiChip(btn) {
-  var q = btn.textContent;
-  btn.parentElement.style.display = 'none'; /* hide chips after first use */
-  appendAiMsg(q, 'user');
-  callAiAssistant(q);
-}
-function sendAiMsg() {
-  var inp = document.getElementById('ai-input');
-  var q = (inp ? inp.value : '').trim();
-  if (!q) return;
-  inp.value = '';
-  appendAiMsg(q, 'user');
-  callAiAssistant(q);
-}
-function appendAiMsg(text, role) {
-  var msgs = document.getElementById('ai-msgs');
-  if (!msgs) return;
-  var div = document.createElement('div');
-  div.className = 'ai-msg ai-msg-' + role;
-  div.textContent = text;
-  msgs.appendChild(div);
-  msgs.scrollTop = msgs.scrollHeight;
-}
-function showAiTyping() {
-  var msgs = document.getElementById('ai-msgs');
-  if (!msgs) return null;
-  var div = document.createElement('div');
-  div.className = 'ai-msg-typing';
-  div.id = 'ai-typing';
-  div.innerHTML = '<div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div>';
-  msgs.appendChild(div);
-  msgs.scrollTop = msgs.scrollHeight;
-  return div;
-}
-async function callAiAssistant(question) {
-  var typingEl = showAiTyping();
+/* ══ AUTH + CHECKOUT ══ */
+function isUserLoggedIn() {
   try {
-    var prod = PRODUCT || {};
-    var context = 'Product: ' + (prod.name||'') +
-      (prod.short_description ? '\nDescription: ' + prod.short_description : '') +
-      (prod.ai_description ? '\nAI Description: ' + prod.ai_description : '') +
-      '\nBrand: 5 Pahadi Roots — authentic Himalayan natural products';
-    var resp = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': window.ANTHROPIC_API_KEY || '',
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true',
-      },
-      body: JSON.stringify({
-        model: 'claude-haiku-4-5-20251001',
-        max_tokens: 200,
-        system: 'You are a helpful product assistant for 5 Pahadi Roots, a premium Himalayan organic products brand. Answer customer questions about the product concisely in 2-3 sentences max. Be warm, honest, and helpful. No markdown.',
-        messages: [{ role: 'user', content: context + '\n\nCustomer question: ' + question }]
-      })
-    });
-    if (typingEl) typingEl.remove();
-    if (!resp.ok) throw new Error('API error');
-    var data = await resp.json();
-    var answer = (data.content||[]).map(function(c){return c.text||'';}).join('');
-    appendAiMsg(answer || 'I\'m not sure about that. Please contact us on WhatsApp for more details!', 'bot');
-  } catch(e) {
-    if (typingEl) typingEl.remove();
-    appendAiMsg('This feature needs an API key. Coming soon! Meanwhile, contact us on WhatsApp for any questions. 🙏', 'bot');
+    return !!(localStorage.getItem('pr_auth_token') && localStorage.getItem('pr_auth_user'));
+  } catch(e) { return false; }
+}
+
+function handleCheckout() {
+  /* Always save cart to localStorage first */
+  try { localStorage.setItem('pr_cart', JSON.stringify(cart)); } catch(e) {}
+  closeCartDrawer();
+
+  if (isUserLoggedIn()) {
+    /* Logged in → go to main site cart page (index.html with cart open) */
+    window.location.href = '/?opencart=1';
+  } else {
+    /* Not logged in → show login/guest choice modal */
+    document.getElementById('login-modal-overlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
   }
+}
+
+function closeLoginModal() {
+  document.getElementById('login-modal-overlay').classList.remove('open');
+  document.body.style.overflow = '';
 }
 
 /* ══ CART DRAWER ══ */
@@ -489,33 +418,27 @@ async function callAiAssistant(question) {
 .s-btn{padding:14px 32px;background:var(--g);color:#fff;border:none;border-radius:13px;font-size:15px;font-weight:900;cursor:pointer;font-family:'Lato',sans-serif}
 
 /* ══ TOAST ══ */
-/* ── LOGIN MODAL ── */
 .login-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(4px);z-index:1200;align-items:center;justify-content:center;padding:20px}
 .login-modal-overlay.open{display:flex;animation:fadeInBg .2s ease}
 @keyframes fadeInBg{from{opacity:0}to{opacity:1}}
-.login-modal{background:#fff;border-radius:20px;width:420px;max-width:100%;box-shadow:0 32px 80px rgba(0,0,0,.25);overflow:hidden;animation:modalUp .28s cubic-bezier(.25,.46,.45,.94)}
-.lm-head{background:linear-gradient(135deg,#1a3a1e,#2d5a32);padding:24px 24px 20px;color:#fff;text-align:center;position:relative}
+.login-modal{background:#fff;border-radius:20px;width:400px;max-width:100%;box-shadow:0 32px 80px rgba(0,0,0,.25);overflow:hidden;animation:modalUp .28s cubic-bezier(.25,.46,.45,.94)}
+.lm-head{background:linear-gradient(135deg,#1a3a1e,#2d5a32);padding:22px 24px 18px;color:#fff;text-align:center;position:relative}
 .lm-head h3{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;margin-bottom:4px}
 .lm-head p{font-size:13px;opacity:.8}
-.lm-close{position:absolute;top:16px;right:18px;background:rgba(255,255,255,.15);border:none;color:#fff;font-size:20px;cursor:pointer;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;transition:.2s}
+.lm-close{position:absolute;top:14px;right:16px;background:rgba(255,255,255,.15);border:none;color:#fff;font-size:20px;cursor:pointer;border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center}
 .lm-close:hover{background:rgba(255,255,255,.25)}
-.lm-body{padding:24px}
+.lm-body{padding:22px}
 .lm-option{display:flex;align-items:center;gap:14px;padding:14px 16px;border:1.5px solid #e0e0e0;border-radius:12px;margin-bottom:10px;cursor:pointer;transition:all .2s;text-decoration:none;color:#1a1a1a}
 .lm-option:hover{border-color:#1a3a1e;background:#f0f7f0;transform:translateY(-1px);box-shadow:0 4px 12px rgba(26,58,30,.1)}
 .lm-option-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
 .lm-option-text strong{display:block;font-size:14px;font-weight:700;margin-bottom:2px}
 .lm-option-text span{font-size:12px;color:#777}
-.lm-divider{text-align:center;font-size:12px;color:#aaa;margin:14px 0;position:relative}
-.lm-divider::before,.lm-divider::after{content:'';position:absolute;top:50%;width:42%;height:1px;background:#e8e8e8}
+.lm-divider{text-align:center;font-size:12px;color:#bbb;margin:12px 0;position:relative}
+.lm-divider::before,.lm-divider::after{content:'';position:absolute;top:50%;width:42%;height:1px;background:#eee}
 .lm-divider::before{left:0}.lm-divider::after{right:0}
-.lm-guest{width:100%;padding:13px;border:1.5px solid #c8b89a;border-radius:12px;background:#fdf8f0;color:#8a6030;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;font-family:'Inter',sans-serif}
-.lm-guest:hover{background:#c8920a;color:#fff;border-color:#c8920a}
-.lm-note{font-size:11px;color:#aaa;text-align:center;margin-top:14px}
-
-/* ── CART ITEM ENTRY ANIMATION ── */
-@keyframes cartItemIn{from{opacity:0;transform:translateX(12px)}to{opacity:1;transform:translateX(0)}}
-.cart-item{animation:cartItemIn .22s ease}
-
+.lm-guest-btn{width:100%;padding:13px;border:1.5px solid #c8b89a;border-radius:12px;background:#fdf8f0;color:#8a6030;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;font-family:'Inter',sans-serif}
+.lm-guest-btn:hover{background:#c8920a;color:#fff;border-color:#c8920a}
+.lm-note{font-size:11px;color:#aaa;text-align:center;margin-top:12px;line-height:1.5}
 .toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:var(--g);color:#fff;padding:12px 24px;border-radius:28px;font-size:14px;font-weight:700;box-shadow:0 8px 28px rgba(0,0,0,.22);z-index:9999;opacity:0;transition:opacity .3s,transform .3s;pointer-events:none;white-space:nowrap;max-width:90vw;text-align:center}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(-6px)}
 @media(max-width:880px){.toast{bottom:90px}}
@@ -528,32 +451,6 @@ async function callAiAssistant(question) {
 .not-found h2{font-family:'Playfair Display',serif;font-size:28px;color:var(--g);margin-bottom:12px}
 
 /* ══ FOOTER ══ */
-.ai-fab{position:fixed;bottom:28px;right:28px;z-index:800;background:linear-gradient(135deg,#1a3a1e,#2d5a32);color:#fff;border:none;border-radius:50px;padding:12px 18px 12px 14px;display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 8px 28px rgba(26,58,30,.45);transition:all .25s;font-family:'Inter',sans-serif}
-.ai-fab:hover{transform:translateY(-3px);box-shadow:0 14px 36px rgba(26,58,30,.55)}
-.ai-fab svg{flex-shrink:0}
-@media(max-width:640px){.ai-fab{bottom:90px;right:16px;padding:11px 16px 11px 13px;font-size:12px}}
-.ai-panel{position:fixed;bottom:90px;right:28px;width:340px;max-height:480px;background:#fff;border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.22);z-index:799;display:none;flex-direction:column;overflow:hidden;border:1px solid #e0d8c8}
-.ai-panel.open{display:flex;animation:aiPanelUp .25s cubic-bezier(.25,.46,.45,.94)}
-@keyframes aiPanelUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
-@media(max-width:640px){.ai-panel{right:0;left:0;width:100%;bottom:72px;border-radius:18px 18px 0 0;max-height:70vh}}
-.ai-panel-head{background:linear-gradient(135deg,#1a3a1e,#2d5a32);color:#fff;padding:14px 16px;display:flex;align-items:center;justify-content:space-between}
-.ai-panel-msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;background:#faf6ee}
-.ai-msg{max-width:88%;padding:10px 13px;border-radius:12px;font-size:13px;line-height:1.6}
-.ai-msg-bot{background:#fff;border:1px solid #e0d8c8;color:#2a2a2a;align-self:flex-start;border-radius:4px 12px 12px 12px}
-.ai-msg-user{background:linear-gradient(135deg,#1a3a1e,#2d5a32);color:#fff;align-self:flex-end;border-radius:12px 12px 4px 12px}
-.ai-msg-typing{display:flex;align-items:center;gap:5px;padding:10px 14px;background:#fff;border:1px solid #e0d8c8;border-radius:4px 12px 12px 12px;align-self:flex-start}
-.ai-dot{width:7px;height:7px;border-radius:50%;background:#c8920a;animation:aiDot .8s ease-in-out infinite}
-.ai-dot:nth-child(2){animation-delay:.15s}
-.ai-dot:nth-child(3){animation-delay:.3s}
-@keyframes aiDot{0%,80%,100%{transform:scale(.7);opacity:.4}40%{transform:scale(1.1);opacity:1}}
-.ai-quick-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
-.ai-chip{padding:6px 12px;border:1px solid #c8b89a;border-radius:20px;font-size:11.5px;font-weight:600;color:#8a6030;background:#fff;cursor:pointer;transition:all .15s;font-family:'Inter',sans-serif}
-.ai-chip:hover{background:#c8920a;color:#fff;border-color:#c8920a}
-.ai-panel-input{display:flex;align-items:center;gap:8px;padding:12px;border-top:1px solid #e8e0d0;background:#fff}
-.ai-panel-input input{flex:1;border:1.5px solid #e0d8c8;border-radius:10px;padding:9px 12px;font-size:13px;font-family:'Inter',sans-serif;outline:none;color:#2a2a2a;transition:border-color .2s}
-.ai-panel-input input:focus{border-color:#c8920a}
-.ai-panel-input button{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#1a3a1e,#2d5a32);color:#fff;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s}
-.ai-panel-input button:hover{opacity:.88}
 .mini-footer{background:var(--g);color:rgba(255,255,255,.65);text-align:center;padding:24px 20px;font-size:12.5px;margin-top:48px}
 .mini-footer a{color:var(--gold2);font-weight:700}
 
@@ -561,26 +458,28 @@ async function callAiAssistant(question) {
 /* ══ ACCORDION TABS ══ */
 .acc-list{display:flex;flex-direction:column;gap:10px;margin:0}
 .acc-item{background:#fff;border:2px solid #c8b89a;border-radius:14px;overflow:hidden;transition:border-color .25s,box-shadow .25s}
-.acc-item.open{border-color:#c8920a;box-shadow:0 4px 20px rgba(200,146,10,.12)}
-.acc-head{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;cursor:pointer;transition:background .2s;user-select:none;gap:12px}
+.acc-item.open{border-color:#c8920a;box-shadow:0 4px 20px rgba(200,146,10,.13)}
+.acc-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;cursor:pointer;transition:background .2s;user-select:none;gap:12px}
 .acc-head:hover{background:#fdf9f0}
 .acc-head-left{display:flex;align-items:center;gap:14px}
-.acc-icon-wrap{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#f5ede0,#ede0cc);border:1.5px solid rgba(200,146,10,.22);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .25s}.acc-icon-wrap svg{width:20px;height:20px;stroke:#8a6030;stroke-width:1.8;fill:none;flex-shrink:0}
-.acc-item.open .acc-icon-wrap{background:linear-gradient(135deg,#fdf0d8,#f5e0b8);border-color:rgba(200,146,10,.45);transform:scale(1.05)}
+.acc-icon-wrap{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#f5ede0,#ede0cc);border:1.5px solid rgba(200,146,10,.22);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .25s}
+.acc-icon-wrap svg{width:19px;height:19px;stroke:#8a6030;stroke-width:1.8;fill:none}
+.acc-item.open .acc-icon-wrap{background:linear-gradient(135deg,#fdf0d8,#f5e0b8);border-color:rgba(200,146,10,.5);transform:scale(1.06)}
+.acc-item.open .acc-icon-wrap svg{stroke:#c8920a}
 .acc-title{font-size:15px;font-weight:600;color:#1a2a1e;letter-spacing:.1px;font-family:'Inter',sans-serif}
-.acc-chevron{width:30px;height:30px;border-radius:50%;background:#f5ede0;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform .3s,background .25s}
-.acc-chevron svg{width:14px;height:14px;stroke:#8a7060;stroke-width:2.5;fill:none;transition:stroke .25s}
+.acc-chevron{width:28px;height:28px;border-radius:50%;background:#f5ede0;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform .3s,background .25s}
+.acc-chevron svg{width:13px;height:13px;stroke:#8a7060;stroke-width:2.5;fill:none;transition:stroke .25s}
 .acc-item.open .acc-chevron{transform:rotate(180deg);background:#fde8b8}
 .acc-item.open .acc-chevron svg{stroke:#c8920a}
-.acc-body{display:none;padding:2px 20px 20px 78px;font-size:14px;color:#4a4a4a;line-height:1.85;font-family:'Inter',sans-serif}
-.acc-item.open .acc-body{display:block;animation:accFadeIn .22s ease}
-@keyframes accFadeIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
-.acc-body ul{padding-left:0;list-style:none;display:flex;flex-direction:column;gap:10px}
+.acc-body{display:none;padding:2px 20px 20px 76px;font-size:14px;color:#4a4a4a;line-height:1.85;font-family:'Inter',sans-serif}
+.acc-item.open .acc-body{display:block;animation:accIn .2s ease}
+@keyframes accIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+.acc-body ul{padding-left:0;list-style:none;display:flex;flex-direction:column;gap:9px}
 .acc-body li{display:flex;align-items:flex-start;gap:10px;font-size:14px;line-height:1.65}
-.acc-body li::before{content:'';display:inline-flex;min-width:20px;height:20px;border-radius:50%;background:rgba(200,146,10,.1);border:1.5px solid rgba(200,146,10,.3);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpolyline points='2,6 5,9 10,3' stroke='%23c8920a' stroke-width='1.8' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:center;background-size:12px;margin-top:2px;flex-shrink:0}
+.acc-body li::before{content:'';display:inline-flex;min-width:20px;height:20px;border-radius:50%;background:rgba(200,146,10,.1);border:1.5px solid rgba(200,146,10,.3);flex-shrink:0;margin-top:2px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpolyline points='2,6 5,9 10,3' stroke='%23c8920a' stroke-width='1.8' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:center;background-size:12px}
 .acc-body-text{font-size:14px;line-height:1.85;color:#4a4a4a}
-.cert-badges{display:flex;gap:10px;flex-wrap:wrap}
-.cert-badge{display:flex;align-items:center;gap:8px;padding:10px 14px;background:rgba(26,58,30,.05);border:1.5px solid rgba(26,58,30,.12);border-radius:10px;font-size:13px;font-weight:600;color:#1a3a1e}
+.cert-badges{display:flex;gap:9px;flex-wrap:wrap}
+.cert-badge{display:flex;align-items:center;gap:7px;padding:9px 13px;background:rgba(26,58,30,.05);border:1.5px solid rgba(26,58,30,.12);border-radius:10px;font-size:13px;font-weight:600;color:#1a3a1e}
 
 /* ══ INLINE BENEFITS ══ */
 .inline-benefits{background:#fff;border:1.5px solid #e8a020;border-radius:14px;padding:20px 22px;margin-top:16px}
@@ -753,7 +652,7 @@ async function callAiAssistant(question) {
   <div class="cd-foot">
     <div class="cd-del-note" id="cd-del-note">Free delivery on orders above ₹799</div>
     <div class="cd-total-row"><span class="cd-total-lbl">Total</span><span class="cd-total-val" id="cd-total">₹0</span></div>
-    <button class="cd-checkout-btn" onclick="handleCheckout()">🔒 Proceed to Checkout</button>
+    <button class="cd-checkout-btn" onclick="handleCheckout()">Proceed to Checkout →</button>
     <div class="cd-pay-row">
       <span class="cd-pay-chip">UPI</span><span class="cd-pay-chip">Cards</span><span class="cd-pay-chip">COD</span><span class="cd-pay-chip">Net Banking</span>
     </div>
@@ -812,30 +711,31 @@ async function callAiAssistant(question) {
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
-<!-- LOGIN MODAL -->
+<!-- LOGIN / GUEST MODAL — shown when unauthenticated user proceeds to checkout -->
 <div class="login-modal-overlay" id="login-modal-overlay" onclick="if(event.target===this)closeLoginModal()">
   <div class="login-modal">
     <div class="lm-head">
       <button class="lm-close" onclick="closeLoginModal()">×</button>
-      <h3>Sign in to Continue</h3>
-      <p>Login to complete your order & track it</p>
+      <h3>Almost there!</h3>
+      <p>Sign in for a faster checkout experience</p>
     </div>
     <div class="lm-body">
-      <a href="/account" class="lm-option" onclick="try{localStorage.setItem('pr_cart',JSON.stringify(cart));}catch(e){}">
+      <a class="lm-option" href="/account"
+         onclick="try{localStorage.setItem('pr_cart',JSON.stringify(cart));localStorage.setItem('pr_checkout_redirect','1');}catch(e){}">
         <div class="lm-option-icon" style="background:#e8f5e9">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1a5c2a" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
         </div>
         <div class="lm-option-text">
           <strong>Login / Register</strong>
-          <span>Use phone number or email — takes 30 seconds</span>
+          <span>Saved address · Order tracking · Reward points</span>
         </div>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#bbb" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
       </a>
       <div class="lm-divider">or</div>
-      <button class="lm-guest" onclick="closeLoginModal();openPayModal();">
+      <button class="lm-guest-btn" onclick="closeLoginModal(); try{localStorage.setItem('pr_cart',JSON.stringify(cart));}catch(e){} window.location.href='/?opencart=1';">
         Continue as Guest →
       </button>
-      <div class="lm-note">Guest orders cannot be tracked. Login for order history, easy returns & reward points.</div>
+      <div class="lm-note">Guest orders cannot be tracked. Login recommended for easy returns & offers.</div>
     </div>
   </div>
 </div>
@@ -1088,7 +988,15 @@ function renderProduct(p, images, related, data, stateMap, stateImgMap) {
       '<div class="info-section">' +
         '<div class="prod-vendor">📍 '+regionName+'</div>' +
         '<h1 class="prod-name">'+p.name+'</h1>' +
-        (p.short_description ? '<p class="prod-tagline">'+p.short_description+'</p>' : '') +
+        (function(){
+          /* Tagline: short_description first, then first sentence of ai_description, else nothing */
+          var tag = p.short_description || '';
+          if (!tag && p.ai_description) {
+            tag = p.ai_description.split(/[.!?]/)[0].trim();
+            if (tag) tag = tag + '.';
+          }
+          return tag ? '<p class="prod-tagline">'+tag+'</p>' : '';
+        })()+
         '<div class="rating-row">' +
           '<div class="stars">'+[1,2,3,4,5].map(function(){return '<svg class="star" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>';}).join('')+'</div>' +
           '<span class="rating-num">4.8</span>' +
@@ -1397,26 +1305,25 @@ function closeZoom() {
 }
 
 /* ══ ACCORDION ══ */
-/* SVG icons for premium accordion — no emoji font dependency */
-var ACC_SVG = {
-  'Description':   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>',
-  'How to Use':    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 2C8.13 2 5 5.13 5 9c0 2.38 1.19 4.47 3 5.74V17a1 1 0 001 1h6a1 1 0 001-1v-2.26C17.81 13.47 19 11.38 19 9c0-3.87-3.13-7-7-7z"/><line x1="9" y1="21" x2="15" y2="21"/></svg>',
-  'Storage Tips':  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 8v13H3V8"/><rect x="1" y="3" width="22" height="5" rx="1"/><line x1="10" y1="12" x2="14" y2="12"/></svg>',
-  'Who Should Buy':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
-  'Ingredients':   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
-  'Certifications':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>',
-  'Shipping':      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="1" y="3" width="15" height="13" rx="1"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>',
-  'Returns & Refunds':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>',
+var _ACC_SVG = {
+  'Description':    '<svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>',
+  'How to Use':     '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+  'Storage Tips':   '<svg viewBox="0 0 24 24"><path d="M21 8v13H3V8"/><rect x="1" y="3" width="22" height="5" rx="1"/><line x1="10" y1="12" x2="14" y2="12"/></svg>',
+  'Who Should Buy': '<svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>',
+  'Ingredients':    '<svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
+  'Certifications': '<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>',
+  'Shipping':       '<svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="1"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>',
+  'Returns & Refunds':'<svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>',
 };
 function makeAcc(title, content, open) {
   var parts = title.match(/^\S+\s+(.+)$/);
   var label = parts ? parts[1] : title;
-  var svgIcon = ACC_SVG[label] || ACC_SVG['Description'];
-  var chevSvg = '<svg viewBox="0 0 14 14" xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px;stroke:#8a7060;stroke-width:2.5;fill:none"><polyline points="2,4 7,10 12,4"/></svg>';
+  var svgIcon = _ACC_SVG[label] || _ACC_SVG['Description'];
+  var chevSvg = '<svg viewBox="0 0 14 14" style="width:13px;height:13px;stroke:#8a7060;stroke-width:2.5;fill:none"><polyline points="2,4 7,10 12,4"/></svg>';
   return '<div class="acc-item'+(open?' open':'')+'">' +
     '<div class="acc-head" onclick="toggleAcc(this.parentElement)">' +
       '<div class="acc-head-left">' +
-        '<div class="acc-icon-wrap" style="color:#8a6030">'+svgIcon+'</div>' +
+        '<div class="acc-icon-wrap">'+svgIcon+'</div>' +
         '<span class="acc-title">'+label+'</span>' +
       '</div>' +
       '<div class="acc-chevron">'+chevSvg+'</div>' +
@@ -1479,7 +1386,11 @@ function checkPin() {
   showToast('✅ Delivery available to PIN '+pin+' in 5–7 days');
 }
 
-/* ══ ADD TO CART / BUY ══ */
+/* ══ ADD TO CART / BUY NOW ══
+   Industry standard behavior (Amazon, Flipkart, Meesho):
+   • Add to Cart  → adds item, shows cart drawer, customer continues browsing
+   • Buy Now      → adds item, skips drawer, goes DIRECTLY to checkout/payment
+   ══════════════════════════════════════════════════════════════════════════ */
 function addToCartProduct(mode) {
   if (!PRODUCT) return;
   var price = selectedVariant ? selectedVariant.price : PRODUCT.price;
@@ -1497,15 +1408,25 @@ function addToCartProduct(mode) {
   if (qd) qd.textContent = '1';
   var minus = document.querySelector('.qty-ctrl .qty-btn:first-child');
   if (minus) minus.style.opacity = '0.3';
-  /* Always open cart drawer — both Add and Buy Now */
-  renderCartDrawer();
-  openCartDrawer();
-  var btn = document.getElementById('atc-add-btn');
+
   if (mode === 'buy') {
-    if (btn) { btn.innerHTML='✅ In Cart';btn.classList.add('added');setTimeout(function(){btn.innerHTML='🛒 Add to Cart';btn.classList.remove('added');},2000); }
+    /* BUY NOW — skip cart, go straight to checkout (like Amazon "Buy Now") */
+    var btn = document.getElementById('atc-btn');
+    if (btn) { btn.innerHTML = '⏳ Going to checkout…'; btn.disabled = true; }
+    setTimeout(function() {
+      handleCheckout();
+      if (btn) { btn.innerHTML = '⚡ Buy Now'; btn.disabled = false; }
+    }, 300);
   } else {
-    if (btn) { btn.innerHTML='✅ Added!';btn.classList.add('added');setTimeout(function(){btn.innerHTML='🛒 Add to Cart';btn.classList.remove('added');},2000); }
-    showToast('✅ '+displayName+' added!');
+    /* ADD TO CART — open drawer so customer can review cart and continue shopping */
+    renderCartDrawer();
+    openCartDrawer();
+    var addBtn = document.getElementById('atc-add-btn');
+    if (addBtn) {
+      addBtn.innerHTML = '✅ Added!';
+      addBtn.classList.add('added');
+      setTimeout(function(){ addBtn.innerHTML='🛒 Add to Cart'; addBtn.classList.remove('added'); }, 2200);
+    }
   }
 }
 
@@ -1556,102 +1477,31 @@ function copyLink(btn) {
   }
 }
 
-/* ══ AI ASSISTANT ══ */
-var aiOpen = false;
-function openAiAssistant() {
-  aiOpen = !aiOpen;
-  var panel = document.getElementById('ai-panel');
-  if (aiOpen) {
-    panel.classList.add('open');
-    /* Populate quick chips from product context */
-    var chips = document.getElementById('ai-chips');
-    if (chips && PRODUCT) {
-      var questions = [
-        'Health benefits?',
-        'How to use daily?',
-        'Safe for kids?',
-        'Storage tips?',
-        'Main ingredients?',
-      ];
-      chips.innerHTML = questions.map(function(q){
-        return '<button class="ai-chip" onclick="askAiChip(this)">' + q + '</button>';
-      }).join('');
-    }
-    setTimeout(function(){ var inp = document.getElementById('ai-input'); if(inp) inp.focus(); }, 300);
-  } else {
-    panel.classList.remove('open');
-  }
-}
-function closeAiAssistant() {
-  aiOpen = false;
-  document.getElementById('ai-panel').classList.remove('open');
-}
-function askAiChip(btn) {
-  var q = btn.textContent;
-  btn.parentElement.style.display = 'none'; /* hide chips after first use */
-  appendAiMsg(q, 'user');
-  callAiAssistant(q);
-}
-function sendAiMsg() {
-  var inp = document.getElementById('ai-input');
-  var q = (inp ? inp.value : '').trim();
-  if (!q) return;
-  inp.value = '';
-  appendAiMsg(q, 'user');
-  callAiAssistant(q);
-}
-function appendAiMsg(text, role) {
-  var msgs = document.getElementById('ai-msgs');
-  if (!msgs) return;
-  var div = document.createElement('div');
-  div.className = 'ai-msg ai-msg-' + role;
-  div.textContent = text;
-  msgs.appendChild(div);
-  msgs.scrollTop = msgs.scrollHeight;
-}
-function showAiTyping() {
-  var msgs = document.getElementById('ai-msgs');
-  if (!msgs) return null;
-  var div = document.createElement('div');
-  div.className = 'ai-msg-typing';
-  div.id = 'ai-typing';
-  div.innerHTML = '<div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div>';
-  msgs.appendChild(div);
-  msgs.scrollTop = msgs.scrollHeight;
-  return div;
-}
-async function callAiAssistant(question) {
-  var typingEl = showAiTyping();
+/* ══ AUTH + CHECKOUT ══ */
+function isUserLoggedIn() {
   try {
-    var prod = PRODUCT || {};
-    var context = 'Product: ' + (prod.name||'') +
-      (prod.short_description ? '\nDescription: ' + prod.short_description : '') +
-      (prod.ai_description ? '\nAI Description: ' + prod.ai_description : '') +
-      '\nBrand: 5 Pahadi Roots — authentic Himalayan natural products';
-    var resp = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': window.ANTHROPIC_API_KEY || '',
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true',
-      },
-      body: JSON.stringify({
-        model: 'claude-haiku-4-5-20251001',
-        max_tokens: 200,
-        system: 'You are a helpful product assistant for 5 Pahadi Roots, a premium Himalayan organic products brand. Answer customer questions about the product concisely in 2-3 sentences max. Be warm, honest, and helpful. No markdown.',
-        messages: [{ role: 'user', content: context + '\n\nCustomer question: ' + question }]
-      })
-    });
-    if (typingEl) typingEl.remove();
-    if (!resp.ok) throw new Error('API error');
-    var data = await resp.json();
-    var answer = (data.content||[]).map(function(c){return c.text||'';}).join('');
-    appendAiMsg(answer || 'I\'m not sure about that. Please contact us on WhatsApp for more details!', 'bot');
-  } catch(e) {
-    if (typingEl) typingEl.remove();
-    appendAiMsg('This feature needs an API key. Coming soon! Meanwhile, contact us on WhatsApp for any questions. 🙏', 'bot');
+    return !!(localStorage.getItem('pr_auth_token') && localStorage.getItem('pr_auth_user'));
+  } catch(e) { return false; }
+}
+
+function handleCheckout() {
+  /* Always save cart to localStorage first */
+  try { localStorage.setItem('pr_cart', JSON.stringify(cart)); } catch(e) {}
+  closeCartDrawer();
+
+  if (isUserLoggedIn()) {
+    /* Logged in → go to main site cart page (index.html with cart open) */
+    window.location.href = '/?opencart=1';
+  } else {
+    /* Not logged in → show login/guest choice modal */
+    document.getElementById('login-modal-overlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
   }
+}
+
+function closeLoginModal() {
+  document.getElementById('login-modal-overlay').classList.remove('open');
+  document.body.style.overflow = '';
 }
 
 /* ══ CART DRAWER ══ */
@@ -1676,36 +1526,6 @@ function openCartDrawer(){ renderCartDrawer();document.getElementById('drawer-ov
 function closeCartDrawer(){ document.getElementById('drawer-overlay').classList.remove('open');document.getElementById('cart-drawer').classList.remove('open');document.body.style.overflow=''; }
 
 /* ══ PAYMENT MODAL ══ */
-/* ── AUTH-AWARE CHECKOUT ── */
-function isUserLoggedIn() {
-  try {
-    var token = localStorage.getItem('pr_auth_token');
-    var user  = localStorage.getItem('pr_auth_user');
-    return !!(token && user);
-  } catch(e) { return false; }
-}
-
-function handleCheckout() {
-  closeCartDrawer();
-  if (isUserLoggedIn()) {
-    /* User is logged in — save cart and go to account checkout */
-    try { localStorage.setItem('pr_cart', JSON.stringify(cart)); } catch(e) {}
-    window.location.href = '/account?tab=checkout';
-  } else {
-    /* Not logged in — show login modal */
-    openLoginModal();
-  }
-}
-
-function openLoginModal() {
-  document.getElementById('login-modal-overlay').classList.add('open');
-  document.body.style.overflow = 'hidden';
-}
-function closeLoginModal() {
-  document.getElementById('login-modal-overlay').classList.remove('open');
-  document.body.style.overflow = '';
-}
-
 function openPayModal(){ closeCartDrawer();var total=cart.reduce(function(s,i){return s+i.price*i.qty;},0);document.getElementById('pm-grand-total').textContent='₹'+total.toLocaleString('en-IN');document.getElementById('pm-order-items').innerHTML=cart.length?cart.map(function(i){return '<div class="pm-order-item"><span>'+i.name+' ×'+i.qty+'</span><span>₹'+(i.price*i.qty).toLocaleString('en-IN')+'</span></div>';}).join(''):'<div class="pm-order-item" style="color:var(--tx3)">No items</div>';document.getElementById('pay-overlay').classList.add('open');document.body.style.overflow='hidden'; }
 function closePayModal(){ document.getElementById('pay-overlay').classList.remove('open');document.body.style.overflow=''; }
 function selPayMethod(el){ document.querySelectorAll('.pm-method').forEach(function(m){m.classList.remove('sel');m.querySelector('.pm-check').textContent='';});el.classList.add('sel');el.querySelector('.pm-check').textContent='✓'; }
@@ -1739,13 +1559,6 @@ function showNotFound(msg){ document.getElementById('main-content').innerHTML='<
 /* ══ INIT ══ */
 updateNavCart();
 loadProduct();
-</script>
-<script 
-  src="/js/ai-assistant.js" 
-  data-edge-url="https://ulyrhnpolypuvaurlqqi.supabase.co/functions/v1/ai-chat"
-  data-name="Pahadi_AI"
-  data-tagline="Himalayan Shopping Guide · Online"
-  data-whatsapp="919XXXXXXXXX">
 </script>
 </body>
 </html>
