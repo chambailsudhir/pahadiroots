@@ -1,25 +1,43 @@
 /**
- * 5 Pahadi Roots — AI Assistant + WhatsApp Widget v4.1
+ * 5 Pahadi Roots — AI Assistant v5.0
  * js/ai-assistant.js
+ *
+ * FIXES:
+ *  1. Multilingual — AI auto-responds in selected language
+ *  2. Real Gemini API called directly — no Edge Function needed
+ *  3. Google Search grounding enabled — web search works
+ *  4. getDemoReply() removed — real AI only
+ *  5. Security restrictions in system prompt only — nothing else blocked
+ *
+ * USAGE in HTML:
+ *   <script src="js/ai-assistant.js"
+ *           data-gemini-key="YOUR_GEMINI_API_KEY"
+ *           data-whatsapp="919XXXXXXXXX">
+ *   </script>
  */
 (function () {
   'use strict';
 
-  const script   = document.currentScript;
-  const EDGE_URL = script?.getAttribute('data-edge-url') || '';
-  const WA_NUM   = script?.getAttribute('data-whatsapp') || '919000000000';
-  const DEMO     = !EDGE_URL;
-  console.log('[Pahadi_AI] Edge URL:', EDGE_URL || 'NOT SET - demo mode');
-  console.log('[Pahadi_AI] Demo mode:', DEMO);
+  const script    = document.currentScript;
+  const GEMINI_KEY = script?.getAttribute('data-gemini-key') || '';
+  const WA_NUM    = script?.getAttribute('data-whatsapp') || '919000000000';
 
-  /* ── THEME from site CSS vars ──────────────────────────── */
+  if (!GEMINI_KEY) {
+    console.warn('[Pahadi_AI] No Gemini API key found. Set data-gemini-key on the script tag.');
+  }
+
+  /* ── GEMINI ENDPOINT ─────────────────────────────────── */
+  // Using gemini-2.0-flash — supports Google Search grounding natively
+  const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + GEMINI_KEY;
+
+  /* ── THEME from site CSS vars ─────────────────────────── */
   const R = getComputedStyle(document.documentElement);
-  const DARK_GREEN = (R.getPropertyValue('--g')  || '#1a3a1e').trim();
-  const MID_GREEN  = (R.getPropertyValue('--g2') || '#2d5233').trim();
-  const GOLD       = (R.getPropertyValue('--gd') || '#c8920a').trim();
-  const GOLD2      = (R.getPropertyValue('--gd2')|| '#e8b84b').trim();
+  const DARK_GREEN = (R.getPropertyValue('--g')   || '#1a3a1e').trim();
+  const MID_GREEN  = (R.getPropertyValue('--g2')  || '#2d5233').trim();
+  const GOLD       = (R.getPropertyValue('--gd')  || '#c8920a').trim();
+  const GOLD2      = (R.getPropertyValue('--gd2') || '#e8b84b').trim();
 
-  /* ── AI CONFIG ─────────────────────────────────────────── */
+  /* ── AI CONFIG ────────────────────────────────────────── */
   let AI_CFG = {
     name   : 'Pahadi_AI',
     tagline: 'Himalayan Shopping Guide · Online',
@@ -31,7 +49,56 @@
     if (s.tagline) AI_CFG.tagline = s.tagline;
   } catch(e) {}
 
-  /* ── STYLES ─────────────────────────────────────────────── */
+  /* ── SYSTEM PROMPT ────────────────────────────────────── */
+  // This is the ONLY place restrictions live.
+  // The AI itself handles everything else freely via web search + knowledge.
+  function buildSystemPrompt(langCode, langName) {
+    return `You are Pahadi_AI — the friendly, knowledgeable AI shopping assistant for "5 Pahadi Roots" (pahadiroots.com), an Indian ecommerce brand selling authentic Himalayan natural products.
+
+LANGUAGE RULE (HIGHEST PRIORITY):
+You MUST respond in ${langName} (language code: ${langCode}).
+- If langCode is "hi" → respond in Hindi (Devanagari script: हिंदी)
+- If langCode is "pa" → respond in Punjabi (Gurmukhi: ਪੰਜਾਬੀ)
+- If langCode is "bn" → respond in Bengali (বাংলা)
+- If langCode is "ta" → respond in Tamil (தமிழ்)
+- If langCode is "te" → respond in Telugu (తెలుగు)
+- If langCode is "mr" → respond in Marathi (मराठी)
+- If langCode is "gu" → respond in Gujarati (ગુજરાતી)
+- If langCode is "kn" → respond in Kannada (ಕನ್ನಡ)
+- If langCode is "ml" → respond in Malayalam (മലയാളം)
+- If langCode is "en" → respond in English
+- For any other language → respond in that language
+NEVER mix languages. If user writes in a different language than selected, still respond in the SELECTED language (${langName}).
+
+ABOUT 5 PAHADI ROOTS:
+- Sells authentic Himalayan natural products sourced directly from mountain farmers
+- Products: Wild Honey (Himachal), A2 Bilona Ghee, Kashmiri Saffron, Ladakhi Shilajit, Assam Tea, Kangra Tea, Lakadong Turmeric, Bamboo Shoot, Joha Rice, Bhut Jolokia, Black Rice, Large Cardamom, Cold Pressed Mustard Oil, Basmati Rice
+- Free shipping above ₹799 | Delivery: 4-7 business days | Returns: within 7 days
+- Website: pahadiroots.com
+
+YOU CAN ANSWER FREELY:
+- ANY question about Himalayan products, superfoods, health benefits, how to use them
+- ANY regional question — weather in Shimla, temperature in Manali, trek info, culture, festivals
+- ANY general knowledge question using your web search capability
+- Product comparisons, cooking tips, nutrition facts
+- Current news, weather, events related to Himalayan states
+- Gift recommendations, budget-based suggestions
+
+STRICT RESTRICTIONS (never cross these):
+1. COMPETITORS: Never recommend any competitor brand, Amazon/Flipkart listings, or other product brands. Always bring focus back to 5 Pahadi Roots products.
+2. PERSONAL INFO: If anyone shares phone/email/Aadhaar/bank details, do NOT store, repeat, or use them. Say: "Please don't share personal info — I'm a product guide only."
+3. MEDICAL ADVICE: Never diagnose illness or prescribe treatment/dosage. You can mention general health benefits of products (e.g. honey boosts immunity), but say "consult a doctor" for medical conditions.
+4. FINANCIAL ADVICE: Never give investment, insurance, or stock market advice.
+5. LEGAL ADVICE: Never give legal interpretation or advice.
+6. POLITICAL CONTENT: Never discuss political parties, elections, or politicians.
+7. RELIGIOUS CONTROVERSY: Never engage in religious debates or comparisons.
+
+TONE: Warm, helpful, like a knowledgeable Pahadi friend. Use relevant emojis naturally. Keep responses concise but complete. Always mention relevant 5 Pahadi Roots products when appropriate.
+
+USE WEB SEARCH: You have Google Search available. Use it for current weather, temperatures, latest news, trek conditions, seasonal availability, and any factual questions.`;
+  }
+
+  /* ── STYLES ───────────────────────────────────────────── */
   const css = document.createElement('style');
   css.textContent = `
   #pr-wa {
@@ -41,7 +108,7 @@
     box-shadow:0 4px 16px rgba(37,211,102,.45);
     display:flex; align-items:center; justify-content:center;
     transition:transform .2s cubic-bezier(.34,1.56,.64,1);
-    z-index:2147483645; position:fixed;
+    z-index:2147483645;
   }
   #pr-wa:hover { transform:scale(1.1) }
   #pr-wa svg { width:27px; height:27px; fill:#fff }
@@ -95,7 +162,6 @@
   #pr-panel.open { transform:scale(1) translateY(0); opacity:1; pointer-events:all }
   @media(max-width:440px) { #pr-panel { width:calc(100vw - 16px) !important; right:8px; bottom:108px } }
 
-  /* Drag handles */
   #pr-drag {
     height:20px; border-radius:18px 18px 0 0;
     display:flex; align-items:center; justify-content:center;
@@ -183,48 +249,36 @@
 
   .pr-toast { position:fixed; bottom:115px; left:50%; transform:translateX(-50%) translateY(14px); border-radius:9px; padding:8px 18px; font-size:12px; font-weight:600; opacity:0; transition:all .28s; z-index:2147483647; pointer-events:none; font-family:inherit; white-space:nowrap }
   .pr-toast.show { opacity:1; transform:translateX(-50%) translateY(0) }
+  .pr-src { font-size:10px; color:rgba(255,255,255,.25); margin-top:4px; padding-left:35px; }
+  .pr-src a { color:rgba(200,146,10,.5); text-decoration:none }
+  .pr-src a:hover { color:rgba(200,146,10,.8) }
   `;
   document.head.appendChild(css);
 
-  /* ── Apply theme colors via JS (avoids CSS template issues) ── */
+  /* ── Apply theme colors ───────────────────────────────── */
   function applyTheme() {
-    // AI FAB background
-    document.getElementById('pr-ai-fab').style.background = DARK_GREEN;
-    document.getElementById('pr-ai-fab').style.boxShadow = '0 6px 22px rgba(26,58,30,.5)';
-    // Panel header gradient
+    const fab2 = document.getElementById('pr-ai-fab');
+    if(fab2){ fab2.style.background = DARK_GREEN; fab2.style.boxShadow = '0 6px 22px rgba(26,58,30,.5)'; }
     const hd = document.querySelector('.pr-hd');
     if(hd) hd.style.background = 'linear-gradient(135deg,' + DARK_GREEN + ',' + MID_GREEN + ')';
-    // Drag bar
     const drag = document.getElementById('pr-drag');
     if(drag) drag.style.background = 'linear-gradient(135deg,' + DARK_GREEN + ',' + MID_GREEN + ')';
-    // Chips color
     document.querySelectorAll('.pr-chip').forEach(c => { c.style.color = GOLD2; });
-    // Lang select
     const lsel = document.getElementById('pr-lang');
-    if(lsel){ lsel.style.background = 'rgba(0,0,0,.3)'; lsel.style.border = '1px solid ' + GOLD + '33'; lsel.style.color = GOLD2; }
-    // Tagline color
+    if(lsel){ lsel.style.background='rgba(0,0,0,.3)'; lsel.style.border='1px solid '+GOLD+'33'; lsel.style.color=GOLD2; }
     const hs = document.querySelector('.pr-hs');
     if(hs) hs.style.color = GOLD2;
-    // Send button
-    const sb = document.getElementById('pr-sb');
-    if(sb){ sb.style.background = GOLD; }
-    const sbSvg = sb ? sb.querySelector('svg') : null;
+    const sb2 = document.getElementById('pr-sb');
+    if(sb2){ sb2.style.background = GOLD; }
+    const sbSvg = sb2 ? sb2.querySelector('svg') : null;
     if(sbSvg) sbSvg.style.fill = '#1a1a0a';
-    // Voice icon
     const vSvg = document.querySelector('#pr-voice svg');
     if(vSvg) vSvg.style.fill = 'rgba(255,255,255,.35)';
-    // Dots color
     document.querySelectorAll('.pr-dots span').forEach(s => s.style.background = GOLD);
-    // Product add button
-    document.querySelectorAll('.pr-pcb').forEach(b => { b.style.background = GOLD; b.style.color = '#1a1a0a'; });
-    // Toast colors
-    const toast = document.querySelector('.pr-toast');
-    if(toast){ toast.style.background = MID_GREEN; toast.style.border = '1px solid ' + GOLD; toast.style.color = GOLD2; }
-    // User bubble
-    document.querySelectorAll('.pr-m.u .pr-mb').forEach(b => b.style.background = 'linear-gradient(135deg,' + MID_GREEN + ',#3d6b42)');
+    document.querySelectorAll('.pr-pcb').forEach(b => { b.style.background=GOLD; b.style.color='#1a1a0a'; });
   }
 
-  /* ── DOM — WhatsApp button ──────────────────────────── */
+  /* ── WhatsApp button ──────────────────────────────────── */
   const waBtn = document.createElement('button');
   waBtn.id = 'pr-wa';
   waBtn.setAttribute('aria-label', 'WhatsApp');
@@ -234,14 +288,14 @@
   });
   document.body.appendChild(waBtn);
 
-  /* ── DOM — AI FAB ───────────────────────────────────── */
+  /* ── AI FAB ───────────────────────────────────────────── */
   const fab = document.createElement('button');
   fab.id = 'pr-ai-fab';
   fab.setAttribute('aria-label', 'Chat with Pahadi_AI');
   fab.innerHTML = '<img class="pr-fi" src="' + AI_CFG.avatar + '" alt="AI"><span class="pr-fc">✕</span><span class="pr-badge" id="pr-badge">1</span>';
   document.body.appendChild(fab);
 
-  /* ── DOM — Panel ────────────────────────────────────── */
+  /* ── Panel ────────────────────────────────────────────── */
   const panel = document.createElement('div');
   panel.id = 'pr-panel';
   panel.innerHTML = '<div id="pr-left-edge"></div><div id="pr-bottom-edge"></div><div id="pr-drag"></div>'
@@ -250,21 +304,31 @@
     + '<div><div class="pr-hn" id="pr-name">' + AI_CFG.name + '</div>'
     + '<div class="pr-hs"><span class="pr-dot"></span><span id="pr-tagline">' + AI_CFG.tagline + '</span></div></div>'
     + '<select class="pr-lsel" id="pr-lang">'
-    + '<optgroup label="Indian"><option value="en">English</option><option value="hi">हिंदी</option>'
-    + '<option value="pa">ਪੰਜਾਬੀ</option><option value="bn">বাংলা</option>'
-    + '<option value="ta">தமிழ்</option><option value="te">తెలుగు</option>'
-    + '<option value="mr">मराठी</option><option value="gu">ગુજરાતી</option>'
-    + '<option value="kn">ಕನ್ನಡ</option><option value="ml">മലയാളം</option>'
-    + '<option value="or">ଓଡ଼ିଆ</option><option value="as">অসমীয়া</option>'
-    + '<option value="mai">मैथिली</option><option value="ne">नेपाली</option>'
-    + '<option value="doi">डोगरी</option><option value="sa">संस्कृत</option></optgroup>'
-    + '<optgroup label="Global"><option value="zh">中文</option><option value="ja">日本語</option>'
-    + '<option value="ko">한국어</option><option value="ar">العربية</option>'
-    + '<option value="fr">Français</option><option value="de">Deutsch</option>'
-    + '<option value="es">Español</option><option value="pt">Português</option>'
-    + '<option value="ru">Русский</option><option value="it">Italiano</option>'
-    + '<option value="tr">Türkçe</option><option value="vi">Tiếng Việt</option>'
-    + '<option value="th">ภาษาไทย</option><option value="id">Bahasa Indonesia</option></optgroup>'
+    + '<optgroup label="Indian">'
+    + '<option value="en">English</option>'
+    + '<option value="hi">हिंदी</option>'
+    + '<option value="pa">ਪੰਜਾਬੀ</option>'
+    + '<option value="bn">বাংলা</option>'
+    + '<option value="ta">தமிழ்</option>'
+    + '<option value="te">తెలుగు</option>'
+    + '<option value="mr">मराठी</option>'
+    + '<option value="gu">ગુજરાતી</option>'
+    + '<option value="kn">ಕನ್ನಡ</option>'
+    + '<option value="ml">മലയാളം</option>'
+    + '<option value="or">ଓଡ଼ିଆ</option>'
+    + '<option value="as">অসমীয়া</option>'
+    + '<option value="ne">नेपाली</option>'
+    + '<option value="doi">डोगरी</option>'
+    + '</optgroup>'
+    + '<optgroup label="Global">'
+    + '<option value="zh">中文</option>'
+    + '<option value="ja">日本語</option>'
+    + '<option value="ko">한국어</option>'
+    + '<option value="ar">العربية</option>'
+    + '<option value="fr">Français</option>'
+    + '<option value="de">Deutsch</option>'
+    + '<option value="es">Español</option>'
+    + '</optgroup>'
     + '</select></div>'
     + '<div class="pr-chips" id="pr-chips">'
     + '<div class="pr-chip" data-q="Best honey recommendation?">🍯 Best honey</div>'
@@ -272,26 +336,25 @@
     + '<div class="pr-chip" data-q="Benefits of A2 Bilona Ghee?">🧈 Ghee benefits</div>'
     + '<div class="pr-chip" data-q="How to identify genuine Kashmiri saffron?">🌸 Real saffron?</div>'
     + '<div class="pr-chip" data-q="Delivery time and shipping details?">🚚 Delivery?</div>'
+    + '<div class="pr-chip" data-q="What is the weather in Shimla today?">🌤️ Shimla weather</div>'
     + '<div class="pr-chip" data-q="Gift ideas from Himachal Pradesh?">🎁 Gift ideas</div>'
-    + '<div class="pr-chip" data-q="Tell me about Himachal Pradesh and its famous products">🏔️ Himachal</div>'
     + '<div class="pr-chip" data-q="What superfoods grow in the Himalayas?">🌿 Superfoods</div>'
     + '</div>'
     + '<div class="pr-msgs" id="pr-msgs"></div>'
     + '<div class="pr-ia"><div class="pr-ir">'
     + '<button id="pr-voice" title="Voice input"><svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm-1 1.93c-3.94-.49-7-3.85-7-7.93H2c0 4.57 3.13 8.37 7.26 9.58V21h5.48v-3.42C18.87 16.37 22 12.57 22 8h-2c0 4.08-3.06 7.44-7 7.93V15.93z"/></svg></button>'
-    + '<textarea id="pr-ti" rows="1" placeholder="Ask anything — products, Himachal, health tips…"></textarea>'
+    + '<textarea id="pr-ti" rows="1" placeholder="Ask anything — products, weather, health…"></textarea>'
     + '<button id="pr-sb" aria-label="Send"><svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg></button>'
-    + '</div><div class="pr-ft">Pahadi Roots AI · Himalayan Guide</div></div>';
+    + '</div><div class="pr-ft">Pahadi Roots AI · Powered by Google Gemini</div></div>';
   document.body.appendChild(panel);
 
   const toast = document.createElement('div');
   toast.className = 'pr-toast';
   document.body.appendChild(toast);
 
-  /* Apply theme after DOM is ready */
   setTimeout(applyTheme, 50);
 
-  /* ── RESIZE HANDLES ─────────────────────────────────── */
+  /* ── RESIZE ───────────────────────────────────────────── */
   const dragBar    = document.getElementById('pr-drag');
   const leftEdge   = document.getElementById('pr-left-edge');
   const bottomEdge = document.getElementById('pr-bottom-edge');
@@ -302,93 +365,91 @@
     rX0=e.clientX; rY0=e.clientY;
     rW0=panel.offsetWidth; rH0=panel.offsetHeight;
     document.body.style.userSelect='none';
-    document.body.style.cursor = type==='left' ? 'ew-resize' : type==='bottom' ? 'ns-resize' : 'row-resize';
+    document.body.style.cursor = type==='left' ? 'ew-resize' : 'ns-resize';
     e.preventDefault();
   }
-  dragBar.addEventListener('mousedown',    function(e){ startResize('top',    e); });
-  leftEdge.addEventListener('mousedown',   function(e){ startResize('left',   e); });
-  bottomEdge.addEventListener('mousedown', function(e){ startResize('bottom', e); });
-
+  dragBar.addEventListener('mousedown',    function(e){ startResize('top',e); });
+  leftEdge.addEventListener('mousedown',   function(e){ startResize('left',e); });
+  bottomEdge.addEventListener('mousedown', function(e){ startResize('bottom',e); });
   document.addEventListener('mousemove', function(e) {
     if (!resizing) return;
-    var maxW = Math.min(700, window.innerWidth * 0.96);
-    var maxH = window.innerHeight * 0.92;
-    if (resizeType === 'top') {
-      panel.style.height = Math.min(Math.max(rH0 + (rY0 - e.clientY), 380), maxH) + 'px';
-    }
-    if (resizeType === 'left') {
-      panel.style.width = Math.min(Math.max(rW0 + (rX0 - e.clientX), 280), maxW) + 'px';
-    }
-    if (resizeType === 'bottom') {
-      panel.style.height = Math.min(Math.max(rH0 - (rY0 - e.clientY), 380), maxH) + 'px';
-    }
+    var maxW=Math.min(700,window.innerWidth*.96), maxH=window.innerHeight*.92;
+    if (resizeType==='top')    panel.style.height=Math.min(Math.max(rH0+(rY0-e.clientY),380),maxH)+'px';
+    if (resizeType==='left')   panel.style.width =Math.min(Math.max(rW0+(rX0-e.clientX),280),maxW)+'px';
+    if (resizeType==='bottom') panel.style.height=Math.min(Math.max(rH0-(rY0-e.clientY),380),maxH)+'px';
   });
   document.addEventListener('mouseup', function() {
-    if (resizing) { resizing=false; document.body.style.userSelect=''; document.body.style.cursor=''; }
+    if(resizing){ resizing=false; document.body.style.userSelect=''; document.body.style.cursor=''; }
   });
-  /* Touch - top bar */
   dragBar.addEventListener('touchstart', function(e){ var t=e.touches[0]; resizing=true; resizeType='top'; rY0=t.clientY; rH0=panel.offsetHeight; },{passive:true});
   leftEdge.addEventListener('touchstart', function(e){ var t=e.touches[0]; resizing=true; resizeType='left'; rX0=t.clientX; rW0=panel.offsetWidth; },{passive:true});
-  document.addEventListener('touchmove', function(e) {
-    if (!resizing) return;
-    var t=e.touches[0];
-    if (resizeType==='top')  panel.style.height = Math.min(Math.max(rH0+(rY0-t.clientY),380),window.innerHeight*.9)+'px';
-    if (resizeType==='left') panel.style.width  = Math.min(Math.max(rW0+(rX0-t.clientX),280),700)+'px';
+  document.addEventListener('touchmove', function(e){
+    if(!resizing) return; var t=e.touches[0];
+    if(resizeType==='top')  panel.style.height=Math.min(Math.max(rH0+(rY0-t.clientY),380),window.innerHeight*.9)+'px';
+    if(resizeType==='left') panel.style.width =Math.min(Math.max(rW0+(rX0-t.clientX),280),700)+'px';
   },{passive:true});
   document.addEventListener('touchend', function(){ resizing=false; });
 
-  /* ── STATE ──────────────────────────────────────────── */
+  /* ── STATE ────────────────────────────────────────────── */
   var isOpen=false, isThinking=false, history=[], lang='en', isRec=false, rec=null;
-  var msgs  = document.getElementById('pr-msgs');
-  var input = document.getElementById('pr-ti');
-  var sb    = document.getElementById('pr-sb');
-  var voice = document.getElementById('pr-voice');
+  var msgs    = document.getElementById('pr-msgs');
+  var input   = document.getElementById('pr-ti');
+  var sb      = document.getElementById('pr-sb');
+  var voice   = document.getElementById('pr-voice');
   var langSel = document.getElementById('pr-lang');
 
   var LANG_NAMES = {
     en:'English', hi:'Hindi', pa:'Punjabi', bn:'Bengali', ta:'Tamil', te:'Telugu',
     mr:'Marathi', gu:'Gujarati', kn:'Kannada', ml:'Malayalam', or:'Odia', as:'Assamese',
-    mai:'Maithili', ne:'Nepali', doi:'Dogri', sa:'Sanskrit',
-    zh:'Chinese', ja:'Japanese', ko:'Korean', ar:'Arabic', fr:'French', de:'German',
-    es:'Spanish', pt:'Portuguese', ru:'Russian', it:'Italian', tr:'Turkish',
-    vi:'Vietnamese', th:'Thai', id:'Indonesian',
+    ne:'Nepali', doi:'Dogri', zh:'Chinese', ja:'Japanese', ko:'Korean', ar:'Arabic',
+    fr:'French', de:'German', es:'Spanish',
   };
 
   var VOICE_MAP = {
     en:'en-IN', hi:'hi-IN', pa:'pa-IN', bn:'bn-IN', ta:'ta-IN', te:'te-IN',
     mr:'mr-IN', gu:'gu-IN', kn:'kn-IN', ml:'ml-IN', or:'or-IN', as:'as-IN',
     ne:'ne-NP', zh:'zh-CN', ja:'ja-JP', ko:'ko-KR', ar:'ar-SA', fr:'fr-FR',
-    de:'de-DE', es:'es-ES', pt:'pt-BR', ru:'ru-RU', it:'it-IT', tr:'tr-TR',
-    vi:'vi-VN', th:'th-TH', id:'id-ID',
+    de:'de-DE', es:'es-ES',
   };
 
+  var PLACEHOLDERS = {
+    hi:'कुछ भी पूछें — उत्पाद, मौसम, स्वास्थ्य…',
+    pa:'ਕੁਝ ਵੀ ਪੁੱਛੋ — ਉਤਪਾਦ, ਮੌਸਮ…',
+    bn:'যেকোনো কিছু জিজ্ঞেস করুন…',
+    ta:'எதையும் கேளுங்கள்…',
+    te:'ఏమైనా అడగండి…',
+    mr:'काहीही विचारा…',
+    gu:'કંઈ પણ પૂછો…',
+    kn:'ಏನಾದರೂ ಕೇಳಿ…',
+    ml:'എന്തും ചോദിക്കൂ…',
+    ar:'اسأل أي شيء…',
+    zh:'请随便问…',
+    ja:'何でも聞いてください…',
+  };
+
+  /* ── LANGUAGE CHANGE ──────────────────────────────────── */
   langSel.addEventListener('change', function() {
     lang = this.value;
-    var placeholders = {
-      hi:'कुछ भी पूछें — उत्पाद, हिमाचल, स्वास्थ्य…',
-      pa:'ਕੁਝ ਵੀ ਪੁੱਛੋ — ਉਤਪਾਦ, ਹਿਮਾਚਲ…',
-      bn:'যেকোনো কিছু জিজ্ঞেস করুন…',
-      ta:'எதையும் கேளுங்கள்…',
-      te:'ఏమైనా అడగండి…',
-      mr:'काहीही विचारा…',
-      gu:'કંઈ પણ પૂછો…',
-    };
-    input.placeholder = placeholders[lang] || 'Ask anything — products, Himachal, health tips…';
+    input.placeholder = PLACEHOLDERS[lang] || 'Ask anything — products, weather, health…';
+    // Clear history so new language context is fresh
+    history = [];
+    msgs.innerHTML = '';
+    welcome();
   });
 
-  /* ── TOGGLE ─────────────────────────────────────────── */
+  /* ── TOGGLE ───────────────────────────────────────────── */
   fab.addEventListener('click', function() {
     isOpen = !isOpen;
     fab.classList.toggle('open', isOpen);
     panel.classList.toggle('open', isOpen);
     var b = document.getElementById('pr-badge');
-    if (b) b.remove();
-    if (isOpen && !msgs.children.length) welcome();
-    if (isOpen) setTimeout(function(){ input.focus(); }, 300);
-    if (isOpen) setTimeout(applyTheme, 60);
+    if(b) b.remove();
+    if(isOpen && !msgs.children.length) welcome();
+    if(isOpen) setTimeout(function(){ input.focus(); }, 300);
+    if(isOpen) setTimeout(applyTheme, 60);
   });
   document.addEventListener('click', function(e) {
-    if (isOpen && !panel.contains(e.target) && !fab.contains(e.target)) {
+    if(isOpen && !panel.contains(e.target) && !fab.contains(e.target)) {
       isOpen=false; fab.classList.remove('open'); panel.classList.remove('open');
     }
   });
@@ -399,226 +460,180 @@
     });
   });
 
-  /* ── WELCOME ────────────────────────────────────────── */
+  /* ── WELCOME MESSAGE ──────────────────────────────────── */
   function welcome() {
     var w = {
-      en: '🙏 Namaste! I am **' + AI_CFG.name + '** — your Himalayan guide!\n\nI can help with:\n• Our pure Himalayan products and health benefits\n• Himachal Pradesh, Kashmir, Ladakh, Northeast info\n• Budget-based product recommendations\n• Delivery, returns, gift ideas\n\nWhat would you like to know?',
-      hi: '🙏 नमस्ते! मैं **' + AI_CFG.name + '** हूँ — आपका Himalayan guide!\n\nमैं इनमें मदद कर सकता हूँ:\n• शुद्ध Himalayan उत्पाद और उनके फायदे\n• हिमाचल, कश्मीर, लद्दाख की जानकारी\n• Budget के अनुसार product सुझाव\n• Delivery, returns, gift ideas\n\nआज क्या जानना है?',
-      pa: '🙏 ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ! ਮੈਂ **' + AI_CFG.name + '** ਹਾਂ — ਤੁਹਾਡਾ Himalayan guide!\n\nਦੱਸੋ ਕੀ ਚਾਹੀਦਾ ਹੈ?',
+      en: '🙏 Namaste! I am **' + AI_CFG.name + '** — your Himalayan guide!\n\nI can help with:\n• Our Himalayan products — benefits, how to use, authenticity\n• Weather in Shimla, Manali, Ladakh (live search!)\n• Budget recommendations, gift ideas\n• Delivery, returns, any questions\n\nWhat would you like to know?',
+      hi: '🙏 नमस्ते! मैं **' + AI_CFG.name + '** हूँ — आपका Himalayan guide!\n\nमैं इनमें मदद कर सकता हूँ:\n• हमारे शुद्ध Himalayan उत्पाद\n• शिमला, मनाली का मौसम (live!)\n• Budget के अनुसार सुझाव\n• Delivery और returns\n\nआज क्या जानना है?',
+      pa: '🙏 ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ! ਮੈਂ **' + AI_CFG.name + '** ਹਾਂ!\n\nਮੈਂ ਮਦਦ ਕਰ ਸਕਦਾ ਹਾਂ:\n• ਸਾਡੇ Himalayan ਉਤਪਾਦ\n• ਮੌਸਮ ਦੀ ਜਾਣਕਾਰੀ\n• Budget ਅਨੁਸਾਰ ਸੁਝਾਅ\n\nਦੱਸੋ ਕੀ ਚਾਹੀਦਾ ਹੈ?',
+      bn: '🙏 নমস্কার! আমি **' + AI_CFG.name + '** — আপনার Himalayan গাইড!\n\nআমি সাহায্য করতে পারি:\n• Himalayan পণ্য ও উপকারিতা\n• আবহাওয়ার তথ্য\n• বাজেট অনুযায়ী পরামর্শ\n\nকী জানতে চান?',
+      ta: '🙏 வணக்கம்! நான் **' + AI_CFG.name + '** — உங்கள் Himalayan வழிகாட்டி!\n\nநான் உதவலாம்:\n• Himalayan தயாரிப்புகள்\n• வானிலை தகவல்\n• பட்ஜெட் பரிந்துரைகள்\n\nஎன்ன தெரிந்துகொள்ள விரும்புகிறீர்கள்?',
+      te: '🙏 నమస్కారం! నేను **' + AI_CFG.name + '** — మీ Himalayan గైడ్!\n\nనేను సహాయపడగలను:\n• Himalayan ఉత్పత్తులు\n• వాతావరణ సమాచారం\n• బడ్జెట్ సూచనలు\n\nమీకు ఏమి తెలుసుకోవాలి?',
+      mr: '🙏 नमस्कार! मी **' + AI_CFG.name + '** — तुमचा Himalayan मार्गदर्शक!\n\nमी मदत करू शकतो:\n• Himalayan उत्पादने\n• हवामान माहिती\n• Budget नुसार सूचना\n\nकाय जाणून घ्यायचे आहे?',
+      gu: '🙏 નમસ્તે! હું **' + AI_CFG.name + '** — તમારો Himalayan ગાઇડ!\n\nહું મદદ કરી શકું:\n• Himalayan ઉત્પાદનો\n• હવામાનની માહિતી\n• Budget મુજબ સૂચનો\n\nશું જાણવું છે?',
     };
     addMsg('bot', w[lang] || w.en, [], true);
   }
 
-  /* ── ADD MESSAGE ────────────────────────────────────── */
-  function addMsg(role, text, products, skipHistory) {
-    products = products || [];
+  /* ── ADD MESSAGE ──────────────────────────────────────── */
+  function addMsg(role, text, sources, skipHistory) {
+    sources = sources || [];
     skipHistory = skipHistory || false;
     var wrap = document.createElement('div');
     wrap.className = 'pr-m ' + (role==='user' ? 'u' : 'b');
-    var av = document.createElement('div'); av.className = 'pr-mav';
-    if (role==='user') { av.textContent='👤'; }
+    var av = document.createElement('div'); av.className='pr-mav';
+    if(role==='user') { av.textContent='👤'; }
     else { av.innerHTML='<img src="' + AI_CFG.avatar + '" alt="AI">'; }
-    var bbl = document.createElement('div'); bbl.className = 'pr-mb';
-    if (role==='user') { bbl.style.background = 'linear-gradient(135deg,' + MID_GREEN + ',#3d6b42)'; }
+    var bbl = document.createElement('div'); bbl.className='pr-mb';
+    if(role==='user') { bbl.style.background='linear-gradient(135deg,'+MID_GREEN+',#3d6b42)'; }
     bbl.innerHTML = text
-      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-      .replace(/\n•/g, '<br>•')
-      .replace(/\n/g, '<br>');
-
-    if (products.length) {
-      var pc = document.createElement('div'); pc.className='pr-pcs';
-      products.forEach(function(p) {
-        var card = document.createElement('div'); card.className='pr-pc';
-        card.innerHTML = '<span class="pr-pce">' + (p.emoji||'🌿') + '</span>'
-          + '<div><div class="pr-pcn">' + p.name + '</div><div class="pr-pcp" style="color:' + GOLD2 + '">₹' + p.price + ' · ' + p.variant + '</div></div>'
-          + '<button class="pr-pcb" style="background:' + GOLD + ';color:#1a1a0a">Add</button>';
-        card.querySelector('.pr-pcb').addEventListener('click', function() {
-          window.dispatchEvent(new CustomEvent('pr-add-cart', {detail:{id:p.id,name:p.name}}));
-          toast.textContent = '✅ ' + p.name + ' added to cart!';
-          toast.classList.add('show');
-          setTimeout(function(){ toast.classList.remove('show'); }, 2500);
-        });
-        pc.appendChild(card);
-      });
-      bbl.appendChild(pc);
-    }
-
+      .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
+      .replace(/\n•/g,'<br>•')
+      .replace(/\n/g,'<br>');
     wrap.appendChild(av); wrap.appendChild(bbl);
     msgs.appendChild(wrap);
 
-    if (role==='bot' && !skipHistory) {
+    // Show search sources if any
+    if(sources && sources.length) {
+      var srcDiv = document.createElement('div');
+      srcDiv.className = 'pr-src';
+      srcDiv.innerHTML = '🔍 ' + sources.slice(0,2).map(function(s){
+        return '<a href="' + s.uri + '" target="_blank" rel="noopener">' + (s.title||s.uri).substring(0,40) + '…</a>';
+      }).join(' · ');
+      msgs.appendChild(srcDiv);
+    }
+
+    if(role==='bot' && !skipHistory) {
       var fb = document.createElement('div'); fb.className='pr-fb';
-      fb.innerHTML = '<button>👍</button><button>👎</button>';
-      fb.querySelectorAll('button').forEach(function(btn, i) {
-        btn.addEventListener('click', function() {
+      fb.innerHTML='<button>👍</button><button>👎</button>';
+      fb.querySelectorAll('button').forEach(function(btn,i){
+        btn.addEventListener('click', function(){
           fb.querySelectorAll('button').forEach(function(b){ b.classList.remove('liked','disliked'); });
-          btn.classList.add(i===0 ? 'liked' : 'disliked');
+          btn.classList.add(i===0?'liked':'disliked');
         });
       });
       msgs.appendChild(fb);
     }
     msgs.scrollTop = msgs.scrollHeight;
-    if (!skipHistory) history.push({role: role==='user'?'user':'model', parts:[{text:text}]});
+    if(!skipHistory) history.push({role:'user'===role?'user':'model', parts:[{text:text}]});
   }
 
-  function showTyping() {
+  function showTyping(){
     var el=document.createElement('div'); el.id='pr-typ'; el.className='pr-m b';
-    el.innerHTML='<div class="pr-mav"><img src="' + AI_CFG.avatar + '" alt="AI"></div>'
+    el.innerHTML='<div class="pr-mav"><img src="'+AI_CFG.avatar+'" alt="AI"></div>'
       +'<div class="pr-mb" style="background:#152018"><div class="pr-dots">'
-      +'<span style="background:' + GOLD + '"></span>'
-      +'<span style="background:' + GOLD + '"></span>'
-      +'<span style="background:' + GOLD + '"></span>'
+      +'<span style="background:'+GOLD+'"></span><span style="background:'+GOLD+'"></span><span style="background:'+GOLD+'"></span>'
       +'</div></div>';
     msgs.appendChild(el); msgs.scrollTop=msgs.scrollHeight;
   }
   function hideTyping(){ var e=document.getElementById('pr-typ'); if(e) e.remove(); }
 
-  /* ── SEND ───────────────────────────────────────────── */
+  /* ── SEND ─────────────────────────────────────────────── */
   function send(txt) {
     var t = (txt || input.value).trim();
-    if (!t || isThinking) return;
+    if(!t || isThinking) return;
     input.value=''; input.style.height='auto';
     addMsg('user', t);
     isThinking=true; sb.disabled=true; showTyping();
-    getReply(t).then(function(r) {
-      hideTyping(); addMsg('bot', r.text, r.products||[]);
+    callGemini(t).then(function(r){
+      hideTyping();
+      addMsg('bot', r.text, r.sources||[]);
       isThinking=false; sb.disabled=false; input.focus();
-    }).catch(function(err) {
+    }).catch(function(err){
       hideTyping();
       console.error('[Pahadi_AI]', err);
-      var dr = getDemoReply(t);
-      addMsg('bot', dr.text, dr.products||[]);
+      var errMsg = {
+        en: '🙏 Sorry, I had trouble connecting. Please try again in a moment.',
+        hi: '🙏 माफ़ करें, connection में कुछ दिक्कत आई। दोबारा try करें।',
+        pa: '🙏 ਮਾਫ਼ ਕਰੋ, connection ਵਿੱਚ ਸਮੱਸਿਆ ਆਈ। ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ।',
+      };
+      addMsg('bot', errMsg[lang] || errMsg.en);
       isThinking=false; sb.disabled=false;
     });
   }
 
-  /* ── AI CALL ────────────────────────────────────────── */
-  function getReply(msg, attempt) {
-    attempt = attempt || 1;
-    if (DEMO) return Promise.resolve(getDemoReply(msg));
-    var ctrl = new AbortController();
-    var timer = setTimeout(function(){ ctrl.abort(); }, 18000);
-    return fetch(EDGE_URL, {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({
-        message: msg,
-        history: history.slice(-10),
-        mode: 'customer',
-        language: lang,
-        languageName: LANG_NAMES[lang] || 'English',
-      }),
-      signal: ctrl.signal,
-    }).then(function(res) {
-      clearTimeout(timer);
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-      return res.json();
-    }).then(function(d) {
-      if (!d.reply) throw new Error('Empty response');
-      return {text: d.reply, products: d.products||[]};
-    }).catch(function(e) {
-      if (attempt < 2) {
-        return new Promise(function(r){ setTimeout(r, 1200); }).then(function(){ return getReply(msg, 2); });
+  /* ── GEMINI API CALL ──────────────────────────────────── */
+  function callGemini(userMsg) {
+    if(!GEMINI_KEY) {
+      return Promise.reject(new Error('No Gemini API key configured'));
+    }
+
+    var systemPrompt = buildSystemPrompt(lang, LANG_NAMES[lang] || 'English');
+
+    // Build conversation — last 10 turns for context
+    var contents = history.slice(-10).concat([
+      { role:'user', parts:[{ text: userMsg }] }
+    ]);
+
+    var body = {
+      system_instruction: {
+        parts: [{ text: systemPrompt }]
+      },
+      contents: contents,
+      tools: [{
+        google_search: {}
+      }],
+      generationConfig: {
+        temperature: 0.7,
+        maxOutputTokens: 1024,
       }
-      throw e;
+    };
+
+    return fetch(GEMINI_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    })
+    .then(function(res){
+      if(!res.ok) return res.json().then(function(e){ throw new Error(e.error?.message || 'HTTP '+res.status); });
+      return res.json();
+    })
+    .then(function(data){
+      var candidate = data.candidates && data.candidates[0];
+      if(!candidate) throw new Error('No candidates in response');
+
+      // Extract text from parts
+      var text = '';
+      if(candidate.content && candidate.content.parts) {
+        candidate.content.parts.forEach(function(p){
+          if(p.text) text += p.text;
+        });
+      }
+      if(!text) throw new Error('Empty text response');
+
+      // Extract search sources if Gemini used web search
+      var sources = [];
+      if(candidate.groundingMetadata && candidate.groundingMetadata.groundingChunks) {
+        candidate.groundingMetadata.groundingChunks.forEach(function(chunk){
+          if(chunk.web && chunk.web.uri) {
+            sources.push({ uri: chunk.web.uri, title: chunk.web.title || '' });
+          }
+        });
+      }
+
+      // Add to conversation history
+      history.push({ role:'model', parts:[{ text: text }] });
+
+      return { text: text, sources: sources };
     });
   }
 
-  /* ── DEMO REPLIES (with Hindi support) ──────────────── */
-  function getDemoReply(t) {
-    var l = t.toLowerCase();
-    var hi = (lang === 'hi' || lang === 'mai' || lang === 'doi');
-    var pa = (lang === 'pa');
-    var bn = (lang === 'bn');
-
-    if (l.match(/himachal|shimla|manali|kullu|palampur|kangra|spiti|kinnaur|dharamsala/)) {
-      return {
-        text: hi
-          ? '🏔️ **हिमाचल प्रदेश** — देवताओं की भूमि!\n\n**पालमपुर और हिमाचल के प्रसिद्ध उत्पाद:**\n• 🍵 **कांगड़ा चाय** — पालमपुर भारत की सबसे उत्तम हरी और काली चाय का केंद्र है\n• 🍯 **जंगली शहद** — कुल्लू और कांगड़ा के जंगली फूलों से\n• 🌿 **जड़ी-बूटियां** — ब्राह्मी, अश्वगंधा, तुलसी (स्पीति से)\n• 🍎 **हिमाचली सेब** — किन्नौर और शिमला के विश्व प्रसिद्ध सेब\n• 🌰 **चिलगोज़ा** — किन्नौर के जंगलों का दुर्लभ पाइन नट\n\n**हिमाचल के बारे में:**\nक्षेत्रफल: 55,673 km² · राजधानी: शिमला · 12 जिले\n\nक्या आप हमारे हिमाचल उत्पाद देखना चाहेंगे?'
-          : '🏔️ **Himachal Pradesh** — Land of the Gods!\n\n**Best products from Palampur & Himachal:**\n• 🍵 **Kangra Tea** — Palampur is India finest green & black tea region\n• 🍯 **Wild Honey** — from Kullu & Kangra valley wildflowers\n• 🌿 **Medicinal herbs** — Brahmi, Ashwagandha from Spiti\n• 🍎 **Himachali Apples** — world-famous from Kinnaur and Shimla\n• 🌰 **Chilgoza Pine nuts** — rare, from Kinnaur forests\n\n**About Himachal:**\nArea: 55,673 km² · Capital: Shimla · 12 districts',
-        products: [{id:'t1',name:'Kangra Green Tea',price:399,variant:'100g',emoji:'🍵'},{id:'h1',name:'Wild Honey',price:499,variant:'500g',emoji:'🍯'}]
-      };
+  /* ── VOICE ────────────────────────────────────────────── */
+  voice.addEventListener('click', function(){
+    if(!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)){
+      addMsg('bot','🎤 Voice works in Chrome. Please type your question!'); return;
     }
-    if (l.match(/honey|शहद|madh/)) {
-      return {
-        text: hi
-          ? '🍯 **हिमालयी जंगली शहद** — कच्चा, अनप्रोसेस्ड, एंजाइम से भरपूर!\n\nहिमाचल प्रदेश की जंगली घाटियों से। कभी गर्म नहीं किया जाता।\n\n**फायदे:**\n• एंटी-बैक्टीरियल और इम्यूनिटी बूस्टर\n• एंटीऑक्सिडेंट और एंजाइम से भरपूर\n• पाचन और ऊर्जा के लिए बेहतरीन\n\n₹799 से ऊपर free shipping 🚚'
-          : '🍯 **Himalayan Wild Honey** — raw, unprocessed, enzyme-rich!\n\nFrom wildflower fields in Himachal Pradesh. Never heated. No additives.\n\n**Benefits:** Anti-bacterial · Immunity · Digestion\n\nFree shipping above ₹799 🚚',
-        products: [{id:'h1',name:'Wild Honey',price:499,variant:'500g',emoji:'🍯'},{id:'h2',name:'Wild Honey',price:899,variant:'1kg',emoji:'🍯'}]
-      };
-    }
-    if (l.match(/ghee|घी/)) {
-      return {
-        text: hi
-          ? '🧈 **A2 बिलोना घी** — पारंपरिक तरीके से हाथ से मथा हुआ।\n\nहिमालयी देसी गाय के A2 दूध से बना।\n\n**फायदे:**\n• आसान पाचन (ब्यूटिरिक एसिड)\n• विटामिन A, D, E, K से भरपूर\n• दिमाग और जोड़ों के लिए फायदेमंद'
-          : '🧈 **A2 Bilona Ghee** — traditional hand-churned from Himalayan desi cows.\n\n**Benefits:** Easy digestion · Vitamins A,D,E,K · Brain health',
-        products: [{id:'g1',name:'A2 Bilona Ghee',price:749,variant:'500ml',emoji:'🧈'},{id:'g2',name:'A2 Bilona Ghee',price:1399,variant:'1L',emoji:'🧈'}]
-      };
-    }
-    if (l.match(/saffron|kesar|केसर/)) {
-      return {
-        text: hi
-          ? '🌸 **कश्मीरी केसर** — Pampore से, दुनिया का सबसे उत्तम।\n\n**असली केसर पहचानें:** गर्म पानी में डालें — धीरे-धीरे सुनहरा-पीला रंग छोड़े तो असली है।\n\nहमारा केसर Grade-A, lab-certified है।'
-          : '🌸 **Kashmiri Saffron** from Pampore — world finest.\n\n**Authenticity test:** In warm water, real saffron releases golden-yellow slowly.\n\nOurs is Grade-A, lab-certified.',
-        products: [{id:'s1',name:'Kashmiri Saffron',price:599,variant:'1g',emoji:'🌸'},{id:'s2',name:'Kashmiri Saffron',price:1099,variant:'2g',emoji:'🌸'}]
-      };
-    }
-    if (l.match(/shilajit|शिलाजीत/)) {
-      return {
-        text: hi
-          ? '⚡ **लद्दाखी शिलाजीत** — 16,000 फीट की ऊंचाई से।\n\n• 60%+ Fulvic acid\n• ऊर्जा और शक्ति बढ़ाता है\n• हार्मोन संतुलन\n• इम्यूनिटी और anti-aging\n\nरोज़ सुबह गर्म दूध में मटर के बराबर मात्रा में लें। 💪'
-          : '⚡ **Ladakhi Shilajit** from 16,000ft altitude.\n\n• 60%+ Fulvic acid · Energy & stamina · Hormonal balance · Immunity',
-        products: [{id:'sh1',name:'Ladakhi Shilajit',price:999,variant:'20g resin',emoji:'⚡'}]
-      };
-    }
-    if (l.match(/500|budget|under|सस्ता|किफायती/i)) {
-      return {
-        text: hi
-          ? '💰 **₹500 से कम के बेहतरीन उत्पाद:**\n\nसीधे हिमालयी किसानों से — शुद्ध गुणवत्ता!'
-          : '💰 **Best products under ₹500:**\n\nDirect from Himalayan farmers — pure quality!',
-        products: [{id:'h1',name:'Wild Honey',price:499,variant:'500g',emoji:'🍯'},{id:'t2',name:'Lakadong Turmeric',price:299,variant:'200g',emoji:'🌿'},{id:'t1',name:'Kangra Green Tea',price:399,variant:'100g',emoji:'🍵'},{id:'c1',name:'Large Cardamom',price:349,variant:'100g',emoji:'🫚'}]
-      };
-    }
-    if (l.match(/deliver|ship|कब|दिन|डिलीवरी/)) {
-      return {
-        text: hi
-          ? '🚚 **Delivery की जानकारी:**\n\n• पूरे भारत में — 4 से 7 कार्य दिवस\n• ₹799 से ऊपर free shipping\n• Payment के 24 घंटे में ship\n• SMS + email tracking\n• J&K और पूर्वोत्तर में भी!'
-          : '🚚 **Delivery Details:**\n\n• Pan India — 4-7 business days · Free shipping above ₹799 · 24hr dispatch · SMS tracking',
-        products: []
-      };
-    }
-    if (l.match(/gift|उपहार|तोहफा/)) {
-      return {
-        text: hi
-          ? '🎁 **हिमालयी Gift Ideas:**\n\n🥇 **Premium (₹1500+):** Saffron + A2 Ghee + Wild Honey\n🥈 **Mid-range (₹800-1200):** Shilajit + Honey\n🥉 **Budget (₹500 से कम):** Turmeric + Cardamom + Tea'
-          : '🎁 **Himalayan Gift Ideas:**\n\n🥇 Premium (₹1500+): Saffron + Ghee + Honey\n🥈 Mid-range (₹800-1200): Shilajit + Honey\n🥉 Budget (under ₹500): Turmeric + Cardamom + Tea',
-        products: [{id:'h1',name:'Wild Honey',price:499,variant:'500g',emoji:'🍯'},{id:'s1',name:'Kashmiri Saffron',price:599,variant:'1g',emoji:'🌸'},{id:'sh1',name:'Ladakhi Shilajit',price:999,variant:'20g',emoji:'⚡'}]
-      };
-    }
-    return {
-      text: hi
-        ? '🌿 नमस्ते! मैं इनमें मदद कर सकता हूँ:\n• **हिमालयी उत्पाद** — फायदे, sourcing, उपयोग\n• **क्षेत्रीय जानकारी** — हिमाचल, कश्मीर, लद्दाख, पूर्वोत्तर\n• **स्वास्थ्य लक्ष्य** — इम्यूनिटी, ऊर्जा, पाचन\n• **Budget filter** — आपके budget में सबसे अच्छे उत्पाद\n\nआज क्या जानना है आपको?'
-        : '🌿 Namaste! I can help with:\n• **Himalayan products** — benefits, sourcing, how to use\n• **Regional info** — Himachal, Kashmir, Ladakh, Northeast\n• **Health goals** — immunity, energy, digestion\n• **Budget filters** — best products in your range\n\nWhat would you like to know?',
-      products: []
-    };
-  }
-
-  /* ── VOICE ──────────────────────────────────────────── */
-  voice.addEventListener('click', function() {
-    if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
-      addMsg('bot','🎤 Voice input works in Chrome. Please type your question!'); return;
-    }
-    if (isRec) { if(rec) rec.stop(); voice.classList.remove('rec'); isRec=false; return; }
+    if(isRec){ if(rec) rec.stop(); voice.classList.remove('rec'); isRec=false; return; }
     var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    rec = new SR(); rec.lang = VOICE_MAP[lang]||'en-IN'; rec.interimResults=false;
-    rec.onresult = function(e){ input.value=e.results[0][0].transcript; autoR(input); voice.classList.remove('rec'); isRec=false; };
-    rec.onerror = function(){ voice.classList.remove('rec'); isRec=false; };
+    rec=new SR(); rec.lang=VOICE_MAP[lang]||'en-IN'; rec.interimResults=false;
+    rec.onresult=function(e){ input.value=e.results[0][0].transcript; autoR(input); voice.classList.remove('rec'); isRec=false; };
+    rec.onerror=function(){ voice.classList.remove('rec'); isRec=false; };
     rec.start(); voice.classList.add('rec'); isRec=true;
   });
 
   input.addEventListener('keydown', function(e){ if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();} });
-  input.addEventListener('input',   function(){ autoR(input); });
-  sb.addEventListener('click',      function(){ send(); });
+  input.addEventListener('input', function(){ autoR(input); });
+  sb.addEventListener('click', function(){ send(); });
   function autoR(el){ el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,100)+'px'; }
 
 })();
