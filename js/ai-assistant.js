@@ -31,21 +31,15 @@
   /* ── STYLES ──────────────────────────────────────────── */
   const css = document.createElement('style');
   css.textContent = `
-  /* ── Both FABs wrap ── */
-  #pr-fabs{
-    position:fixed;right:24px;bottom:30px;
-    display:flex;flex-direction:row;align-items:flex-end;gap:10px;
-    z-index:2147483645;
-  }
-
-  /* ── WhatsApp FAB ── */
+  /* ── WhatsApp FAB — fixed independently ── */
   #pr-wa{
+    position:fixed;right:90px;bottom:30px;
     width:52px;height:52px;border-radius:50%;
     background:#25D366;border:none;cursor:pointer;
     box-shadow:0 4px 16px rgba(37,211,102,.45);
     display:flex;align-items:center;justify-content:center;
     transition:transform .2s cubic-bezier(.34,1.56,.64,1);
-    position:relative;
+    z-index:2147483645;
   }
   #pr-wa:hover{transform:scale(1.1)}
   #pr-wa svg{width:27px;height:27px;fill:#fff}
@@ -57,14 +51,16 @@
   }
   #pr-wa:hover .pr-tip{opacity:1}
 
-  /* ── AI FAB ── */
+  /* ── AI FAB — fixed independently ── */
   #pr-ai-fab{
+    position:fixed;right:24px;bottom:30px;
     width:56px;height:56px;border-radius:50%;
     background:${DARK_GREEN};border:none;cursor:pointer;
     box-shadow:0 6px 22px rgba(26,58,30,.5);
     display:flex;align-items:center;justify-content:center;overflow:hidden;
     transition:transform .22s cubic-bezier(.34,1.56,.64,1);
-    animation:pr-pulse 3s ease-out infinite;position:relative;
+    animation:pr-pulse 3s ease-out infinite;
+    z-index:2147483645;
   }
   #pr-ai-fab:hover{transform:scale(1.08)}
   #pr-ai-fab.open{animation:none}
@@ -81,7 +77,7 @@
 
   /* ── Panel ── */
   #pr-panel{
-    position:fixed;bottom:105px;right:24px;
+    position:fixed;bottom:100px;right:24px;
     width:380px;height:560px;
     min-width:280px;min-height:380px;
     max-width:min(700px,96vw);max-height:92vh;
@@ -216,9 +212,6 @@
   document.head.appendChild(css);
 
   /* ── DOM — FABs wrapper (side by side) ──────────────── */
-  const fabsWrap = document.createElement('div');
-  fabsWrap.id = 'pr-fabs';
-
   // WhatsApp
   const waFab = document.createElement('button');
   waFab.id = 'pr-wa';
@@ -235,9 +228,8 @@
   fab.setAttribute('aria-label', 'Chat with Pahadi_AI');
   fab.innerHTML = `<img class="pr-fi" src="${AI_CFG.avatar}" alt="AI"><span class="pr-fc">✕</span><span class="pr-badge" id="pr-badge">1</span>`;
 
-  fabsWrap.appendChild(waFab);
-  fabsWrap.appendChild(fab);
-  document.body.appendChild(fabsWrap);
+  document.body.appendChild(waFab);
+  document.body.appendChild(fab);
 
   /* ── DOM — Panel ─────────────────────────────────────── */
   const panel = document.createElement('div');
@@ -429,7 +421,7 @@
     if(isOpen) setTimeout(() => input.focus(), 300);
   });
   document.addEventListener('click', e => {
-    if(isOpen && !panel.contains(e.target) && !fab.contains(e.target) && !fabsWrap.contains(e.target)){
+    if(isOpen && !panel.contains(e.target) && !fab.contains(e.target)){
       isOpen=false; fab.classList.remove('open'); panel.classList.remove('open');
     }
   });
