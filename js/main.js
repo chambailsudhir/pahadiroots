@@ -333,6 +333,12 @@ async function loadData() {
       if (data.settings.flat_shipping_charge !== undefined && data.settings.flat_shipping_charge !== null) FLAT_SHIP_CHARGE    = parseInt(data.settings.flat_shipping_charge, 10);
       if (data.settings.whatsapp_number)      WHATSAPP_NUMBER     = data.settings.whatsapp_number;
       if (data.razorpay_key)                  _RAZORPAY_KEY       = data.razorpay_key;
+      // Hide Razorpay button if disabled in admin settings
+      var rzpBtn = document.getElementById('btn-razorpay');
+      if (rzpBtn) rzpBtn.style.display = (data.settings.upi_enabled === 'false') ? 'none' : '';
+      // Hide COD button if disabled in admin settings
+      var codBtn = document.getElementById('btn-cod');
+      if (codBtn) codBtn.style.display = (data.settings.cod_enabled === 'false') ? 'none' : '';
       updateShipAmountDisplays();
       uCart(); // Recalculate cart total with correct shipping settings from DB
       initHeroPanel(data.settings); // Hero panel images + sale badge
