@@ -61,13 +61,33 @@ You MUST respond in ${langName} (language code: ${langCode}).
 - If langCode is "gu" → respond in Gujarati (ગુજરાતી)
 - If langCode is "kn" → respond in Kannada (ಕನ್ನಡ)
 - If langCode is "ml" → respond in Malayalam (മലയാളം)
-- If langCode is "doi" → respond in Dogri (डोगरी)
-- If langCode is "kngr" → respond ONLY in Kangri dialect (कांगड़ी बोली). Use words like: किड़ा, कुसा, छा, ओ, हाँ जी, थुआड़ा, म्हारा. Do NOT use standard Hindi. Use Devanagari script.
-- If langCode is "garh" → respond ONLY in Garhwali dialect (गढ़वाली बोली). Use words like: को, छ, मी, तुम, ह्वेगो, आजा, कख. Use Devanagari script.
-- If langCode is "doi" → respond in Dogri (डोगरी). Use Devanagari script.
-- If langCode is "kum" → respond in Kumaoni dialect (कुमाऊँनी बोली). Use Devanagari script.
-- If langCode is "him" → respond in Himachali Pahari dialect. Use Devanagari script.
-- If langCode is "lad" → respond in Ladakhi language.
+- If langCode is "kngr" → respond ONLY in Kangri/Himachali Pahari boli. NOTE: Kangri AND Himachali Pahari are the SAME language — both are Pahari boli of Himachal Pradesh.
+  STRICT RULES: 
+  • "छां/छा" = हूँ/है  • "थुआड़ा/थारा" = तुम्हारा  • "म्हारा" = मेरा  
+  • "किड़ा" = कैसे  • "कुसा/कुस" = क्या  • "दस्सो" = बताओ  
+  • "लोड़" = जरूरत  • "इत्थें" = यहाँ  • "साड़े/म्हारे" = हमारे  
+  • "चाहिदा" = चाहिए  • "ओ जी / राम राम जी" = greeting
+  Example: "राम राम जी! किड़ा छो थुआड़ा? म्हारे कोल असली पहाड़ी माल छा — शहद, घी, केसर सब कुछ। दस्सो कुसा चाहिदा थारे?"
+  STRICTLY DO NOT use Punjabi (no Gurmukhi script). DO NOT use standard Hindi. Devanagari script only.
+
+
+
+- If langCode is "garh" → respond ONLY in Garhwali dialect (गढ़वाली — Uttarakhand).
+  STRICT RULES: Use "छु/छ" for हूँ/है, "मि" for मैं, "तुम" stays same, "क्वे" for कौन, "कख" for कहाँ, "ह्वे" for हो, "आ जा" for आओ, "बटे" for से.
+  Example: "नमस्कार! मि Pahadi_AI छु — तुमारो Himalayan गाइड। मि यख मदद करण छु — शहद, घी, केसर सब बटे। बताओ क्या चयेंद?"
+  DO NOT use Hindi. Use Devanagari script only.
+
+- If langCode is "kum" → respond ONLY in Kumaoni dialect (कुमाऊँनी — Uttarakhand).
+  Use words: "छु/छ" for है, "मैं" stays, "तुमर" for तुम्हारा, "हमर" for हमारा, "क्या" stays, "बताओ" stays, "चनो" for चाहिए.
+  Example: "नमस्कार! मैं Pahadi_AI छु — तुमर Himalayan गाइड। हमर पास असली पहाड़ी चीज़ें छन — शहद, घी, केसर। बताओ क्या चनो?"
+  DO NOT use Hindi. Use Devanagari only.
+
+- If langCode is "doi" → respond ONLY in Dogri (डोगरी — Jammu).
+  Use words: "आं" for हूँ, "ऐ" for है, "म्हेंगी" for मुझे, "तुंदा" for तुम्हारा, "साड्डा" for हमारा, "दस्सो" for बताओ, "लोड़" for जरूरत.
+  Example: "राम राम! मैं Pahadi_AI आं — तुंदा Himalayan गाइड। साड्डे कोल शुद्ध पहाड़ी माल ऐ। दस्सो की चाहिदा?"
+  DO NOT use Hindi or Punjabi. Use Devanagari only.
+
+- If langCode is "lad" → respond in Ladakhi language (simple words with Hindi mix is okay for Ladakhi).
 - If langCode is "ur" → respond in Urdu (use Nastaliq script: اردو)
 - If langCode is "mai" → respond in Maithili (मैथिली)
 - If langCode is "kok" → respond in Konkani (कोंकणी)
@@ -377,12 +397,11 @@ USE WEB SEARCH: You have Google Search available. Use it for current weather, te
     + '<div class="pr-lang-opt" data-lang="sa">संस्कृत — Sanskrit</div>'
     + '<div class="pr-lang-opt" data-lang="si">සිංහල — Sinhala</div>'
     + '<div class="pr-lang-group">🏔️ Pahadi Bolis</div>'
-    + '<div class="pr-lang-opt" data-lang="kngr">कांगड़ी — Kangri (HP)</div>'
-    + '<div class="pr-lang-opt" data-lang="garh">गढ़वाली — Garhwali (UK)</div>'
+    + '<div class="pr-lang-opt" data-lang="kngr">कांगड़ी/हिमाचली — Kangri Pahari (HP)</div>'
+    + '<div class="pr-lang-opt" data-lang="garh">गढ़वाली — Garhwali (Uttarakhand)</div>'
+    + '<div class="pr-lang-opt" data-lang="kum">कुमाऊँनी — Kumaoni (Uttarakhand)</div>'
     + '<div class="pr-lang-opt" data-lang="doi">डोगरी — Dogri (J&K)</div>'
-    + '<div class="pr-lang-opt" data-lang="kum">कुमाऊँनी — Kumaoni (UK)</div>'
-    + '<div class="pr-lang-opt" data-lang="him">हिमाचली — Himachali Pahari</div>'
-    + '<div class="pr-lang-opt" data-lang="lad">Ladakhi — Ladakhi</div>'
+    + '<div class="pr-lang-opt" data-lang="lad">Ladakhi — Ladakhi (Ladakh)</div>'
     + '<div class="pr-lang-group">🌍 Global Languages</div>'
     + '<div class="pr-lang-opt" data-lang="zh">中文 — Chinese</div>'
     + '<div class="pr-lang-opt" data-lang="ja">日本語 — Japanese</div>'
@@ -466,8 +485,8 @@ USE WEB SEARCH: You have Google Search available. Use it for current weather, te
   var LANG_NAMES = {
     en:'English', hi:'Hindi', pa:'Punjabi', bn:'Bengali', ta:'Tamil', te:'Telugu',
     mr:'Marathi', gu:'Gujarati', kn:'Kannada', ml:'Malayalam', or:'Odia', as:'Assamese',
-    ne:'Nepali', doi:'Dogri', kngr:'Kangri', garh:'Garhwali',
-    kum:'Kumaoni', him:'Himachali Pahari', lad:'Ladakhi',
+    ne:'Nepali', doi:'Dogri', kngr:'Kangri Pahari (Himachali)', garh:'Garhwali',
+    kum:'Kumaoni', lad:'Ladakhi',
     ur:'Urdu', sa:'Sanskrit', mai:'Maithili', kok:'Konkani', mni:'Manipuri', si:'Sinhala',
     zh:'Chinese', ja:'Japanese', ko:'Korean', ar:'Arabic',
     fr:'French', de:'German', es:'Spanish', ru:'Russian', pt:'Portuguese',
@@ -476,7 +495,7 @@ USE WEB SEARCH: You have Google Search available. Use it for current weather, te
   var VOICE_MAP = {
     en:'en-IN', hi:'hi-IN', pa:'pa-IN', bn:'bn-IN', ta:'ta-IN', te:'te-IN',
     mr:'mr-IN', gu:'gu-IN', kn:'kn-IN', ml:'ml-IN', or:'or-IN', as:'as-IN',
-    ne:'ne-NP', kngr:'hi-IN', garh:'hi-IN', doi:'hi-IN', kum:'hi-IN', him:'hi-IN', lad:'hi-IN',
+    ne:'ne-NP', kngr:'hi-IN', garh:'hi-IN', doi:'hi-IN', kum:'hi-IN', lad:'hi-IN',
     ur:'ur-PK', si:'si-LK', zh:'zh-CN', ru:'ru-RU', pt:'pt-BR', ja:'ja-JP', ko:'ko-KR', ar:'ar-SA', fr:'fr-FR',
     de:'de-DE', es:'es-ES',
   };
@@ -580,7 +599,7 @@ USE WEB SEARCH: You have Google Search available. Use it for current weather, te
       te: '🙏 నమస్కారం! నేను **' + AI_CFG.name + '** — మీ Himalayan గైడ్!\n\nనేను సహాయపడగలను:\n• Himalayan ఉత్పత్తులు\n• వాతావరణ సమాచారం\n• బడ్జెట్ సూచనలు\n\nమీకు ఏమి తెలుసుకోవాలి?',
       mr: '🙏 नमस्कार! मी **' + AI_CFG.name + '** — तुमचा Himalayan मार्गदर्शक!\n\nमी मदत करू शकतो:\n• Himalayan उत्पादने\n• हवामान माहिती\n• Budget नुसार सूचना\n\nकाय जाणून घ्यायचे आहे?',
       gu: '🙏 નમસ્તે! હું **' + AI_CFG.name + '** — તમારો Himalayan ગાઇડ!\n\nહું મદદ કરી શકું:\n• Himalayan ઉત્પાદનો\n• હવામાનની માહિતી\n• Budget મુજબ સૂચनो\n\nशું જаणвू  છे?',
-      kngr: '🙏 राम राम जी! मैं **' + AI_CFG.name + '** छां — थुआड़ा Himalayan गाइड!\n\nमैं इत्थें मदद करी सकदा छां:\n• साड़े शुद्ध Himalayan उत्पाद\n• शिमले, मनाली दा मौसम\n• Budget दे हिसाब नाल सलाह\n• Delivery ते returns\n\nदस्सो, किसी चीज़ दी लोड़ है?',
+      kngr: '🙏 राम राम जी! मैं **' + AI_CFG.name + '** छां — थुआड़ा Himachali गाइड!\n\nमैं इत्थें मदद करी सकदा छां:\n• साड़े शुद्ध पहाड़ी उत्पाद — शहद, घी, केसर\n• शिमले, मनाली दा मौसम (live!)\n• Budget दे हिसाब नाल सलाह\n• Delivery ते returns\n\nदस्सो, किसी चीज़ दी लोड़ है?',
       garh: '🙏 नमस्कार! मी **' + AI_CFG.name + '** छूं — तुमारो Himalayan गाइड!\n\nमी यूँ मदद करी सकदूं:\n• हमारा Himalayan उत्पाद\n• शिमला, मनाली को मौसम\n• Budget क हिसाब से सलाह\n• Delivery अर returns\n\nबताओ, क्या जाणनो छ?',
       doi: '🙏 राम राम! मैं **' + AI_CFG.name + '** आं — तुंदा Himalayan guide!\n\nमैं इत्थें मदद करी सकदा आं:\n• साडे Himalayan उत्पाद\n• मौसम दी जानकारी\n• Budget मताबक सलाह\n\nदस्सो की जानना ऐ?',
     };
@@ -678,6 +697,7 @@ USE WEB SEARCH: You have Google Search available. Use it for current weather, te
         parts: [{ text: systemPrompt }]
       },
       contents: contents,
+      tools: [{ google_search: {} }],
       generationConfig: {
         temperature: 0.7,
         maxOutputTokens: 1024,
