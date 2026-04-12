@@ -335,6 +335,17 @@ async function loadData() {
       if (data.settings.min_order_amount     !== undefined && data.settings.min_order_amount     !== null) MIN_ORDER_AMOUNT    = parseInt(data.settings.min_order_amount,     10);
       if (data.settings.whatsapp_number)      WHATSAPP_NUMBER     = data.settings.whatsapp_number;
       if (data.razorpay_key)                  _RAZORPAY_KEY       = data.razorpay_key;
+      // ── Store closed / maintenance mode ──
+      if (data.settings.store_open === 'false') {
+        var msg = data.settings.maintenance_message || "We'll be back soon! 🌿";
+        document.body.innerHTML = '<div style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#f7f4ef;font-family:sans-serif;padding:32px;text-align:center">' +
+          '<div style="font-size:56px;margin-bottom:16px">🌿</div>' +
+          '<div style="font-size:26px;font-weight:800;color:#1b4332;margin-bottom:10px">Pahadi Roots</div>' +
+          '<div style="font-size:16px;color:#555;max-width:400px;line-height:1.6">' + msg + '</div>' +
+          '<div style="margin-top:24px;font-size:12px;color:#aaa">For help: <a href="mailto:hello@pahadiroots.com" style="color:#2d6a4f">hello@pahadiroots.com</a></div>' +
+        '</div>';
+        return; // stop all further JS execution
+      }
       // Hide Razorpay button if disabled in admin settings
       var rzpBtn = document.getElementById('btn-razorpay');
       if (rzpBtn) rzpBtn.style.display = (data.settings.upi_enabled === 'false') ? 'none' : '';
