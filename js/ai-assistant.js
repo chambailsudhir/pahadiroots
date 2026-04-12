@@ -61,14 +61,29 @@ You MUST respond in ${langName} (language code: ${langCode}).
 - If langCode is "gu" → respond in Gujarati (ગુજરાતી)
 - If langCode is "kn" → respond in Kannada (ಕನ್ನಡ)
 - If langCode is "ml" → respond in Malayalam (മലയാളം)
-- If langCode is "kngr" → respond ONLY in Kangri/Himachali Pahari boli. NOTE: Kangri AND Himachali Pahari are the SAME language — both are Pahari boli of Himachal Pradesh.
-  STRICT RULES: 
-  • "छां/छा" = हूँ/है  • "थुआड़ा/थारा" = तुम्हारा  • "म्हारा" = मेरा  
-  • "किड़ा" = कैसे  • "कुसा/कुस" = क्या  • "दस्सो" = बताओ  
-  • "लोड़" = जरूरत  • "इत्थें" = यहाँ  • "साड़े/म्हारे" = हमारे  
-  • "चाहिदा" = चाहिए  • "ओ जी / राम राम जी" = greeting
-  Example: "राम राम जी! किड़ा छो थुआड़ा? म्हारे कोल असली पहाड़ी माल छा — शहद, घी, केसर सब कुछ। दस्सो कुसा चाहिदा थारे?"
-  STRICTLY DO NOT use Punjabi (no Gurmukhi script). DO NOT use standard Hindi. Devanagari script only.
+- If langCode is "kngr" → respond ONLY in Kangri/Himachali Pahari boli using AUTHENTIC vocabulary:
+  PRONOUNS: मई (I), तुसा/तुसां (you/आप), सेह/उनी (he/she), असां (we/हम), उदा (his/her)
+  GREETINGS: "राम राम जी!" • "हाँजी!" (yes) • "नहीं" (no)
+  KEY WORDS from Himachali Kangri Shabdawali:
+  • असल = असली  • खरा = बढ़िया/ठीक  • गल = बात  • गपां = बातें
+  • दस्सो = बताओ  • कने = और/साथ में  • म्हारा = हमारा  • साड़ा = हमारा
+  • पाणी = पानी  • घियो = घी  • मखीर = शहद  • लूण = नमक
+  • सोहणा = सुन्दर  • खरा = अच्छा  • माड़ा = बुरा  • महीन = बारीक
+  • कदकी = कभी कभार  • इब्बे = अभी/अब  • इत = यहाँ  • ओथु = वहाँ
+  • कजो = क्यों  • किसी/कुण = कौन  • कुतांह = किधर/कहाँ
+  • तत्ता = गर्म  • सीत = सर्दी  • बरखा = बारिश  • आहूण = ओलावृष्टि
+  • ग्रां = गांव  • हार = खेत  • दरयो = दरिया  • रुख = वृक्ष
+  • कुक्कड़ = मुर्गा  • मछी = मछली  • डंगरे = पशु  • म्है = भैंस
+  • खणक = चांदी  • लोह = खून  • बाल = सहारा/सहायता
+  • मापे = माँ-बाप  • धी = बेटी  • जागत = लड़का  • बिट्टी = बेटी
+  • सहोआं = अच्छा/सुन्दर  • बाँका = सुन्दर  • सणहूट = तेज़ दौड़ना
+  • जमात = कक्षा  • जमाती = सहपाठी  • मास्टर = अध्यापक
+  EXAMPLE SENTENCES:
+  "राम राम जी! तुसां किदे हान? मई खरा हाँ।" (How are you? I am fine)
+  "म्हारे कोल असल पहाड़ी माल छा — मखीर, घियो, केसर सब।" (We have real Pahadi products)
+  "दस्सो, कुसा चाहिदा थारे?" (Tell me, what do you need?)
+  "इत आओ, गल करीए!" (Come here, let's talk!)
+  DO NOT use Punjabi Gurmukhi script. Use Devanagari. Mix natural Kangri with Hindi only when needed.
 
 
 
@@ -93,6 +108,11 @@ You MUST respond in ${langName} (language code: ${langCode}).
 - If langCode is "kok" → respond in Konkani (कोंकणी)
 - If langCode is "mni" → respond in Manipuri/Meitei
 - If langCode is "si" → respond in Sinhala (සිංහල)
+- If langCode is "nag" → respond in Nagamese (Nagaland creole — mix of Nagamese Assamese base with simple English words, friendly tone)
+- If langCode is "bodo" → respond in Bodo language (Assam) — use simple Bodo words with Hindi/English mix
+- If langCode is "mizo" → respond in Mizo language (Mizoram) — use Mizo words naturally
+- If langCode is "khasi" → respond in Khasi language (Meghalaya) — use Khasi words naturally  
+- If langCode is "sikkimese" → respond in Sikkimese/Nepali dialect (Sikkim)
 - If langCode is "ru" → respond in Russian
 - If langCode is "pt" → respond in Portuguese
 - If langCode is "en" → respond in English
@@ -402,6 +422,14 @@ USE WEB SEARCH: You have Google Search available. Use it for current weather, te
     + '<div class="pr-lang-opt" data-lang="kum">कुमाऊँनी — Kumaoni (Uttarakhand)</div>'
     + '<div class="pr-lang-opt" data-lang="doi">डोगरी — Dogri (J&K)</div>'
     + '<div class="pr-lang-opt" data-lang="lad">Ladakhi — Ladakhi (Ladakh)</div>'
+    + '<div class="pr-lang-group">🌿 Northeast India</div>'
+    + '<div class="pr-lang-opt" data-lang="as">অসমীয়া — Assamese</div>'
+    + '<div class="pr-lang-opt" data-lang="mni">মৈতৈ — Manipuri</div>'
+    + '<div class="pr-lang-opt" data-lang="nag">Nagamese — Nagamese (Nagaland)</div>'
+    + '<div class="pr-lang-opt" data-lang="bodo">बड़ो — Bodo (Assam)</div>'
+    + '<div class="pr-lang-opt" data-lang="mizo">Mizo — Mizo (Mizoram)</div>'
+    + '<div class="pr-lang-opt" data-lang="khasi">Khasi — Khasi (Meghalaya)</div>'
+    + '<div class="pr-lang-opt" data-lang="sikkimese">Sikkimese — Sikkimese (Sikkim)</div>'
     + '<div class="pr-lang-group">🌍 Global Languages</div>'
     + '<div class="pr-lang-opt" data-lang="zh">中文 — Chinese</div>'
     + '<div class="pr-lang-opt" data-lang="ja">日本語 — Japanese</div>'
@@ -488,6 +516,7 @@ USE WEB SEARCH: You have Google Search available. Use it for current weather, te
     ne:'Nepali', doi:'Dogri', kngr:'Kangri Pahari (Himachali)', garh:'Garhwali',
     kum:'Kumaoni', lad:'Ladakhi',
     ur:'Urdu', sa:'Sanskrit', mai:'Maithili', kok:'Konkani', mni:'Manipuri', si:'Sinhala',
+    nag:'Nagamese', bodo:'Bodo', mizo:'Mizo', khasi:'Khasi', sikkimese:'Sikkimese',
     zh:'Chinese', ja:'Japanese', ko:'Korean', ar:'Arabic',
     fr:'French', de:'German', es:'Spanish', ru:'Russian', pt:'Portuguese',
   };
@@ -496,6 +525,7 @@ USE WEB SEARCH: You have Google Search available. Use it for current weather, te
     en:'en-IN', hi:'hi-IN', pa:'pa-IN', bn:'bn-IN', ta:'ta-IN', te:'te-IN',
     mr:'mr-IN', gu:'gu-IN', kn:'kn-IN', ml:'ml-IN', or:'or-IN', as:'as-IN',
     ne:'ne-NP', kngr:'hi-IN', garh:'hi-IN', doi:'hi-IN', kum:'hi-IN', lad:'hi-IN',
+    nag:'en-IN', bodo:'hi-IN', mizo:'en-IN', khasi:'en-IN', sikkimese:'ne-NP',
     ur:'ur-PK', si:'si-LK', zh:'zh-CN', ru:'ru-RU', pt:'pt-BR', ja:'ja-JP', ko:'ko-KR', ar:'ar-SA', fr:'fr-FR',
     de:'de-DE', es:'es-ES',
   };
@@ -602,6 +632,16 @@ USE WEB SEARCH: You have Google Search available. Use it for current weather, te
       kngr: '🙏 राम राम जी! मैं **' + AI_CFG.name + '** छां — थुआड़ा Himachali गाइड!\n\nमैं इत्थें मदद करी सकदा छां:\n• साड़े शुद्ध पहाड़ी उत्पाद — शहद, घी, केसर\n• शिमले, मनाली दा मौसम (live!)\n• Budget दे हिसाब नाल सलाह\n• Delivery ते returns\n\nदस्सो, किसी चीज़ दी लोड़ है?',
       garh: '🙏 नमस्कार! मी **' + AI_CFG.name + '** छूं — तुमारो Himalayan गाइड!\n\nमी यूँ मदद करी सकदूं:\n• हमारा Himalayan उत्पाद\n• शिमला, मनाली को मौसम\n• Budget क हिसाब से सलाह\n• Delivery अर returns\n\nबताओ, क्या जाणनो छ?',
       doi: '🙏 राम राम! मैं **' + AI_CFG.name + '** आं — तुंदा Himalayan guide!\n\nमैं इत्थें मदद करी सकदा आं:\n• साडे Himalayan उत्पाद\n• मौसम दी जानकारी\n• Budget मताबक सलाह\n\nदस्सो की जानना ऐ?',
+      kum: '🙏 नमस्कार! मैं **' + AI_CFG.name + '** छु — तुमर Himalayan गाइड!\n\nमैं यूँ मदद करि सकूँ:\n• हमर असली पहाड़ी उत्पाद\n• मौसम की जानकारी\n• Budget क हिसाब से सलाह\n\nबताओ क्या चनो?',
+      lad: '🙏 Juley! I am **' + AI_CFG.name + '** — your Himalayan guide!\n\nI can help with:\n• Our pure Ladakhi & Himalayan products\n• Weather in Leh, Ladakh\n• Budget suggestions\n\nYang cho dukpo? (What do you need?)',
+      or: '🙏 ନମସ୍କାର! ମୁଁ **' + AI_CFG.name + '** — ଆପଣଙ୍କର Himalayan ଗାଇଡ଼!\n\nମୁଁ ସାହାଯ୍ୟ କରିପାରିବି:\n• Himalayan ଉତ୍ପାଦ\n• ପାଣିପାଗ ସୂଚନା\n• Budget ଅନୁଯାୟୀ ପରାମର୍ଶ\n\nଆପଣ କ'ଣ ଜାଣିବାକୁ ଚାହୁଁଛନ୍ତି?',
+      as: '🙏 নমস্কাৰ! মই **' + AI_CFG.name + '** — আপোনাৰ Himalayan গাইড!\n\nমই সহায় কৰিব পাৰোঁ:\n• আমাৰ Himalayan সামগ্ৰী\n• বতৰৰ খবৰ\n• Budget অনুযায়ী পৰামৰ্শ\n\nআপুনি কি জানিব বিচাৰে?',
+      ne: '🙏 नमस्ते! म **' + AI_CFG.name + '** हुँ — तपाईंको Himalayan गाइड!\n\nमैले मद्दत गर्न सक्छु:\n• हाम्रा Himalayan उत्पादनहरू\n• मौसमको जानकारी\n• Budget अनुसार सुझाव\n\nके जान्न चाहनुहुन्छ?',
+      ur: '🙏 آداب! میں **' + AI_CFG.name + '** ہوں — آپ کا Himalayan گائیڈ!\n\nمیں مدد کر سکتا ہوں:\n• ہمارے خالص Himalayan مصنوعات\n• موسم کی معلومات\n• Budget کے مطابق مشورہ\n\nبتائیں، کیا جاننا ہے?',
+      nag: '🙏 Namaste! Me **' + AI_CFG.name + '** — tumhara Himalayan guide!\n\nMe help dibo pari:\n• Hamara pure Himalayan product — shahad, ghee, kesar\n• Mausam ki jankari\n• Budget hisab se suggestion\n\nBolo, ki chahiye?',
+      bodo: '🙏 Namaskar! Mwi **' + AI_CFG.name + '** — nwngni Himalayan guide!\n\nMwi help dibo:\n• Himalayan products — shahad, ghee, kesar\n• Mausam jankari\n• Budget suggestion\n\nBolo ki chahiye?',
+      mizo: '🙏 Chibai! Ka hming chu **' + AI_CFG.name + '** — i Himalayan guide!\n\nKa tanpui theih:\n• Himalayan products — shahad, ghee, kesar\n• Weather info\n• Budget suggestion\n\nHe la, i duh engzat nge?',
+      khasi: '🙏 Khublei! Nga **' + AI_CFG.name + '** — ngi Himalayan guide!\n\nNga sngewbha:\n• Himalayan products — shahad, ghee, kesar\n• Mausam info\n• Budget suggestion\n\nLa hap, ia la leh?',
     };
     addMsg('bot', w[lang] || w.en, [], true);
   }
