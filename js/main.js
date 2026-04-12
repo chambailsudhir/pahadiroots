@@ -225,21 +225,6 @@ function initHeroPanel(settings) {
   var grid = document.getElementById('heroProdGrid');
   var saleBadge = document.getElementById('heroSaleBadge');
   if (!grid) return;
-
-  // ── HERO BACKGROUND IMAGE (single full panel image) ──
-  var bgUrl = settings && settings.hero_bg_image;
-  var panel = document.getElementById('heroProdPanel');
-  if (bgUrl && panel) {
-    // Single big image mode — hide the 2x2 grid, show one large image
-    panel.style.backgroundImage = 'url(' + bgUrl + ')';
-    panel.style.backgroundSize = 'cover';
-    panel.style.backgroundPosition = 'center';
-    panel.style.borderRadius = '24px';
-    panel.style.overflow = 'hidden';
-    grid.style.opacity = '0';
-    grid.style.pointerEvents = 'none';
-  }
-
   var rawUrls = (settings && settings.hero_images) ? settings.hero_images : '';
   var urls = rawUrls.split(',').map(function(u){ return u.trim(); }).filter(Boolean).slice(0, 4);
   if (!urls.length && PRODUCTS && PRODUCTS.length) {
@@ -263,23 +248,6 @@ function initHeroPanel(settings) {
   }
 }
 function initHeroSlideshow() { initHeroPanel(null); }
-// ── COLLECTION CATEGORY IMAGES ─────────────────────────────────────
-// Admin can set images per category via Settings → Collection Images
-// Keys: coll_img_honey, coll_img_ghee, coll_img_spices, coll_img_tea, coll_img_grains, coll_img_dryfruits
-function initCollectionImages(settings) {
-  var CATS = ['honey','ghee','spices','tea','grains','dryfruits'];
-  CATS.forEach(function(cat) {
-    var url = settings && settings['coll_img_' + cat];
-    if (!url) return;
-    var img = document.getElementById('ccat-img-' + cat);
-    var emo = document.getElementById('ccat-emo-' + cat);
-    if (!img) return;
-    img.src = url;
-    img.style.display = 'block';
-    img.onerror = function() { img.style.display='none'; if(emo) emo.style.display='block'; };
-    if (emo) emo.style.display = 'none';
-  });
-}
 
 async function loadData() {
   // Step 1: render states fallback only — skip fake products to avoid price flash
@@ -335,7 +303,6 @@ async function loadData() {
       updateShipAmountDisplays();
       uCart(); // Recalculate cart total with correct shipping settings from DB
       initHeroPanel(data.settings); // Hero panel images + sale badge
-      initCollectionImages(data.settings); // Category card images
     }
     var updated  = false;
 
@@ -2199,11 +2166,4 @@ window.addEventListener('DOMContentLoaded', function() {
   } else {
     checkOpenCart();
   }
-})();
-
-// ── APPLY SAVED THEME ON LOAD (index.html) ───────────────────────
-(function() {
-  var saved;
-  try { saved = localStorage.getItem('pr_theme'); } catch(e) {}
-  applyTheme(saved || 'pahadi');
 })();
