@@ -302,39 +302,31 @@
   <a href="#contact" onclick="closeMobNav()">Contact</a>
   </div>
 </div>
-<section class="hero hero-v2" id="home">
-  <div class="hov"></div>
-  <div class="lw">
-    <span class="lf" style="left:6%;font-size:14px;animation-duration:14s;animation-delay:0s">🍃</span>
-    <span class="lf" style="left:18%;animation-duration:17s;animation-delay:3s">🌿</span>
-    <span class="lf" style="left:38%;font-size:12px;animation-duration:12s;animation-delay:6s">🍃</span>
-  </div>
-  <div class="hero-inner">
-    <div class="hc hero-text">
-      <div class="eyebrow">🌿 Pure · Himalayan · Natural</div>
-      <h1>Born in the<br><em>Himalayas,</em><br>For Your Table</h1>
-      <p class="hsub">Handpicked from the purest altitudes — where clean air, ancient soil, and tradition create nature's finest.</p>
-      <div class="hbtns"><a href="#shop" class="btn-g">Explore Our Store</a><a href="/our-story" class="btn-w">Our Story</a></div>
-      <div class="hero-trust-row">
-        <span class="hero-trust-pill">✔ Lab Tested</span>
-        <span class="hero-trust-pill">✔ Direct from Farmers</span>
-        <span class="hero-trust-pill">✔ Free Shipping ₹799+</span>
-      </div>
-    </div>
-    <div class="hero-products-panel" id="heroProdPanel">
-      <div class="hero-prod-grid" id="heroProdGrid">
-        <div class="hero-prod-card hero-prod-placeholder"></div>
-        <div class="hero-prod-card hero-prod-placeholder"></div>
-        <div class="hero-prod-card hero-prod-placeholder"></div>
-        <div class="hero-prod-card hero-prod-placeholder"></div>
-      </div>
-      <div class="hero-sale-badge" id="heroSaleBadge" style="display:none">
-        <span id="heroSaleText">Summer Sale</span>
-        <strong id="heroSaleDiscount">FLAT 10% OFF</strong>
-        <span id="heroSaleCode">USE CODE: SUMMER10</span>
+<section class="hero-slider" id="home">
+  <!-- Slides populated by JS from DB settings -->
+  <div class="hslider-track" id="hsliderTrack">
+    <!-- Fallback slide shown before JS loads / if no banners configured -->
+    <div class="hslide hslide-fallback active">
+      <div class="hslide-content">
+        <div class="hslide-eyebrow">🌿 Pure · Himalayan · Natural</div>
+        <h1 class="hslide-title">Born in the<br><em>Himalayas,</em><br>For Your Table</h1>
+        <p class="hslide-sub">Handpicked from the purest altitudes — where clean air, ancient soil, and tradition create nature's finest.</p>
+        <div class="hslide-btns">
+          <a href="#shop" class="hslide-btn-primary">Explore Our Store</a>
+          <a href="/our-story" class="hslide-btn-secondary">Our Story</a>
+        </div>
       </div>
     </div>
   </div>
+
+  <!-- Navigation arrows -->
+  <button class="hslider-arrow hslider-prev" id="hsliderPrev" onclick="heroSlide(-1)" aria-label="Previous">&#8249;</button>
+  <button class="hslider-arrow hslider-next" id="hsliderNext" onclick="heroSlide(1)" aria-label="Next">&#8250;</button>
+
+  <!-- Dots -->
+  <div class="hslider-dots" id="hsliderDots"></div>
+
+  <!-- Stats bar -->
   <div class="hstats" id="hstats">
     <div class="hstat"><div class="hstat-num" data-target="500">0<em>+</em></div><div class="hstat-lbl">Farmer Families</div></div>
     <div class="hstat-div"></div>
@@ -345,6 +337,7 @@
     <div class="hstat"><div class="hstat-num" data-target="48">0<em>hr</em></div><div class="hstat-lbl">Avg Dispatch</div></div>
   </div>
 </section>
+
 
 <div class="trust">
   <div class="tc"><span class="tico">🌿</span><div><div class="tlb">100% Natural</div><div class="tds">No chemicals, no preservatives</div></div></div>

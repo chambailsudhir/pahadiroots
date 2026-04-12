@@ -219,51 +219,127 @@ function getStoreApiBase() {
 
 // ── DATA LOADING ───────────────────────────────────────────────────
 
-// ── HERO BACKGROUND — static single image (no slideshow) ──
-var _heroFallback = 'https://images.unsplash.com/photo-1587049352846-4a222e784d38?w=1600&q=80';
+// ══════════════════════════════════════════════════════════════
+// FULL-WIDTH HERO SLIDER  (3 banners, auto-rotate every 5s)
+// Settings keys: hero_slide_1_img, hero_slide_1_eyebrow, hero_slide_1_title,
+//   hero_slide_1_sub, hero_slide_1_cta_text, hero_slide_1_cta_link,
+//   hero_slide_1_cta2_text, hero_slide_1_cta2_link,
+//   hero_slide_1_coupon_label, hero_slide_1_coupon_offer, hero_slide_1_coupon_code
+//   (repeat for _2_ and _3_)
+// ══════════════════════════════════════════════════════════════
+var _heroSlideIndex = 0;
+var _heroSlideTimer = null;
+var _heroSlideCount = 0;
 
-function initHeroPanel(settings) {
-  var grid = document.getElementById('heroProdGrid');
-  var saleBadge = document.getElementById('heroSaleBadge');
-  if (!grid) return;
+function esc2(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
-  // ── HERO BACKGROUND IMAGE (single full panel image) ──
-  var bgUrl = settings && settings.hero_bg_image;
-  var panel = document.getElementById('heroProdPanel');
-  if (bgUrl && panel) {
-    // Single big image mode — hide the 2x2 grid, show one large image
-    panel.style.backgroundImage = 'url(' + bgUrl + ')';
-    panel.style.backgroundSize = 'cover';
-    panel.style.backgroundPosition = 'center';
-    panel.style.borderRadius = '24px';
-    panel.style.overflow = 'hidden';
-    grid.style.opacity = '0';
-    grid.style.pointerEvents = 'none';
+function buildSlide(s, idx) {
+  var img = s.img || '';
+  var hasCoupon = s.coupon_offer || s.coupon_code;
+  var html = '<div class="hslide' + (idx === 0 ? ' active' : '') + '"'
+    + (img ? ' style="background-image:url(' + esc2(img) + ')"' : ' style="background:linear-gradient(150deg,#071a09 0%,#0d2410 30%,#1a3a1e 65%,#2d5233 100%)"')
+    + '>';
+  html += '<div class="hslide-overlay"></div>';
+  html += '<div class="hslide-content">';
+  if (s.eyebrow) html += '<div class="hslide-eyebrow">' + esc2(s.eyebrow) + '</div>';
+  if (s.title)   html += '<h1 class="hslide-title">' + s.title.replace(/\*([^*]+)\*/g, '<em>$1</em>') + '</h1>';
+  if (s.sub)     html += '<p class="hslide-sub">' + esc2(s.sub) + '</p>';
+  if (hasCoupon) {
+    html += '<div class="hslide-coupon">';
+    if (s.coupon_label) html += '<span class="hslide-coupon-label">' + esc2(s.coupon_label) + '</span>';
+    if (s.coupon_offer) html += '<span class="hslide-coupon-offer">' + esc2(s.coupon_offer) + '</span>';
+    if (s.coupon_code)  html += '<span class="hslide-coupon-code">USE CODE: ' + esc2(s.coupon_code) + '</span>';
+    html += '</div>';
   }
+  html += '<div class="hslide-btns">';
+  html += '<a href="' + esc2(s.cta_link || '#shop') + '" class="hslide-btn-primary">' + esc2(s.cta_text || 'Explore Our Store') + '</a>';
+  if (s.cta2_text) html += '<a href="' + esc2(s.cta2_link || '/our-story') + '" class="hslide-btn-secondary">' + esc2(s.cta2_text) + '</a>';
+  html += '</div></div></div>';
+  return html;
+}
 
-  var rawUrls = (settings && settings.hero_images) ? settings.hero_images : '';
-  var urls = rawUrls.split(',').map(function(u){ return u.trim(); }).filter(Boolean).slice(0, 4);
-  if (!urls.length && PRODUCTS && PRODUCTS.length) {
-    urls = PRODUCTS.slice(0, 4).map(function(p){ return p.image_url; }).filter(Boolean);
+function initHeroSlider(settings) {
+  var track = document.getElementById('hsliderTrack');
+  var dotsEl = document.getElementById('hsliderDots');
+  if (!track) return;
+  var slides = [];
+  for (var n = 1; n <= 3; n++) {
+    var img = settings && settings['hero_slide_' + n + '_img'];
+    if (!img) continue;
+    slides.push({
+      img:          img,
+      eyebrow:      (settings && settings['hero_slide_' + n + '_eyebrow'])       || '',
+      title:        (settings && settings['hero_slide_' + n + '_title'])          || '',
+      sub:          (settings && settings['hero_slide_' + n + '_sub'])            || '',
+      cta_text:     (settings && settings['hero_slide_' + n + '_cta_text'])       || 'Explore Our Store',
+      cta_link:     (settings && settings['hero_slide_' + n + '_cta_link'])       || '#shop',
+      cta2_text:    (settings && settings['hero_slide_' + n + '_cta2_text'])      || '',
+      cta2_link:    (settings && settings['hero_slide_' + n + '_cta2_link'])      || '',
+      coupon_label: (settings && settings['hero_slide_' + n + '_coupon_label'])   || '',
+      coupon_offer: (settings && settings['hero_slide_' + n + '_coupon_offer'])   || '',
+      coupon_code:  (settings && settings['hero_slide_' + n + '_coupon_code'])    || '',
+    });
   }
-  if (urls.length) {
-    grid.innerHTML = urls.map(function(url, i) {
-      return '<div class="hero-prod-card" style="animation-delay:' + (i * 0.12) + 's">'
-           + '<img src="' + url + '" alt="Product" loading="' + (i===0?'eager':'lazy') + '">'
-           + '</div>';
-    }).join('');
+  if (!slides.length) {
+    _heroSlideCount = 1;
+    if (dotsEl) dotsEl.style.display = 'none';
+    var pa = document.getElementById('hsliderPrev'); if (pa) pa.style.display = 'none';
+    var na = document.getElementById('hsliderNext'); if (na) na.style.display = 'none';
+    return;
   }
-  if (settings && settings.hero_sale_text && saleBadge) {
-    var st = document.getElementById('heroSaleText');
-    var sd = document.getElementById('heroSaleDiscount');
-    var sc = document.getElementById('heroSaleCode');
-    if (st) st.textContent = settings.hero_sale_text || '';
-    if (sd) sd.textContent = settings.hero_sale_discount || '';
-    if (sc) sc.textContent = settings.hero_sale_code ? ('USE CODE: ' + settings.hero_sale_code) : '';
-    saleBadge.style.display = 'flex';
+  track.innerHTML = slides.map(function(s, i) { return buildSlide(s, i); }).join('');
+  _heroSlideCount = slides.length;
+  _heroSlideIndex = 0;
+  if (dotsEl) {
+    if (slides.length < 2) {
+      dotsEl.style.display = 'none';
+      var pa2 = document.getElementById('hsliderPrev'); if (pa2) pa2.style.display = 'none';
+      var na2 = document.getElementById('hsliderNext'); if (na2) na2.style.display = 'none';
+    } else {
+      dotsEl.innerHTML = slides.map(function(_, i) {
+        return '<button class="hslider-dot' + (i===0?' active':'') + '" onclick="heroGoTo(' + i + ')" aria-label="Slide ' + (i+1) + '"></button>';
+      }).join('');
+      startHeroAutoplay();
+    }
   }
 }
-function initHeroSlideshow() { initHeroPanel(null); }
+
+function heroGoTo(idx) {
+  var slides = document.querySelectorAll('.hslide');
+  var dots   = document.querySelectorAll('.hslider-dot');
+  if (!slides.length) return;
+  if (slides[_heroSlideIndex]) slides[_heroSlideIndex].classList.remove('active');
+  if (dots[_heroSlideIndex])   dots[_heroSlideIndex].classList.remove('active');
+  _heroSlideIndex = ((idx % _heroSlideCount) + _heroSlideCount) % _heroSlideCount;
+  if (slides[_heroSlideIndex]) slides[_heroSlideIndex].classList.add('active');
+  if (dots[_heroSlideIndex])   dots[_heroSlideIndex].classList.add('active');
+}
+
+function heroSlide(dir) { stopHeroAutoplay(); heroGoTo(_heroSlideIndex + dir); startHeroAutoplay(); }
+
+function startHeroAutoplay() {
+  stopHeroAutoplay();
+  if (_heroSlideCount < 2) return;
+  _heroSlideTimer = setInterval(function() { heroGoTo(_heroSlideIndex + 1); }, 5000);
+}
+function stopHeroAutoplay() { if (_heroSlideTimer) { clearInterval(_heroSlideTimer); _heroSlideTimer = null; } }
+
+document.addEventListener('DOMContentLoaded', function() {
+  var slider = document.querySelector('.hero-slider');
+  if (!slider) return;
+  slider.addEventListener('mouseenter', stopHeroAutoplay);
+  slider.addEventListener('mouseleave', function() { if (_heroSlideCount > 1) startHeroAutoplay(); });
+  var tx = 0;
+  slider.addEventListener('touchstart', function(e) { tx = e.touches[0].clientX; }, {passive:true});
+  slider.addEventListener('touchend', function(e) {
+    var dx = e.changedTouches[0].clientX - tx;
+    if (Math.abs(dx) > 40) heroSlide(dx < 0 ? 1 : -1);
+  }, {passive:true});
+});
+
+// Backwards-compat — called from loadData()
+function initHeroPanel(settings) { initHeroSlider(settings || {}); }
+function initHeroSlideshow()     { initHeroSlider({}); }
 // ── COLLECTION CATEGORY IMAGES ─────────────────────────────────────
 // Reads all coll_img_* keys from settings — dynamic, matches any category slug
 function initCollectionImages(settings) {
