@@ -335,6 +335,30 @@ async function loadData() {
       if (data.settings.min_order_amount     !== undefined && data.settings.min_order_amount     !== null) MIN_ORDER_AMOUNT    = parseInt(data.settings.min_order_amount,     10);
       if (data.settings.whatsapp_number)      WHATSAPP_NUMBER     = data.settings.whatsapp_number;
       if (data.razorpay_key)                  _RAZORPAY_KEY       = data.razorpay_key;
+      // ── Contact info → footer ──
+      (function() {
+        var s = data.settings;
+        // Email
+        var fEmail = document.getElementById('footer-email');
+        if (fEmail && s.contact_email) { fEmail.href = 'mailto:' + s.contact_email; fEmail.textContent = s.contact_email; }
+        // Phone
+        var fPhone = document.getElementById('footer-phone');
+        if (fPhone && s.contact_phone) { fPhone.href = 'tel:' + s.contact_phone.replace(/\s/g,''); fPhone.textContent = s.contact_phone; }
+        // Address
+        var fAddr = document.getElementById('footer-address');
+        if (fAddr && s.contact_address) fAddr.innerHTML = s.contact_address.replace(/\n/g,'<br>');
+        // Social links
+        var socials = { instagram: 'social-instagram', facebook: 'social-facebook', twitter: 'social-twitter', youtube: 'social-youtube', pinterest: 'social-pinterest' };
+        Object.keys(socials).forEach(function(key) {
+          var el = document.getElementById(socials[key]);
+          var url = s['social_' + key];
+          if (el && url) el.href = url;
+          if (el && url === '') el.style.display = 'none'; // hide if cleared
+        });
+        // WhatsApp float button
+        var waBtn = document.getElementById('waFloatBtn');
+        if (waBtn && s.whatsapp_number) waBtn.href = 'https://wa.me/' + s.whatsapp_number.replace(/[^0-9]/g,'');
+      })();
       // ── Store closed / maintenance mode ──
       if (data.settings.store_open === 'false') {
         var msg = data.settings.maintenance_message || "We'll be back soon! 🌿";
