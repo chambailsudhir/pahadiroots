@@ -812,8 +812,8 @@ function quickAddToCart(id) {
 // ── QUICK VIEW — openQV() / closeQV() / chQvQty() defined below ──
 
 // ── THEME SWITCHER ───────────────────────────────────────────────
-var currentTheme = 'dukan';
-try { currentTheme = localStorage.getItem('pr_theme') || 'dukan'; } catch(e) {}
+var currentTheme = 'pahadi';
+try { currentTheme = localStorage.getItem('pr_theme') || 'pahadi'; } catch(e) {}
 
 function applyTheme(theme) {
   currentTheme = theme;
@@ -2172,5 +2172,5 @@ window.addEventListener('DOMContentLoaded', function() {
 (function() {
   var saved;
   try { saved = localStorage.getItem('pr_theme'); } catch(e) {}
-  applyTheme(saved || 'dukan');
+  applyTheme(saved || 'pahadi');
 })();
