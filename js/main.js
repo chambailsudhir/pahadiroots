@@ -117,6 +117,7 @@ var FREE_SHIP_THRESHOLD = 799;   // overridden from DB
 var FLAT_SHIP_CHARGE    = 99;    // overridden from DB
 var WHATSAPP_NUMBER     = '919899984895'; // overridden from DB
 var _RAZORPAY_KEY       = 'rzp_live_SNFVJBHdd3dYRQ'; // overridden from store-data
+var MIN_ORDER_AMOUNT    = 0;     // overridden from DB — 0 means no minimum
 
 // ── AUTH STATE ─────────────────────────────────────────────────────
 var _authToken   = null;
@@ -331,6 +332,7 @@ async function loadData() {
     if (data.settings) {
       if (data.settings.free_shipping_min    !== undefined && data.settings.free_shipping_min    !== null) FREE_SHIP_THRESHOLD = parseInt(data.settings.free_shipping_min,    10);
       if (data.settings.flat_shipping_charge !== undefined && data.settings.flat_shipping_charge !== null) FLAT_SHIP_CHARGE    = parseInt(data.settings.flat_shipping_charge, 10);
+      if (data.settings.min_order_amount     !== undefined && data.settings.min_order_amount     !== null) MIN_ORDER_AMOUNT    = parseInt(data.settings.min_order_amount,     10);
       if (data.settings.whatsapp_number)      WHATSAPP_NUMBER     = data.settings.whatsapp_number;
       if (data.razorpay_key)                  _RAZORPAY_KEY       = data.razorpay_key;
       // Hide Razorpay button if disabled in admin settings
@@ -1012,6 +1014,18 @@ function uCart() {
   updateShipProgress(final);
   renderUpsell();
 
+  // ── Min order amount banner ──
+  var minBanner = document.getElementById('minOrderBanner');
+  if (minBanner) {
+    if (MIN_ORDER_AMOUNT > 0 && final < MIN_ORDER_AMOUNT && cart.length > 0) {
+      var needed = MIN_ORDER_AMOUNT - final;
+      minBanner.innerHTML = '🛒 Add <strong>₹' + needed + ' more</strong> to meet the minimum order of <strong>₹' + MIN_ORDER_AMOUNT + '</strong>';
+      minBanner.style.display = '';
+    } else {
+      minBanner.style.display = 'none';
+    }
+  }
+
   var ciw = document.getElementById('ciw');
   if (!ciw) return;
   if (!cart.length) {
@@ -1215,6 +1229,13 @@ async function checkoutRazorpay() {
   if (!_authToken) { showCartLoginBanner(); return; }
   if (_orderProcessing) { showToast('⏳ Processing, please wait…'); return; }
 
+  // Min order check
+  var rzpSubtotal = cart.reduce(function(a,i){return a+i.price*i.qty;},0);
+  if (MIN_ORDER_AMOUNT > 0 && rzpSubtotal < MIN_ORDER_AMOUNT) {
+    showToast('🛒 Minimum order is ₹' + MIN_ORDER_AMOUNT + '. Add ₹' + (MIN_ORDER_AMOUNT - rzpSubtotal) + ' more.');
+    return;
+  }
+
   var name  = (document.getElementById('del-name') ||{}).value||'';
   var phone = (document.getElementById('del-phone')||{}).value||'';
   var addr  = (document.getElementById('del-addr') ||{}).value||'';
@@ -1390,6 +1411,14 @@ async function checkout() {
   if (!_authToken) { showCartLoginBanner(); return; }
   if (_orderProcessing) { showToast('⏳ Processing, please wait…'); return; }
   _orderProcessing = true;
+
+  // Min order check
+  var codSubtotal = cart.reduce(function(a,i){return a+i.price*i.qty;},0);
+  if (MIN_ORDER_AMOUNT > 0 && codSubtotal < MIN_ORDER_AMOUNT) {
+    _orderProcessing = false;
+    showToast('🛒 Minimum order is ₹' + MIN_ORDER_AMOUNT + '. Add ₹' + (MIN_ORDER_AMOUNT - codSubtotal) + ' more.');
+    return;
+  }
 
   // Validate delivery fields
   var name  = (document.getElementById('del-name') ||{}).value||'';
