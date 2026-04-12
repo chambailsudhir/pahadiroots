@@ -394,6 +394,9 @@ USE WEB SEARCH: You have Google Search available. Use it for current weather, te
     + '<div class="pr-lang-opt" data-lang="ru">Русский — Russian</div>'
     + '<div class="pr-lang-opt" data-lang="pt">Português — Portuguese</div>'
     + '</div></div></div>'
+    + '<div class="pr-chips-toggle" id="pr-chips-toggle"><span>💬 Quick Questions</span><span class="pr-chips-arrow" id="pr-chips-arrow">▼</span></div>'
+    + '<div class="pr-chips" id="pr-chips">'
+    + '<div class="pr-chip" data-q="Best honey recommendation?">🍯 Best honey</div>'
     + '<div class="pr-chip" data-q="Show products under 500 rupees">💰 Under ₹500</div>'
     + '<div class="pr-chip" data-q="Benefits of A2 Bilona Ghee?">🧈 Ghee benefits</div>'
     + '<div class="pr-chip" data-q="How to identify genuine Kashmiri saffron?">🌸 Real saffron?</div>'
@@ -546,20 +549,23 @@ USE WEB SEARCH: You have Google Search available. Use it for current weather, te
   var chipsDiv    = document.getElementById('pr-chips');
   var chipsArrow  = document.getElementById('pr-chips-arrow');
 
-  // Force hide on load
-  chipsDiv.style.display = 'none';
+  // Null-safe — hide chips on load
+  if (chipsDiv) chipsDiv.style.display = 'none';
 
-  chipsToggle.addEventListener('click', function() {
-    var isOpen = chipsDiv.style.display === 'flex';
-    chipsDiv.style.display = isOpen ? 'none' : 'flex';
-    chipsArrow.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
-  });
+  if (chipsToggle) {
+    chipsToggle.addEventListener('click', function() {
+      if (!chipsDiv) return;
+      var isOpen = chipsDiv.style.display === 'flex';
+      chipsDiv.style.display = isOpen ? 'none' : 'flex';
+      if (chipsArrow) chipsArrow.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
+    });
+  }
 
   panel.querySelectorAll('.pr-chip').forEach(function(c) {
     c.addEventListener('click', function() {
       send(c.getAttribute('data-q'));
-      chipsDiv.style.display = 'none';
-      chipsArrow.style.transform = 'rotate(0deg)';
+      if (chipsDiv) chipsDiv.style.display = 'none';
+      if (chipsArrow) chipsArrow.style.transform = 'rotate(0deg)';
     });
   });
 
