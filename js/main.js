@@ -264,15 +264,16 @@ function initHeroPanel(settings) {
 }
 function initHeroSlideshow() { initHeroPanel(null); }
 // ── COLLECTION CATEGORY IMAGES ─────────────────────────────────────
-// Admin can set images per category via Settings → Collection Images
-// Keys: coll_img_honey, coll_img_ghee, coll_img_spices, coll_img_tea, coll_img_grains, coll_img_dryfruits
+// Reads all coll_img_* keys from settings — dynamic, matches any category slug
 function initCollectionImages(settings) {
-  var CATS = ['honey','ghee','spices','tea','grains','dryfruits'];
-  CATS.forEach(function(cat) {
-    var url = settings && settings['coll_img_' + cat];
+  if (!settings) return;
+  Object.keys(settings).forEach(function(key) {
+    if (!key.startsWith('coll_img_')) return;
+    var slug = key.replace('coll_img_', '');
+    var url = settings[key];
     if (!url) return;
-    var img = document.getElementById('ccat-img-' + cat);
-    var emo = document.getElementById('ccat-emo-' + cat);
+    var img = document.getElementById('ccat-img-' + slug);
+    var emo = document.getElementById('ccat-emo-' + slug);
     if (!img) return;
     img.src = url;
     img.style.display = 'block';
