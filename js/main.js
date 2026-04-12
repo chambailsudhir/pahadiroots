@@ -335,6 +335,31 @@ async function loadData() {
       if (data.settings.min_order_amount     !== undefined && data.settings.min_order_amount     !== null) MIN_ORDER_AMOUNT    = parseInt(data.settings.min_order_amount,     10);
       if (data.settings.whatsapp_number)      WHATSAPP_NUMBER     = data.settings.whatsapp_number;
       if (data.razorpay_key)                  _RAZORPAY_KEY       = data.razorpay_key;
+      // ── SEO meta tags → <head> ──
+      (function() {
+        var s = data.settings;
+        if (s.meta_title)       { var t = document.getElementById('meta-title'); if(t) t.textContent = s.meta_title; document.title = s.meta_title; }
+        if (s.meta_description) { var md = document.getElementById('meta-description'); if(md) md.setAttribute('content', s.meta_description); var ogd = document.getElementById('og-description'); if(ogd) ogd.setAttribute('content', s.meta_description); }
+        if (s.meta_keywords)    { var mk = document.getElementById('meta-keywords'); if(mk) mk.setAttribute('content', s.meta_keywords); }
+        if (s.site_name)        { var ogn = document.getElementById('og-site-name'); if(ogn) ogn.setAttribute('content', s.site_name); var ogt = document.getElementById('og-title'); if(ogt) ogt.setAttribute('content', s.site_name); }
+        if (s.og_image)         { var ogi = document.getElementById('og-image'); if(ogi) ogi.setAttribute('content', s.og_image); }
+        // Inject Google Tag (GA4 / GTM) dynamically
+        if (s.google_tag_id && s.google_tag_id.trim()) {
+          var tagId = s.google_tag_id.trim();
+          var existing = document.getElementById('google-tag-placeholder');
+          if (existing && !document.getElementById('gtag-script')) {
+            var gScript = document.createElement('script');
+            gScript.id = 'gtag-script';
+            gScript.async = true;
+            gScript.src = 'https://www.googletagmanager.com/gtag/js?id=' + tagId;
+            document.head.appendChild(gScript);
+            window.dataLayer = window.dataLayer || [];
+            window.gtag = function(){ window.dataLayer.push(arguments); };
+            window.gtag('js', new Date());
+            window.gtag('config', tagId);
+          }
+        }
+      })();
       // ── Contact info → footer ──
       (function() {
         var s = data.settings;
