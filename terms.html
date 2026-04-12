@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Terms, Returns & Privacy — 5 Pahadi Roots</title>
-  <meta name="description" content="Terms and Conditions, Return &amp; Refund Policy, Privacy Policy and Shipping Policy for 5 Pahadi Roots — Himalayan Organic Products.">
+  <meta name="description" content="Terms and Conditions, Return &amp; Refund Policy, Privacy Policy and Shipping Policy for 5 Pahadi Roots — Himalayan Natural Products.">
   <link rel="canonical" href="https://pahadiroots.com/terms">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
@@ -87,19 +87,36 @@
     footer a{color:var(--g)}
   </style>
 </head>
-<body>
+<body data-theme="pahadi">
+<script src="/js/theme.js"></script>
 
 <nav>
-  <a href="/" class="logo">
-    <div class="logo-icon">🌿</div>
+  <a href="/" class="logo" style="display:flex;align-items:center;gap:10px;text-decoration:none">
+    <div class="logo-icon" style="width:38px;height:38px;border-radius:9px;overflow:hidden;display:flex;align-items:center;justify-content:center;background:var(--g,#1a3a1e);flex-shrink:0">
+      <img src="https://ulyrhnpoiypuvaurlqqi.supabase.co/storage/v1/object/public/pahadi-images/5%20pahadi%20roots.png" alt="5 Pahadi Roots" style="width:38px;height:38px;object-fit:contain" onerror="this.style.display='none';this.parentElement.textContent='🌿'">
+    </div>
     <div>
       <div class="logo-name">5 Pahadi Roots</div>
-      <div class="logo-tl">HIMALAYAN ORGANIC STORE</div>
+      <div class="logo-tl">HIMALAYAN NATURAL STORE</div>
     </div>
   </a>
-  <a href="/" class="nav-back">← Back to Store</a>
+  <div style="display:flex;align-items:center;gap:10px">
+    <div style="position:relative;display:inline-flex">
+      <button onclick="(function(){var p=document.getElementById('trThemePanel');p.style.display=p.style.display==='block'?'none':'block'})()" title="Switch theme" style="background:none;border:1.5px solid rgba(26,58,30,.18);border-radius:20px;padding:5px 12px;font-size:13px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;color:var(--g,#1a3a1e);transition:all .2s">🎨</button>
+      <div id="trThemePanel" style="display:none;position:absolute;top:calc(100% + 10px);right:0;background:#fff;border:1px solid rgba(0,0,0,.1);border-radius:16px;box-shadow:0 12px 40px rgba(0,0,0,.2);padding:16px;width:260px;z-index:9999">
+        <div style="font-size:9.5px;font-weight:800;letter-spacing:1.8px;text-transform:uppercase;color:#999;margin-bottom:12px">Choose Theme</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <button class="theme-opt" data-theme="pahadi" onclick="applyTheme('dukan');document.getElementById('trThemePanel').style.display='none'" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:12px;border:2px solid transparent;cursor:pointer;background:rgba(0,0,0,.03);width:100%;text-align:left"><div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#006d77 50%,#bf4e2c 50%);flex-shrink:0"></div><div><div style="font-size:12px;font-weight:800;color:#1a1a1a">Pahadi Dukkan ✦</div><div style="font-size:10px;color:#999">Default</div></div><span class="theme-check" style="margin-left:auto;color:#006d77;opacity:0">✓</span></button>
+          <button class="theme-opt" data-theme="pahadi" onclick="applyTheme('pahadi');document.getElementById('trThemePanel').style.display='none'" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:12px;border:2px solid transparent;cursor:pointer;background:rgba(0,0,0,.03);width:100%;text-align:left"><div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#1a3a1e 50%,#c8920a 50%);flex-shrink:0"></div><div><div style="font-size:12px;font-weight:800;color:#1a1a1a">Pahadi Roots</div><div style="font-size:10px;color:#999">Forest green · Gold</div></div><span class="theme-check" style="margin-left:auto;color:#1a3a1e;opacity:0">✓</span></button>
+          <button class="theme-opt" data-theme="saffron" onclick="applyTheme('saffron');document.getElementById('trThemePanel').style.display='none'" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:12px;border:2px solid transparent;cursor:pointer;background:rgba(0,0,0,.03);width:100%;text-align:left"><div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#8B1A1A 50%,#c8920a 50%);flex-shrink:0"></div><div><div style="font-size:12px;font-weight:800;color:#1a1a1a">Saffron Gold ✦</div><div style="font-size:10px;color:#999">Premium</div></div><span class="theme-check" style="margin-left:auto;color:#8B1A1A;opacity:0">✓</span></button>
+          <button class="theme-opt" data-theme="midnight" onclick="applyTheme('midnight');document.getElementById('trThemePanel').style.display='none'" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:12px;border:2px solid transparent;cursor:pointer;background:rgba(0,0,0,.03);width:100%;text-align:left"><div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#0d1117 50%,#d4a843 50%);flex-shrink:0"></div><div><div style="font-size:12px;font-weight:800;color:#1a1a1a">Midnight Cedar ✦</div><div style="font-size:10px;color:#999">Premium</div></div><span class="theme-check" style="margin-left:auto;color:#d4a843;opacity:0">✓</span></button>
+          <button class="theme-opt" data-theme="valley" onclick="applyTheme('valley');document.getElementById('trThemePanel').style.display='none'" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:12px;border:2px solid transparent;cursor:pointer;background:rgba(0,0,0,.03);width:100%;text-align:left"><div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#4a7c59 50%,#c9676b 50%);flex-shrink:0"></div><div><div style="font-size:12px;font-weight:800;color:#1a1a1a">Valley Bloom ✦</div><div style="font-size:10px;color:#999">Premium</div></div><span class="theme-check" style="margin-left:auto;color:#4a7c59;opacity:0">✓</span></button>
+        </div>
+      </div>
+    </div>
+    <a href="/" class="nav-back">← Back to Store</a>
+  </div>
 </nav>
-
 <div class="hero">
   <h1>Legal &amp; Policies</h1>
   <p>Complete transparency in how we operate, protect your data, and handle your orders.</p>
@@ -300,7 +317,7 @@
       <h3>2. Products &amp; Descriptions</h3>
       <ul>
         <li>All products are sourced from verified Himalayan farmers, producers, and cooperatives</li>
-        <li>Product images are representative — natural products may vary in colour, texture, and appearance due to their organic nature</li>
+        <li>Product images are representative — natural products may vary in colour, texture, and appearance due to their natural variation</li>
         <li>Prices are in <strong>Indian Rupees (₹)</strong> and inclusive of applicable taxes</li>
         <li>We reserve the right to modify descriptions, pricing, or discontinue any product at any time</li>
         <li>We cannot guarantee that product quality will meet every individual's subjective expectations</li>

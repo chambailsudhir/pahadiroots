@@ -117,6 +117,7 @@ var FREE_SHIP_THRESHOLD = 799;   // overridden from DB
 var FLAT_SHIP_CHARGE    = 99;    // overridden from DB
 var WHATSAPP_NUMBER     = '919899984895'; // overridden from DB
 var _RAZORPAY_KEY       = 'rzp_live_SNFVJBHdd3dYRQ'; // overridden from store-data
+var MIN_ORDER_AMOUNT    = 0;     // overridden from DB — 0 means no minimum
 
 // ── AUTH STATE ─────────────────────────────────────────────────────
 var _authToken   = null;
@@ -225,6 +226,21 @@ function initHeroPanel(settings) {
   var grid = document.getElementById('heroProdGrid');
   var saleBadge = document.getElementById('heroSaleBadge');
   if (!grid) return;
+
+  // ── HERO BACKGROUND IMAGE (single full panel image) ──
+  var bgUrl = settings && settings.hero_bg_image;
+  var panel = document.getElementById('heroProdPanel');
+  if (bgUrl && panel) {
+    // Single big image mode — hide the 2x2 grid, show one large image
+    panel.style.backgroundImage = 'url(' + bgUrl + ')';
+    panel.style.backgroundSize = 'cover';
+    panel.style.backgroundPosition = 'center';
+    panel.style.borderRadius = '24px';
+    panel.style.overflow = 'hidden';
+    grid.style.opacity = '0';
+    grid.style.pointerEvents = 'none';
+  }
+
   var rawUrls = (settings && settings.hero_images) ? settings.hero_images : '';
   var urls = rawUrls.split(',').map(function(u){ return u.trim(); }).filter(Boolean).slice(0, 4);
   if (!urls.length && PRODUCTS && PRODUCTS.length) {
@@ -248,6 +264,24 @@ function initHeroPanel(settings) {
   }
 }
 function initHeroSlideshow() { initHeroPanel(null); }
+// ── COLLECTION CATEGORY IMAGES ─────────────────────────────────────
+// Reads all coll_img_* keys from settings — dynamic, matches any category slug
+function initCollectionImages(settings) {
+  if (!settings) return;
+  Object.keys(settings).forEach(function(key) {
+    if (!key.startsWith('coll_img_')) return;
+    var slug = key.replace('coll_img_', '');
+    var url = settings[key];
+    if (!url) return;
+    var img = document.getElementById('ccat-img-' + slug);
+    var emo = document.getElementById('ccat-emo-' + slug);
+    if (!img) return;
+    img.src = url;
+    img.style.display = 'block';
+    img.onerror = function() { img.style.display='none'; if(emo) emo.style.display='block'; };
+    if (emo) emo.style.display = 'none';
+  });
+}
 
 async function loadData() {
   // Step 1: render states fallback only — skip fake products to avoid price flash
@@ -298,11 +332,19 @@ async function loadData() {
     if (data.settings) {
       if (data.settings.free_shipping_min    !== undefined && data.settings.free_shipping_min    !== null) FREE_SHIP_THRESHOLD = parseInt(data.settings.free_shipping_min,    10);
       if (data.settings.flat_shipping_charge !== undefined && data.settings.flat_shipping_charge !== null) FLAT_SHIP_CHARGE    = parseInt(data.settings.flat_shipping_charge, 10);
+      if (data.settings.min_order_amount     !== undefined && data.settings.min_order_amount     !== null) MIN_ORDER_AMOUNT    = parseInt(data.settings.min_order_amount,     10);
       if (data.settings.whatsapp_number)      WHATSAPP_NUMBER     = data.settings.whatsapp_number;
       if (data.razorpay_key)                  _RAZORPAY_KEY       = data.razorpay_key;
+      // Hide Razorpay button if disabled in admin settings
+      var rzpBtn = document.getElementById('btn-razorpay');
+      if (rzpBtn) rzpBtn.style.display = (data.settings.upi_enabled === 'false') ? 'none' : '';
+      // Hide COD button if disabled in admin settings
+      var codBtn = document.getElementById('btn-cod');
+      if (codBtn) codBtn.style.display = (data.settings.cod_enabled === 'false') ? 'none' : '';
       updateShipAmountDisplays();
       uCart(); // Recalculate cart total with correct shipping settings from DB
       initHeroPanel(data.settings); // Hero panel images + sale badge
+      initCollectionImages(data.settings); // Category card images
     }
     var updated  = false;
 
@@ -972,6 +1014,18 @@ function uCart() {
   updateShipProgress(final);
   renderUpsell();
 
+  // ── Min order amount banner ──
+  var minBanner = document.getElementById('minOrderBanner');
+  if (minBanner) {
+    if (MIN_ORDER_AMOUNT > 0 && final < MIN_ORDER_AMOUNT && cart.length > 0) {
+      var needed = MIN_ORDER_AMOUNT - final;
+      minBanner.innerHTML = '🛒 Add <strong>₹' + needed + ' more</strong> to meet the minimum order of <strong>₹' + MIN_ORDER_AMOUNT + '</strong>';
+      minBanner.style.display = '';
+    } else {
+      minBanner.style.display = 'none';
+    }
+  }
+
   var ciw = document.getElementById('ciw');
   if (!ciw) return;
   if (!cart.length) {
@@ -1175,6 +1229,13 @@ async function checkoutRazorpay() {
   if (!_authToken) { showCartLoginBanner(); return; }
   if (_orderProcessing) { showToast('⏳ Processing, please wait…'); return; }
 
+  // Min order check
+  var rzpSubtotal = cart.reduce(function(a,i){return a+i.price*i.qty;},0);
+  if (MIN_ORDER_AMOUNT > 0 && rzpSubtotal < MIN_ORDER_AMOUNT) {
+    showToast('🛒 Minimum order is ₹' + MIN_ORDER_AMOUNT + '. Add ₹' + (MIN_ORDER_AMOUNT - rzpSubtotal) + ' more.');
+    return;
+  }
+
   var name  = (document.getElementById('del-name') ||{}).value||'';
   var phone = (document.getElementById('del-phone')||{}).value||'';
   var addr  = (document.getElementById('del-addr') ||{}).value||'';
@@ -1350,6 +1411,14 @@ async function checkout() {
   if (!_authToken) { showCartLoginBanner(); return; }
   if (_orderProcessing) { showToast('⏳ Processing, please wait…'); return; }
   _orderProcessing = true;
+
+  // Min order check
+  var codSubtotal = cart.reduce(function(a,i){return a+i.price*i.qty;},0);
+  if (MIN_ORDER_AMOUNT > 0 && codSubtotal < MIN_ORDER_AMOUNT) {
+    _orderProcessing = false;
+    showToast('🛒 Minimum order is ₹' + MIN_ORDER_AMOUNT + '. Add ₹' + (MIN_ORDER_AMOUNT - codSubtotal) + ' more.');
+    return;
+  }
 
   // Validate delivery fields
   var name  = (document.getElementById('del-name') ||{}).value||'';
@@ -2166,4 +2235,11 @@ window.addEventListener('DOMContentLoaded', function() {
   } else {
     checkOpenCart();
   }
+})();
+
+// ── APPLY SAVED THEME ON LOAD (index.html) ───────────────────────
+(function() {
+  var saved;
+  try { saved = localStorage.getItem('pr_theme'); } catch(e) {}
+  applyTheme(saved || 'pahadi');
 })();

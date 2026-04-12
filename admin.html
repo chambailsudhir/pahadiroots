@@ -482,7 +482,12 @@ CREATE INDEX IF NOT EXISTS idx_products_is_deleted ON products(is_deleted);</div
       <div class="sc">
         <h4>🖼️ Hero Banner</h4>
         <div style="font-size:12px;color:var(--tx3);margin-bottom:12px">Set up to 4 product images shown on the homepage hero. Separate URLs with commas. Alternatively, upload images below.</div>
-        <div class="fg"><label>Hero Images (comma-separated URLs, max 4)</label><textarea class="fi" id="cfg-hero-images" rows="3" placeholder="https://...image1.jpg, https://...image2.jpg"></textarea></div>
+        <div class="fg">
+          <label>Hero Panel — Single Big Image <small style="color:var(--tx3);font-weight:400">(optional) — one large photo fills the right panel, like a banner ad</small></label>
+          <input type="text" class="fi" id="cfg-hero-bg-image" placeholder="https://... single large image URL (e.g. your store banner)">
+          <div style="font-size:11px;color:var(--tx3);margin-top:4px">💡 If set, this replaces the 4-image grid with one big product photo. Leave blank to use the 4-card grid below.</div>
+        </div>
+        <div class="fg"><label>Hero Images Grid (4 product photos, comma-separated URLs)</label><textarea class="fi" id="cfg-hero-images" rows="3" placeholder="https://...image1.jpg, https://...image2.jpg, https://...image3.jpg, https://...image4.jpg"></textarea></div>
         <div class="fg"><label>Upload Hero Images</label>
           <input type="file" id="hero-img-upload" multiple accept="image/*" style="margin-bottom:8px">
           <button class="btn btn-s btn-sm" onclick="uploadHeroImages()">Upload & Save</button>
@@ -496,6 +501,40 @@ CREATE INDEX IF NOT EXISTS idx_products_is_deleted ON products(is_deleted);</div
           <div class="fg"><label>Coupon Code <small style="color:var(--tx3)">e.g. SUMMER10</small></label><input type="text" class="fi" id="cfg-hero-sale-code" placeholder="SUMMER10"></div>
         </div>
         <button class="btn btn-p" onclick="saveHeroSettings()">Save Hero Settings</button>
+      </div>
+
+      <div class="sc">
+        <h4>🖼️ Collection Card Images</h4>
+        <div style="font-size:12px;color:var(--tx3);margin-bottom:14px">Set a product photo for each category card on the homepage. Leave blank to show the default emoji. Paste a direct image URL (Supabase, CDN, etc).</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+          <div class="fg" style="margin:0">
+            <label style="display:flex;align-items:center;gap:6px">🍯 Wild Honey</label>
+            <input type="text" class="fi" id="cfg-coll-honey" placeholder="https://... image URL">
+          </div>
+          <div class="fg" style="margin:0">
+            <label style="display:flex;align-items:center;gap:6px">🥛 A2 Ghee</label>
+            <input type="text" class="fi" id="cfg-coll-ghee" placeholder="https://... image URL">
+          </div>
+          <div class="fg" style="margin:0">
+            <label style="display:flex;align-items:center;gap:6px">🌿 Herbs & Spices</label>
+            <input type="text" class="fi" id="cfg-coll-spices" placeholder="https://... image URL">
+          </div>
+          <div class="fg" style="margin:0">
+            <label style="display:flex;align-items:center;gap:6px">🍵 Himalayan Teas</label>
+            <input type="text" class="fi" id="cfg-coll-tea" placeholder="https://... image URL">
+          </div>
+          <div class="fg" style="margin:0">
+            <label style="display:flex;align-items:center;gap:6px">🌾 Ancient Grains</label>
+            <input type="text" class="fi" id="cfg-coll-grains" placeholder="https://... image URL">
+          </div>
+          <div class="fg" style="margin:0">
+            <label style="display:flex;align-items:center;gap:6px">🌰 Dry Fruits</label>
+            <input type="text" class="fi" id="cfg-coll-dryfruits" placeholder="https://... image URL">
+          </div>
+        </div>
+        <div id="coll-img-preview" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px"></div>
+        <button class="btn btn-p" onclick="saveCollectionImages()">💾 Save Collection Images</button>
+        <div id="coll-img-msg" style="font-size:12px;margin-top:8px;color:var(--g);display:none">✓ Collection images saved!</div>
       </div>
 
       <div class="sc">
@@ -1938,11 +1977,18 @@ async function loadSettings(){
     if(s.whatsapp_number)      document.getElementById('cfg-wa').value         = s.whatsapp_number;
     if(s.free_shipping_min)    document.getElementById('cfg-free-ship').value  = s.free_shipping_min;
     if(s.flat_shipping_charge) document.getElementById('cfg-flat-ship').value  = s.flat_shipping_charge;
+    if(s.hero_bg_image)        { const el=document.getElementById('cfg-hero-bg-image'); if(el) el.value=s.hero_bg_image; }
     if(s.hero_images)          document.getElementById('cfg-hero-images').value       = s.hero_images;
     if(s.hero_sale_text)       document.getElementById('cfg-hero-sale-text').value    = s.hero_sale_text;
     if(s.hero_sale_discount)   document.getElementById('cfg-hero-sale-discount').value= s.hero_sale_discount;
     if(s.hero_sale_code)       document.getElementById('cfg-hero-sale-code').value    = s.hero_sale_code;
     renderHeroImgPreview(s.hero_images || '');
+    // Load collection card images
+    ['honey','ghee','spices','tea','grains','dryfruits'].forEach(cat => {
+      const el = document.getElementById('cfg-coll-' + cat);
+      if (el && s['coll_img_' + cat]) el.value = s['coll_img_' + cat];
+    });
+    renderCollImgPreview();
   } catch(e) {}
   // Table status
   const tables=['products','categories','orders','order_items','customers','coupons','coupon_usage','subscribers','reviews','inventory_logs','order_status_history','admin_logs','revenue_summary','site_settings'];
@@ -2007,7 +2053,9 @@ async function saveHeroSettings() {
   const saleText = (document.getElementById('cfg-hero-sale-text')?.value||'').trim();
   const salDisc  = (document.getElementById('cfg-hero-sale-discount')?.value||'').trim();
   const salCode  = (document.getElementById('cfg-hero-sale-code')?.value||'').trim();
+  const heroBg = (document.getElementById('cfg-hero-bg-image')?.value||'').trim();
   const keys = [
+    {key:'hero_bg_image',      value:heroBg},
     {key:'hero_images',        value:heroImgs},
     {key:'hero_sale_text',     value:saleText},
     {key:'hero_sale_discount', value:salDisc},
@@ -2022,6 +2070,42 @@ async function saveHeroSettings() {
     renderHeroImgPreview(heroImgs);
     toast('Hero settings saved ✓','ok');
   } catch(e) { toast('Save failed: '+e.message,'err'); }
+}
+
+// ── COLLECTION CARD IMAGES ─────────────────────────────────────
+async function saveCollectionImages() {
+  const CATS = ['honey','ghee','spices','tea','grains','dryfruits'];
+  const keys = CATS.map(cat => ({
+    key: 'coll_img_' + cat,
+    value: (document.getElementById('cfg-coll-' + cat)?.value || '').trim()
+  }));
+  try {
+    for (const u of keys) {
+      const ex = await GET('site_settings',`key=eq.${encodeURIComponent(u.key)}&limit=1`).catch(()=>[]);
+      if (ex && ex.length) await PATCH('site_settings',`key=eq.${encodeURIComponent(u.key)}`,{value:u.value});
+      else await POST('site_settings',{key:u.key,value:u.value});
+    }
+    renderCollImgPreview();
+    const msg = document.getElementById('coll-img-msg');
+    if (msg) { msg.style.display='block'; setTimeout(()=>msg.style.display='none', 3000); }
+    toast('Collection images saved ✓','ok');
+  } catch(e) { toast('Save failed: '+e.message,'err'); }
+}
+
+function renderCollImgPreview() {
+  const CATS = ['honey','ghee','spices','tea','grains','dryfruits'];
+  const EMOJIS = {honey:'🍯',ghee:'🥛',spices:'🌿',tea:'🍵',grains:'🌾',dryfruits:'🌰'};
+  const LABELS = {honey:'Wild Honey',ghee:'A2 Ghee',spices:'Herbs & Spices',tea:'Himalayan Teas',grains:'Ancient Grains',dryfruits:'Dry Fruits'};
+  const wrap = document.getElementById('coll-img-preview');
+  if (!wrap) return;
+  wrap.innerHTML = CATS.map(cat => {
+    const url = (document.getElementById('cfg-coll-' + cat)?.value || '').trim();
+    if (!url) return '';
+    return `<div style="text-align:center;font-size:10px;color:var(--tx3)">
+      <img src="${url}" alt="${LABELS[cat]}" style="width:56px;height:56px;object-fit:cover;border-radius:10px;display:block;margin-bottom:3px" onerror="this.src='';this.style.display='none'">
+      ${LABELS[cat]}
+    </div>`;
+  }).join('');
 }
 
 async function saveSiteSettings(){

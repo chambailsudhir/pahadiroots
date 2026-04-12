@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Our Story — 5 Pahadi Roots | Pure Himalayan Organic Products</title>
+<title>Our Story — 5 Pahadi Roots | Pure Himalayan Natural Products</title>
 <meta name="description" content="The story of 5 Pahadi Roots — founded by Sudhir Chambail, born in the mountains of Himachal Pradesh, built on the belief that the purest things come from the highest places.">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://pahadiroots.com/our-story">
@@ -436,13 +436,45 @@ img { max-width: 100%; }
   .hero { padding: 100px 20px 60px; }
   .nav { padding: 0 20px; }
 }
+/* ── THEME SWITCHER (shared) ── */
+.theme-panel{position:absolute;top:calc(100% + 10px);right:0;background:#fff;border:1px solid rgba(26,58,30,.14);border-radius:16px;box-shadow:0 12px 40px rgba(0,0,0,.16);padding:16px;width:268px;z-index:9999;display:none}
+.theme-panel.open{display:block;animation:themeIn .18s ease}
+@keyframes themeIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+.theme-panel-title{font-size:9.5px;font-weight:800;letter-spacing:1.8px;text-transform:uppercase;color:#999;margin-bottom:12px}
+.theme-opts{display:flex;flex-direction:column;gap:8px}
+.theme-opt{display:flex;align-items:center;gap:11px;padding:10px 13px;border-radius:12px;border:2px solid transparent;cursor:pointer;background:rgba(0,0,0,.03);transition:all .18s;font-family:inherit;text-align:left;width:100%}
+.theme-opt:hover{border-color:rgba(26,58,30,.3);background:rgba(26,58,30,.04)}
+.theme-opt.active{border-color:var(--g);background:rgba(26,58,30,.07)}
+.theme-swatch{width:34px;height:34px;border-radius:50%;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.swatch-pahadi{background:linear-gradient(135deg,#1a3a1e 50%,#c8920a 50%)}
+.swatch-dukan{background:linear-gradient(135deg,#006d77 50%,#bf4e2c 50%)}
+.swatch-saffron{background:linear-gradient(135deg,#8B1A1A 50%,#c8920a 50%)}
+.swatch-midnight{background:linear-gradient(135deg,#0d1117 50%,#d4a843 50%)}
+.swatch-valley{background:linear-gradient(135deg,#4a7c59 50%,#c9676b 50%)}
+.theme-opt-info{display:flex;flex-direction:column;gap:2px}
+.theme-opt-label{font-size:13px;font-weight:800;color:#1a1a1a;line-height:1.2}
+.theme-opt-sub{font-size:10.5px;color:#999}
+.theme-check{margin-left:auto;color:var(--g);font-size:16px;opacity:0}
+.theme-opt.active .theme-check{opacity:1}
+/* Logo overrides for about page */
+.logo-name{font-family:'Playfair Display',serif;font-size:17px;font-weight:900;color:var(--g);line-height:1.1;display:block}
+.logo-tl{font-size:9px;color:var(--gold,#c8a45a);font-weight:700;letter-spacing:1.2px;text-transform:uppercase;display:block}
 </style>
 </head>
-<body>
+<body data-theme="pahadi">
+<script src="/js/theme.js"></script>
 
 <!-- NAV -->
 <nav class="nav">
-  <a href="/" class="nav-logo">Pahadi <span>Roots</span></a>
+  <a href="/" class="logo" style="display:flex;align-items:center;gap:10px;text-decoration:none">
+    <div class="logo-icon" style="width:40px;height:40px;border-radius:10px;overflow:hidden;display:flex;align-items:center;justify-content:center;background:var(--g)">
+      <img src="https://ulyrhnpoiypuvaurlqqi.supabase.co/storage/v1/object/public/pahadi-images/5%20pahadi%20roots.png" alt="5 Pahadi Roots" style="width:40px;height:40px;object-fit:contain" onerror="this.style.display='none';this.parentElement.textContent='🌿'">
+    </div>
+    <div class="logo-words">
+      <span class="logo-name">5 Pahadi Roots</span>
+      <span class="logo-tl">Himalayan Natural Store</span>
+    </div>
+  </a>
   <div class="nav-links">
     <a href="/">Home</a>
     <a href="/our-story" class="active">Our Story</a>
@@ -450,8 +482,23 @@ img { max-width: 100%; }
     <a href="/#states">By State</a>
     <a href="/#contact">Contact</a>
   </div>
-  <a href="/#shop" class="nav-cta">Shop Now</a>
-  <button class="mob-menu-btn" onclick="this.textContent = this.textContent === '☰' ? '✕' : '☰'">☰</button>
+  <div style="display:flex;align-items:center;gap:8px">
+    <div class="theme-switcher-wrap" style="position:relative;display:inline-flex">
+      <button onclick="openThemeSwitcher()" title="Switch colour theme" style="background:none;border:1.5px solid var(--bd,rgba(26,58,30,.14));border-radius:20px;padding:5px 12px;font-size:13px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;color:var(--tx2,#3a5c3e);transition:all .2s;white-space:nowrap">🎨</button>
+      <div class="theme-panel" id="themeSwitcherPanel">
+        <div class="theme-panel-title">Choose Theme</div>
+        <div class="theme-opts">
+          <button class="theme-opt" data-theme="pahadi" onclick="applyTheme('dukan');closeThemeSwitcher()"><div class="theme-swatch swatch-dukan"></div><div class="theme-opt-info"><div class="theme-opt-label">Pahadi Dukkan ✦</div><div class="theme-opt-sub">Ocean teal · Warm orange · Default</div></div><span class="theme-check">✓</span></button>
+          <button class="theme-opt" data-theme="pahadi" onclick="applyTheme('pahadi');closeThemeSwitcher()"><div class="theme-swatch swatch-pahadi"></div><div class="theme-opt-info"><div class="theme-opt-label">Pahadi Roots</div><div class="theme-opt-sub">Forest green · Gold · Serif</div></div><span class="theme-check">✓</span></button>
+          <button class="theme-opt" data-theme="saffron" onclick="applyTheme('saffron');closeThemeSwitcher()"><div class="theme-swatch swatch-saffron"></div><div class="theme-opt-info"><div class="theme-opt-label">Saffron Gold ✦ Premium</div><div class="theme-opt-sub">Deep burgundy · Saffron · Editorial</div></div><span class="theme-check">✓</span></button>
+          <button class="theme-opt" data-theme="midnight" onclick="applyTheme('midnight');closeThemeSwitcher()"><div class="theme-swatch swatch-midnight"></div><div class="theme-opt-info"><div class="theme-opt-label">Midnight Cedar ✦ Premium</div><div class="theme-opt-sub">Dark luxury · Gold · Night mode</div></div><span class="theme-check">✓</span></button>
+          <button class="theme-opt" data-theme="valley" onclick="applyTheme('valley');closeThemeSwitcher()"><div class="theme-swatch swatch-valley"></div><div class="theme-opt-info"><div class="theme-opt-label">Valley Bloom ✦ Premium</div><div class="theme-opt-sub">Sage green · Blush rose · Airy</div></div><span class="theme-check">✓</span></button>
+        </div>
+      </div>
+    </div>
+    <a href="/#shop" class="nav-cta">Shop Now</a>
+    <button class="mob-menu-btn" onclick="this.textContent = this.textContent === '☰' ? '✕' : '☰'">☰</button>
+  </div>
 </nav>
 
 <!-- HERO -->
@@ -755,11 +802,10 @@ async function loadTeamSection() {
 loadTeamSection();
 </script>
 <script 
-  src="/js/ai-assistant.js" 
-  data-edge-url="https://ulyrhnpolypuvaurlqqi.supabase.co/functions/v1/ai-chat"
-  data-name="5Roots Guide"
+  src="/js/ai-assistant.js"
+  data-name="Pahadi_AI"
   data-tagline="Himalayan Shopping Guide · Online"
-  data-avatar="🌿">
+  data-whatsapp="919XXXXXXXXX">
 </script>
 </body>
 </html>
