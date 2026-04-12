@@ -353,12 +353,12 @@
 <section class="sec coll-bg" id="shop">
   <div class="ct rv"><div class="chip">Browse Collections</div><h2 class="sh2">What the Mountains Offer</h2><p class="ssub">Every category tells a story of altitude, tradition, and purity.</p></div>
   <div class="cgrid" id="cgrid">
-    <a href="#products" class="cc rv" style="transition-delay:.08s" onclick="setTimeout(function(){setFilter('honey',document.querySelector('[onclick*=honey]'))},50)"><span class="cemo">🍯</span><div class="cname">Wild Honey</div><div class="cnum">10+ Varieties</div></a>
-    <a href="#products" class="cc rv" style="transition-delay:.13s" onclick="setTimeout(function(){setFilter('ghee',document.querySelector('[onclick*=ghee]'))},50)"><span class="cemo">🥛</span><div class="cname">A2 Ghee</div><div class="cnum">Bilona Method</div></a>
-    <a href="#products" class="cc rv" style="transition-delay:.18s" onclick="setTimeout(function(){setFilter('spices',document.querySelector('[onclick*=spices]'))},50)"><span class="cemo">🌿</span><div class="cname">Herbs & Spices</div><div class="cnum">40+ Varieties</div></a>
-    <a href="#products" class="cc rv" style="transition-delay:.23s" onclick="setTimeout(function(){setFilter('tea',document.querySelector('[onclick*=tea]'))},50)"><span class="cemo">🍵</span><div class="cname">Himalayan Teas</div><div class="cnum">Rare Blends</div></a>
-    <a href="#products" class="cc rv" style="transition-delay:.28s" onclick="setTimeout(function(){setFilter('all',document.querySelector('[onclick*=all]'))},50)"><span class="cemo">🌾</span><div class="cname">Ancient Grains</div><div class="cnum">Millet · Buckwheat</div></a>
-    <a href="#products" class="cc rv" style="transition-delay:.33s" onclick="setTimeout(function(){setFilter('all',document.querySelector('[onclick*=all]'))},50)"><span class="cemo">🌰</span><div class="cname">Dry Fruits</div><div class="cnum">Sun-dried & Pure</div></a>
+    <a href="#products" class="cc rv" id="ccat-honey" style="transition-delay:.08s" onclick="setTimeout(function(){setFilter('honey',document.querySelector('[onclick*=honey]'))},50)"><div class="ccat-img-wrap"><img class="ccat-img" id="ccat-img-honey" src="" alt="Wild Honey" style="display:none"><span class="cemo" id="ccat-emo-honey">🍯</span></div><div class="cname">Wild Honey</div><div class="cnum">10+ Varieties</div></a>
+    <a href="#products" class="cc rv" id="ccat-ghee" style="transition-delay:.13s" onclick="setTimeout(function(){setFilter('ghee',document.querySelector('[onclick*=ghee]'))},50)"><div class="ccat-img-wrap"><img class="ccat-img" id="ccat-img-ghee" src="" alt="A2 Ghee" style="display:none"><span class="cemo" id="ccat-emo-ghee">🥛</span></div><div class="cname">A2 Ghee</div><div class="cnum">Bilona Method</div></a>
+    <a href="#products" class="cc rv" id="ccat-spices" style="transition-delay:.18s" onclick="setTimeout(function(){setFilter('spices',document.querySelector('[onclick*=spices]'))},50)"><div class="ccat-img-wrap"><img class="ccat-img" id="ccat-img-spices" src="" alt="Herbs & Spices" style="display:none"><span class="cemo" id="ccat-emo-spices">🌿</span></div><div class="cname">Herbs & Spices</div><div class="cnum">40+ Varieties</div></a>
+    <a href="#products" class="cc rv" id="ccat-tea" style="transition-delay:.23s" onclick="setTimeout(function(){setFilter('tea',document.querySelector('[onclick*=tea]'))},50)"><div class="ccat-img-wrap"><img class="ccat-img" id="ccat-img-tea" src="" alt="Himalayan Teas" style="display:none"><span class="cemo" id="ccat-emo-tea">🍵</span></div><div class="cname">Himalayan Teas</div><div class="cnum">Rare Blends</div></a>
+    <a href="#products" class="cc rv" id="ccat-grains" style="transition-delay:.28s" onclick="setTimeout(function(){setFilter('all',document.querySelector('[onclick*=all]'))},50)"><div class="ccat-img-wrap"><img class="ccat-img" id="ccat-img-grains" src="" alt="Ancient Grains" style="display:none"><span class="cemo" id="ccat-emo-grains">🌾</span></div><div class="cname">Ancient Grains</div><div class="cnum">Millet · Buckwheat</div></a>
+    <a href="#products" class="cc rv" id="ccat-dryfruits" style="transition-delay:.33s" onclick="setTimeout(function(){setFilter('all',document.querySelector('[onclick*=all]'))},50)"><div class="ccat-img-wrap"><img class="ccat-img" id="ccat-img-dryfruits" src="" alt="Dry Fruits" style="display:none"><span class="cemo" id="ccat-emo-dryfruits">🌰</span></div><div class="cname">Dry Fruits</div><div class="cnum">Sun-dried & Pure</div></a>
   </div>
 </section>
 <section class="sec" id="products" style="background:#fff;padding:36px 40px 48px">
@@ -617,8 +617,10 @@
 
     <!-- Brand col -->
     <div>
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
-        <span style="font-size:26px">🌿</span>
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:4px">
+        <div style="width:46px;height:46px;border-radius:12px;overflow:hidden;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <img src="https://ulyrhnpoiypuvaurlqqi.supabase.co/storage/v1/object/public/pahadi-images/5%20pahadi%20roots.png" alt="5 Pahadi Roots" style="width:46px;height:46px;object-fit:contain" onerror="this.style.display='none';this.parentElement.textContent='🌿'">
+        </div>
         <div>
           <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:900;color:#fff;line-height:1.1">5 Pahadi Roots</div>
           <div style="font-size:10px;color:var(--gd);font-weight:700;letter-spacing:1px">HIMALAYAN NATURAL STORE</div>

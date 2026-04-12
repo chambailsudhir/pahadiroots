@@ -2209,3 +2209,23 @@ html[data-theme="valley"] .chkbtn  { background: #4a7c59; box-shadow: 0 4px 16px
 html[data-theme="valley"] .chkbtn:hover { background: #5e9470; }
 html[data-theme="valley"] .coup-btn { background: #4a7c59; }
 html[data-theme="valley"] .toast { background: #4a7c59; }
+/* ── COLLECTION CARD IMAGE SUPPORT ────────────────────────────── */
+.ccat-img-wrap { position:relative; width:64px; height:64px; display:flex; align-items:center; justify-content:center; margin-bottom:4px; }
+.ccat-img { width:64px; height:64px; object-fit:cover; border-radius:14px; box-shadow:0 4px 14px rgba(0,0,0,.1); }
+.cc:hover .ccat-img { transform:scale(1.06); transition:transform .3s ease; }
+.cemo { font-size:36px; display:block; line-height:1; }
+
+/* ── HERO PANEL: Single big image mode (admin-set hero_bg_image) ── */
+#heroProdPanel[style*="background-image"] {
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0,0,0,.35);
+  min-height: 420px;
+}
+#heroProdPanel[style*="background-image"] .hero-sale-badge {
+  bottom: 20px;
+  right: 20px;
+}
+#heroProdPanel[style*="background-image"]::before {
+  display: none;
+}
