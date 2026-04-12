@@ -300,32 +300,39 @@
   <a href="#contact" onclick="closeMobNav()">Contact</a>
   </div>
 </div>
-<section class="hero-slider" id="home">
-  <!-- Slides — populated by JS from DB settings -->
-  <div class="hslider-track" id="hsliderTrack">
-    <!-- Fallback slide shown before JS loads -->
-    <div class="hslide hslide-fallback active">
-      <div class="hslide-overlay"></div>
-      <div class="hslide-content">
-        <div class="hslide-eyebrow">🌿 Pure · Himalayan · Natural</div>
-        <h1 class="hslide-title">Born in the<br><em>Himalayas,</em><br>For Your Table</h1>
-        <p class="hslide-sub">Handpicked from the purest altitudes — where clean air, ancient soil, and tradition create nature's finest.</p>
-        <div class="hslide-btns">
-          <a href="#shop" class="hslide-btn-primary">Explore Our Store</a>
-          <a href="/our-story" class="hslide-btn-secondary">Our Story</a>
-        </div>
+<section class="hero hero-v2" id="home">
+  <div class="hov"></div>
+  <div class="lw">
+    <span class="lf" style="left:6%;font-size:14px;animation-duration:14s;animation-delay:0s">🍃</span>
+    <span class="lf" style="left:18%;animation-duration:17s;animation-delay:3s">🌿</span>
+    <span class="lf" style="left:38%;font-size:12px;animation-duration:12s;animation-delay:6s">🍃</span>
+  </div>
+  <div class="hero-inner">
+    <div class="hc hero-text">
+      <div class="eyebrow">🌿 Pure · Himalayan · Natural</div>
+      <h1>Born in the<br><em>Himalayas,</em><br>For Your Table</h1>
+      <p class="hsub">Handpicked from the purest altitudes — where clean air, ancient soil, and tradition create nature's finest.</p>
+      <div class="hbtns"><a href="#shop" class="btn-g">Explore Our Store</a><a href="/our-story" class="btn-w">Our Story</a></div>
+      <div class="hero-trust-row">
+        <span class="hero-trust-pill">✔ Lab Tested</span>
+        <span class="hero-trust-pill">✔ Direct from Farmers</span>
+        <span class="hero-trust-pill">✔ Free Shipping ₹799+</span>
+      </div>
+    </div>
+    <div class="hero-products-panel" id="heroProdPanel">
+      <div class="hero-prod-grid" id="heroProdGrid">
+        <div class="hero-prod-card hero-prod-placeholder"></div>
+        <div class="hero-prod-card hero-prod-placeholder"></div>
+        <div class="hero-prod-card hero-prod-placeholder"></div>
+        <div class="hero-prod-card hero-prod-placeholder"></div>
+      </div>
+      <div class="hero-sale-badge" id="heroSaleBadge" style="display:none">
+        <span id="heroSaleText">Summer Sale</span>
+        <strong id="heroSaleDiscount">FLAT 10% OFF</strong>
+        <span id="heroSaleCode">USE CODE: SUMMER10</span>
       </div>
     </div>
   </div>
-
-  <!-- Navigation arrows -->
-  <button class="hslider-arrow hslider-prev" id="hsliderPrev" onclick="heroSlide(-1)" aria-label="Previous">&#8249;</button>
-  <button class="hslider-arrow hslider-next" id="hsliderNext" onclick="heroSlide(1)" aria-label="Next">&#8250;</button>
-
-  <!-- Dots -->
-  <div class="hslider-dots" id="hsliderDots"></div>
-
-  <!-- Stats bar -->
   <div class="hstats" id="hstats">
     <div class="hstat"><div class="hstat-num" data-target="500">0<em>+</em></div><div class="hstat-lbl">Farmer Families</div></div>
     <div class="hstat-div"></div>
@@ -836,8 +843,9 @@
             </div>
           </div>
         </div>
-        <button class="chkbtn" onclick="checkoutRazorpay()" style="background:linear-gradient(135deg,#2d6a4f,#40916c);margin-bottom:10px;">💳 Pay Online (UPI · Cards · Net Banking)</button>
-        <button class="chkbtn" onclick="checkout()" style="background:linear-gradient(135deg,#e76f51,#f4a261)">📱 COD + WhatsApp Confirm →</button>
+        <div id="minOrderBanner" style="display:none;background:rgba(210,153,34,0.12);border:1px solid rgba(210,153,34,0.35);color:#d29922;border-radius:10px;padding:10px 14px;font-size:12.5px;margin-bottom:10px;text-align:center;"></div>
+        <button id="btn-razorpay" class="chkbtn" onclick="checkoutRazorpay()" style="background:linear-gradient(135deg,#2d6a4f,#40916c);margin-bottom:10px;">💳 Pay Online (UPI · Cards · Net Banking)</button>
+        <button id="btn-cod" class="chkbtn" onclick="checkout()" style="background:linear-gradient(135deg,#e76f51,#f4a261)">📱 COD + WhatsApp Confirm →</button>
         <div class="cpays">📱 UPI &nbsp;·&nbsp; 💳 Cards &nbsp;·&nbsp; 🏧 Net Banking &nbsp;·&nbsp; 🚪 COD</div>
         <div class="cpage-secure">🔒 100% Secure & Encrypted Checkout</div>
       </div>
