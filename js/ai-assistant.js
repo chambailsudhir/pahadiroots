@@ -61,32 +61,40 @@ You MUST respond in ${langName} (language code: ${langCode}).
 - If langCode is "gu" → respond in Gujarati (ગુજરાતી)
 - If langCode is "kn" → respond in Kannada (ಕನ್ನಡ)
 - If langCode is "ml" → respond in Malayalam (മലയാളം)
-- If langCode is "kngr" → respond ONLY in Kangri/Himachali Pahari boli using AUTHENTIC vocabulary:
-  PRONOUNS: मई (I), तुसा/तुसां (you/आप), सेह/उनी (he/she), असां (we/हम), उदा (his/her)
-  GREETINGS: "राम राम जी!" • "हाँजी!" (yes) • "नहीं" (no)
-  KEY WORDS from Himachali Kangri Shabdawali:
-  • असल = असली  • खरा = बढ़िया/ठीक  • गल = बात  • गपां = बातें
-  • दस्सो = बताओ  • कने = और/साथ में  • म्हारा = हमारा  • साड़ा = हमारा
-  • पाणी = पानी  • घियो = घी  • मखीर = शहद  • लूण = नमक
-  • सोहणा = सुन्दर  • खरा = अच्छा  • माड़ा = बुरा  • महीन = बारीक
-  • कदकी = कभी कभार  • इब्बे = अभी/अब  • इत = यहाँ  • ओथु = वहाँ
-  • कजो = क्यों  • किसी/कुण = कौन  • कुतांह = किधर/कहाँ
-  • तत्ता = गर्म  • सीत = सर्दी  • बरखा = बारिश  • आहूण = ओलावृष्टि
-  • ग्रां = गांव  • हार = खेत  • दरयो = दरिया  • रुख = वृक्ष
-  • कुक्कड़ = मुर्गा  • मछी = मछली  • डंगरे = पशु  • म्है = भैंस
-  • खणक = चांदी  • लोह = खून  • बाल = सहारा/सहायता
-  • मापे = माँ-बाप  • धी = बेटी  • जागत = लड़का  • बिट्टी = बेटी
-  • सहोआं = अच्छा/सुन्दर  • बाँका = सुन्दर  • सणहूट = तेज़ दौड़ना
-  • जमात = कक्षा  • जमाती = सहपाठी  • मास्टर = अध्यापक
+- If langCode is "kngr" → respond ONLY in Kangri/Himachali Pahari boli.
+  CRITICAL: "है/हैं" in Kangri = "हाई/ऐ" (NOT "छा/छां" which is WRONG)
+  "हूँ" in Kangri = "हां" — "मई खरा हां" (I am fine)
+  
+  PRONOUNS (from Himachali Kangri Shabdawali):
+  • मई = मैं  • तुसां/तुसा = आप/तुम  • असां = हम  • उदा = उसका  • अप्पू = स्वयं
+  
+  COMMON WORDS (authentic from PDF):
+  • खरा = ठीक/अच्छा  • माड़ा = बुरा  • गल = बात  • गपां = बातें  • असल = असली
+  • कने = और/साथ में  • इत = यहाँ  • ओथु = वहाँ  • इब्बे = अब/अभी  • हुण = अब
+  • म्हारा = मेरा  • साड़े = हमारे  • तुहाड़ा = तुम्हारा  • अपणी = अपनी
+  • मखीर = शहद  • घियो = घी  • पाणी = पानी  • लूण = नमक  • बरखा = बारिश
+  • ग्रां = गांव  • हार = खेत  • रुख = पेड़  • दरयो = दरिया  • कुक्कड़ = मुर्गा
+  • दस्सो = बताओ  • गलाणा = बताना  • कदेया = कैसा  • कदकी = कभी-कभार
+  • लोड़ = ज़रूरत  • खाहमखाह = बिना मतलब  • खरा = ठीक/सही  • सोहणा = सुन्दर
+  • बाँका = सुन्दर  • गमणा = पसंद आना  • खुशी = दिखाना (फणसूणा)
+  • बल्द = बैल  • डंगरे = पशु  • म्है = भैंस  • कुड़ी = लड़की  • जागत = लड़का
+  • मापे = माँ-बाप  • धी = बेटी  • बिट्टी = बेटी  • बड़का = बड़ा भाई
+  • राम राम जी = greeting  • हामी = विश्वासपूर्ण हाँ  • अरड़-बरड़ = फिजूल बातें
+  
+  GRAMMAR RULES:
+  • "है" = "हाई" या "ऐ"  (NEVER "छा")
+  • "हूँ" = "हां"  (NEVER "छां")  
+  • "था/थे" = "छां" (past tense only)
+  • "हैं" (plural) = "हन/हन्"
+  
   EXAMPLE SENTENCES:
-  "राम राम जी! तुसां किदे हान? मई खरा हाँ।" (How are you? I am fine)
-  "म्हारे कोल असल पहाड़ी माल छा — मखीर, घियो, केसर सब।" (We have real Pahadi products)
-  "दस्सो, कुसा चाहिदा थारे?" (Tell me, what do you need?)
-  "इत आओ, गल करीए!" (Come here, let's talk!)
-  DO NOT use Punjabi Gurmukhi script. Use Devanagari. Mix natural Kangri with Hindi only when needed.
-
-
-
+  "राम राम जी! तुसां किदे हान? मई खरा हां।" = How are you? I am fine.
+  "म्हारे कोल असल पहाड़ी माल हाई — मखीर, घियो, केसर सब कुछ।"
+  "दस्सो, किसी चीज़ दी लोड़ हाई थारे?"
+  "इत आओ, गल करीए!" = Come here, let's talk!
+  "गपां करणी हाई?" = Want to chat?
+  
+  STRICTLY: Use हाई/ऐ for है, हां for हूँ. NO Punjabi Gurmukhi. Devanagari only.
 - If langCode is "garh" → respond ONLY in Garhwali dialect (गढ़वाली — Uttarakhand).
   STRICT RULES: Use "छु/छ" for हूँ/है, "मि" for मैं, "तुम" stays same, "क्वे" for कौन, "कख" for कहाँ, "ह्वे" for हो, "आ जा" for आओ, "बटे" for से.
   Example: "नमस्कार! मि Pahadi_AI छु — तुमारो Himalayan गाइड। मि यख मदद करण छु — शहद, घी, केसर सब बटे। बताओ क्या चयेंद?"
@@ -636,7 +644,7 @@ USE WEB SEARCH: You have Google Search available. Use it for current weather, te
       te: '🙏 నమస్కారం! నేను **' + AI_CFG.name + '** — మీ Himalayan గైడ్!\n\nనేను సహాయపడగలను:\n• Himalayan ఉత్పత్తులు\n• వాతావరణ సమాచారం\n• బడ్జెట్ సూచనలు\n\nమీకు ఏమి తెలుసుకోవాలి?',
       mr: '🙏 नमस्कार! मी **' + AI_CFG.name + '** — तुमचा Himalayan मार्गदर्शक!\n\nमी मदत करू शकतो:\n• Himalayan उत्पादने\n• हवामान माहिती\n• Budget नुसार सूचना\n\nकाय जाणून घ्यायचे आहे?',
       gu: '🙏 નમસ્તે! હું **' + AI_CFG.name + '** — તમારો Himalayan ગાઇડ!\n\nહું મદદ કરી શકું:\n• Himalayan ઉત્પાદનો\n• હવામાનની માહિતી\n• Budget મુજબ સૂચनो\n\nशું જаणвू  છे?',
-      kngr: '🙏 राम राम जी! मई **' + AI_CFG.name + '** छां — थुआड़ा Himachali Pahari guide!\n\nमई इत मदद करी सकदा छां:\n• साड़े असल पहाड़ी माल — मखीर (शहद), घियो (घी), केसर\n• शिमले, मनाली दा मौसम (live!)\n• Budget दे हिसाब नाल सलाह\n• Delivery ते returns\n\nदस्सो जी, किसी चीज़ दी लोड़ छा?',
+      kngr: '🙏 राम राम जी! मई **' + AI_CFG.name + '** हां — थुआड़ा Himachali गाइड!\n\nमई इत मदद करी सकदा हां:\n• साड़े असल पहाड़ी माल — मखीर (शहद), घियो (घी), केसर\n• शिमले, मनाली दा मौसम (live!)\n• Budget दे हिसाब नाल सलाह\n• Delivery ते returns\n\nदस्सो, किसी चीज़ दी लोड़ हाई?',
       garh: '🙏 नमस्कार! मी **' + AI_CFG.name + '** छूं — तुमारो Himalayan गाइड!\n\nमी यूँ मदद करी सकदूं:\n• हमारा Himalayan उत्पाद\n• शिमला, मनाली को मौसम\n• Budget क हिसाब से सलाह\n• Delivery अर returns\n\nबताओ, क्या जाणनो छ?',
       doi: '🙏 राम राम! मैं **' + AI_CFG.name + '** आं — तुंदा Himalayan guide!\n\nमैं इत्थें मदद करी सकदा आं:\n• साडे Himalayan उत्पाद\n• मौसम दी जानकारी\n• Budget मताबक सलाह\n\nदस्सो की जानना ऐ?',
       kum: '🙏 नमस्कार! मैं **' + AI_CFG.name + '** छु — तुमर Himalayan गाइड!\n\nमैं यूँ मदद करि सकूँ:\n• हमर असली पहाड़ी उत्पाद\n• मौसम की जानकारी\n• Budget क हिसाब से सलाह\n\nबताओ क्या चनो?',
