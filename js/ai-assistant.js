@@ -106,6 +106,13 @@ You MUST respond in ${langName} (language code: ${langCode}).
 - If langCode is "ur" → respond in Urdu (use Nastaliq script: اردو)
 - If langCode is "mai" → respond in Maithili (मैथिली)
 - If langCode is "kok" → respond in Konkani (कोंकणी)
+- If langCode is "as" → respond ONLY in Assamese (অসমীয়া) using AUTHENTIC vocabulary from Assamese dictionary:
+  PRONOUNS: মই (I), তুমি/আপুনি (you), সি (he/she), আমাৰ (our), মোৰ (my), তোমাৰ (your)
+  KEY WORDS: বাৰু (good), দুখ (sad/sorrow), উপকাৰ (help), ভোক (hunger), হাত (hand), বায়ু (air), পানী (water)
+  COMMON: এতিয়া (now), কেনেকৈ (how), কেতিয়া (when), ভাল (good/fine), নমস্কাৰ (greeting)
+  VERBS: আহে (comes), যাওঁ (I go), দিওঁ (I give), কওঁ (I say), খাওঁ (I eat)
+  EXAMPLE: "নমস্কাৰ! মই আপোনাৰ Himalayan guide। মই উপকাৰ কৰিব পাৰোঁ। কি বিচাৰে কওক!"
+  Use proper Assamese script (অসমীয়া) throughout. DO NOT use Bengali script.
 - If langCode is "mni" → respond in Manipuri/Meitei
 - If langCode is "si" → respond in Sinhala (සිංහල)
 - If langCode is "nag" → respond in Nagamese (Nagaland creole — mix of Nagamese Assamese base with simple English words, friendly tone)
@@ -629,13 +636,13 @@ USE WEB SEARCH: You have Google Search available. Use it for current weather, te
       te: '🙏 నమస్కారం! నేను **' + AI_CFG.name + '** — మీ Himalayan గైడ్!\n\nనేను సహాయపడగలను:\n• Himalayan ఉత్పత్తులు\n• వాతావరణ సమాచారం\n• బడ్జెట్ సూచనలు\n\nమీకు ఏమి తెలుసుకోవాలి?',
       mr: '🙏 नमस्कार! मी **' + AI_CFG.name + '** — तुमचा Himalayan मार्गदर्शक!\n\nमी मदत करू शकतो:\n• Himalayan उत्पादने\n• हवामान माहिती\n• Budget नुसार सूचना\n\nकाय जाणून घ्यायचे आहे?',
       gu: '🙏 નમસ્તે! હું **' + AI_CFG.name + '** — તમારો Himalayan ગાઇડ!\n\nહું મદદ કરી શકું:\n• Himalayan ઉત્પાદનો\n• હવામાનની માહિતી\n• Budget મુજબ સૂચनो\n\nशું જаणвू  છे?',
-      kngr: '🙏 राम राम जी! मैं **' + AI_CFG.name + '** छां — थुआड़ा Himachali गाइड!\n\nमैं इत्थें मदद करी सकदा छां:\n• साड़े शुद्ध पहाड़ी उत्पाद — शहद, घी, केसर\n• शिमले, मनाली दा मौसम (live!)\n• Budget दे हिसाब नाल सलाह\n• Delivery ते returns\n\nदस्सो, किसी चीज़ दी लोड़ है?',
+      kngr: '🙏 राम राम जी! मई **' + AI_CFG.name + '** छां — थुआड़ा Himachali Pahari guide!\n\nमई इत मदद करी सकदा छां:\n• साड़े असल पहाड़ी माल — मखीर (शहद), घियो (घी), केसर\n• शिमले, मनाली दा मौसम (live!)\n• Budget दे हिसाब नाल सलाह\n• Delivery ते returns\n\nदस्सो जी, किसी चीज़ दी लोड़ छा?',
       garh: '🙏 नमस्कार! मी **' + AI_CFG.name + '** छूं — तुमारो Himalayan गाइड!\n\nमी यूँ मदद करी सकदूं:\n• हमारा Himalayan उत्पाद\n• शिमला, मनाली को मौसम\n• Budget क हिसाब से सलाह\n• Delivery अर returns\n\nबताओ, क्या जाणनो छ?',
       doi: '🙏 राम राम! मैं **' + AI_CFG.name + '** आं — तुंदा Himalayan guide!\n\nमैं इत्थें मदद करी सकदा आं:\n• साडे Himalayan उत्पाद\n• मौसम दी जानकारी\n• Budget मताबक सलाह\n\nदस्सो की जानना ऐ?',
       kum: '🙏 नमस्कार! मैं **' + AI_CFG.name + '** छु — तुमर Himalayan गाइड!\n\nमैं यूँ मदद करि सकूँ:\n• हमर असली पहाड़ी उत्पाद\n• मौसम की जानकारी\n• Budget क हिसाब से सलाह\n\nबताओ क्या चनो?',
       lad: '🙏 Juley! I am **' + AI_CFG.name + '** — your Himalayan guide!\n\nI can help with:\n• Our pure Ladakhi & Himalayan products\n• Weather in Leh, Ladakh\n• Budget suggestions\n\nYang cho dukpo? (What do you need?)',
       or: '🙏 ନମସ୍କାର! ମୁଁ **' + AI_CFG.name + '** — ଆପଣଙ୍କର Himalayan ଗାଇଡ଼!\n\nମୁଁ ସାହାଯ୍ୟ କରିପାରିବି:\n• Himalayan ଉତ୍ପାଦ\n• ମୌସମ ସୂଚନା\n• Budget ପରାମର୍ଶ\n\nଆପଣ କଣ ଜାଣିବାକୁ ଚାହୁଁଛନ୍ତି?',
-      as: '🙏 নমস্কাৰ! মই **' + AI_CFG.name + '** — আপোনাৰ Himalayan গাইড!\n\nমই সহায় কৰিব পাৰোঁ:\n• আমাৰ Himalayan সামগ্ৰী\n• বতৰৰ খবৰ\n• Budget অনুযায়ী পৰামৰ্শ\n\nআপুনি কি জানিব বিচাৰে?',
+      as: '🙏 নমস্কাৰ! মই **' + AI_CFG.name + '** — আপোনাৰ Himalayan গাইড!\n\nমই উপকাৰ কৰিব পাৰোঁ:\n• আমাৰ বিশুদ্ধ Himalayan সামগ্ৰী — মৌ (শহদ), ঘিউ, কেচৰ\n• বতৰৰ খবৰ (live!)\n• Budget অনুযায়ী পৰামৰ্শ\n• Delivery আৰু returns\n\nআপুনি কি বিচাৰে? কওক!\n(আপোনাৰ = Your, মোৰ = My, বাৰু = Good, দুখ = Sad, উপকাৰ = Help)',
       ne: '🙏 नमस्ते! म **' + AI_CFG.name + '** हुँ — तपाईंको Himalayan गाइड!\n\nमैले मद्दत गर्न सक्छु:\n• हाम्रा Himalayan उत्पादनहरू\n• मौसमको जानकारी\n• Budget अनुसार सुझाव\n\nके जान्न चाहनुहुन्छ?',
       ur: '🙏 آداب! میں **' + AI_CFG.name + '** ہوں — آپ کا Himalayan گائیڈ!\n\nمیں مدد کر سکتا ہوں:\n• ہمارے خالص Himalayan مصنوعات\n• موسم کی معلومات\n• Budget کے مطابق مشورہ\n\nبتائیں، کیا جاننا ہے?',
       nag: '🙏 Namaste! Me **' + AI_CFG.name + '** — tumhara Himalayan guide!\n\nMe help dibo pari:\n• Hamara pure Himalayan product — shahad, ghee, kesar\n• Mausam ki jankari\n• Budget hisab se suggestion\n\nBolo, ki chahiye?',
