@@ -20,10 +20,26 @@ export default async function handler(req, res) {
   try { body = req.body || {}; if (typeof body === 'string') body = JSON.parse(body); }
   catch(e) { return res.status(400).json({ error: 'Invalid JSON' }); }
 
+  // ── Load site_settings from Supabase ──
+  let dbSettings = {};
+  try {
+    const sbRes = await fetch(`${process.env.SUPABASE_URL}/rest/v1/site_settings?select=key,value`, {
+      headers: { 'apikey': process.env.SUPABASE_SERVICE_KEY, 'Authorization': `Bearer ${process.env.SUPABASE_SERVICE_KEY}` }
+    });
+    if (sbRes.ok) { const rows = await sbRes.json(); (rows||[]).forEach(r => { dbSettings[r.key] = r.value; }); }
+  } catch(e) { /* non-critical — fall back to defaults */ }
+
+  // ── If order emails are disabled in Settings, skip (except admin notifications) ──
+  if (dbSettings.order_email_enabled === 'false' && body.type !== 'admin_new_order') {
+    return res.status(200).json({ success: true, skipped: true, reason: 'order_email_enabled is off' });
+  }
+
   const { type, to, orderNumber, orderId, name, items, total, discount, shipping,
           address, city, state, pin, payMethod, whatsappNumber, trackingNumber, courier, gstAmount } = body;
 
-  const ADMIN_EMAIL  = process.env.ADMIN_NOTIFY_EMAIL || 'support@pahadiroots.com';
+  // ── Admin email: DB setting overrides Vercel env ──
+  const ADMIN_EMAIL  = dbSettings.admin_notify_email || process.env.ADMIN_NOTIFY_EMAIL || 'support@pahadiroots.com';
+  const FOOTER_TEXT  = dbSettings.email_footer_text  || '© Pahadi Roots. All rights reserved.';
   const WA_NUMBER    = whatsappNumber || process.env.WHATSAPP_NUMBER || '919899984895';
   const WA_DISPLAY   = WA_NUMBER.replace(/^91/, '+91 ').replace(/(\d{5})(\d{5})$/, '$1 $2');
   const ORDER_URL    = `https://pahadiroots.com/order-confirmation?id=${orderId}&num=${encodeURIComponent(orderNumber||'')}`;
@@ -61,7 +77,8 @@ export default async function handler(req, res) {
       🌿 5 Pahadi Roots — Pure Himalayan Goodness<br>
       <a href="https://pahadiroots.com" style="color:#e8b84b;text-decoration:none">pahadiroots.com</a>
       &nbsp;·&nbsp;
-      <a href="https://wa.me/${WA_NUMBER}" style="color:#e8b84b;text-decoration:none">WhatsApp Us</a>
+      <a href="https://wa.me/${WA_NUMBER}" style="color:#e8b84b;text-decoration:none">WhatsApp Us</a><br>
+      <span style="font-size:11px;opacity:0.7">${FOOTER_TEXT}</span>
     </div>
   </div>
 </div>
