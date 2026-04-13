@@ -241,9 +241,18 @@ function buildSlide(s, idx) {
     + '>';
   html += '<div class="hslide-overlay"></div>';
   html += '<div class="hslide-content">';
-  if (s.eyebrow) html += '<div class="hslide-eyebrow">' + esc2(s.eyebrow) + '</div>';
-  if (s.title)   html += '<h1 class="hslide-title">' + s.title.replace(/\*([^*]+)\*/g, '<em>$1</em>') + '</h1>';
-  if (s.sub)     html += '<p class="hslide-sub">' + esc2(s.sub) + '</p>';
+  if (s.eyebrow) {
+    var eyeStyle = s.eyebrow_colour ? ' style="color:' + esc2(s.eyebrow_colour) + ';border-color:' + esc2(s.eyebrow_colour) + '44"' : '';
+    html += '<div class="hslide-eyebrow"' + eyeStyle + '>' + esc2(s.eyebrow) + '</div>';
+  }
+  if (s.title) {
+    var titleStyle = s.title_colour ? ' style="color:' + esc2(s.title_colour) + '"' : '';
+    html += '<h1 class="hslide-title"' + titleStyle + '>' + s.title.replace(/\*([^*]+)\*/g, '<em>$1</em>') + '</h1>';
+  }
+  if (s.sub) {
+    var subStyle = s.sub_colour ? ' style="color:' + esc2(s.sub_colour) + '"' : '';
+    html += '<p class="hslide-sub"' + subStyle + '>' + esc2(s.sub) + '</p>';
+  }
   if (hasCoupon) {
     html += '<div class="hslide-coupon">';
     if (s.coupon_label) html += '<span class="hslide-coupon-label">' + esc2(s.coupon_label) + '</span>';
@@ -275,9 +284,12 @@ function initHeroSlider(settings) {
       cta_link:     (settings && settings['hero_slide_' + n + '_cta_link'])       || '#shop',
       cta2_text:    (settings && settings['hero_slide_' + n + '_cta2_text'])      || '',
       cta2_link:    (settings && settings['hero_slide_' + n + '_cta2_link'])      || '',
-      coupon_label: (settings && settings['hero_slide_' + n + '_coupon_label'])   || '',
-      coupon_offer: (settings && settings['hero_slide_' + n + '_coupon_offer'])   || '',
-      coupon_code:  (settings && settings['hero_slide_' + n + '_coupon_code'])    || '',
+      coupon_label:    (settings && settings['hero_slide_' + n + '_coupon_label'])    || '',
+      coupon_offer:    (settings && settings['hero_slide_' + n + '_coupon_offer'])    || '',
+      coupon_code:     (settings && settings['hero_slide_' + n + '_coupon_code'])     || '',
+      eyebrow_colour:  (settings && settings['hero_slide_' + n + '_eyebrow_colour'])  || '',
+      title_colour:    (settings && settings['hero_slide_' + n + '_title_colour'])    || '',
+      sub_colour:      (settings && settings['hero_slide_' + n + '_sub_colour'])      || '',
     });
   }
   if (!slides.length) {

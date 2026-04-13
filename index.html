@@ -303,10 +303,11 @@
   </div>
 </div>
 <section class="hero-slider" id="home">
-  <!-- Slides populated by JS from DB settings -->
+  <!-- Slides + stats all inside hslider-track so stats overlays the image -->
   <div class="hslider-track" id="hsliderTrack">
     <!-- Fallback slide shown before JS loads / if no banners configured -->
     <div class="hslide hslide-fallback active">
+      <div class="hslide-overlay"></div>
       <div class="hslide-content">
         <div class="hslide-eyebrow">🌿 Pure · Himalayan · Natural</div>
         <h1 class="hslide-title">Born in the<br><em>Himalayas,</em><br>For Your Table</h1>
@@ -317,24 +318,24 @@
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Navigation arrows -->
-  <button class="hslider-arrow hslider-prev" id="hsliderPrev" onclick="heroSlide(-1)" aria-label="Previous">&#8249;</button>
-  <button class="hslider-arrow hslider-next" id="hsliderNext" onclick="heroSlide(1)" aria-label="Next">&#8250;</button>
+    <!-- Navigation arrows -->
+    <button class="hslider-arrow hslider-prev" id="hsliderPrev" onclick="heroSlide(-1)" aria-label="Previous">&#8249;</button>
+    <button class="hslider-arrow hslider-next" id="hsliderNext" onclick="heroSlide(1)" aria-label="Next">&#8250;</button>
 
-  <!-- Dots -->
-  <div class="hslider-dots" id="hsliderDots"></div>
+    <!-- Dots -->
+    <div class="hslider-dots" id="hsliderDots"></div>
 
-  <!-- Stats bar -->
-  <div class="hstats" id="hstats">
-    <div class="hstat"><div class="hstat-num" data-target="500">0<em>+</em></div><div class="hstat-lbl">Farmer Families</div></div>
-    <div class="hstat-div"></div>
-    <div class="hstat"><div class="hstat-num" data-target="10">0<em>+</em></div><div class="hstat-lbl">Himalayan States</div></div>
-    <div class="hstat-div"></div>
-    <div class="hstat"><div class="hstat-num" data-target="10000">0<em>+</em></div><div class="hstat-lbl">Happy Customers</div></div>
-    <div class="hstat-div"></div>
-    <div class="hstat"><div class="hstat-num" data-target="48">0<em>hr</em></div><div class="hstat-lbl">Avg Dispatch</div></div>
+    <!-- Stats bar — absolutely positioned, overlays bottom of image -->
+    <div class="hstats" id="hstats">
+      <div class="hstat"><div class="hstat-num" data-target="500">0<em>+</em></div><div class="hstat-lbl">Farmer Families</div></div>
+      <div class="hstat-div"></div>
+      <div class="hstat"><div class="hstat-num" data-target="10">0<em>+</em></div><div class="hstat-lbl">Himalayan States</div></div>
+      <div class="hstat-div"></div>
+      <div class="hstat"><div class="hstat-num" data-target="10000">0<em>+</em></div><div class="hstat-lbl">Happy Customers</div></div>
+      <div class="hstat-div"></div>
+      <div class="hstat"><div class="hstat-num" data-target="48">0<em>hr</em></div><div class="hstat-lbl">Avg Dispatch</div></div>
+    </div>
   </div>
 </section>
 
