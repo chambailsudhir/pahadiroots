@@ -2498,13 +2498,13 @@ html[data-theme="valley"] .toast { background: #4a7c59; }
   z-index: 10;
   background: rgba(5,20,8,.97);
   border-top: none;
-  display: flex;
+  display: flex; /* overrides the default display:none when JS shows it */
   align-items: center;
   justify-content: center;
   gap: 0;
   padding: 16px 40px;
   flex-wrap: wrap;
-  margin-top: -2px; /* eliminate any sub-pixel gap */
+  margin-top: -2px;
 }
 
 /* ── Theme overrides for slider ── */

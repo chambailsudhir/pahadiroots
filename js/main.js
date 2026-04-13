@@ -2226,9 +2226,6 @@ function initTickerBar(s) {
 }
 
 // ── HERO STATS — editable from admin Settings ─────────────────────
-// Keys: stat_farmer_families, stat_himalayan_states, stat_happy_customers,
-//       stat_avg_dispatch, stat_farmer_label, stat_states_label,
-//       stat_customers_label, stat_dispatch_label
 function initHeroStats(s) {
   if (!s) return;
   var stats = [
@@ -2237,6 +2234,7 @@ function initHeroStats(s) {
     { selector: '[data-stat="customers"]', numKey: 'stat_happy_customers',  lblKey: 'stat_customers_label', defaultNum: '10000', defaultLbl: 'Happy Customers', suffix: '+' },
     { selector: '[data-stat="dispatch"]',  numKey: 'stat_avg_dispatch',     lblKey: 'stat_dispatch_label',  defaultNum: '48',    defaultLbl: 'Avg Dispatch', suffix: 'hr' },
   ];
+  var visibleCount = 0;
   stats.forEach(function(st) {
     var el = document.querySelector(st.selector);
     if (!el) return;
@@ -2248,18 +2246,30 @@ function initHeroStats(s) {
       numEl.innerHTML = val + '<em>' + st.suffix + '</em>';
     }
     if (lblEl && s[st.lblKey]) lblEl.textContent = s[st.lblKey];
-    // Show/hide individual stat
     var hidden = s['stat_hide_' + st.numKey];
-    if (el.closest('.hstat')) el.closest('.hstat').style.display = hidden === 'true' ? 'none' : '';
+    var statEl = el.closest('.hstat');
+    if (statEl) {
+      if (hidden === 'true') {
+        statEl.style.display = 'none';
+        // also hide the divider after this stat
+        var next = statEl.nextElementSibling;
+        if (next && next.classList.contains('hstat-div')) next.style.display = 'none';
+      } else {
+        statEl.style.display = '';
+        visibleCount++;
+      }
+    }
   });
+  // If ALL stats are hidden, collapse the entire stats bar so no black gap shows
+  var container = document.getElementById('hstats');
+  if (container) container.style.display = visibleCount === 0 ? 'none' : 'flex';
 }
 
 // ── TRUST BAR — editable from admin Settings ──────────────────────
-// Keys: trust_1_icon/title/sub, trust_2_icon/title/sub, trust_3_icon/title/sub, trust_4_icon/title/sub
-// trust_N_hide = 'true' hides that item
 function initTrustBar(s) {
   if (!s) return;
   var items = document.querySelectorAll('.tc');
+  var visibleCount = 0;
   items.forEach(function(tc, i) {
     var n = i + 1;
     var ico  = s['trust_' + n + '_icon'];
@@ -2267,6 +2277,8 @@ function initTrustBar(s) {
     var sub  = s['trust_' + n + '_sub'];
     var hide = s['trust_' + n + '_hide'];
     if (hide === 'true') { tc.style.display = 'none'; return; }
+    tc.style.display = '';
+    visibleCount++;
     var icoEl = tc.querySelector('.tico');
     var lblEl = tc.querySelector('.tlb');
     var subEl = tc.querySelector('.tds');
@@ -2274,6 +2286,9 @@ function initTrustBar(s) {
     if (lblEl && lbl) lblEl.textContent = lbl;
     if (subEl && sub) subEl.innerHTML  = sub;
   });
+  // Collapse entire trust bar if all items are hidden
+  var trustBar = document.querySelector('.trust');
+  if (trustBar) trustBar.style.display = visibleCount === 0 ? 'none' : '';
 }
 
 function animateCounters() {
