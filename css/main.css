@@ -2297,12 +2297,12 @@ html[data-theme="valley"] .toast { background: #4a7c59; }
   );
 }
 
-/* Content box — vertically centred in the image, with bottom padding to clear stats bar */
+/* Content box — vertically centred in the image */
 .hslide-content {
   position: relative;
   z-index: 2;
   max-width: 600px;
-  padding: 0 0 100px 72px; /* 100px bottom clears the stats overlay */
+  padding: 0 0 0 72px;
   display: flex;
   flex-direction: column;
   gap: 0;
@@ -2469,7 +2469,7 @@ html[data-theme="valley"] .toast { background: #4a7c59; }
 /* ── Dots ── */
 .hslider-dots {
   position: absolute;
-  bottom: 90px; /* above the stats overlay */
+  bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
@@ -2492,21 +2492,19 @@ html[data-theme="valley"] .toast { background: #4a7c59; }
   background: #fff;
 }
 
-/* ── Stats bar — overlaid at the BOTTOM of the hero image, no gap ── */
+/* ── Stats bar — sits directly below the slide image, NO gap ── */
 .hero-slider .hstats {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 5;
-  background: linear-gradient(to top, rgba(5,20,8,0.92) 0%, rgba(5,20,8,0.6) 70%, transparent 100%);
+  position: relative;
+  z-index: 10;
+  background: rgba(5,20,8,.97);
   border-top: none;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0;
-  padding: 32px 40px 18px;
+  padding: 16px 40px;
   flex-wrap: wrap;
+  margin-top: -2px; /* eliminate any sub-pixel gap */
 }
 
 /* ── Theme overrides for slider ── */

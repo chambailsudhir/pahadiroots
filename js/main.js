@@ -495,6 +495,8 @@ async function loadData() {
       initCollectionImages(data.settings); // Category card images
       initHeroStats(data.settings);  // Editable stats counters
       initTrustBar(data.settings);   // Editable trust bar
+      initAnnBar(data.settings);     // Announcement bar
+      initTickerBar(data.settings);  // Scrolling ticker
     }
     var updated  = false;
 
@@ -2182,6 +2184,38 @@ function hideStickyAtc() { var sa = document.getElementById('stickyAtc'); if(sa)
 function stickyAddToCart() { if (_stickyProdId) addToCart(_stickyProdId); }
 
 // ── HERO STATS COUNTER ────────────────────────────────────────────
+// ── ANNOUNCEMENT BAR — editable from admin Settings ───────────────────────────
+// Keys: ann_hide='true', ann_text (custom text override)
+function initAnnBar(s) {
+  if (!s) return;
+  var bar = document.getElementById('annBar');
+  if (!bar) return;
+  if (s.ann_hide === 'true') { bar.style.display = 'none'; return; }
+  if (s.ann_text) {
+    var span = document.getElementById('annText');
+    if (span) span.innerHTML = s.ann_text;
+  }
+}
+
+// ── TICKER BAR — editable from admin Settings ──────────────────────────────
+// Keys: ticker_hide='true', ticker_1..5_text (text), ticker_1..5_hide='true'
+function initTickerBar(s) {
+  if (!s) return;
+  var wrap = document.getElementById('tickerWrap');
+  if (!wrap) return;
+  if (s.ticker_hide === 'true') { wrap.style.display = 'none'; return; }
+  // Update/hide individual ticker items (both copies for seamless loop)
+  for (var n = 1; n <= 5; n++) {
+    var items = document.querySelectorAll('[data-ticker="' + n + '"]');
+    var hide = s['ticker_' + n + '_hide'] === 'true';
+    var text = s['ticker_' + n + '_text'];
+    items.forEach(function(el) {
+      if (hide) { el.style.display = 'none'; return; }
+      if (text) el.innerHTML = text;
+    });
+  }
+}
+
 // ── HERO STATS — editable from admin Settings ─────────────────────
 // Keys: stat_farmer_families, stat_himalayan_states, stat_happy_customers,
 //       stat_avg_dispatch, stat_farmer_label, stat_states_label,
