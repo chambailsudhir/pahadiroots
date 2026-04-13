@@ -2188,9 +2188,17 @@ function stickyAddToCart() { if (_stickyProdId) addToCart(_stickyProdId); }
 // Keys: ann_hide='true', ann_text (custom text override)
 function initAnnBar(s) {
   if (!s) return;
+  // Cache to localStorage so next page load applies instantly (no flash)
+  try {
+    var cached = JSON.parse(localStorage.getItem('pr_site_settings') || '{}');
+    cached.ann_hide    = s.ann_hide    || 'false';
+    cached.ticker_hide = s.ticker_hide || 'false';
+    localStorage.setItem('pr_site_settings', JSON.stringify(cached));
+  } catch(e) {}
   var bar = document.getElementById('annBar');
   if (!bar) return;
   if (s.ann_hide === 'true') { bar.style.display = 'none'; return; }
+  bar.style.display = '';
   if (s.ann_text) {
     var span = document.getElementById('annText');
     if (span) span.innerHTML = s.ann_text;
@@ -2198,19 +2206,20 @@ function initAnnBar(s) {
 }
 
 // ── TICKER BAR — editable from admin Settings ──────────────────────────────
-// Keys: ticker_hide='true', ticker_1..5_text (text), ticker_1..5_hide='true'
+// Keys: ticker_hide='true', ticker_1..5_text, ticker_1..5_hide='true'
 function initTickerBar(s) {
   if (!s) return;
   var wrap = document.getElementById('tickerWrap');
   if (!wrap) return;
   if (s.ticker_hide === 'true') { wrap.style.display = 'none'; return; }
-  // Update/hide individual ticker items (both copies for seamless loop)
+  wrap.style.display = '';
   for (var n = 1; n <= 5; n++) {
     var items = document.querySelectorAll('[data-ticker="' + n + '"]');
     var hide = s['ticker_' + n + '_hide'] === 'true';
     var text = s['ticker_' + n + '_text'];
     items.forEach(function(el) {
       if (hide) { el.style.display = 'none'; return; }
+      el.style.display = '';
       if (text) el.innerHTML = text;
     });
   }

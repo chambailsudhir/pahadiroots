@@ -193,6 +193,16 @@
 </script>
 <div class="ann" id="annBar">🌿 <span id="annText">Free Shipping above ₹<span id="annShipAmt">799</span> &nbsp;|&nbsp; <a href="#pay-sec">UPI · Cards · COD</a> &nbsp;|&nbsp; 10 Himalayan States Covered</span></div>
 <!-- Announcement Ticker -->
+<script>
+// Apply ticker/ann visibility instantly from localStorage cache (no flash)
+(function(){
+  try {
+    var sc = JSON.parse(localStorage.getItem('pr_site_settings') || '{}');
+    if(sc.ticker_hide==='true'){document.write('<style>#tickerWrap{display:none}</style>');}
+    if(sc.ann_hide==='true'){document.write('<style>#annBar{display:none}</style>');}
+  } catch(e){}
+})();
+</script>
 <div class="ticker-wrap" id="tickerWrap" aria-label="Announcements">
   <div class="ticker-track" id="tickerTrack">
     <span class="ticker-item" data-ticker="1">🎁 Use code <strong>WELCOME50</strong> <span>·</span> ₹50 off your first order</span>
