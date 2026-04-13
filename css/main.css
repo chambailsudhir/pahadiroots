@@ -84,7 +84,7 @@ nav#mNav.shadow{box-shadow:0 2px 16px rgba(0,0,0,.08)}
 .btn-g:hover{background:var(--gd2);transform:translateY(-2px);box-shadow:0 8px 24px rgba(200,146,10,.35)}
 .btn-w{padding:14px 28px;border-radius:30px;font-size:14px;font-weight:800;letter-spacing:.5px;background:rgba(255,255,255,.12);color:#fff;border:1.5px solid rgba(255,255,255,.35);transition:all .25s;display:inline-block}
 .btn-w:hover{background:rgba(255,255,255,.22)}
-.hstats{display:flex;gap:0;justify-content:center;margin-top:44px;background:rgba(0,0,0,.2);backdrop-filter:blur(8px);border-top:1px solid rgba(255,255,255,.1);width:100%;padding:18px 20px;flex-wrap:wrap;position:relative;z-index:1}
+.hstats{display:flex;gap:0;justify-content:center;background:transparent;width:100%;padding:0;flex-wrap:wrap;position:relative;z-index:1}
 .hstat{text-align:center;padding:0 28px}
 .hstat-num{font-family:'Playfair Display',serif;font-size:clamp(22px,3vw,34px);font-weight:900;color:var(--gd2)}
 .hstat-num em{font-size:.55em;font-style:normal;opacity:.8}
@@ -2242,12 +2242,13 @@ html[data-theme="valley"] .toast { background: #4a7c59; }
   background: #0d2410;
 }
 
-/* Track holds all slides stacked */
+/* Track holds all slides stacked — must be position:relative for absolute hstats */
 .hslider-track {
   position: relative;
   width: 100%;
   min-height: calc(100vh - 110px);
   min-height: max(560px, calc(100vh - 110px));
+  overflow: hidden;
 }
 
 /* Each slide — full viewport height, image covers entire area, NO gap */
@@ -2296,12 +2297,12 @@ html[data-theme="valley"] .toast { background: #4a7c59; }
   );
 }
 
-/* Content box — vertically centred in the image */
+/* Content box — vertically centred in the image, with bottom padding to clear stats bar */
 .hslide-content {
   position: relative;
   z-index: 2;
   max-width: 600px;
-  padding: 0 0 0 72px;
+  padding: 0 0 100px 72px; /* 100px bottom clears the stats overlay */
   display: flex;
   flex-direction: column;
   gap: 0;
@@ -2440,15 +2441,15 @@ html[data-theme="valley"] .toast { background: #4a7c59; }
 /* ── Navigation Arrows ── */
 .hslider-arrow {
   position: absolute;
-  top: 50%;
+  top: calc(50% - 35px); /* center in image, offset to stay clear of stats bar */
   transform: translateY(-50%);
-  z-index: 10;
-  background: rgba(255,255,255,.12);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(255,255,255,.2);
+  z-index: 20;
+  background: rgba(0,0,0,.35);
+  backdrop-filter: blur(10px);
+  border: 1.5px solid rgba(255,255,255,.4);
   color: #fff;
-  width: 44px;
-  height: 44px;
+  width: 46px;
+  height: 46px;
   border-radius: 50%;
   font-size: 26px;
   display: flex;
@@ -2458,8 +2459,10 @@ html[data-theme="valley"] .toast { background: #4a7c59; }
   transition: all .2s;
   line-height: 1;
   padding: 0;
+  text-shadow: none;
+  box-shadow: 0 2px 12px rgba(0,0,0,.4);
 }
-.hslider-arrow:hover { background: rgba(255,255,255,.25); transform: translateY(-50%) scale(1.08); }
+.hslider-arrow:hover { background: rgba(0,0,0,.55); transform: translateY(-50%) scale(1.08); border-color: rgba(255,255,255,.7); }
 .hslider-prev { left: 20px; }
 .hslider-next { right: 20px; }
 

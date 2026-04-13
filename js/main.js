@@ -493,6 +493,8 @@ async function loadData() {
       uCart(); // Recalculate cart total with correct shipping settings from DB
       initHeroPanel(data.settings); // Hero panel images + sale badge
       initCollectionImages(data.settings); // Category card images
+      initHeroStats(data.settings);  // Editable stats counters
+      initTrustBar(data.settings);   // Editable trust bar
     }
     var updated  = false;
 
@@ -2180,6 +2182,57 @@ function hideStickyAtc() { var sa = document.getElementById('stickyAtc'); if(sa)
 function stickyAddToCart() { if (_stickyProdId) addToCart(_stickyProdId); }
 
 // ── HERO STATS COUNTER ────────────────────────────────────────────
+// ── HERO STATS — editable from admin Settings ─────────────────────
+// Keys: stat_farmer_families, stat_himalayan_states, stat_happy_customers,
+//       stat_avg_dispatch, stat_farmer_label, stat_states_label,
+//       stat_customers_label, stat_dispatch_label
+function initHeroStats(s) {
+  if (!s) return;
+  var stats = [
+    { selector: '[data-stat="farmers"]',   numKey: 'stat_farmer_families',  lblKey: 'stat_farmer_label',    defaultNum: '500',   defaultLbl: 'Farmer Families', suffix: '+' },
+    { selector: '[data-stat="states"]',    numKey: 'stat_himalayan_states', lblKey: 'stat_states_label',    defaultNum: '10',    defaultLbl: 'Himalayan States', suffix: '+' },
+    { selector: '[data-stat="customers"]', numKey: 'stat_happy_customers',  lblKey: 'stat_customers_label', defaultNum: '10000', defaultLbl: 'Happy Customers', suffix: '+' },
+    { selector: '[data-stat="dispatch"]',  numKey: 'stat_avg_dispatch',     lblKey: 'stat_dispatch_label',  defaultNum: '48',    defaultLbl: 'Avg Dispatch', suffix: 'hr' },
+  ];
+  stats.forEach(function(st) {
+    var el = document.querySelector(st.selector);
+    if (!el) return;
+    var numEl = el.querySelector('.hstat-num');
+    var lblEl = el.querySelector('.hstat-lbl');
+    if (numEl && s[st.numKey]) {
+      var val = parseInt(s[st.numKey], 10) || 0;
+      numEl.dataset.target = val;
+      numEl.innerHTML = val + '<em>' + st.suffix + '</em>';
+    }
+    if (lblEl && s[st.lblKey]) lblEl.textContent = s[st.lblKey];
+    // Show/hide individual stat
+    var hidden = s['stat_hide_' + st.numKey];
+    if (el.closest('.hstat')) el.closest('.hstat').style.display = hidden === 'true' ? 'none' : '';
+  });
+}
+
+// ── TRUST BAR — editable from admin Settings ──────────────────────
+// Keys: trust_1_icon/title/sub, trust_2_icon/title/sub, trust_3_icon/title/sub, trust_4_icon/title/sub
+// trust_N_hide = 'true' hides that item
+function initTrustBar(s) {
+  if (!s) return;
+  var items = document.querySelectorAll('.tc');
+  items.forEach(function(tc, i) {
+    var n = i + 1;
+    var ico  = s['trust_' + n + '_icon'];
+    var lbl  = s['trust_' + n + '_title'];
+    var sub  = s['trust_' + n + '_sub'];
+    var hide = s['trust_' + n + '_hide'];
+    if (hide === 'true') { tc.style.display = 'none'; return; }
+    var icoEl = tc.querySelector('.tico');
+    var lblEl = tc.querySelector('.tlb');
+    var subEl = tc.querySelector('.tds');
+    if (icoEl && ico) icoEl.textContent = ico;
+    if (lblEl && lbl) lblEl.textContent = lbl;
+    if (subEl && sub) subEl.innerHTML  = sub;
+  });
+}
+
 function animateCounters() {
   document.querySelectorAll('.hstat-num[data-target]').forEach(function(el) {
     var target = parseInt(el.dataset.target);
