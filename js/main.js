@@ -387,75 +387,77 @@ function initHeroSlideshow()     { initHeroSlider({}); }
 function initCollectionImages(settings) {
   if (!settings) return;
 
-  // Collect all category slugs that have images set
-  var imgMap = {}; // slug → url
+  // Build slug->url and slug->hidden maps from settings
+  var imgMap = {}, hiddenMap = {};
   Object.keys(settings).forEach(function(key) {
-    if (!key.startsWith('coll_img_')) return;
-    var slug = key.replace('coll_img_', '');
-    var url = settings[key];
-    if (url && url.trim()) imgMap[slug] = url.trim();
+    if (key.startsWith('coll_img_')) {
+      var slug = key.replace('coll_img_', '');
+      if (settings[key] && settings[key].trim()) imgMap[slug] = settings[key].trim();
+    }
+    if (key.startsWith('coll_hidden_') && settings[key] === 'true') {
+      hiddenMap[key.replace('coll_hidden_', '')] = true;
+    }
   });
 
-  // Also collect hidden slugs
-  var hiddenMap = {};
-  Object.keys(settings).forEach(function(key) {
-    if (!key.startsWith('coll_hidden_')) return;
-    var slug = key.replace('coll_hidden_', '');
-    if (settings[key] === 'true') hiddenMap[slug] = true;
-  });
+  function applyImg(imgEl, wrapEl, url) {
+    if (!imgEl || !url) return;
+    imgEl.onload = function() {
+      wrapEl.classList.add('img-loaded');
+      var emo = wrapEl.querySelector('.cemo');
+      if (emo) emo.style.opacity = '0';
+    };
+    imgEl.onerror = function() { imgEl.style.display = 'none'; };
+    imgEl.src = url;
+  }
 
-  // For each existing hardcoded card, apply image or hide if hidden
+  // Apply to existing hardcoded cards
   Object.keys(imgMap).forEach(function(slug) {
     if (hiddenMap[slug]) return;
-    var img = document.getElementById('ccat-img-' + slug);
-    var emo = document.getElementById('ccat-emo-' + slug);
-    if (img) {
-      // Card exists in HTML — just update the image
-      img.src = imgMap[slug];
-      img.style.display = 'block';
-      img.onload = function() {
-        img.style.opacity = '1';
-        if (img.parentElement) img.parentElement.classList.add('img-loaded');
-      };
-      img.onerror = function() { img.style.display = 'none'; if (emo) emo.style.display = 'block'; if (img.parentElement) img.parentElement.classList.add('img-loaded'); };
-      if (emo) emo.style.display = 'none';
-    }
-    // Card doesn't exist in HTML — will be handled by dynamic section below
+    var imgEl  = document.getElementById('ccat-img-' + slug);
+    var wrapEl = imgEl && imgEl.closest('.ccat-img-wrap');
+    if (imgEl && wrapEl) applyImg(imgEl, wrapEl, imgMap[slug]);
   });
 
-  // Hide any hardcoded cards that are marked hidden
+  // Hide cards marked hidden
   Object.keys(hiddenMap).forEach(function(slug) {
     var card = document.getElementById('ccat-' + slug);
     if (card) card.style.display = 'none';
   });
 
-  // Build dynamic extra cards for slugs NOT in the hardcoded HTML
+  // Dynamically add cards for slugs not in hardcoded HTML
   var cgrid = document.getElementById('cgrid');
   if (!cgrid) return;
-  var hardcodedSlugs = ['honey','ghee','spices','tea','grains','dryfruits'];
+  var hardcoded = ['honey','ghee','spices','tea','grains','dryfruits'];
 
   Object.keys(imgMap).forEach(function(slug) {
     if (hiddenMap[slug]) return;
-    if (hardcodedSlugs.indexOf(slug) !== -1) return; // already handled above
-    if (document.getElementById('ccat-' + slug)) return; // already exists
+    if (hardcoded.indexOf(slug) !== -1) return;
+    if (document.getElementById('ccat-' + slug)) return;
 
-    // Create a new card dynamically
     var label = slug.charAt(0).toUpperCase() + slug.slice(1).replace(/-/g, ' ');
     var card = document.createElement('a');
     card.href = '#products';
     card.className = 'cc rv';
     card.id = 'ccat-' + slug;
-    card.style.cssText = 'transition-delay:.38s';
-    card.innerHTML =
-      '<div class="ccat-img-wrap">' +
-        '<img class="ccat-img" id="ccat-img-' + slug + '" src="' + imgMap[slug] + '" alt="' + label + '" style="opacity:0;transition:opacity .4s">' +
-      '</div>' +
-      '<div class="cname">' + label + '</div>' +
-      '<div class="cnum"></div>';
-    var imgEl = card.querySelector('img');
-    imgEl.onload  = function() { imgEl.style.opacity = '1'; if (imgEl.parentElement) imgEl.parentElement.classList.add('img-loaded'); };
-    imgEl.onerror = function() { imgEl.style.display = 'none'; if (imgEl.parentElement) imgEl.parentElement.classList.add('img-loaded'); };
+
+    var wrap = document.createElement('div');
+    wrap.className = 'ccat-img-wrap';
+
+    var img = document.createElement('img');
+    img.className = 'ccat-img';
+    img.id = 'ccat-img-' + slug;
+    img.alt = label;
+
+    var body = document.createElement('div');
+    body.className = 'cc-body';
+    body.innerHTML = '<div class="cname">' + label + '</div><div class="cnum"></div>';
+
+    wrap.appendChild(img);
+    card.appendChild(wrap);
+    card.appendChild(body);
     cgrid.appendChild(card);
+
+    applyImg(img, wrap, imgMap[slug]);
   });
 }
 
@@ -747,8 +749,8 @@ function mkProd(p) {
   var inWL   = wishlist.findIndex(function(x){ return String(x) === String(p.id); }) > -1;
   var slug   = getProductSlug(p);
   var imgHtml = p.image_url
-    ? '<img src="" data-src="' + p.image_url + '" alt="' + p.name + '" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1" onerror="this.style.display=\'none\'">'    : '';
-  var img = '<div class="piw skel skel-dark" style="background:' + (p.card_bg||'#f9f4ec') + '">' +
+    ? '<img src="' + p.image_url + '" alt="' + p.name + '" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;opacity:0;transition:opacity .45s" onload="this.style.opacity=1;this.closest(\'.piw\')&&this.closest(\'.piw\').classList.add(\'img-ready\')" onerror="this.style.display=\'none\'">'    : '';
+  var img = '<div class="piw" style="background:' + (p.card_bg||'#f9f4ec') + '">' +
     imgHtml +
     '<span class="pemo" style="position:relative;z-index:0">' + (p.emoji||'🌿') + '</span>' +
     '<div class="piw-hover-overlay">' +
@@ -812,22 +814,7 @@ function renderProds() {
   g.innerHTML = list.map(function(p) { return mkProd(p); }).join('');
   updateAllWLButtons();
   setTimeout(initProductHoverImages, 50);
-  // Lazy-load product images with skeleton fade-in
-  setTimeout(function() {
-    g.querySelectorAll('img[data-src]').forEach(function(img) {
-      var src = img.getAttribute('data-src');
-      if (!src) return;
-      var wrap = img.closest('.piw');
-      var tmp = new Image();
-      tmp.onload = function() {
-        img.src = src;
-        img.removeAttribute('data-src');
-        if (wrap) { wrap.classList.add('img-ready'); setTimeout(function(){ wrap.classList.remove('skel'); }, 420); }
-      };
-      tmp.onerror = function() { if (wrap) { wrap.classList.remove('skel'); wrap.classList.add('img-ready'); } };
-      tmp.src = src;
-    });
-  }, 0);
+
 }
 
 function setFilter(f, btn) {
