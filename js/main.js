@@ -233,11 +233,27 @@ var _heroSlideCount = 0;
 
 function esc2(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
+// ── UNIVERSAL IMAGE LOADER — adds .skel + .img-ready for skeleton fade-in ──
+function imgLoad(el, url, wrapSelector) {
+  if (!el || !url) return;
+  var wrap = wrapSelector ? (typeof wrapSelector === 'string' ? el.closest(wrapSelector) : wrapSelector) : el.parentElement;
+  if (wrap) wrap.classList.add('skel');
+  var tmp = new Image();
+  tmp.onload = function() {
+    if (el.tagName === 'IMG') { el.src = url; }
+    else { el.style.backgroundImage = 'url(' + url + ')'; }
+    if (wrap) { wrap.classList.add('img-ready'); setTimeout(function(){ wrap.classList.remove('skel'); }, 400); }
+  };
+  tmp.onerror = function() { if (wrap) { wrap.classList.add('img-ready'); wrap.classList.remove('skel'); } };
+  tmp.src = url;
+}
+
+
 function buildSlide(s, idx) {
   var img = s.img || '';
   var hasCoupon = s.coupon_offer || s.coupon_code;
   var html = '<div class="hslide' + (idx === 0 ? ' active' : '') + '"'
-    + (img ? ' style="background-image:url(' + esc2(img) + ')"' : ' style="background:linear-gradient(150deg,#071a09 0%,#0d2410 30%,#1a3a1e 65%,#2d5233 100%)"')
+    + (img ? ' data-bgimg="' + esc2(img) + '" style="background:linear-gradient(150deg,#071a09 0%,#0d2410 30%,#1a3a1e 65%,#2d5233 100%)"' : ' style="background:linear-gradient(150deg,#071a09 0%,#0d2410 30%,#1a3a1e 65%,#2d5233 100%)"')
     + '>';
   html += '<div class="hslide-overlay"></div>';
   html += '<div class="hslide-content">';
@@ -314,6 +330,19 @@ function initHeroSlider(settings) {
       startHeroAutoplay();
     }
   }
+  // Preload hero background images with fade-in skeleton
+  setTimeout(function() {
+    document.querySelectorAll('.hslide[data-bgimg]').forEach(function(slide) {
+      var bgUrl = slide.getAttribute('data-bgimg');
+      if (!bgUrl) return;
+      var tmp = new Image();
+      tmp.onload = function() {
+        slide.style.backgroundImage = 'url(' + bgUrl + ')';
+        slide.removeAttribute('data-bgimg');
+      };
+      tmp.src = bgUrl;
+    });
+  }, 0);
 }
 
 function heroGoTo(idx) {
@@ -353,21 +382,80 @@ document.addEventListener('DOMContentLoaded', function() {
 function initHeroPanel(settings) { initHeroSlider(settings || {}); }
 function initHeroSlideshow()     { initHeroSlider({}); }
 // ── COLLECTION CATEGORY IMAGES ─────────────────────────────────────
-// Reads all coll_img_* keys from settings — dynamic, matches any category slug
+// Reads ALL coll_img_* keys from settings and builds the collection grid dynamically
+// This handles any category slug — not just the 6 hardcoded in HTML
 function initCollectionImages(settings) {
   if (!settings) return;
+
+  // Collect all category slugs that have images set
+  var imgMap = {}; // slug → url
   Object.keys(settings).forEach(function(key) {
     if (!key.startsWith('coll_img_')) return;
     var slug = key.replace('coll_img_', '');
     var url = settings[key];
-    if (!url) return;
+    if (url && url.trim()) imgMap[slug] = url.trim();
+  });
+
+  // Also collect hidden slugs
+  var hiddenMap = {};
+  Object.keys(settings).forEach(function(key) {
+    if (!key.startsWith('coll_hidden_')) return;
+    var slug = key.replace('coll_hidden_', '');
+    if (settings[key] === 'true') hiddenMap[slug] = true;
+  });
+
+  // For each existing hardcoded card, apply image or hide if hidden
+  Object.keys(imgMap).forEach(function(slug) {
+    if (hiddenMap[slug]) return;
     var img = document.getElementById('ccat-img-' + slug);
     var emo = document.getElementById('ccat-emo-' + slug);
-    if (!img) return;
-    img.src = url;
-    img.style.display = 'block';
-    img.onerror = function() { img.style.display='none'; if(emo) emo.style.display='block'; };
-    if (emo) emo.style.display = 'none';
+    if (img) {
+      // Card exists in HTML — just update the image
+      img.src = imgMap[slug];
+      img.style.display = 'block';
+      img.onload = function() {
+        img.style.opacity = '1';
+        if (img.parentElement) img.parentElement.classList.add('img-loaded');
+      };
+      img.onerror = function() { img.style.display = 'none'; if (emo) emo.style.display = 'block'; if (img.parentElement) img.parentElement.classList.add('img-loaded'); };
+      if (emo) emo.style.display = 'none';
+    }
+    // Card doesn't exist in HTML — will be handled by dynamic section below
+  });
+
+  // Hide any hardcoded cards that are marked hidden
+  Object.keys(hiddenMap).forEach(function(slug) {
+    var card = document.getElementById('ccat-' + slug);
+    if (card) card.style.display = 'none';
+  });
+
+  // Build dynamic extra cards for slugs NOT in the hardcoded HTML
+  var cgrid = document.getElementById('cgrid');
+  if (!cgrid) return;
+  var hardcodedSlugs = ['honey','ghee','spices','tea','grains','dryfruits'];
+
+  Object.keys(imgMap).forEach(function(slug) {
+    if (hiddenMap[slug]) return;
+    if (hardcodedSlugs.indexOf(slug) !== -1) return; // already handled above
+    if (document.getElementById('ccat-' + slug)) return; // already exists
+
+    // Create a new card dynamically
+    var label = slug.charAt(0).toUpperCase() + slug.slice(1).replace(/-/g, ' ');
+    var card = document.createElement('a');
+    card.href = '#products';
+    card.className = 'cc rv';
+    card.id = 'ccat-' + slug;
+    card.style.cssText = 'transition-delay:.38s';
+    card.innerHTML =
+      '<div class="ccat-img-wrap">' +
+        '<img class="ccat-img" id="ccat-img-' + slug + '" src="' + imgMap[slug] + '" alt="' + label + '" style="opacity:0;transition:opacity .4s">' +
+      '</div>' +
+      '<div class="cname">' + label + '</div>' +
+      '<div class="cnum"></div>';
+    var imgEl = card.querySelector('img');
+    imgEl.onload  = function() { imgEl.style.opacity = '1'; if (imgEl.parentElement) imgEl.parentElement.classList.add('img-loaded'); };
+    imgEl.onerror = function() { imgEl.style.display = 'none'; if (imgEl.parentElement) imgEl.parentElement.classList.add('img-loaded'); };
+    cgrid.appendChild(card);
   });
 }
 
@@ -659,9 +747,8 @@ function mkProd(p) {
   var inWL   = wishlist.findIndex(function(x){ return String(x) === String(p.id); }) > -1;
   var slug   = getProductSlug(p);
   var imgHtml = p.image_url
-    ? '<img src="' + p.image_url + '" alt="' + p.name + '" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1" onerror="this.style.display=\'none\'">'
-    : '';
-  var img = '<div class="piw" style="background:' + (p.card_bg||'#f9f4ec') + '">' +
+    ? '<img src="" data-src="' + p.image_url + '" alt="' + p.name + '" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1" onerror="this.style.display=\'none\'">'    : '';
+  var img = '<div class="piw skel skel-dark" style="background:' + (p.card_bg||'#f9f4ec') + '">' +
     imgHtml +
     '<span class="pemo" style="position:relative;z-index:0">' + (p.emoji||'🌿') + '</span>' +
     '<div class="piw-hover-overlay">' +
@@ -725,6 +812,22 @@ function renderProds() {
   g.innerHTML = list.map(function(p) { return mkProd(p); }).join('');
   updateAllWLButtons();
   setTimeout(initProductHoverImages, 50);
+  // Lazy-load product images with skeleton fade-in
+  setTimeout(function() {
+    g.querySelectorAll('img[data-src]').forEach(function(img) {
+      var src = img.getAttribute('data-src');
+      if (!src) return;
+      var wrap = img.closest('.piw');
+      var tmp = new Image();
+      tmp.onload = function() {
+        img.src = src;
+        img.removeAttribute('data-src');
+        if (wrap) { wrap.classList.add('img-ready'); setTimeout(function(){ wrap.classList.remove('skel'); }, 420); }
+      };
+      tmp.onerror = function() { if (wrap) { wrap.classList.remove('skel'); wrap.classList.add('img-ready'); } };
+      tmp.src = src;
+    });
+  }, 0);
 }
 
 function setFilter(f, btn) {
@@ -752,7 +855,7 @@ function renderStates() {
   tb.innerHTML = STATES.map(function(s, i) {
     var imgSrc = (s._uploadedImgs && s._uploadedImgs[0]) || s._uploadedImg || s.tab_photo_url || '';
     var imgHtml = imgSrc
-      ? '<div class="stab-thumb"><img src="' + imgSrc + '" alt="' + s.name + '" onerror="this.parentNode.style.display=\'none\'" loading="lazy"></div>'
+      ? '<div class="stab-thumb skel skel-dark"><img data-src="' + imgSrc + '" src="" alt="' + s.name + '" loading="lazy"></div>'
       : '<div class="stab-thumb stab-thumb-emo">' + s.emoji + '</div>';
     return '<button class="stab' + (i===0?' active':'') + '" onclick="swState(\'' + s.id + '\')" id="t-' + s.id + '">' +
       imgHtml +
@@ -809,6 +912,38 @@ function renderStates() {
       '<div class="spgrid">' + prodsHtml + '</div>' +
     '</div>';
   }).join('');
+
+  // Wire skeleton fade-in for state tab thumbnails
+  setTimeout(function() {
+    document.querySelectorAll('.stab-thumb img[data-src]').forEach(function(img) {
+      var wrap = img.closest('.stab-thumb');
+      var src = img.getAttribute('data-src');
+      if (!src) return;
+      var tmp = new Image();
+      tmp.onload = function() {
+        img.src = src; img.removeAttribute('data-src');
+        if (wrap) { wrap.classList.add('img-ready'); setTimeout(function(){ wrap.classList.remove('skel'); }, 420); }
+      };
+      tmp.onerror = function() { if (wrap) { wrap.classList.remove('skel'); wrap.classList.add('img-ready'); } };
+      tmp.src = src;
+    });
+    // Wire skeleton fade-in for state header (shdr-img-col) images
+    document.querySelectorAll('.shdr-img-col img').forEach(function(img) {
+      var wrap = img.closest('.shdr-img-col');
+      if (!wrap || wrap.classList.contains('img-ready')) return;
+      if (!img.src && !img.getAttribute('data-src')) return;
+      var src = img.getAttribute('data-src') || img.src;
+      if (!src) return;
+      if (wrap) wrap.classList.add('skel', 'skel-dark');
+      var tmp = new Image();
+      tmp.onload = function() {
+        if (img.getAttribute('data-src')) { img.src = src; img.removeAttribute('data-src'); }
+        if (wrap) { wrap.classList.add('img-ready'); setTimeout(function(){ wrap.classList.remove('skel'); }, 600); }
+      };
+      tmp.onerror = function() { if (wrap) { wrap.classList.remove('skel'); wrap.classList.add('img-ready'); } };
+      tmp.src = src;
+    });
+  }, 0);
 }
 
 
@@ -831,7 +966,7 @@ function renderStoryCards(activeId) {
   el.innerHTML = STATES.map(function(s) {
     var imgSrc = (s._uploadedImgs && s._uploadedImgs[0]) || s._uploadedImg || s.tab_photo_url || '';
     var imgHtml = imgSrc
-      ? '<img class="story-card-img" src="' + imgSrc + '" alt="' + s.name + '" loading="lazy" onerror="this.style.display=\'none\">'
+      ? '<img class="story-card-img" data-src="' + imgSrc + '" src="" alt="' + s.name + '" loading="lazy">'
       : '<div class="story-card-emo" style="background:' + (s.panel_bg||'linear-gradient(135deg,#1a3a1e,#2d5233)') + '">' + s.emoji + '</div>';
     var snippet = _storySnippets[s.id] || s.description.substring(0, 90) + '…';
     var isActive = s.id === (activeId || STATES[0].id);
@@ -844,6 +979,24 @@ function renderStoryCards(activeId) {
       '</div>'+
     '</div>';
   }).join('');
+
+  // Wire skeleton fade-in for story card images
+  setTimeout(function() {
+    document.querySelectorAll('.story-card-img[data-src]').forEach(function(img) {
+      var wrap = img.closest('.story-card');
+      var src = img.getAttribute('data-src');
+      if (!src) return;
+      var tmp = new Image();
+      tmp.onload = function() {
+        img.src = src;
+        img.removeAttribute('data-src');
+        img.style.opacity = '1';
+        if (wrap) wrap.classList.add('img-ready');
+      };
+      tmp.onerror = function() { img.style.display = 'none'; if (wrap) wrap.classList.add('img-ready'); };
+      tmp.src = src;
+    });
+  }, 0);
 }
 
 function swState(id) {

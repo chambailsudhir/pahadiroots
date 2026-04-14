@@ -177,6 +177,9 @@ section.sec{padding:52px 40px}
 /* ── REGION STORYTELLING CARDS ──────────────────── */
 .story-card{flex:0 0 auto;width:200px;border-radius:14px;overflow:hidden;position:relative;cursor:pointer;transition:transform .3s,box-shadow .3s;box-shadow:0 3px 14px rgba(0,0,0,.1)}
 .story-card:hover{transform:translateY(-5px);box-shadow:0 12px 32px rgba(0,0,0,.18)}
+/* Skeleton shimmer on top of story card img area before load */
+.story-card:not(.img-ready)::before{content:'';position:absolute;top:0;left:0;right:0;height:130px;z-index:2;background:linear-gradient(90deg,#d4cfc7 25%,#e8e4dc 50%,#d4cfc7 75%);background-size:200% 100%;animation:skelshimmer 1.4s infinite;pointer-events:none}
+.story-card.img-ready::before{display:none}
 .story-card-img{width:100%;height:130px;object-fit:cover;object-position:center top;display:block}
 .story-card-emo{width:100%;height:130px;display:flex;align-items:center;justify-content:center;font-size:52px}
 .story-card-body{padding:12px 14px 14px;background:#fff}
@@ -2211,8 +2214,24 @@ html[data-theme="valley"] .coup-btn { background: #4a7c59; }
 html[data-theme="valley"] .toast { background: #4a7c59; }
 /* ── COLLECTION CARD IMAGE SUPPORT ────────────────────────────── */
 .ccat-img-wrap { position:relative; width:64px; height:64px; display:flex; align-items:center; justify-content:center; margin-bottom:4px; }
-.ccat-img { width:64px; height:64px; object-fit:cover; border-radius:14px; box-shadow:0 4px 14px rgba(0,0,0,.1); }
-.cc:hover .ccat-img { transform:scale(1.06); transition:transform .3s ease; }
+.ccat-img { width:64px; height:64px; object-fit:cover; border-radius:14px; box-shadow:0 4px 14px rgba(0,0,0,.1); opacity:0; transition:opacity .4s ease; }
+.ccat-img.loaded { opacity:1; }
+.cc:hover .ccat-img { transform:scale(1.06); transition:transform .3s ease, opacity .4s ease; }
+/* Skeleton shimmer on ccat-img-wrap while image loads */
+.ccat-img-wrap::before {
+  content:'';
+  position:absolute;
+  inset:0;
+  border-radius:14px;
+  background:linear-gradient(90deg, #e8e4dc 25%, #f5f0e8 50%, #e8e4dc 75%);
+  background-size:200% 100%;
+  animation:skelshimmer 1.4s infinite;
+  opacity:1;
+  transition:opacity .3s;
+  pointer-events:none;
+}
+.ccat-img-wrap.img-loaded::before { opacity:0; }
+@keyframes skelshimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
 .cemo { font-size:36px; display:block; line-height:1; }
 
 /* ── HERO PANEL: Single big image mode (admin-set hero_bg_image) ── */
@@ -2561,3 +2580,53 @@ html[data-theme="valley"] .hslide-btn-primary { background: #4a7c59; }
   .hslider-arrows { display: none; }
 }
 
+
+/* ═══════════════════════════════════════════════════════════════
+   UNIVERSAL IMAGE SKELETON / FADE-IN SYSTEM
+   All images start invisible; JS adds .img-ready when loaded.
+   .skel class on wrapper shows shimmer until image is ready.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Shimmer base — applied to any wrapper with class .skel */
+.skel {
+  position: relative;
+  overflow: hidden;
+}
+.skel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  background: linear-gradient(90deg, #e8e4dc 25%, #f0ece4 50%, #e8e4dc 75%);
+  background-size: 200% 100%;
+  animation: skelshimmer 1.4s infinite;
+  transition: opacity .35s ease;
+  pointer-events: none;
+}
+.skel.img-ready::before { opacity: 0; pointer-events: none; }
+/* Dark variant for state/header images */
+.skel-dark::before {
+  background: linear-gradient(90deg, #1a2a1d 25%, #243628 50%, #1a2a1d 75%);
+  background-size: 200% 100%;
+}
+
+/* Product image wrap — emoji shows as fallback, img fades over it */
+.piw img { opacity: 0; transition: opacity .45s ease; z-index: 1; }
+.piw.img-ready img { opacity: 1; }
+.piw.skel::before { border-radius: 0; z-index: 2; }
+
+/* State tab thumbnails */
+.stab-thumb img { opacity: 0; transition: opacity .4s ease; }
+.stab-thumb.img-ready img { opacity: 1; }
+.stab-thumb.skel::before { border-radius: 0; }
+
+/* State header image */
+.shdr-img-col img { opacity: 0; transition: opacity .6s ease; }
+.shdr-img-col.img-ready img { opacity: 1; }
+.shdr-img-col.skel::before { border-radius: 0; z-index: 2; }
+
+/* Story card image */
+.story-card-img { opacity: 0; transition: opacity .4s ease; display: block; }
+.story-card.img-ready .story-card-img { opacity: 1; }
+/* Hero banner background — starts as solid dark, fades in */
+.hslide[data-img-ready="true"] { transition: background-image .001s; }
