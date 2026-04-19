@@ -346,16 +346,16 @@
   <div class="tc"><span class="tico">🤝</span><div><div class="tlb">Fair Trade</div><div class="tds">Supporting local farmers always</div></div></div>
   <div class="tc"><span class="tico">🚚</span><div><div class="tlb">Free Shipping</div><div class="tds">On orders above ₹<span class="dynShipAmt">799</span></div></div></div>
 </div>
-<section class="sec coll-bg" id="shop" style="padding:36px 40px 48px;background:#eef4ee">
-  <div class="ct rv" style="margin-bottom:28px">
+<section class="sec coll-bg" id="shop" style="padding:36px 0 48px;background:#ede8d5">
+  <div class="ct rv" style="margin-bottom:28px;padding:0 40px">
     <div style="display:inline-block;border:1.5px solid #c9a84c;border-radius:20px;padding:5px 18px;font-family:'Lato',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;color:#a07830;text-transform:uppercase;margin-bottom:12px">Browse Collections</div>
     <h2 style="font-family:'Playfair Display',serif;font-size:clamp(28px,4vw,52px);font-weight:700;color:#1a3a1e;text-align:center;margin:0 0 10px;line-height:1.15;font-style:italic">What the Mountains Offer</h2>
     <p class="ssub">Every category tells a story of altitude, tradition, and purity.</p>
   </div>
-  <div class="cgrid-outer">
-    <button class="cgrid-arrow left" onclick="document.getElementById('cgrid').scrollBy({left:-440,behavior:'smooth'})">&#8249;</button>
-    <button class="cgrid-arrow right" onclick="document.getElementById('cgrid').scrollBy({left:440,behavior:'smooth'})">&#8250;</button>
-    <div class="cgrid" id="cgrid"></div>
+  <div style="position:relative;width:100%">
+    <button class="cgrid-arrow left" style="position:absolute;left:8px;top:50%;transform:translateY(-60%);z-index:10" onclick="document.getElementById('cgrid').scrollBy({left:-440,behavior:'smooth'})">&#8249;</button>
+    <button class="cgrid-arrow right" style="position:absolute;right:8px;top:50%;transform:translateY(-60%);z-index:10" onclick="document.getElementById('cgrid').scrollBy({left:440,behavior:'smooth'})">&#8250;</button>
+    <div id="cgrid"></div>
   </div>
 </section>
 <section class="sec" id="products" style="background:#f5f0e8;padding:36px 40px 48px">
