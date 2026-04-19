@@ -473,6 +473,10 @@ footer{background:#0b160d;padding:0;position:relative;overflow:hidden}
 .f-contact-text a{color:rgba(255,255,255,.45);transition:color .2s}
 .f-contact-text a:hover{color:#fff}
 
+/* Newsletter bridge section (between pay-sec and footer) */
+.newsletter-bridge{margin:0;padding:0}
+.newsletter-bridge .f-newsletter{border-top:2px solid #c8920a;border-bottom:2px solid rgba(200,146,10,.2);box-shadow:0 -6px 32px rgba(0,0,0,.18),inset 0 1px 0 rgba(200,146,10,.15)}
+
 /* Newsletter strip */
 .f-newsletter{background:linear-gradient(180deg,#0f2a14 0%,#1a3a1e 100%);padding:32px 40px 36px}
 .f-nl-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap}
