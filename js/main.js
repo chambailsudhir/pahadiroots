@@ -393,6 +393,30 @@ function initCollectionImages(settings) {
   var cgrid = document.getElementById('cgrid');
   if (!cgrid) return;
 
+  // Inject grid + card styles once
+  if (!document.getElementById('ccat-style-v2')) {
+    var st = document.createElement('style');
+    st.id = 'ccat-style-v2';
+    st.textContent = [
+      /* Grid: horizontal scroll, no overflow clipping so cards never show half */
+      '#cgrid{display:flex;gap:18px;overflow-x:auto;scroll-snap-type:x mandatory;padding:8px 4px 20px;scrollbar-width:none;}',
+      '#cgrid::-webkit-scrollbar{display:none;}',
+      /* Outer wrapper: no overflow:hidden so arrows don't clip cards */
+      '.cgrid-outer{position:relative;padding:0 44px;}',
+      /* Each card wrapper: label OUTSIDE below the box */
+      '.ccat-v2{flex:0 0 200px;display:flex;flex-direction:column;align-items:center;gap:12px;scroll-snap-align:start;text-decoration:none;cursor:pointer;transition:transform .2s;}',
+      '.ccat-v2:hover{transform:translateY(-4px);}',
+      /* The image box — golden border */
+      '.ccat-v2-box{width:200px;height:200px;border-radius:16px;border:2px solid #c9a84c;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;box-shadow:0 2px 12px rgba(201,168,76,.18);transition:border-color .2s,box-shadow .2s;}',
+      '.ccat-v2:hover .ccat-v2-box{border-color:#a07830;box-shadow:0 6px 24px rgba(201,168,76,.32);}',
+      '.ccat-v2-box img{width:100%;height:100%;object-fit:cover;display:block;}',
+      '.ccat-v2-box .ccat-v2-emo{font-size:64px;line-height:1;transition:opacity .3s;}',
+      /* Label OUTSIDE below the box */
+      '.ccat-v2-label{font-family:"Playfair Display",serif;font-size:15px;font-weight:700;color:#1a3a1e;text-align:center;line-height:1.3;padding:0 4px;}',
+    ].join('');
+    document.head.appendChild(st);
+  }
+
   // Emoji map for known slugs
   var emoMap = {
     honey:'🍯', jams:'🍓', juice:'🧃', oil:'🫚', oils:'🫚', ghee:'🥛',
@@ -409,7 +433,7 @@ function initCollectionImages(settings) {
     tea:'Himalayan Teas', grains:'Ancient Grains', rice:'Heritage Rice',
     pulses:'Pulses & Dal', dryfruits:'Dry Fruits', 'dry-fruits':'Dry Fruits',
     masala:'Masalas', coffee:'Mountain Coffee', saffron:'Kashmiri Saffron',
-    turmeric:'Turmeric', herbs:'Herbs', seeds:'Seeds', shilajit:'Shilajit'
+    turmeric:'Turmeric', herbs:'Herbs & Spices', seeds:'Seeds', shilajit:'Shilajit'
   };
 
   // Build slug→url and slug→hidden maps + order from settings
@@ -439,12 +463,11 @@ function initCollectionImages(settings) {
   // Clear grid and rebuild from scratch
   cgrid.innerHTML = '';
 
-  slugs.forEach(function(slug, i) {
+  function buildCard(slug, i) {
     var url   = imgMap[slug];
     var label = labelMap[slug] || (slug.charAt(0).toUpperCase() + slug.slice(1).replace(/-/g, ' '));
     var emoji = emoMap[slug] || emoMap.default;
 
-    // Build filter key — map slug to existing filter
     var filterKey = 'all';
     if (/honey/i.test(slug)) filterKey = 'honey';
     else if (/ghee|butter/i.test(slug)) filterKey = 'ghee';
@@ -455,62 +478,53 @@ function initCollectionImages(settings) {
 
     var card = document.createElement('a');
     card.href = '#products';
-    card.className = 'cc rv';
+    card.className = 'ccat-v2 rv';
     card.id = 'ccat-' + slug;
     card.style.transitionDelay = (i * 0.05) + 's';
     card.setAttribute('onclick', "setTimeout(function(){setFilter('" + filterKey + "',document.querySelector('[onclick*=" + filterKey + "]'))},50)");
 
-    var wrap = document.createElement('div');
-    wrap.className = 'ccat-img-wrap';
+    // Image box
+    var box = document.createElement('div');
+    box.className = 'ccat-v2-box';
 
-    var img = document.createElement('img');
-    img.className = 'ccat-img';
-    img.id = 'ccat-img-' + slug;
-    img.alt = label;
-    img.loading = 'lazy';
-    img.onload = function() {
-      wrap.classList.add('img-loaded');
-      var e = wrap.querySelector('.cemo');
-      if (e) e.style.opacity = '0';
-    };
-    img.onerror = function() { this.style.display = 'none'; };
-    img.src = url;
+    if (url) {
+      var img = document.createElement('img');
+      img.alt = label;
+      img.loading = 'lazy';
+      img.onerror = function() {
+        this.style.display = 'none';
+        var emoEl = document.createElement('span');
+        emoEl.className = 'ccat-v2-emo';
+        emoEl.textContent = emoji;
+        box.appendChild(emoEl);
+      };
+      img.src = url;
+      box.appendChild(img);
+    } else {
+      var emoEl = document.createElement('span');
+      emoEl.className = 'ccat-v2-emo';
+      emoEl.textContent = emoji;
+      box.appendChild(emoEl);
+    }
 
-    var emo = document.createElement('span');
-    emo.className = 'cemo';
-    emo.textContent = emoji;
+    // Label OUTSIDE the box
+    var lbl = document.createElement('div');
+    lbl.className = 'ccat-v2-label';
+    lbl.textContent = label;
 
-    var body = document.createElement('div');
-    body.className = 'cc-body';
-    body.innerHTML = '<div class="cname">' + label + '</div>';
-
-    wrap.appendChild(img);
-    wrap.appendChild(emo);
-    card.appendChild(wrap);
-    card.appendChild(body);
+    card.appendChild(box);
+    card.appendChild(lbl);
     cgrid.appendChild(card);
-  });
+  }
 
-  // If no images set yet, show placeholder cards with emoji only
-  if (slugs.length === 0) {
-    var defaults = [
-      {slug:'honey',label:'Wild Honey',emoji:'🍯',filter:'honey'},
-      {slug:'ghee',label:'A2 Ghee',emoji:'🥛',filter:'ghee'},
-      {slug:'spices',label:'Herbs & Spices',emoji:'🌿',filter:'spices'},
-      {slug:'tea',label:'Himalayan Teas',emoji:'🍵',filter:'tea'},
-      {slug:'oil',label:'Oils',emoji:'🫚',filter:'oil'},
-      {slug:'grains',label:'Ancient Grains',emoji:'🌾',filter:'all'},
-    ];
-    defaults.forEach(function(d, i) {
-      var card = document.createElement('a');
-      card.href = '#products';
-      card.className = 'cc rv';
-      card.id = 'ccat-' + d.slug;
-      card.style.transitionDelay = (i * 0.05) + 's';
-      card.setAttribute('onclick', "setTimeout(function(){setFilter('" + d.filter + "',document.querySelector('[onclick*=" + d.filter + "]'))},50)");
-      card.innerHTML = '<div class="ccat-img-wrap"><span class="cemo">' + d.emoji + '</span></div><div class="cc-body"><div class="cname">' + d.label + '</div></div>';
-      cgrid.appendChild(card);
-    });
+  if (slugs.length > 0) {
+    slugs.forEach(buildCard);
+  } else {
+    // Fallback defaults if admin has nothing configured
+    [{slug:'honey',filter:'honey'},{slug:'ghee',filter:'ghee'},
+     {slug:'spices',filter:'spices'},{slug:'tea',filter:'tea'},
+     {slug:'oil',filter:'oil'},{slug:'grains',filter:'all'}
+    ].forEach(function(d,i){ buildCard(d.slug, i); });
   }
 }
 
