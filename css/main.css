@@ -439,46 +439,74 @@ section.sec{padding:52px 40px}
 .po-note{font-size:10px;color:var(--tx3);margin-top:6px}
 .pay-secure{text-align:center;margin-top:16px;font-size:12px;color:var(--tx3)}
 
-/* ── PREMIUM FOOTER ── */
-footer{background:#0b160d url("data:image/svg+xml,%3Csvg viewBox='0 0 1440 480' xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='none' style='position:absolute;top:0;left:0;width:100%;height:100%;display:block'%3E    %3C!-- Night sky --%3E    %3Crect width='1440' height='480' fill='%230b160d'/%3E    %3C!-- Stars --%3E    %3Ccircle cx='80' cy='18' r='1.2' fill='%23fff' opacity='0.5'/%3E    %3Ccircle cx='200' cy='10' r='1' fill='%23e8b84b' opacity='0.6'/%3E    %3Ccircle cx='380' cy='22' r='1.5' fill='%23fff' opacity='0.4'/%3E    %3Ccircle cx='520' cy='8' r='1' fill='%23fff' opacity='0.5'/%3E    %3Ccircle cx='660' cy='16' r='1.2' fill='%23e8b84b' opacity='0.5'/%3E    %3Ccircle cx='790' cy='6' r='1' fill='%23fff' opacity='0.4'/%3E    %3Ccircle cx='950' cy='20' r='1.5' fill='%23fff' opacity='0.45'/%3E    %3Ccircle cx='1100' cy='10' r='1' fill='%23e8b84b' opacity='0.5'/%3E    %3Ccircle cx='1250' cy='18' r='1.2' fill='%23fff' opacity='0.4'/%3E    %3Ccircle cx='1390' cy='12' r='1' fill='%23fff' opacity='0.5'/%3E    %3Ccircle cx='440' cy='14' r='1' fill='%23fff' opacity='0.35'/%3E    %3Ccircle cx='870' cy='12' r='1' fill='%23fff' opacity='0.35'/%3E    %3C!-- Extra stars for tall sky --%3E    %3Ccircle cx='140' cy='60' r='1' fill='%23fff' opacity='0.3'/%3E    %3Ccircle cx='300' cy='80' r='1.2' fill='%23e8b84b' opacity='0.4'/%3E    %3Ccircle cx='500' cy='50' r='1' fill='%23fff' opacity='0.35'/%3E    %3Ccircle cx='700' cy='70' r='1.5' fill='%23fff' opacity='0.3'/%3E    %3Ccircle cx='900' cy='55' r='1' fill='%23e8b84b' opacity='0.4'/%3E    %3Ccircle cx='1050' cy='75' r='1.2' fill='%23fff' opacity='0.35'/%3E    %3Ccircle cx='1200' cy='45' r='1' fill='%23fff' opacity='0.3'/%3E    %3Ccircle cx='1350' cy='65' r='1.5' fill='%23e8b84b' opacity='0.35'/%3E    %3Ccircle cx='180' cy='110' r='1' fill='%23fff' opacity='0.25'/%3E    %3Ccircle cx='420' cy='130' r='1.2' fill='%23fff' opacity='0.2'/%3E    %3Ccircle cx='620' cy='100' r='1' fill='%23fff' opacity='0.25'/%3E    %3Ccircle cx='820' cy='120' r='1' fill='%23e8b84b' opacity='0.2'/%3E    %3Ccircle cx='1020' cy='105' r='1.2' fill='%23fff' opacity='0.25'/%3E    %3Ccircle cx='1320' cy='115' r='1' fill='%23fff' opacity='0.2'/%3E    %3C!-- Crescent moon --%3E    %3Ccircle cx='1370' cy='32' r='16' fill='%23fffde7' opacity='0.1'/%3E    %3Ccircle cx='1376' cy='29' r='14' fill='%230b160d'/%3E    %3C!-- Far mountains (lightest — snow peaks) --%3E    %3Cpolygon points='0,450 80,362 160,415 260,338 380,402 480,350 580,408 680,342 780,398 880,348 980,400 1080,350 1180,405 1280,358 1380,392 1440,375 1440,480 0,480' fill='%231e3d24'/%3E    %3C!-- Snow caps on tallest peaks --%3E    %3Cpolygon points='254,338 260,338 278,358 242,358' fill='%233d6b47' opacity='0.7'/%3E    %3Cpolygon points='674,342 680,342 698,364 662,364' fill='%233d6b47' opacity='0.6'/%3E    %3Cpolygon points='874,348 880,348 898,370 862,370' fill='%233d6b47' opacity='0.6'/%3E    %3C!-- Mid mountains --%3E    %3Cpolygon points='0,468 60,412 140,446 240,388 360,432 460,392 560,438 660,376 760,428 860,390 960,432 1060,386 1160,430 1260,390 1360,428 1440,402 1440,480 0,480' fill='%23152b18'/%3E    %3C!-- Pine trees — LEFT --%3E    %3Cg fill='%230d2010'%3E     %3Cpolygon points='22,478 38,436 54,478'/%3E     %3Cpolygon points='16,478 38,422 60,478'/%3E     %3Cpolygon points='55,478 70,440 85,478'/%3E     %3Cpolygon points='49,478 70,426 91,478'/%3E     %3Cpolygon points='90,478 105,444 120,478'/%3E     %3Cpolygon points='125,478 140,438 155,478'/%3E     %3Cpolygon points='119,478 140,424 161,478'/%3E     %3Crect x='34' y='474' width='8' height='7' fill='%23060f07'/%3E     %3Crect x='66' y='474' width='8' height='7' fill='%23060f07'/%3E     %3Crect x='136' y='474' width='8' height='7' fill='%23060f07'/%3E    %3C/g%3E    %3C!-- Pine trees — RIGHT --%3E    %3Cg fill='%230d2010'%3E     %3Cpolygon points='1284,478 1300,436 1316,478'/%3E     %3Cpolygon points='1278,478 1300,422 1322,478'/%3E     %3Cpolygon points='1318,478 1334,440 1350,478'/%3E     %3Cpolygon points='1312,478 1334,426 1356,478'/%3E     %3Cpolygon points='1355,478 1372,438 1389,478'/%3E     %3Cpolygon points='1393,478 1410,442 1427,478'/%3E     %3Cpolygon points='1386,478 1410,426 1434,478'/%3E     %3Crect x='1296' y='474' width='8' height='7' fill='%23060f07'/%3E     %3Crect x='1330' y='474' width='8' height='7' fill='%23060f07'/%3E     %3Crect x='1406' y='474' width='8' height='7' fill='%23060f07'/%3E    %3C/g%3E    %3C!-- Village hut LEFT --%3E    %3Cg fill='%230d2010'%3E     %3Crect x='218' y='448' width='62' height='36'/%3E     %3Cpolygon points='204,452 249,416 294,452'/%3E     %3Crect x='240' y='462' width='16' height='22'/%3E     %3Crect x='220' y='453' width='13' height='11' fill='%23c8920a' opacity='0.4'/%3E     %3Crect x='258' y='453' width='13' height='11' fill='%23c8920a' opacity='0.4'/%3E    %3C/g%3E    %3Cellipse cx='253' cy='411' rx='3' ry='6' fill='%231e3d24' opacity='0.6'/%3E    %3Cellipse cx='255' cy='401' rx='2' ry='4' fill='%231e3d24' opacity='0.35'/%3E    %3C!-- Village hut RIGHT --%3E    %3Cg fill='%230d2010'%3E     %3Crect x='1158' y='445' width='66' height='38'/%3E     %3Cpolygon points='1145,449 1191,412 1237,449'/%3E     %3Crect x='1183' y='460' width='17' height='24'/%3E     %3Crect x='1161' y='450' width='14' height='11' fill='%23c8920a' opacity='0.4'/%3E     %3Crect x='1200' y='450' width='14' height='11' fill='%23c8920a' opacity='0.4'/%3E    %3C/g%3E    %3Cellipse cx='1196' cy='407' rx='3' ry='6' fill='%231e3d24' opacity='0.6'/%3E    %3Cellipse cx='1198' cy='397' rx='2' ry='4' fill='%231e3d24' opacity='0.35'/%3E    %3C!-- Center hut --%3E    %3Cg fill='%230d2010'%3E     %3Crect x='690' y='456' width='42' height='26'/%3E     %3Cpolygon points='679,459 711,434 743,459'/%3E     %3Crect x='703' y='468' width='12' height='14'/%3E     %3Crect x='693' y='460' width='10' height='9' fill='%23c8920a' opacity='0.3'/%3E    %3C/g%3E    %3C!-- Ground --%3E    %3Crect x='0' y='475' width='1440' height='5' fill='%23060f07'/%3E   %3C/svg%3E") no-repeat bottom center/cover;padding:0;position:relative}
-.f-newsletter{background:linear-gradient(180deg,#0f2a14 0%,#1a3a1e 100%);padding:40px 40px 44px;border-bottom:none}
-.f-nl-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap}
-.f-nl-text h4{font-family:'Playfair Display',serif;font-size:20px;font-weight:900;color:#fff;margin-bottom:4px}
-.f-nl-text p{font-size:13px;color:rgba(255,255,255,.55)}
-.f-nl-form{display:flex;gap:0;border-radius:10px;overflow:hidden;border:1.5px solid rgba(255,255,255,.18);min-width:320px}
-.f-nl-inp{flex:1;padding:13px 18px;background:rgba(255,255,255,.07);border:none;color:#fff;font-size:13.5px;font-family:'Lato',sans-serif;outline:none}
-.f-nl-inp::placeholder{color:rgba(255,255,255,.35)}
-.f-nl-btn{padding:13px 22px;background:var(--gd);color:#1a0800;font-weight:800;font-size:13px;border:none;cursor:pointer;font-family:'Lato',sans-serif;transition:background .2s;white-space:nowrap}
-.f-nl-btn:hover{background:var(--gd2)}
-.f-main{max-width:1200px;margin:0 auto;padding:44px 40px 32px;display:grid;grid-template-columns:2fr 1fr 1fr 1.3fr;gap:40px;border-bottom:1px solid rgba(255,255,255,.06)}
-.f-brand-desc{font-size:12.5px;color:rgba(255,255,255,.42);line-height:1.8;margin:12px 0 20px}
+/* ── HIMACHALI CHAMBA RUMAL FOOTER ── */
+footer{background:#0b160d;padding:0;position:relative;overflow:hidden}
+
+/* Top frieze band */
+.f-art-frieze{background:#1a0d2e;border-top:2px solid #c8920a;border-bottom:2px solid #c8920a;line-height:0;overflow:hidden}
+.f-art-frieze svg{display:block;width:100%}
+
+/* Brand row: medallion + text + vine */
+.f-brand-row{display:flex;align-items:center;gap:28px;padding:28px 40px 22px;border-bottom:1px solid rgba(200,146,10,.15);max-width:1200px;margin:0 auto;box-sizing:border-box}
+.f-brand-col{flex:1;min-width:0}
+.f-brand-name{font-family:'Playfair Display',serif;font-size:22px;font-weight:900;color:#fff;line-height:1.1;margin-bottom:3px}
+.f-brand-sub{font-size:10px;color:#c8920a;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:10px}
+.f-brand-desc{font-size:12.5px;color:rgba(255,255,255,.42);line-height:1.8;margin-bottom:14px}
 .f-soc-row{display:flex;gap:8px;flex-wrap:wrap}
-.f-soc{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;transition:all .2s;color:rgba(255,255,255,.6);text-decoration:none}
-.f-soc:hover{background:var(--g2);border-color:rgba(255,255,255,.3);color:#fff}
-.f-fssai{margin-top:20px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:10px 14px;display:inline-flex;align-items:center;gap:10px}
-.f-fssai-badge{background:#fff;border-radius:6px;padding:4px 8px;font-size:11px;font-weight:900;color:#1a6b1a;letter-spacing:.5px}
+.f-soc{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.06);border:1px solid rgba(200,146,10,.3);display:flex;align-items:center;justify-content:center;transition:all .2s;color:rgba(255,255,255,.6);text-decoration:none}
+.f-soc:hover{background:rgba(200,146,10,.15);border-color:#c8920a;color:#fff}
+.f-fssai{margin-top:16px;background:rgba(255,255,255,.04);border:1px solid rgba(200,146,10,.2);border-radius:10px;padding:9px 13px;display:inline-flex;align-items:center;gap:10px}
+.f-fssai-badge{background:#fff;border-radius:5px;padding:3px 7px;font-size:11px;font-weight:900;color:#1a6b1a;letter-spacing:.5px}
 .f-fssai-num{font-size:10.5px;color:rgba(255,255,255,.4);margin-top:2px}
-.fh{font-size:10.5px;font-weight:800;letter-spacing:1.8px;color:var(--gd2);margin-bottom:14px;text-transform:uppercase}
-.ful{list-style:none;display:flex;flex-direction:column;gap:9px}
-.ful li a{font-size:13px;color:rgba(255,255,255,.48);transition:all .2s;display:flex;align-items:center;gap:6px}
+.f-vine-panel{flex-shrink:0;align-self:stretch;display:flex;align-items:center}
+.f-vine-panel svg{display:block}
+
+/* Main links grid */
+.f-main{max-width:1200px;margin:0 auto;padding:22px 40px 18px;display:grid;grid-template-columns:1fr 1fr 1.2fr;gap:40px}
+.fh{font-size:10px;font-weight:800;letter-spacing:2px;color:#c8920a;text-transform:uppercase;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid rgba(200,146,10,.2)}
+.ful{list-style:none;display:flex;flex-direction:column;gap:8px}
+.ful li a{font-size:12.5px;color:rgba(255,255,255,.45);transition:all .2s;display:flex;align-items:center;gap:6px}
 .ful li a:hover{color:#fff;padding-left:4px}
-.f-contact-item{display:flex;align-items:flex-start;gap:10px;margin-bottom:11px}
-.f-contact-icon{font-size:15px;flex-shrink:0;margin-top:1px}
-.f-contact-text{font-size:12.5px;color:rgba(255,255,255,.48);line-height:1.65}
-.f-contact-text a{color:rgba(255,255,255,.48);transition:color .2s}
+.f-contact-item{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px}
+.f-contact-icon{font-size:14px;flex-shrink:0;margin-top:1px}
+.f-contact-text{font-size:12.5px;color:rgba(255,255,255,.45);line-height:1.65}
+.f-contact-text a{color:rgba(255,255,255,.45);transition:color .2s}
 .f-contact-text a:hover{color:#fff}
-.f-grievance{margin-top:14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px 14px}
-.f-grievance-label{font-size:9.5px;font-weight:800;letter-spacing:1px;color:var(--gd2);text-transform:uppercase;margin-bottom:4px}
-.f-grievance-name{font-size:12.5px;color:rgba(255,255,255,.7);font-weight:700}
-.f-grievance-email{font-size:11.5px;color:rgba(255,255,255,.4)}
-.f-divider{max-width:1200px;margin:0 40px;border:none;border-top:1px solid rgba(255,255,255,.07);position:relative;z-index:2}
-.f-bot{max-width:1200px;margin:0 auto;padding:18px 40px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;position:relative;z-index:2}
-.f-bot-left{font-size:12px;color:rgba(255,255,255,.32);font-family:'Lato',sans-serif;white-space:nowrap}
-.f-bot-left strong.fd{color:rgba(255,255,255,.85) !important;font-weight:700;font-style:normal}
-.f-bot-tag{font-size:11.5px;color:rgba(255,255,255,.3);font-style:italic;white-space:nowrap}
+
+/* Newsletter strip */
+.f-newsletter{background:linear-gradient(180deg,#0f2a14 0%,#1a3a1e 100%);padding:32px 40px 36px}
+.f-nl-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap}
+.f-nl-text h4{font-family:'Playfair Display',serif;font-size:18px;font-weight:900;color:#fff;margin-bottom:4px}
+.f-nl-text p{font-size:13px;color:rgba(255,255,255,.55)}
+.f-nl-form{display:flex;border-radius:10px;overflow:hidden;border:1.5px solid rgba(255,255,255,.18);min-width:300px}
+.f-nl-inp{flex:1;padding:12px 16px;background:rgba(255,255,255,.07);border:none;color:#fff;font-size:13px;font-family:'Lato',sans-serif;outline:none}
+.f-nl-inp::placeholder{color:rgba(255,255,255,.35)}
+.f-nl-btn{padding:12px 20px;background:var(--gd);color:#1a0800;font-weight:800;font-size:13px;border:none;cursor:pointer;font-family:'Lato',sans-serif;transition:background .2s;white-space:nowrap}
+.f-nl-btn:hover{background:var(--gd2)}
+
+/* Diamond vine divider */
+.f-vine-divider{display:block;width:100%}
+
+/* Bottom bar */
+.f-bot{max-width:1200px;margin:0 auto;padding:12px 40px 16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;position:relative;z-index:2}
+.f-bot-left{font-size:12px;color:rgba(255,255,255,.28);font-family:'Lato',sans-serif}
+.f-bot-left strong.fd{color:rgba(255,255,255,.8)!important;font-weight:700}
+.f-bot-tag{font-size:11.5px;color:rgba(200,146,10,.45);font-style:italic;white-space:nowrap}
 .fd{color:var(--gd);font-weight:700}
-@media(max-width:900px){.f-main{grid-template-columns:1fr 1fr;gap:28px}.f-nl-inner{flex-direction:column;align-items:flex-start}.f-nl-form{min-width:100%;width:100%}}
-@media(max-width:560px){.f-main{grid-template-columns:1fr;padding:32px 20px 24px}.f-newsletter{padding:28px 20px}.f-bot{padding:16px 20px;flex-direction:column;text-align:center;gap:8px}.f-divider{margin:0 20px}}
+
+@media(max-width:900px){
+  .f-main{grid-template-columns:1fr 1fr;gap:24px}
+  .f-brand-row{flex-wrap:wrap;gap:16px}
+  .f-vine-panel{display:none}
+  .f-nl-inner{flex-direction:column;align-items:flex-start}
+  .f-nl-form{min-width:100%;width:100%}
+}
+@media(max-width:560px){
+  .f-brand-row{padding:20px;flex-direction:column;align-items:flex-start}
+  .f-main{grid-template-columns:1fr;padding:20px 20px 16px}
+  .f-newsletter{padding:24px 20px}
+  .f-bot{padding:12px 20px;flex-direction:column;text-align:center;gap:6px}
+}
 
 /* SEARCH */
 .srch-overlay{position:fixed;inset:0;z-index:1200;background:rgba(0,0,0,.65);display:none;align-items:flex-start;justify-content:center;padding-top:80px;backdrop-filter:blur(4px)}
