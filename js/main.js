@@ -515,56 +515,66 @@ function initCollectionImages(settings) {
   if (slugs.length > 0) {
     slugs.forEach(buildCard);
   } else {
-    // Fallback defaults if admin has nothing configured
     [{slug:'honey',filter:'honey'},{slug:'ghee',filter:'ghee'},
      {slug:'spices',filter:'spices'},{slug:'tea',filter:'tea'},
      {slug:'oil',filter:'oil'},{slug:'grains',filter:'all'}
     ].forEach(function(d,i){ buildCard(d.slug, i); });
   }
 
-  // ── AUTO-SCROLL (train effect) ──────────────────────────────────
+  // ── AUTO-SCROLL: one card at a time, every 2.5s ─────────────────
+  var isPaused = false;
+  var isScrolling = false;
+
+  function scrollOneCard() {
+    if (isPaused || isScrolling) return;
+    var cards = cgrid.querySelectorAll('.ccat-v2');
+    if (!cards.length) return;
+    var cardWidth = cards[0].offsetWidth + 16; // card + gap
+    var halfWidth = cgrid.scrollWidth / 2;
+    isScrolling = true;
+
+    var start = cgrid.scrollLeft;
+    var target = start + cardWidth;
+    var duration = 500; // ms for slide animation
+    var startTime = null;
+
+    function easeInOut(t) { return t < 0.5 ? 2*t*t : -1+(4-2*t)*t; }
+
+    function animate(ts) {
+      if (!startTime) startTime = ts;
+      var elapsed = ts - startTime;
+      var progress = Math.min(elapsed / duration, 1);
+      cgrid.scrollLeft = start + (target - start) * easeInOut(progress);
+
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      } else {
+        // Seamless loop — if past halfway, snap back silently
+        if (cgrid.scrollLeft >= halfWidth) {
+          cgrid.scrollLeft = cgrid.scrollLeft - halfWidth;
+        }
+        isScrolling = false;
+      }
+    }
+    requestAnimationFrame(animate);
+  }
+
   // Duplicate cards for seamless infinite loop
-  var originalCards = Array.from(cgrid.children);
-  originalCards.forEach(function(card) {
+  var origCards = Array.from(cgrid.children);
+  origCards.forEach(function(card) {
     var clone = card.cloneNode(true);
     clone.setAttribute('aria-hidden', 'true');
     cgrid.appendChild(clone);
   });
 
-  var scrollSpeed = 0.6; // px per frame — adjust for faster/slower
-  var isPaused = false;
-  var rafId = null;
+  var timer = setInterval(scrollOneCard, 2500);
 
-  function autoScroll() {
-    if (!isPaused) {
-      cgrid.scrollLeft += scrollSpeed;
-      // When we've scrolled one full set of originals, jump back seamlessly
-      var halfWidth = cgrid.scrollWidth / 2;
-      if (cgrid.scrollLeft >= halfWidth) {
-        cgrid.scrollLeft = cgrid.scrollLeft - halfWidth;
-      }
-    }
-    rafId = requestAnimationFrame(autoScroll);
-  }
-
-  // Pause on hover or touch
   cgrid.addEventListener('mouseenter', function() { isPaused = true; });
   cgrid.addEventListener('mouseleave', function() { isPaused = false; });
   cgrid.addEventListener('touchstart', function() { isPaused = true; }, {passive:true});
   cgrid.addEventListener('touchend',   function() {
     setTimeout(function() { isPaused = false; }, 2000);
   }, {passive:true});
-
-  // Also pause when user manually scrolls
-  var userScrolling = false;
-  cgrid.addEventListener('scroll', function() {
-    if (isPaused) return; // already paused by hover
-    userScrolling = true;
-    clearTimeout(cgrid._scrollTimer);
-    cgrid._scrollTimer = setTimeout(function() { userScrolling = false; }, 1500);
-  });
-
-  rafId = requestAnimationFrame(autoScroll);
 }
 
 async function loadData() {
