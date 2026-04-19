@@ -453,11 +453,16 @@ function initCollectionImages(settings) {
     img.id = 'ccat-img-' + slug;
     img.alt = label;
 
+    var emo = document.createElement('span');
+    emo.className = 'cemo';
+    emo.textContent = '🌿';
+
     var body = document.createElement('div');
     body.className = 'cc-body';
     body.innerHTML = '<div class="cname">' + label + '</div><div class="cnum"></div>';
 
     wrap.appendChild(img);
+    wrap.appendChild(emo);
     card.appendChild(wrap);
     card.appendChild(body);
     cgrid.appendChild(card);
