@@ -398,16 +398,16 @@ function initCollectionImages(settings) {
     var st = document.createElement('style');
     st.id = 'ccat-style-v2';
     st.textContent = [
-      /* Grid: horizontal scroll, no overflow clipping so cards never show half */
-      '#cgrid{display:flex;gap:18px;overflow-x:auto;scroll-snap-type:x mandatory;padding:8px 4px 20px;scrollbar-width:none;}',
+      /* Grid: full width, 6 cards visible, horizontal scroll for extras */
+      '#cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(0,1fr));grid-auto-flow:column;grid-auto-columns:calc((100vw - 120px) / 6);gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;padding:8px 44px 24px;scrollbar-width:none;box-sizing:border-box;}',
       '#cgrid::-webkit-scrollbar{display:none;}',
-      /* Outer wrapper: no overflow:hidden so arrows don't clip cards */
-      '.cgrid-outer{position:relative;padding:0 44px;}',
+      /* Outer wrapper */
+      '[id=cgrid]{}'  ,
       /* Each card wrapper: label OUTSIDE below the box */
-      '.ccat-v2{flex:0 0 200px;display:flex;flex-direction:column;align-items:center;gap:12px;scroll-snap-align:start;text-decoration:none;cursor:pointer;transition:transform .2s;}',
+      '.ccat-v2{display:flex;flex-direction:column;align-items:center;gap:12px;scroll-snap-align:start;text-decoration:none;cursor:pointer;transition:transform .2s;width:100%;}',
       '.ccat-v2:hover{transform:translateY(-4px);}',
-      /* The image box — golden border */
-      '.ccat-v2-box{width:200px;height:200px;border-radius:16px;border:2px solid #c9a84c;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;box-shadow:0 2px 12px rgba(201,168,76,.18);transition:border-color .2s,box-shadow .2s;}',
+      /* The image box — golden border, square using aspect-ratio */
+      '.ccat-v2-box{width:100%;aspect-ratio:1/1;border-radius:16px;border:2px solid #c9a84c;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;box-shadow:0 2px 12px rgba(201,168,76,.18);transition:border-color .2s,box-shadow .2s;}',
       '.ccat-v2:hover .ccat-v2-box{border-color:#a07830;box-shadow:0 6px 24px rgba(201,168,76,.32);}',
       '.ccat-v2-box img{width:100%;height:100%;object-fit:cover;display:block;}',
       '.ccat-v2-box .ccat-v2-emo{font-size:64px;line-height:1;transition:opacity .3s;}',
