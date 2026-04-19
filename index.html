@@ -358,7 +358,10 @@
   </div>
 </section>
 <section class="sec" id="products" style="background:#fff;padding:36px 40px 48px">
-  <div class="ct rv"><div class="chip">Bestsellers</div><h2 class="sh2">Our Finest Offerings</h2><p class="ssub">Curated from 10 Himalayan states — the products our customers love most.</p></div>
+  <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:0">
+    <div class="ct rv" style="margin-bottom:0;text-align:left"><div class="chip">Bestsellers</div><h2 class="sh2">Our Finest Offerings</h2><p class="ssub">Curated from 10 Himalayan states — the products our customers love most.</p></div>
+    <a href="all-products.html" class="show-all-btn" style="display:inline-flex;align-items:center;gap:8px;background:var(--g);color:#fff;font-family:'Lato',sans-serif;font-size:13px;font-weight:800;letter-spacing:.5px;padding:11px 22px;border-radius:24px;text-decoration:none;transition:all .2s;white-space:nowrap;flex-shrink:0" onmouseover="this.style.background='var(--g2)';this.style.transform='translateY(-1px)'" onmouseout="this.style.background='var(--g)';this.style.transform='translateY(0)'">🌿 Show All Products <span style="font-size:16px;line-height:1">→</span></a>
+  </div>
   <!-- Filter bar -->
   <div class="filter-bar" id="filterBar">
     <button class="filter-btn active" onclick="setFilter('all',this)">🌿 All</button>
@@ -378,6 +381,9 @@
   </div>
   <div class="pgrid" id="pgrid"></div>
   <div id="noResults" style="display:none;text-align:center;padding:40px;color:var(--tx3);font-family:'Playfair Display',serif;font-style:italic">No products found for this filter 🏔️</div>
+  <div id="showMoreWrap" style="text-align:center;margin-top:32px;display:none">
+    <a href="all-products.html" id="viewAllBtn" style="display:inline-flex;align-items:center;gap:10px;background:#fff;border:2px solid var(--g);color:var(--g);font-family:Lato,sans-serif;font-size:13.5px;font-weight:800;letter-spacing:.5px;padding:13px 32px;border-radius:24px;text-decoration:none;transition:all .2s" onmouseover="this.style.background=getComputedStyle(document.documentElement).getPropertyValue('--g');this.style.color='#fff'" onmouseout="this.style.background='#fff';this.style.color=getComputedStyle(document.documentElement).getPropertyValue('--g')">View All Products <span id="totalProdCount"></span> →</a>
+  </div>
 </section>
 <section class="sec state-sec" id="states">
   <div class="rv" id="regions" style="margin-bottom:20px">

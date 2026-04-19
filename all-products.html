@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og: https://ogp.me/ns#">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>All Products – 5 Pahadi Roots | Pure Himalayan Natural Products</title>
+<meta name="description" content="Browse all pure Himalayan natural products at 5 Pahadi Roots — wild honey, A2 Bilona ghee, Kashmiri saffron, teas, spices, oils & more. Sourced directly from mountain farmers.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://pahadiroots.com/all-products">
+<link rel="icon" type="image/png" href="https://ulyrhnpoiypuvaurlqqi.supabase.co/storage/v1/object/public/pahadi-images/5%20pahadi%20roots.png">
+<link rel="apple-touch-icon" href="https://ulyrhnpoiypuvaurlqqi.supabase.co/storage/v1/object/public/pahadi-images/5%20pahadi%20roots.png">
+<meta name="theme-color" content="#1a3a1e">
+
+<!-- OG -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="5 Pahadi Roots">
+<meta property="og:title" content="All Products – 5 Pahadi Roots">
+<meta property="og:description" content="Browse all pure Himalayan natural products — honey, ghee, saffron, teas, spices & more.">
+<meta property="og:url" content="https://pahadiroots.com/all-products">
+<meta property="og:locale" content="en_IN">
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Lato:wght@300;400;700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<link rel="stylesheet" href="/css/main.css">
+
+<style>
+  /* Page-specific styles */
+  .ap-hero {
+    background: var(--g);
+    padding: 28px 40px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .ap-hero-left .ap-breadcrumb {
+    font-size: 11px;
+    color: rgba(255,255,255,.55);
+    font-family: 'Lato', sans-serif;
+    font-weight: 700;
+    letter-spacing: .5px;
+    margin-bottom: 6px;
+  }
+  .ap-hero-left .ap-breadcrumb a {
+    color: rgba(255,255,255,.55);
+    text-decoration: none;
+  }
+  .ap-hero-left .ap-breadcrumb a:hover { color: rgba(255,255,255,.85); }
+  .ap-hero-left .ap-breadcrumb span { margin: 0 6px; }
+  .ap-hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(22px, 3.5vw, 38px);
+    font-weight: 700;
+    color: #fff;
+    margin: 0;
+    line-height: 1.2;
+  }
+  .ap-hero-sub {
+    font-size: 13px;
+    color: rgba(255,255,255,.65);
+    font-family: 'Lato', sans-serif;
+    margin-top: 4px;
+  }
+  .ap-count-badge {
+    background: rgba(255,255,255,.13);
+    border: 1px solid rgba(255,255,255,.2);
+    color: #fff;
+    font-family: 'Lato', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 8px 18px;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+  #apProductCount { font-weight: 900; color: var(--gd2, #e8b84b); }
+
+  /* Products section on this page — no top margin since hero replaces it */
+  .ap-products-sec {
+    background: #fff;
+    padding: 28px 40px 56px;
+  }
+  .ap-products-sec .filter-bar {
+    margin-top: 0;
+    margin-bottom: 28px;
+  }
+
+  @media (max-width: 600px) {
+    .ap-hero { padding: 20px 16px 18px; }
+    .ap-products-sec { padding: 20px 12px 40px; }
+  }
+</style>
+</head>
+<body data-theme="pahadi">
+
+<!-- Announcement bar -->
+<div class="ann" id="annBar">🌿 <span id="annText">Free Shipping above ₹<span id="annShipAmt">799</span> &nbsp;|&nbsp; <a href="/#pay-sec">UPI · Cards · COD</a> &nbsp;|&nbsp; 10 Himalayan States Covered</span></div>
+
+<!-- Ticker -->
+<div class="ticker-wrap" id="tickerWrap" aria-label="Announcements">
+  <div class="ticker-track" id="tickerTrack">
+    <span class="ticker-item" data-ticker="1">🎁 Use code <strong>WELCOME50</strong> <span>·</span> ₹50 off your first order</span>
+    <span class="ticker-item" data-ticker="2">🚚 Free shipping <span>·</span> On orders above ₹<span class="dynShipAmt">799</span> — Pan India</span>
+    <span class="ticker-item" data-ticker="3">🌿 100% Natural <span>·</span> Lab-tested, pure</span>
+    <span class="ticker-item" data-ticker="4">🏔️ Direct from farmers <span>·</span> 200+ mountain families</span>
+    <span class="ticker-item" data-ticker="5">⭐ Rated 4.9/5 <span>·</span> 10,000+ happy customers</span>
+    <span class="ticker-item" data-ticker="1">🎁 Use code <strong>WELCOME50</strong> <span>·</span> ₹50 off your first order</span>
+    <span class="ticker-item" data-ticker="2">🚚 Free shipping <span>·</span> On orders above ₹<span class="dynShipAmt">799</span> — Pan India</span>
+    <span class="ticker-item" data-ticker="3">🌿 100% Natural <span>·</span> Lab-tested, pure</span>
+    <span class="ticker-item" data-ticker="4">🏔️ Direct from farmers <span>·</span> 200+ mountain families</span>
+    <span class="ticker-item" data-ticker="5">⭐ Rated 4.9/5 <span>·</span> 10,000+ happy customers</span>
+  </div>
+</div>
+
+<!-- Nav — identical to index.html -->
+<nav id="mNav">
+  <a href="https://pahadiroots.com" class="logo">
+    <div class="logo-icon"><img src="https://ulyrhnpoiypuvaurlqqi.supabase.co/storage/v1/object/public/pahadi-images/5%20pahadi%20roots.png" alt="5 Pahadi Roots" style="height:40px;width:40px;object-fit:contain" onerror="this.style.display='none'"></div>
+    <div class="logo-words"><div class="logo-name">5 Pahadi Roots</div><div class="logo-tl">Himalayan Natural Store</div></div>
+  </a>
+  <ul class="nav-links">
+    <li><a href="/">Home</a></li><li><a href="/our-story">Our Story</a></li><li><a href="/all-products.html" style="color:var(--g);font-weight:900">Shop</a></li>
+    <li><a href="/#states">By State</a></li><li><a href="/#regions">Regions</a></li><li><a href="/#pay-sec">Payment</a></li><li><a href="/#contact">Contact</a></li>
+  </ul>
+  <div class="nav-right">
+    <button class="nib" onclick="openSearch()" title="Search products" aria-label="Search">🔍</button>
+    <button class="nib" onclick="openWishlist()" title="Wishlist" aria-label="Wishlist" style="position:relative">❤️<span class="wl-badge" id="wlBadge"></span></button>
+    <div style="position:relative" id="acctHoverZone" onmouseenter="showAcctDropdown()" onmouseleave="hideAcctDropdown()">
+      <button class="nib" id="accountBtn" onclick="goToAccount()" title="My Account" aria-label="My Account" style="position:relative">👤<span id="accountDot" style="display:none;position:absolute;top:4px;right:4px;width:7px;height:7px;background:#2d6a4f;border-radius:50%;border:1.5px solid #fff"></span></button>
+      <div id="acctDropdown" style="display:none;position:absolute;top:100%;right:0;width:220px;background:#fff;border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,.15);border:1px solid #f0f0f0;z-index:9999;overflow:hidden;padding:8px 0">
+        <div style="padding:12px 16px;border-bottom:1px solid #f5f5f5">
+          <div style="font-size:13px;font-weight:800;color:#1a3a1e" id="dd-name">Welcome!</div>
+          <div style="font-size:11px;color:#888;margin-top:2px" id="dd-sub">Login to manage your account</div>
+        </div>
+        <div onclick="closeAcctDropdown();goToAccount()" style="padding:11px 16px;font-size:13px;color:#333;cursor:pointer;display:flex;align-items:center;gap:10px" onmouseover="this.style.background='#f9f9f9'" onmouseout="this.style.background=''"><span>📦</span> My Orders</div>
+        <div onclick="closeAcctDropdown();openWishlist()" style="padding:11px 16px;font-size:13px;color:#333;cursor:pointer;display:flex;align-items:center;gap:10px" onmouseover="this.style.background='#f9f9f9'" onmouseout="this.style.background=''"><span>🤍</span> Wishlist</div>
+        <div onclick="closeAcctDropdown();goToAccount()" style="padding:11px 16px;font-size:13px;color:#333;cursor:pointer;display:flex;align-items:center;gap:10px" onmouseover="this.style.background='#f9f9f9'" onmouseout="this.style.background=''"><span>👤</span> Profile & Address</div>
+        <div style="padding:8px 16px;border-top:1px solid #f5f5f5">
+          <button id="dd-login-btn" onclick="closeAcctDropdown();openAuth()" style="width:100%;padding:9px;background:#1a3a1e;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer">Login / Sign Up</button>
+          <button id="dd-logout-btn" onclick="closeAcctDropdown();logoutAccount()" style="display:none;width:100%;padding:9px;background:#fdecea;color:#c0392b;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;margin-top:6px">Logout</button>
+        </div>
+      </div>
+    </div>
+    <button class="dark-btn" onclick="toggleDark()" id="darkBtn" title="Toggle dark mode">🌙</button>
+    <div class="theme-switcher-wrap">
+      <button class="theme-btn" onclick="openThemeSwitcher()" title="Switch colour theme">🎨 Theme</button>
+      <div class="theme-panel" id="themeSwitcherPanel">
+        <div class="theme-panel-title">Choose Theme</div>
+        <div class="theme-opts">
+          <button class="theme-opt active" data-theme="pahadi" onclick="applyTheme('pahadi');closeThemeSwitcher()">
+            <div class="theme-swatch swatch-pahadi"></div>
+            <div class="theme-opt-info"><div class="theme-opt-label">Pahadi Roots</div><div class="theme-opt-sub">Forest green · Gold · Serif · Default</div></div>
+            <span class="theme-check">✓</span>
+          </button>
+          <button class="theme-opt" data-theme="dukan" onclick="applyTheme('dukan');closeThemeSwitcher()">
+            <div class="theme-swatch swatch-dukan"></div>
+            <div class="theme-opt-info"><div class="theme-opt-label">Pahadi Dukkan ✦</div><div class="theme-opt-sub">Ocean teal · Warm orange</div></div>
+            <span class="theme-check">✓</span>
+          </button>
+          <button class="theme-opt" data-theme="saffron" onclick="applyTheme('saffron');closeThemeSwitcher()">
+            <div class="theme-swatch swatch-saffron"></div>
+            <div class="theme-opt-info"><div class="theme-opt-label">Saffron Gold ✦ Premium</div><div class="theme-opt-sub">Deep burgundy · Saffron · Editorial</div></div>
+            <span class="theme-check">✓</span>
+          </button>
+          <button class="theme-opt" data-theme="midnight" onclick="applyTheme('midnight');closeThemeSwitcher()">
+            <div class="theme-swatch swatch-midnight"></div>
+            <div class="theme-opt-info"><div class="theme-opt-label">Midnight Cedar ✦ Premium</div><div class="theme-opt-sub">Dark luxury · Gold · Night mode</div></div>
+            <span class="theme-check">✓</span>
+          </button>
+          <button class="theme-opt" data-theme="valley" onclick="applyTheme('valley');closeThemeSwitcher()">
+            <div class="theme-swatch swatch-valley"></div>
+            <div class="theme-opt-info"><div class="theme-opt-label">Valley Bloom ✦ Premium</div><div class="theme-opt-sub">Sage green · Blush rose · Airy</div></div>
+            <span class="theme-check">✓</span>
+          </button>
+        </div>
+      </div>
+    </div>
+    <button class="cart-btn" onclick="openCart()">🛒 Cart <span class="cbadge" id="cartCount">0</span></button>
+    <button class="mob-menu-btn" onclick="openMobNav()" aria-label="Menu">☰</button>
+  </div>
+</nav>
+
+<!-- Mobile nav -->
+<div class="mob-nav" id="mobNav">
+  <div class="mob-nav-bg" onclick="closeMobNav()"></div>
+  <div class="mob-nav-panel">
+    <button class="mob-close" onclick="closeMobNav()">✕</button>
+    <a href="/" onclick="closeMobNav()">Home</a>
+    <a href="/all-products.html" onclick="closeMobNav()">Shop — All Products</a>
+    <a href="/#states" onclick="closeMobNav()">By State</a>
+    <a href="/our-story" onclick="closeMobNav()">Our Story</a>
+    <a href="/#pay-sec" onclick="closeMobNav()">Payment</a>
+    <a href="/#contact" onclick="closeMobNav()">Contact</a>
+  </div>
+</div>
+
+<!-- Page Hero / Breadcrumb -->
+<div class="ap-hero">
+  <div class="ap-hero-left">
+    <div class="ap-breadcrumb"><a href="/">Home</a><span>›</span> All Products</div>
+    <h1 class="ap-hero-title">All Products</h1>
+    <div class="ap-hero-sub">Pure Himalayan natural products — sourced from 10 mountain states</div>
+  </div>
+  <div class="ap-count-badge">🌿 <span id="apProductCount">—</span> Products</div>
+</div>
+
+<!-- Products Section -->
+<section class="ap-products-sec">
+  <!-- Filter bar -->
+  <div class="filter-bar" id="filterBar">
+    <button class="filter-btn active" onclick="setFilter('all',this)">🌿 All</button>
+    <button class="filter-btn" onclick="setFilter('honey',this)">🍯 Honey</button>
+    <button class="filter-btn" onclick="setFilter('ghee',this)">🥛 Ghee</button>
+    <button class="filter-btn" onclick="setFilter('spices',this)">🌿 Spices</button>
+    <button class="filter-btn" onclick="setFilter('tea',this)">🍵 Tea</button>
+    <button class="filter-btn" onclick="setFilter('saffron',this)">🌸 Saffron</button>
+    <button class="filter-btn" onclick="setFilter('oil',this)">🫚 Oils</button>
+    <select class="filter-sort" onchange="setSortOrder(this.value)">
+      <option value="default">Sort: Featured</option>
+      <option value="price_asc">Price: Low → High</option>
+      <option value="price_desc">Price: High → Low</option>
+      <option value="discount">Best Discount</option>
+      <option value="name">Name A–Z</option>
+    </select>
+  </div>
+
+  <div class="pgrid" id="pgrid"></div>
+  <div id="noResults" style="display:none;text-align:center;padding:60px;color:var(--tx3);font-family:'Playfair Display',serif;font-style:italic">No products found for this filter 🏔️</div>
+
+  <!-- Load More / Infinite scroll trigger -->
+  <div id="apLoadMoreWrap" style="display:none;flex-direction:column;align-items:center;gap:12px;padding:40px 0 20px">
+    <div id="apLoadMoreInfo" style="font-size:13px;color:var(--tx3);font-family:'Lato',sans-serif"></div>
+    <button id="apLoadMoreBtn" onclick="_apLoadMore()" style="background:var(--g);color:#fff;border:none;border-radius:24px;padding:14px 40px;font-family:'Lato',sans-serif;font-size:14px;font-weight:800;letter-spacing:.5px;cursor:pointer;transition:all .2s;box-shadow:0 4px 16px rgba(26,58,30,.25)" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 24px rgba(26,58,30,.35)'" onmouseout="this.style.transform='';this.style.boxShadow='0 4px 16px rgba(26,58,30,.25)'">Load More Products</button>
+  </div>
+  <!-- Invisible sentinel for infinite scroll -->
+  <div id="apScrollSentinel" style="height:1px;margin-top:-1px"></div>
+</section>
+
+<!-- Footer — identical to index.html -->
+<footer id="contact">
+  <div class="f-newsletter">
+    <div class="f-nl-inner">
+      <div class="f-nl-text">
+        <h4>🌿 Join the Pahadi Family</h4>
+        <p>Exclusive deals, new arrivals &amp; Himalayan stories — straight to your inbox</p>
+      </div>
+      <div class="f-nl-form">
+        <input type="email" class="f-nl-inp" id="nlEmail" placeholder="Enter your email address" autocomplete="email">
+        <button class="f-nl-btn" onclick="subscribe()">Subscribe</button>
+      </div>
+    </div>
+  </div>
+  <div class="f-main">
+    <div>
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:4px">
+        <div style="width:46px;height:46px;border-radius:12px;overflow:hidden;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <img src="https://ulyrhnpoiypuvaurlqqi.supabase.co/storage/v1/object/public/pahadi-images/5%20pahadi%20roots.png" alt="5 Pahadi Roots" style="width:46px;height:46px;object-fit:contain" onerror="this.style.display='none';this.parentElement.textContent='🌿'">
+        </div>
+        <div>
+          <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:900;color:#fff;line-height:1.1">5 Pahadi Roots</div>
+          <div style="font-size:10px;color:var(--gd);font-weight:700;letter-spacing:1px">HIMALAYAN NATURAL STORE</div>
+        </div>
+      </div>
+      <p class="f-brand-desc">Born in the mountains, delivered to your doorstep. Pure Himalayan natural products, sourced with love from farming communities across 10 Himalayan states.</p>
+      <div class="f-soc-row">
+        <a href="https://www.instagram.com/pahadiroots" target="_blank" rel="noopener" class="f-soc" title="Instagram">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+        </a>
+        <a href="https://www.facebook.com/pahadiroots" target="_blank" rel="noopener" class="f-soc" title="Facebook">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+        </a>
+        <a href="https://www.youtube.com/@pahadiroots" target="_blank" rel="noopener" class="f-soc" title="YouTube">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M23.495 6.205a3.007 3.007 0 0 0-2.088-2.088c-1.87-.501-9.396-.501-9.396-.501s-7.507-.01-9.396.501A3.007 3.007 0 0 0 .527 6.205a31.247 31.247 0 0 0-.522 5.805 31.247 31.247 0 0 0 .522 5.783 3.007 3.007 0 0 0 2.088 2.088c1.868.502 9.396.502 9.396.502s7.506 0 9.396-.502a3.007 3.007 0 0 0 2.088-2.088 31.247 31.247 0 0 0 .5-5.783 31.247 31.247 0 0 0-.5-5.805zM9.609 15.601V8.408l6.264 3.602z"/></svg>
+        </a>
+      </div>
+    </div>
+    <div>
+      <div class="fh">Quick Selects</div>
+      <ul class="ful">
+        <li><a href="/all-products.html">🍯 Wild Honey</a></li>
+        <li><a href="/all-products.html">🧈 A2 Bilona Ghee</a></li>
+        <li><a href="/all-products.html">🌸 Kashmiri Saffron</a></li>
+        <li><a href="/all-products.html">🪨 Ladakhi Shilajit</a></li>
+        <li><a href="/all-products.html">🍃 Himalayan Teas</a></li>
+        <li><a href="/all-products.html">🌾 Ancient Grains</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="fh">Company</div>
+      <ul class="ful">
+        <li><a href="/our-story">Our Story</a></li>
+        <li><a href="/#states">By Region</a></li>
+        <li><a href="/terms#returns">Returns &amp; Refunds</a></li>
+        <li><a href="/terms#shipping">Shipping Policy</a></li>
+        <li><a href="/terms#privacy">Privacy Policy</a></li>
+        <li><a href="/terms">Terms &amp; Conditions</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="fh">Connect With Us</div>
+      <div class="f-contact-item"><span class="f-contact-icon">🌐</span><div class="f-contact-text"><a href="https://pahadiroots.com">pahadiroots.com</a></div></div>
+      <div class="f-contact-item"><span class="f-contact-icon">📧</span><div class="f-contact-text"><a id="footer-email" href="mailto:hello@pahadiroots.com">hello@pahadiroots.com</a></div></div>
+      <div class="f-contact-item"><span class="f-contact-icon">📞</span><div class="f-contact-text"><a id="footer-phone" href="tel:+919899984895">+91 98999 84895</a></div></div>
+      <div class="f-contact-item"><span class="f-contact-icon">📍</span><div id="footer-address" class="f-contact-text">5 Pahadi Roots<br>New Delhi, India</div></div>
+    </div>
+  </div>
+  <hr class="f-divider">
+  <div class="f-bot">
+    <div class="f-bot-left">© 2026 <strong class="fd">5 Pahadi Roots</strong> · Founded by Sudhir Chambail · New Delhi, India</div>
+    <div class="f-bot-tag">Making India eat clean</div>
+  </div>
+</footer>
+
+<!-- Search overlay (required by main.js) -->
+<div class="srch-overlay" id="srchOverlay" onclick="if(event.target===this)closeSearch()">
+  <div class="srch-box">
+    <div class="srch-inp-row">
+      <span style="font-size:20px;margin-right:12px;color:var(--tx3)">🔍</span>
+      <input type="text" class="srch-inp" id="srchInp" placeholder="Search products..." oninput="doSearch(this.value)" onkeydown="if(event.key==='Escape')closeSearch()">
+      <button class="srch-close" onclick="closeSearch()">✕</button>
+    </div>
+    <div class="srch-res" id="srchRes"></div>
+  </div>
+</div>
+
+<!-- Cart overlay (required by main.js) -->
+<div class="cart-overlay" id="cartOverlay" onclick="if(event.target===this)closeCart()">
+  <div class="cart-panel" id="cartPanel">
+    <div class="cart-hdr">
+      <div class="cart-title">🛒 Your Cart</div>
+      <button class="cart-cls" onclick="closeCart()">✕</button>
+    </div>
+    <div class="cart-items" id="cartItems"></div>
+    <div class="cart-foot" id="cartFoot"></div>
+  </div>
+</div>
+
+<!-- Wishlist overlay -->
+<div class="wl-overlay" id="wlOverlay" onclick="if(event.target===this)closeWishlist()">
+  <div class="wl-panel" id="wlPanel">
+    <div class="cart-hdr">
+      <div class="cart-title">❤️ Wishlist</div>
+      <button class="cart-cls" onclick="closeWishlist()">✕</button>
+    </div>
+    <div class="cart-items" id="wlItems"></div>
+  </div>
+</div>
+
+<!-- Quick view overlay -->
+<div id="qvOverlay" style="position:fixed;inset:0;z-index:1100;background:rgba(0,0,0,.65);display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(5px)" onclick="if(event.target===this)closeQV()">
+  <div id="qvPanel" style="background:#fff;border-radius:20px;max-width:860px;width:100%;max-height:90vh;overflow-y:auto;position:relative"></div>
+</div>
+
+<!-- Auth overlay -->
+<div id="authOverlay" style="display:none;position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.6);align-items:center;justify-content:center;backdrop-filter:blur(6px)" onclick="if(event.target===this)closeAuth()">
+  <div id="authPanel" style="background:#fff;border-radius:20px;padding:36px;max-width:420px;width:calc(100% - 32px);position:relative;box-shadow:0 20px 60px rgba(0,0,0,.3)"></div>
+</div>
+
+<!-- Notify overlay -->
+<div id="notifyOverlay" style="display:none;position:fixed;inset:0;z-index:2100;background:rgba(0,0,0,.6);align-items:center;justify-content:center" onclick="if(event.target===this)closeNotify()">
+  <div id="notifyPanel" style="background:#fff;border-radius:16px;padding:28px;max-width:380px;width:calc(100% - 32px);position:relative"></div>
+</div>
+
+<!-- Toast -->
+<div id="toast" style="position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--g);color:#fff;padding:12px 24px;border-radius:24px;font-size:13.5px;font-weight:700;z-index:9999;opacity:0;transition:all .35s;pointer-events:none;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,.2)"></div>
+
+<!-- Compare bar -->
+<div id="compareBar" style="display:none;position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:2px solid var(--g);z-index:800;padding:12px 20px;box-shadow:0 -4px 24px rgba(0,0,0,.1)">
+  <div style="max-width:960px;margin:0 auto;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+    <div id="cmpChips" style="display:flex;gap:8px;flex-wrap:wrap;flex:1"></div>
+    <button onclick="doCompare()" style="background:var(--g);color:#fff;border:none;border-radius:10px;padding:10px 20px;font-size:13px;font-weight:700;cursor:pointer">Compare</button>
+    <button onclick="clearCompare()" style="background:#f5f5f5;color:#666;border:none;border-radius:10px;padding:10px 16px;font-size:13px;font-weight:700;cursor:pointer">Clear</button>
+  </div>
+</div>
+
+<!-- main.js handles everything: data loading, cart, filters, auth, etc. -->
+<script>
+  // Signal to main.js: all-products page — paginated, no homepage limit
+  window.IS_ALL_PRODUCTS_PAGE = true;
+
+  // Update count badge when products load from DB
+  window.addEventListener('pahadiProductsLoaded', function(e) {
+    var count = e.detail && e.detail.count;
+    if (count) {
+      var el = document.getElementById('apProductCount');
+      if (el) el.textContent = count;
+    }
+  });
+
+  // Infinite scroll — auto-load more when user reaches sentinel
+  document.addEventListener('DOMContentLoaded', function() {
+    var sentinel = document.getElementById('apScrollSentinel');
+    if (!sentinel || !window.IntersectionObserver) return;
+    var observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          var btn = document.getElementById('apLoadMoreBtn');
+          if (btn && !btn.disabled) _apLoadMore();
+        }
+      });
+    }, { rootMargin: '200px' });
+    observer.observe(sentinel);
+  });
+</script>
+<script src="/js/main.js"></script>
+<script src="/js/auth-frontend.js"></script>
+
+</body>
+</html>
