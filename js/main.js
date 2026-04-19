@@ -189,6 +189,11 @@ try {
 // ── FILTER/SORT STATE ──────────────────────────────────────────────
 let activeFilter = 'all';
 let activeSortOrder = 'default';
+// Pagination state for all-products page
+var _apPage = 1;
+var _apPageSize = 48;
+var _apCurrentList = [];  // sorted+filtered list, updated on each renderProds call
+var _apLoadingMore = false;
 
 // ── COMPARE STATE ──────────────────────────────────────────────────
 let compareIds = [];
@@ -706,6 +711,13 @@ async function loadData() {
       var activeStateEl = document.querySelector('.spnl.active');
       var activeStateId = activeStateEl ? activeStateEl.id.replace('p-','') : null;
       renderProds(); renderStates(); observeRv(); injectProductSchema(); renderUpsell();
+      // Fire event so all-products.html can update its count badge
+      try { window.dispatchEvent(new CustomEvent('pahadiProductsLoaded', {detail:{count:PRODUCTS.length}})); } catch(e){}
+      // Update homepage "View All" count if present
+      var tpc2 = document.getElementById('totalProdCount');
+      if (tpc2 && PRODUCTS.length) tpc2.textContent = '(' + PRODUCTS.length + ')';
+      var apc = document.getElementById('apProductCount');
+      if (apc && PRODUCTS.length) apc.textContent = PRODUCTS.length;
       // Restore active state if user had clicked one
       if (activeStateId && activeStateId !== STATES[0].id) {
         swState(activeStateId);
@@ -789,10 +801,7 @@ function mkProd(p) {
 }
 
 
-function renderProds() {
-  var g  = document.getElementById('pgrid');
-  var nr = document.getElementById('noResults');
-  if (!g) return;
+function _buildSortedList() {
   var list = PRODUCTS.slice();
   if (activeFilter && activeFilter !== 'all' && FILTER_MAP[activeFilter]) {
     list = list.filter(FILTER_MAP[activeFilter]);
@@ -805,16 +814,99 @@ function renderProds() {
     return db - da;
   });
   if (activeSortOrder === 'name') list.sort(function(a,b) { return a.name.localeCompare(b.name); });
+  return list;
+}
+
+function renderProds() {
+  var g  = document.getElementById('pgrid');
+  var nr = document.getElementById('noResults');
+  var smw = document.getElementById('showMoreWrap');
+  var tpc = document.getElementById('totalProdCount');
+  if (!g) return;
+
+  var isAllPage = window.IS_ALL_PRODUCTS_PAGE === true;
+  var list = _buildSortedList();
+  _apCurrentList = list;
+  _apPage = 1; // reset page on every new filter/sort
+
   if (!list.length) {
     g.innerHTML = '';
     if (nr) nr.style.display = 'block';
+    if (smw) smw.style.display = 'none';
+    _apHideLoadMore();
     return;
   }
   if (nr) nr.style.display = 'none';
-  g.innerHTML = list.map(function(p) { return mkProd(p); }).join('');
+
+  if (isAllPage) {
+    // Show first batch, set up infinite scroll / load more
+    var firstBatch = list.slice(0, _apPageSize);
+    g.innerHTML = firstBatch.map(function(p) { return mkProd(p); }).join('');
+    _apUpdateLoadMore(list.length);
+  } else {
+    // Homepage: show 8 + View All button
+    var LIMIT = 8;
+    var displayList = list.length > LIMIT ? list.slice(0, LIMIT) : list;
+    g.innerHTML = displayList.map(function(p) { return mkProd(p); }).join('');
+    if (smw) {
+      if (list.length > LIMIT) {
+        if (tpc) tpc.textContent = '(' + list.length + ')';
+        smw.style.display = 'block';
+      } else {
+        smw.style.display = 'none';
+      }
+    }
+  }
   updateAllWLButtons();
   setTimeout(initProductHoverImages, 50);
+}
 
+function _apLoadMore() {
+  if (_apLoadingMore) return;
+  var isAllPage = window.IS_ALL_PRODUCTS_PAGE === true;
+  if (!isAllPage) return;
+  var g = document.getElementById('pgrid');
+  if (!g) return;
+  var total = _apCurrentList.length;
+  var loaded = _apPage * _apPageSize;
+  if (loaded >= total) return;
+  _apLoadingMore = true;
+  var btn = document.getElementById('apLoadMoreBtn');
+  if (btn) { btn.textContent = 'Loading...'; btn.disabled = true; }
+  // Small timeout for smooth UX
+  setTimeout(function() {
+    _apPage++;
+    var nextBatch = _apCurrentList.slice((_apPage - 1) * _apPageSize, _apPage * _apPageSize);
+    var frag = document.createDocumentFragment();
+    var tmp = document.createElement('div');
+    tmp.innerHTML = nextBatch.map(function(p) { return mkProd(p); }).join('');
+    while (tmp.firstChild) frag.appendChild(tmp.firstChild);
+    g.appendChild(frag);
+    _apLoadingMore = false;
+    _apUpdateLoadMore(total);
+    updateAllWLButtons();
+    setTimeout(initProductHoverImages, 50);
+  }, 120);
+}
+
+function _apUpdateLoadMore(total) {
+  var wrap = document.getElementById('apLoadMoreWrap');
+  var btn  = document.getElementById('apLoadMoreBtn');
+  var info = document.getElementById('apLoadMoreInfo');
+  if (!wrap) return;
+  var loaded = Math.min(_apPage * _apPageSize, total);
+  if (loaded >= total) {
+    wrap.style.display = 'none';
+  } else {
+    wrap.style.display = 'flex';
+    if (btn) { btn.textContent = 'Load More Products'; btn.disabled = false; }
+    if (info) info.textContent = 'Showing ' + loaded + ' of ' + total + ' products';
+  }
+}
+
+function _apHideLoadMore() {
+  var wrap = document.getElementById('apLoadMoreWrap');
+  if (wrap) wrap.style.display = 'none';
 }
 
 function setFilter(f, btn) {
