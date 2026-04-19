@@ -413,22 +413,25 @@ function initCollectionImages(settings) {
   };
 
   // Build slug→url and slug→hidden maps + order from settings
-  var imgMap = {}, hiddenMap = {}, orderMap = {};
+  var imgMap = {}, hiddenMap = {}, orderMap = {}, allSlugsSet = {};
   Object.keys(settings).forEach(function(key) {
     if (key.startsWith('coll_img_')) {
       var slug = key.replace('coll_img_', '');
+      allSlugsSet[slug] = true;
       if (settings[key] && settings[key].trim()) imgMap[slug] = settings[key].trim();
     }
     if (key.startsWith('coll_hidden_') && settings[key] === 'true') {
       hiddenMap[key.replace('coll_hidden_', '')] = true;
     }
     if (key.startsWith('coll_order_')) {
-      orderMap[key.replace('coll_order_', '')] = parseInt(settings[key]) || 99;
+      var slug2 = key.replace('coll_order_', '');
+      allSlugsSet[slug2] = true;
+      orderMap[slug2] = parseInt(settings[key]) || 99;
     }
   });
 
-  // Get all slugs that have images, sorted by order then alphabetically
-  var slugs = Object.keys(imgMap).filter(function(s) { return !hiddenMap[s]; });
+  // Get ALL known slugs (with or without images), excluding hidden ones
+  var slugs = Object.keys(allSlugsSet).filter(function(s) { return !hiddenMap[s]; });
   slugs.sort(function(a, b) {
     return (orderMap[a] || 99) - (orderMap[b] || 99) || a.localeCompare(b);
   });
