@@ -476,7 +476,7 @@ footer{background:#132b17;padding:0;position:relative;overflow:hidden}
 
 /* Social + FSSAI bar — below the links grid */
 .f-social-bar{width:100%;box-sizing:border-box;padding:24px 60px 28px;border-bottom:1px solid rgba(200,146,10,.12)}
-.f-social-bar-inner{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px}
+.f-social-bar-inner{display:flex;align-items:center;justify-content:flex-start;flex-wrap:wrap;gap:32px}
 .f-soc-row--lg .f-soc{width:46px;height:46px}
 .f-soc-row--lg{gap:12px}
 
