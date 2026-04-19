@@ -1287,8 +1287,8 @@ function addToCart(id) {
   var displayName = p.name + (variantLabel ? ' (' + variantLabel + ')' : '');
   if (ex) ex.qty++;
   else cart.push({cartKey:cartKey, id:p.id, variantId:variantId||null, name:displayName, emoji:p.emoji, image:p.image_url||'', price:price, gst_rate:p.gst_rate||5, qty:1});
-  sv(); uCart(); openCart();
-  showToast('✅ ' + displayName + ' added!');
+  sv(); uCart();
+  showToast('✅ ' + displayName + ' added to cart! <span onclick="openCart()" style="text-decoration:underline;cursor:pointer;font-weight:900">View Cart →</span>');
   return true;
 }
 function rmCart(id) { var sid=String(id); cart = cart.filter(function(x) { return String(x.cartKey||x.id) !== sid; }); sv(); uCart(); }
@@ -2213,8 +2213,9 @@ function addToCartQty(id, qty) {
   if (addQty <= 0) { showToast('⚠️ Only ' + stockNum + ' in stock!'); return; }
   if (ex) ex.qty += addQty;
   else cart.push({id:p.id, name:p.name, emoji:p.emoji, image:p.image_url||'', price:p.price, gst_rate:p.gst_rate||5, qty:addQty, cartKey:cartKey, variantId:null});
-  sv(); uCart(); openCart();
-  showToast('✅ ' + p.name + ' × ' + addQty + ' added!');
+  sv(); uCart();
+  closeQV();
+  showToast('✅ ' + p.name + ' × ' + addQty + ' added! <span onclick="openCart()" style="text-decoration:underline;cursor:pointer;font-weight:900">View Cart →</span>');
 }
 
 // ── PINCODE CHECKER ────────────────────────────────────────────────
@@ -2603,7 +2604,7 @@ var _tt;
 function showToast(m) {
   var t = document.getElementById('toast');
   if (!t) return;
-  t.textContent = m; t.classList.add('show');
+  t.innerHTML = m; t.classList.add('show');
   clearTimeout(_tt);
   _tt = setTimeout(function() { t.classList.remove('show'); }, 2800);
 }
