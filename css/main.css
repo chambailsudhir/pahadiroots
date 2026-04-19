@@ -440,38 +440,44 @@ section.sec{padding:52px 40px}
 .pay-secure{text-align:center;margin-top:16px;font-size:12px;color:var(--tx3)}
 
 /* ── HIMACHALI CHAMBA RUMAL FOOTER ── */
-footer{background:#0b160d;padding:0;position:relative;overflow:hidden}
+footer{background:#132b17;padding:0;position:relative;overflow:hidden}
 
 /* Top frieze band */
 .f-art-frieze{background:#1a0d2e;border-top:2px solid #c8920a;border-bottom:2px solid #c8920a;line-height:0;overflow:hidden}
 .f-art-frieze svg{display:block;width:100%}
 
-/* Brand row: medallion + text + vine */
-.f-brand-row{display:flex;align-items:center;gap:28px;padding:28px 40px 22px;border-bottom:1px solid rgba(200,146,10,.15);max-width:1200px;margin:0 auto;box-sizing:border-box}
+/* Brand row: medallion + text + vine — full width spread */
+.f-brand-row{display:flex;align-items:center;gap:32px;padding:36px 60px 28px;border-bottom:1px solid rgba(200,146,10,.18);width:100%;max-width:100%;box-sizing:border-box}
 .f-brand-col{flex:1;min-width:0}
-.f-brand-name{font-family:'Playfair Display',serif;font-size:22px;font-weight:900;color:#fff;line-height:1.1;margin-bottom:3px}
-.f-brand-sub{font-size:10px;color:#c8920a;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:10px}
-.f-brand-desc{font-size:12.5px;color:rgba(255,255,255,.42);line-height:1.8;margin-bottom:14px}
-.f-soc-row{display:flex;gap:8px;flex-wrap:wrap}
-.f-soc{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.06);border:1px solid rgba(200,146,10,.3);display:flex;align-items:center;justify-content:center;transition:all .2s;color:rgba(255,255,255,.6);text-decoration:none}
-.f-soc:hover{background:rgba(200,146,10,.15);border-color:#c8920a;color:#fff}
-.f-fssai{margin-top:16px;background:rgba(255,255,255,.04);border:1px solid rgba(200,146,10,.2);border-radius:10px;padding:9px 13px;display:inline-flex;align-items:center;gap:10px}
+.f-brand-name{font-family:'Playfair Display',serif;font-size:26px;font-weight:900;color:#fff;line-height:1.1;margin-bottom:4px}
+.f-brand-sub{font-size:10.5px;color:#c8920a;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;margin-bottom:12px}
+.f-brand-desc{font-size:14px;color:rgba(255,255,255,.5);line-height:1.85;margin-bottom:0;max-width:560px}
+.f-soc-row{display:flex;gap:10px;flex-wrap:wrap}
+.f-soc{width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.06);border:1px solid rgba(200,146,10,.35);display:flex;align-items:center;justify-content:center;transition:all .22s;color:rgba(255,255,255,.65);text-decoration:none}
+.f-soc:hover{background:rgba(200,146,10,.2);border-color:#c8920a;color:#fff;transform:translateY(-2px)}
+.f-fssai{background:rgba(255,255,255,.05);border:1px solid rgba(200,146,10,.22);border-radius:10px;padding:9px 14px;display:inline-flex;align-items:center;gap:10px}
 .f-fssai-badge{background:#fff;border-radius:5px;padding:3px 7px;font-size:11px;font-weight:900;color:#1a6b1a;letter-spacing:.5px}
 .f-fssai-num{font-size:10.5px;color:rgba(255,255,255,.4);margin-top:2px}
 .f-vine-panel{flex-shrink:0;align-self:stretch;display:flex;align-items:center}
 .f-vine-panel svg{display:block}
 
-/* Main links grid */
-.f-main{max-width:1200px;margin:0 auto;padding:22px 40px 18px;display:grid;grid-template-columns:1fr 1fr 1.2fr;gap:40px}
-.fh{font-size:10px;font-weight:800;letter-spacing:2px;color:#c8920a;text-transform:uppercase;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid rgba(200,146,10,.2)}
-.ful{list-style:none;display:flex;flex-direction:column;gap:8px}
-.ful li a{font-size:12.5px;color:rgba(255,255,255,.45);transition:all .2s;display:flex;align-items:center;gap:6px}
-.ful li a:hover{color:#fff;padding-left:4px}
-.f-contact-item{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px}
-.f-contact-icon{font-size:14px;flex-shrink:0;margin-top:1px}
-.f-contact-text{font-size:12.5px;color:rgba(255,255,255,.45);line-height:1.65}
-.f-contact-text a{color:rgba(255,255,255,.45);transition:color .2s}
+/* Main links grid — 3 equal cols, full width, bigger text */
+.f-main{width:100%;box-sizing:border-box;padding:32px 60px 28px;display:grid;grid-template-columns:1fr 1fr 1.4fr;gap:60px;border-bottom:1px solid rgba(200,146,10,.12)}
+.fh{font-size:11px;font-weight:800;letter-spacing:2.5px;color:#c8920a;text-transform:uppercase;margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid rgba(200,146,10,.22)}
+.ful{list-style:none;display:flex;flex-direction:column;gap:11px}
+.ful li a{font-size:14.5px;color:rgba(255,255,255,.55);transition:all .2s;display:flex;align-items:center;gap:7px}
+.ful li a:hover{color:#fff;padding-left:5px}
+.f-contact-item{display:flex;align-items:flex-start;gap:11px;margin-bottom:13px}
+.f-contact-icon{font-size:15px;flex-shrink:0;margin-top:1px}
+.f-contact-text{font-size:14px;color:rgba(255,255,255,.5);line-height:1.7}
+.f-contact-text a{color:rgba(255,255,255,.5);transition:color .2s}
 .f-contact-text a:hover{color:#fff}
+
+/* Social + FSSAI bar — below the links grid */
+.f-social-bar{width:100%;box-sizing:border-box;padding:24px 60px 28px;border-bottom:1px solid rgba(200,146,10,.12)}
+.f-social-bar-inner{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px}
+.f-soc-row--lg .f-soc{width:46px;height:46px}
+.f-soc-row--lg{gap:12px}
 
 /* Newsletter bridge section (between pay-sec and footer) */
 .newsletter-bridge{margin:0;padding:0}
@@ -492,22 +498,25 @@ footer{background:#0b160d;padding:0;position:relative;overflow:hidden}
 .f-vine-divider{display:block;width:100%}
 
 /* Bottom bar */
-.f-bot{max-width:1200px;margin:0 auto;padding:12px 40px 16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;position:relative;z-index:2}
+.f-bot{max-width:100%;margin:0;padding:14px 60px 18px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;position:relative;z-index:2}
 .f-bot-left{font-size:12px;color:rgba(255,255,255,.28);font-family:'Lato',sans-serif}
 .f-bot-left strong.fd{color:rgba(255,255,255,.8)!important;font-weight:700}
 .f-bot-tag{font-size:11.5px;color:rgba(200,146,10,.45);font-style:italic;white-space:nowrap}
 .fd{color:var(--gd);font-weight:700}
 
 @media(max-width:900px){
-  .f-main{grid-template-columns:1fr 1fr;gap:24px}
-  .f-brand-row{flex-wrap:wrap;gap:16px}
+  .f-main{grid-template-columns:1fr 1fr;gap:28px;padding:28px 28px 20px}
+  .f-brand-row{flex-wrap:wrap;gap:16px;padding:28px 28px 22px}
   .f-vine-panel{display:none}
+  .f-social-bar{padding:20px 28px 24px}
+  .f-social-bar-inner{flex-direction:column;align-items:flex-start;gap:16px}
   .f-nl-inner{flex-direction:column;align-items:flex-start}
   .f-nl-form{min-width:100%;width:100%}
 }
 @media(max-width:560px){
   .f-brand-row{padding:20px;flex-direction:column;align-items:flex-start}
   .f-main{grid-template-columns:1fr;padding:20px 20px 16px}
+  .f-social-bar{padding:20px 20px 24px}
   .f-newsletter{padding:24px 20px}
   .f-bot{padding:12px 20px;flex-direction:column;text-align:center;gap:6px}
 }
