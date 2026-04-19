@@ -459,6 +459,7 @@ footer{background:#132b17;padding:0;position:relative;overflow:hidden}
 .f-fssai-badge{background:#fff;border-radius:5px;padding:3px 7px;font-size:11px;font-weight:900;color:#1a6b1a;letter-spacing:.5px}
 .f-fssai-num{font-size:10.5px;color:rgba(255,255,255,.4);margin-top:2px}
 .f-vine-panel{flex-shrink:0;align-self:stretch;display:flex;align-items:center}
+.f-vine-panel--left{margin-right:0}
 .f-vine-panel svg{display:block}
 
 /* Main links grid — 3 equal cols, full width, bigger text */
@@ -508,6 +509,7 @@ footer{background:#132b17;padding:0;position:relative;overflow:hidden}
   .f-main{grid-template-columns:1fr 1fr;gap:28px;padding:28px 28px 20px}
   .f-brand-row{flex-wrap:wrap;gap:16px;padding:28px 28px 22px}
   .f-vine-panel{display:none}
+  .f-vine-panel--left{display:none}
   .f-social-bar{padding:20px 28px 24px}
   .f-social-bar-inner{flex-direction:column;align-items:flex-start;gap:16px}
   .f-nl-inner{flex-direction:column;align-items:flex-start}

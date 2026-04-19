@@ -646,7 +646,19 @@
 
   <!-- ② BRAND ROW: full-width spread -->
   <div class="f-brand-row">
-    <div style="flex-shrink:0">
+    <!-- Left vine panel (mirror of right) -->
+    <div class="f-vine-panel f-vine-panel--left">
+      <svg width="52" height="120" viewBox="0 0 52 120" xmlns="http://www.w3.org/2000/svg" style="transform:scaleX(-1)">
+        <line x1="26" y1="0" x2="26" y2="120" stroke="#c8920a" stroke-width=".7" opacity=".25"/>
+        <g transform="translate(26,14)"><circle cx="0" cy="0" r="5" fill="#d4186c" opacity=".8"/><circle cx="-8" cy="0" r="3" fill="#e87c3e" opacity=".65"/><circle cx="8" cy="0" r="3" fill="#e87c3e" opacity=".65"/><circle cx="0" cy="-8" r="3" fill="#56b848" opacity=".65"/></g>
+        <g transform="translate(26,36)"><ellipse cx="0" cy="0" rx="6" ry="4" fill="#e87c3e" opacity=".75"/><circle cx="7" cy="-2" r="2" fill="#f0c030" opacity=".65"/><polygon points="-8,2 -12,7 -5,5" fill="#c8340c" opacity=".55"/></g>
+        <g transform="translate(26,58)"><circle cx="0" cy="0" r="5" fill="#1e6bb0" opacity=".8"/><circle cx="-8" cy="0" r="3" fill="#c84090" opacity=".65"/><circle cx="8" cy="0" r="3" fill="#c84090" opacity=".65"/><circle cx="0" cy="8" r="3" fill="#56b848" opacity=".65"/></g>
+        <g transform="translate(26,80)"><ellipse cx="0" cy="0" rx="6" ry="4" fill="#56b848" opacity=".75"/><circle cx="7" cy="-2" r="2" fill="#c8920a" opacity=".65"/><polygon points="-8,2 -12,7 -5,5" fill="#2d8020" opacity=".55"/></g>
+        <g transform="translate(26,102)"><circle cx="0" cy="0" r="4" fill="#c8920a" opacity=".65"/><circle cx="-6" cy="0" r="2" fill="#e8b050" opacity=".5"/><circle cx="6" cy="0" r="2" fill="#e8b050" opacity=".5"/></g>
+      </svg>
+    </div>
+    <!-- Medallion shifted slightly right -->
+    <div style="flex-shrink:0;margin-left:20px">
       <svg width="104" height="104" viewBox="0 0 110 110" xmlns="http://www.w3.org/2000/svg">
         <circle cx="55" cy="55" r="52" fill="none" stroke="#c8920a" stroke-width="1.5" opacity=".6"/>
         <circle cx="55" cy="55" r="48" fill="#1a0400" opacity=".95"/>
