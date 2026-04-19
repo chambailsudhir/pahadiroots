@@ -315,7 +315,7 @@
   </div>
 </footer>
 
-<!-- Search overlay (required by main.js) -->
+<!-- Search overlay -->
 <div class="srch-overlay" id="srchOverlay" onclick="if(event.target===this)closeSearch()">
   <div class="srch-box">
     <div class="srch-inp-row">
@@ -327,32 +327,15 @@
   </div>
 </div>
 
-<!-- Cart overlay (required by main.js) -->
-<div class="cart-overlay" id="cartOverlay" onclick="if(event.target===this)closeCart()">
-  <div class="cart-panel" id="cartPanel">
-    <div class="cart-hdr">
-      <div class="cart-title">🛒 Your Cart</div>
-      <button class="cart-cls" onclick="closeCart()">✕</button>
-    </div>
-    <div class="cart-items" id="cartItems"></div>
-    <div class="cart-foot" id="cartFoot"></div>
-  </div>
+<!-- Wishlist drawer — exact same IDs as index.html -->
+<div class="wl-drw" id="wlDrw">
+  <div class="wl-hdr"><div class="wl-title">❤️ Wishlist</div><button class="cx" onclick="closeWishlist()">✕</button></div>
+  <div class="wl-body" id="wlBody"></div>
 </div>
 
-<!-- Wishlist overlay -->
-<div class="wl-overlay" id="wlOverlay" onclick="if(event.target===this)closeWishlist()">
-  <div class="wl-panel" id="wlPanel">
-    <div class="cart-hdr">
-      <div class="cart-title">❤️ Wishlist</div>
-      <button class="cart-cls" onclick="closeWishlist()">✕</button>
-    </div>
-    <div class="cart-items" id="wlItems"></div>
-  </div>
-</div>
-
-<!-- Quick view overlay -->
-<div id="qvOverlay" style="position:fixed;inset:0;z-index:1100;background:rgba(0,0,0,.65);display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(5px)" onclick="if(event.target===this)closeQV()">
-  <div id="qvPanel" style="background:#fff;border-radius:20px;max-width:860px;width:100%;max-height:90vh;overflow-y:auto;position:relative"></div>
+<!-- Quick view modal — exact same IDs as index.html -->
+<div class="qv-ov" id="qvOv" onclick="handleQvClick(event)">
+  <div class="qv-box" id="qvBox"></div>
 </div>
 
 <!-- Auth overlay -->
@@ -365,9 +348,6 @@
   <div id="notifyPanel" style="background:#fff;border-radius:16px;padding:28px;max-width:380px;width:calc(100% - 32px);position:relative"></div>
 </div>
 
-<!-- Toast -->
-<div id="toast" style="position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--g);color:#fff;padding:12px 24px;border-radius:24px;font-size:13.5px;font-weight:700;z-index:9999;opacity:0;transition:all .35s;pointer-events:none;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,.2)"></div>
-
 <!-- Compare bar -->
 <div id="compareBar" style="display:none;position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:2px solid var(--g);z-index:800;padding:12px 20px;box-shadow:0 -4px 24px rgba(0,0,0,.1)">
   <div style="max-width:960px;margin:0 auto;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
@@ -376,6 +356,100 @@
     <button onclick="clearCompare()" style="background:#f5f5f5;color:#666;border:none;border-radius:10px;padding:10px 16px;font-size:13px;font-weight:700;cursor:pointer">Clear</button>
   </div>
 </div>
+
+<!-- Full-screen cart page — exact same as index.html -->
+<div class="cart-page" id="cartPage">
+  <div class="cpage-hdr">
+    <button class="cpage-back" onclick="closeCart()">← Continue Shopping</button>
+    <div class="cpage-title" style="display:flex;align-items:center;gap:12px">🛒 Your Cart <button onclick="cart=[];uCart();try{localStorage.removeItem('pr_cart')}catch(e){};showToast('Cart cleared!')" style="background:none;border:1px solid rgba(0,0,0,.15);padding:3px 10px;border-radius:6px;font-size:11px;cursor:pointer;color:var(--tx3);font-weight:600">🗑 Clear</button></div>
+    <a href="/" class="cpage-logo" onclick="closeCart()">5 Pahadi Roots 🌿</a>
+  </div>
+  <div class="cpage-body">
+    <div class="cpage-left">
+      <div class="ship-prog">
+        <div class="ship-prog-txt" id="shipTxt">Add ₹<span id="shipProgAmt">799</span> more for FREE shipping 🚚</div>
+        <div class="ship-prog-bar"><div class="ship-prog-fill" id="shipFill" style="width:0%"></div></div>
+      </div>
+      <div class="ciw" id="ciw"></div>
+      <div id="cart-login-banner" style="display:none;background:linear-gradient(135deg,#fff8e1,#fff3cd);border:1.5px solid #f4c430;border-radius:14px;padding:20px 22px;margin:8px 0 4px;text-align:center">
+        <div style="font-size:28px;margin-bottom:8px">🔒</div>
+        <div style="font-weight:800;font-size:15px;color:#1a3a1e;margin-bottom:4px">Login Required to Checkout</div>
+        <div style="font-size:13px;color:#666;margin-bottom:14px">Your cart is saved! Login karo aur order place karo.</div>
+        <button onclick="cartLoginRedirect()" style="background:linear-gradient(135deg,#2d6a4f,#40916c);color:#fff;border:none;padding:11px 28px;border-radius:10px;font-size:14px;font-weight:800;cursor:pointer;width:100%">👤 Login / Sign Up</button>
+      </div>
+      <div class="cart-upsell" id="cartUpsell" style="display:none">
+        <div class="cu-title">🛍️ You might have missed</div>
+        <div class="cu-strip" id="cuStrip"></div>
+      </div>
+    </div>
+    <div class="cpage-right">
+      <div class="cpage-summary">
+        <div class="csum-title" style="display:flex;align-items:center;justify-content:space-between">
+          <span>Order Summary</span>
+          <button onclick="resetOrderSummary()" style="background:none;border:1px solid rgba(0,0,0,.15);padding:3px 10px;border-radius:6px;font-size:11px;cursor:pointer;color:var(--tx3);font-weight:600">↺ Reset</button>
+        </div>
+        <div class="coup-row">
+          <div id="coupApplied" style="display:none">
+            <div class="coup-applied"><span>🎟️ <span id="coupCode"></span> applied! Saving ₹<span id="coupSaving"></span></span><button class="coup-rm" onclick="removeCoupon()">✕</button></div>
+          </div>
+          <div id="coupForm">
+            <div class="coup-inp-row">
+              <input class="coup-inp" id="coupInp" placeholder="COUPON CODE" maxlength="20" oninput="this.value=this.value.toUpperCase()" style="text-transform:uppercase">
+              <button class="coup-btn" onclick="applyCoupon()">Apply</button>
+            </div>
+            <div class="coup-msg" id="coupMsg"></div>
+          </div>
+        </div>
+        <div class="cart-savings" id="cartSavings"><span>🎉</span><span>You're saving ₹<span id="savingAmt"></span>!</span></div>
+        <div class="csum-rows">
+          <div class="csum-row"><span>Subtotal (incl. GST)</span><span id="ctval">₹0</span></div>
+          <div class="csum-row" id="gstRow" style="display:none"><span id="gstLabel">GST included</span><span id="gstAmt" style="color:var(--tx3);font-size:12px">₹0</span></div>
+          <div class="csum-row"><span>Shipping</span><span class="csum-free" id="shipLabel">Free on ₹<span class="dynShipAmt">799</span>+</span></div>
+          <div class="csum-divider"></div>
+          <div class="csum-row csum-total"><span>Total</span><span id="ctvalTotal">₹0</span></div>
+        </div>
+        <div class="del-form" id="del-form" autocomplete="off">
+          <div class="del-form-title">📍 Delivery Details</div>
+          <div id="saved-addr-bar" style="display:none;margin-bottom:16px">
+            <div style="font-size:11px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">📋 Saved Addresses — Select to use</div>
+            <div id="saved-addr-cards" style="display:flex;flex-direction:column;gap:8px;max-height:220px;overflow-y:auto;padding-right:2px"></div>
+          </div>
+          <div class="del-row">
+            <div class="del-field"><label>Full Name *</label><input class="del-input" id="del-name" placeholder="Your name" autocomplete="name"></div>
+            <div class="del-field"><label>Phone *</label><input class="del-input" id="del-phone" placeholder="10-digit mobile" type="tel" maxlength="10" autocomplete="tel"></div>
+          </div>
+          <div class="del-row full">
+            <div class="del-field"><label>Address *</label><input class="del-input" id="del-addr" placeholder="House / Flat, Street, Area" autocomplete="address-line1"></div>
+          </div>
+          <div class="del-row">
+            <div class="del-field"><label>City *</label><input class="del-input" id="del-city" placeholder="City" autocomplete="address-level2"></div>
+            <div class="del-field"><label>State</label>
+              <select class="del-input" id="del-state" style="background:#fff"><option value="">State / UT</option><option>Andhra Pradesh</option><option>Arunachal Pradesh</option><option>Assam</option><option>Bihar</option><option>Chhattisgarh</option><option>Goa</option><option>Gujarat</option><option>Haryana</option><option>Himachal Pradesh</option><option>Jharkhand</option><option>Karnataka</option><option>Kerala</option><option>Madhya Pradesh</option><option>Maharashtra</option><option>Manipur</option><option>Meghalaya</option><option>Mizoram</option><option>Nagaland</option><option>Odisha</option><option>Punjab</option><option>Rajasthan</option><option>Sikkim</option><option>Tamil Nadu</option><option>Telangana</option><option>Tripura</option><option>Uttar Pradesh</option><option>Uttarakhand</option><option>West Bengal</option><option>Andaman &amp; Nicobar Islands</option><option>Chandigarh</option><option>Dadra &amp; Nagar Haveli and Daman &amp; Diu</option><option>Delhi</option><option>Jammu &amp; Kashmir</option><option>Ladakh</option><option>Lakshadweep</option><option>Puducherry</option></select>
+            </div>
+          </div>
+          <div class="del-row">
+            <div class="del-field"><label>Pincode *</label><input class="del-input" id="del-pin" placeholder="6-digit pincode" autocomplete="postal-code" maxlength="6" type="tel"></div>
+            <div class="del-field"><label>Email</label><input class="del-input" id="del-email" placeholder="Optional" type="email" autocomplete="email"></div>
+          </div>
+        </div>
+        <div id="minOrderBanner" style="display:none;background:rgba(210,153,34,0.12);border:1px solid rgba(210,153,34,0.35);color:#d29922;border-radius:10px;padding:10px 14px;font-size:12.5px;margin-bottom:10px;text-align:center;"></div>
+        <button id="btn-razorpay" class="chkbtn" onclick="checkoutRazorpay()" style="background:linear-gradient(135deg,#2d6a4f,#40916c);margin-bottom:10px;">💳 Pay Online (UPI · Cards · Net Banking)</button>
+        <button id="btn-cod" class="chkbtn" onclick="checkout()" style="background:linear-gradient(135deg,#e76f51,#f4a261)">📱 COD + WhatsApp Confirm →</button>
+        <div class="cpays">📱 UPI &nbsp;·&nbsp; 💳 Cards &nbsp;·&nbsp; 🏧 Net Banking &nbsp;·&nbsp; 🚪 COD</div>
+        <div class="cpage-secure">🔒 100% Secure & Encrypted Checkout</div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="cov" id="cov" onclick="closeCart()" style="display:none"></div>
+<div class="toast" id="toast"></div>
+
+<!-- WhatsApp float -->
+<a href="https://wa.me/919899984895" target="_blank" rel="noopener" class="wa-float" aria-label="Chat on WhatsApp" id="waFloatBtn">
+  <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+  <span class="wa-tooltip">Chat on WhatsApp</span>
+</a>
+<button class="btt" id="btt" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Back to top">↑</button>
 
 <!-- main.js handles everything: data loading, cart, filters, auth, etc. -->
 <script>
