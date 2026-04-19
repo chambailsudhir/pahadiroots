@@ -398,10 +398,10 @@ function initCollectionImages(settings) {
     var st = document.createElement('style');
     st.id = 'ccat-style-v2';
     st.textContent = [
-      '#cgrid{display:flex;flex-direction:row;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;padding:8px 0 28px;scrollbar-width:none;box-sizing:border-box;width:100%;}',
+      '#cgrid{display:flex;flex-direction:row;gap:16px;overflow-x:auto;padding:8px 0 28px;scrollbar-width:none;box-sizing:border-box;width:100%;}',
       '#cgrid::-webkit-scrollbar{display:none;}',
-      /* 6 cards exactly: (100% - 5 gaps of 16px) / 6 */
-      '.ccat-v2{flex:0 0 calc((100% - 80px) / 6);min-width:0;display:flex;flex-direction:column;align-items:center;gap:12px;scroll-snap-align:start;text-decoration:none;cursor:pointer;transition:transform .2s;}',
+      /* Each card: exactly 1/6 of container, no snap so auto-scroll flows freely */
+      '.ccat-v2{flex:0 0 calc((100% - 80px) / 6);min-width:0;display:flex;flex-direction:column;align-items:center;gap:12px;text-decoration:none;cursor:pointer;transition:transform .2s;}',
       '.ccat-v2:hover{transform:translateY(-4px);}',
       '.ccat-v2-box{width:100%;aspect-ratio:1/1;border-radius:16px;border:2px solid #c9a84c;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:0 2px 12px rgba(201,168,76,.18);transition:border-color .2s,box-shadow .2s;}',
       '.ccat-v2:hover .ccat-v2-box{border-color:#a07830;box-shadow:0 6px 24px rgba(201,168,76,.32);}',
@@ -521,6 +521,50 @@ function initCollectionImages(settings) {
      {slug:'oil',filter:'oil'},{slug:'grains',filter:'all'}
     ].forEach(function(d,i){ buildCard(d.slug, i); });
   }
+
+  // ── AUTO-SCROLL (train effect) ──────────────────────────────────
+  // Duplicate cards for seamless infinite loop
+  var originalCards = Array.from(cgrid.children);
+  originalCards.forEach(function(card) {
+    var clone = card.cloneNode(true);
+    clone.setAttribute('aria-hidden', 'true');
+    cgrid.appendChild(clone);
+  });
+
+  var scrollSpeed = 0.6; // px per frame — adjust for faster/slower
+  var isPaused = false;
+  var rafId = null;
+
+  function autoScroll() {
+    if (!isPaused) {
+      cgrid.scrollLeft += scrollSpeed;
+      // When we've scrolled one full set of originals, jump back seamlessly
+      var halfWidth = cgrid.scrollWidth / 2;
+      if (cgrid.scrollLeft >= halfWidth) {
+        cgrid.scrollLeft = cgrid.scrollLeft - halfWidth;
+      }
+    }
+    rafId = requestAnimationFrame(autoScroll);
+  }
+
+  // Pause on hover or touch
+  cgrid.addEventListener('mouseenter', function() { isPaused = true; });
+  cgrid.addEventListener('mouseleave', function() { isPaused = false; });
+  cgrid.addEventListener('touchstart', function() { isPaused = true; }, {passive:true});
+  cgrid.addEventListener('touchend',   function() {
+    setTimeout(function() { isPaused = false; }, 2000);
+  }, {passive:true});
+
+  // Also pause when user manually scrolls
+  var userScrolling = false;
+  cgrid.addEventListener('scroll', function() {
+    if (isPaused) return; // already paused by hover
+    userScrolling = true;
+    clearTimeout(cgrid._scrollTimer);
+    cgrid._scrollTimer = setTimeout(function() { userScrolling = false; }, 1500);
+  });
+
+  rafId = requestAnimationFrame(autoScroll);
 }
 
 async function loadData() {
@@ -901,17 +945,13 @@ function renderProds() {
     g.innerHTML = firstBatch.map(function(p) { return mkProd(p); }).join('');
     _apUpdateLoadMore(list.length);
   } else {
-    // Homepage: show 8 + View All button
+    // Homepage: show 8 + View All button (always visible)
     var LIMIT = 8;
     var displayList = list.length > LIMIT ? list.slice(0, LIMIT) : list;
     g.innerHTML = displayList.map(function(p) { return mkProd(p); }).join('');
     if (smw) {
-      if (list.length > LIMIT) {
-        if (tpc) tpc.textContent = '(' + list.length + ')';
-        smw.style.display = 'block';
-      } else {
-        smw.style.display = 'none';
-      }
+      smw.style.display = 'block'; // always show View All on homepage
+      if (tpc) tpc.textContent = list.length > LIMIT ? '(' + list.length + ')' : '';
     }
   }
   updateAllWLButtons();
