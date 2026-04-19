@@ -347,36 +347,11 @@
   <div class="tc"><span class="tico">🚚</span><div><div class="tlb">Free Shipping</div><div class="tds">On orders above ₹<span class="dynShipAmt">799</span></div></div></div>
 </div>
 <section class="sec coll-bg" id="shop" style="padding:36px 40px 48px">
-  <div class="ct rv"><div class="chip">Browse Collections</div><h2 class="sh2">What the Mountains Offer</h2><p class="ssub">Every category tells a story of altitude, tradition, and purity.</p></div>
+  <div class="ct rv" style="margin-bottom:28px"><h2 style="font-family:'Playfair Display',serif;font-size:clamp(24px,3.5vw,38px);font-weight:800;color:#1a1a1a;text-align:center;margin:0 0 6px">Shop By Category</h2><p class="ssub">Every category tells a story of altitude, tradition, and purity.</p></div>
   <div class="cgrid-outer">
     <button class="cgrid-arrow left" onclick="document.getElementById('cgrid').scrollBy({left:-440,behavior:'smooth'})">&#8249;</button>
     <button class="cgrid-arrow right" onclick="document.getElementById('cgrid').scrollBy({left:440,behavior:'smooth'})">&#8250;</button>
-    <div class="cgrid" id="cgrid">
-      <a href="#products" class="cc rv" id="ccat-honey" style="transition-delay:.06s" onclick="setTimeout(function(){setFilter('honey',document.querySelector('[onclick*=honey]'))},50)">
-        <div class="ccat-img-wrap"><img class="ccat-img" id="ccat-img-honey" src="" alt="Wild Honey" onload="this.closest('.ccat-img-wrap').classList.add('img-loaded')"><span class="cemo" id="ccat-emo-honey">🍯</span></div>
-        <div class="cc-body"><div class="cname">Wild Honey</div><div class="cnum">10+ Varieties</div></div>
-      </a>
-      <a href="#products" class="cc rv" id="ccat-ghee" style="transition-delay:.10s" onclick="setTimeout(function(){setFilter('ghee',document.querySelector('[onclick*=ghee]'))},50)">
-        <div class="ccat-img-wrap"><img class="ccat-img" id="ccat-img-ghee" src="" alt="A2 Ghee" onload="this.closest('.ccat-img-wrap').classList.add('img-loaded')"><span class="cemo" id="ccat-emo-ghee">🥛</span></div>
-        <div class="cc-body"><div class="cname">A2 Ghee</div><div class="cnum">Bilona Method</div></div>
-      </a>
-      <a href="#products" class="cc rv" id="ccat-spices" style="transition-delay:.14s" onclick="setTimeout(function(){setFilter('spices',document.querySelector('[onclick*=spices]'))},50)">
-        <div class="ccat-img-wrap"><img class="ccat-img" id="ccat-img-spices" src="" alt="Herbs & Spices" onload="this.closest('.ccat-img-wrap').classList.add('img-loaded')"><span class="cemo" id="ccat-emo-spices">🌿</span></div>
-        <div class="cc-body"><div class="cname">Herbs & Spices</div><div class="cnum">40+ Varieties</div></div>
-      </a>
-      <a href="#products" class="cc rv" id="ccat-tea" style="transition-delay:.18s" onclick="setTimeout(function(){setFilter('tea',document.querySelector('[onclick*=tea]'))},50)">
-        <div class="ccat-img-wrap"><img class="ccat-img" id="ccat-img-tea" src="" alt="Himalayan Teas" onload="this.closest('.ccat-img-wrap').classList.add('img-loaded')"><span class="cemo" id="ccat-emo-tea">🍵</span></div>
-        <div class="cc-body"><div class="cname">Himalayan Teas</div><div class="cnum">Rare Blends</div></div>
-      </a>
-      <a href="#products" class="cc rv" id="ccat-grains" style="transition-delay:.22s" onclick="setTimeout(function(){setFilter('all',document.querySelector('[onclick*=all]'))},50)">
-        <div class="ccat-img-wrap"><img class="ccat-img" id="ccat-img-grains" src="" alt="Ancient Grains" onload="this.closest('.ccat-img-wrap').classList.add('img-loaded')"><span class="cemo" id="ccat-emo-grains">🌾</span></div>
-        <div class="cc-body"><div class="cname">Ancient Grains</div><div class="cnum">Millet · Buckwheat</div></div>
-      </a>
-      <a href="#products" class="cc rv" id="ccat-dryfruits" style="transition-delay:.26s" onclick="setTimeout(function(){setFilter('all',document.querySelector('[onclick*=all]'))},50)">
-        <div class="ccat-img-wrap"><img class="ccat-img" id="ccat-img-dryfruits" src="" alt="Dry Fruits" onload="this.closest('.ccat-img-wrap').classList.add('img-loaded')"><span class="cemo" id="ccat-emo-dryfruits">🌰</span></div>
-        <div class="cc-body"><div class="cname">Dry Fruits</div><div class="cnum">Sun-dried & Pure</div></div>
-      </a>
-    </div>
+    <div class="cgrid" id="cgrid"></div>
   </div>
 </section>
 <section class="sec" id="products" style="background:#fff;padding:36px 40px 48px">
