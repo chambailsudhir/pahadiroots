@@ -398,18 +398,15 @@ function initCollectionImages(settings) {
     var st = document.createElement('style');
     st.id = 'ccat-style-v2';
     st.textContent = [
-      /* Grid: flex, no overflow clipping, padding matches outer wrapper */
-      '#cgrid{display:flex;flex-direction:row;gap:16px;overflow-x:auto;overflow-y:visible;scroll-snap-type:x mandatory;padding:8px 0 28px;scrollbar-width:none;box-sizing:border-box;width:100%;}',
+      '#cgrid{display:flex;flex-direction:row;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;padding:8px 0 28px;scrollbar-width:none;box-sizing:border-box;width:100%;}',
       '#cgrid::-webkit-scrollbar{display:none;}',
-      /* Each card: exactly 1/6 of container width (100vw minus 96px padding+arrows), no shrink */
-      '.ccat-v2{flex:0 0 calc((100vw - 96px - 80px) / 6 - 8px);min-width:0;display:flex;flex-direction:column;align-items:center;gap:12px;scroll-snap-align:start;text-decoration:none;cursor:pointer;transition:transform .2s;}',
+      /* 6 cards exactly: (100% - 5 gaps of 16px) / 6 */
+      '.ccat-v2{flex:0 0 calc((100% - 80px) / 6);min-width:0;display:flex;flex-direction:column;align-items:center;gap:12px;scroll-snap-align:start;text-decoration:none;cursor:pointer;transition:transform .2s;}',
       '.ccat-v2:hover{transform:translateY(-4px);}',
-      /* Image box — golden border, perfect square */
       '.ccat-v2-box{width:100%;aspect-ratio:1/1;border-radius:16px;border:2px solid #c9a84c;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:0 2px 12px rgba(201,168,76,.18);transition:border-color .2s,box-shadow .2s;}',
       '.ccat-v2:hover .ccat-v2-box{border-color:#a07830;box-shadow:0 6px 24px rgba(201,168,76,.32);}',
       '.ccat-v2-box img{width:100%;height:100%;object-fit:cover;display:block;}',
       '.ccat-v2-box .ccat-v2-emo{font-size:52px;line-height:1;}',
-      /* Label sits outside below the box */
       '.ccat-v2-label{font-family:"Playfair Display",serif;font-size:14px;font-weight:700;color:#1a3a1e;text-align:center;line-height:1.3;padding:0 4px;width:100%;}',
     ].join('');
     document.head.appendChild(st);
