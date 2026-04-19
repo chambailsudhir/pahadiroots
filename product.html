@@ -81,6 +81,15 @@ button{font-family:'Inter',sans-serif;cursor:pointer}
 /* ══ BREADCRUMB ══ */
 .breadcrumb{padding:12px 32px;font-size:12px;color:var(--tx3);max-width:1280px;margin:0 auto;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 .breadcrumb a{color:var(--g3,#2d6b35);font-weight:700}
+/* ── BACK TO RESULTS BAR ── */
+.back-bar{background:#f5f0e8;border-bottom:1px solid rgba(26,58,30,.1);padding:0;position:sticky;top:0;z-index:200}
+.back-bar-inner{max-width:1320px;margin:0 auto;padding:0 32px;display:flex;align-items:center;justify-content:space-between;gap:12px;height:42px}
+.back-bar-link{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:700;color:var(--g,#1a3a1e);text-decoration:none;font-family:'Lato',sans-serif;white-space:nowrap;transition:color .15s}
+.back-bar-link:hover{color:var(--g3,#2d6b35)}
+.back-bar-link svg{flex-shrink:0}
+.back-bar-shop{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:var(--tx3,#7a7a7a);text-decoration:none;font-family:'Lato',sans-serif;white-space:nowrap;transition:color .15s}
+.back-bar-shop:hover{color:var(--g,#1a3a1e)}
+@media(max-width:600px){.back-bar-inner{padding:0 14px}.back-bar-shop{display:none}}
 
 /* ══ PRODUCT LAYOUT ══ */
 .product-page-bg{background:#faf6ee}.product-wrap{max-width:1320px;margin:0 auto;padding:0 32px 32px;display:grid;grid-template-columns:1fr 1.15fr;gap:44px;align-items:start;width:100%}
@@ -684,11 +693,24 @@ body{letter-spacing:.01em}
   </div>
 </div>
 
+<!-- BACK TO ALL PRODUCTS BAR -->
+<div class="back-bar" id="backBar">
+  <div class="back-bar-inner">
+    <a href="/all-products.html" class="back-bar-link">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15,18 9,12 15,6"/></svg>
+      Back to All Products
+    </a>
+    <a href="/all-products.html" class="back-bar-shop">
+      🌿 Browse <span id="backBarCount"></span> Himalayan Products
+    </a>
+  </div>
+</div>
+
 <!-- BREADCRUMB -->
 <div class="breadcrumb">
   <a href="/">Home</a>
   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9,18 15,12 9,6"/></svg>
-  <a href="/products">Products</a>
+  <a href="/all-products.html">All Products</a>
   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9,18 15,12 9,6"/></svg>
   <span id="bc-name">Loading…</span>
 </div>
@@ -895,6 +917,9 @@ async function loadProduct() {
     if (!res.ok) throw new Error('Server error ' + res.status);
     var data = await res.json();
     ALL_PRODUCTS = data.products || [];
+    // Update back bar product count
+    var bbc = document.getElementById('backBarCount');
+    if (bbc && ALL_PRODUCTS.length) bbc.textContent = ALL_PRODUCTS.length + '+';
     var prod = ALL_PRODUCTS.find(function(p){ return (p.slug||'').toLowerCase() === slug; });
     if (!prod) prod = ALL_PRODUCTS.find(function(p){ return String(p.id) === String(slug); });
     if (!prod) { showNotFound('Product not found'); return; }
@@ -1861,7 +1886,7 @@ function relATC(id,name,price,image,emoji){
 function goToProduct(slug){ var s=String(slug||'');if(!s||/^\d+$/.test(s)){var prod=ALL_PRODUCTS.find(function(p){return String(p.id)===s;});if(prod)s=prod.slug&&!/^\d+$/.test(prod.slug)?prod.slug:(prod.name?prod.name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,''):s);}window.location.href='/products/'+s; }
 
 /* ══ NOT FOUND ══ */
-function showNotFound(msg){ document.getElementById('main-content').innerHTML='<div class="not-found"><h2>Product not found</h2><p>'+msg+'</p><br><a href="/" style="color:var(--g);font-weight:700">← Back to store</a></div>'; }
+function showNotFound(msg){ document.getElementById('main-content').innerHTML='<div class="not-found"><h2>Product not found</h2><p>'+msg+'</p><br><a href="/all-products.html" style="color:var(--g);font-weight:700">← Back to All Products</a></div>'; }
 
 /* ══ INIT ══ */
 updateNavCart();
