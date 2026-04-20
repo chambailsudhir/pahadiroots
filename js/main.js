@@ -236,6 +236,24 @@ var _heroSlideIndex = 0;
 var _heroSlideTimer = null;
 var _heroSlideCount = 0;
 
+// ── IMAGE OPTIMIZER — rewrites Supabase URLs to use built-in transform API ──
+// Converts full-res images (2-5MB) → resized WebP (30-150KB) = up to 30x faster
+// Supabase: /storage/v1/render/image/public/... ?width=W&quality=Q&format=webp
+function imgOpt(url, opts) {
+  if (!url) return url;
+  try {
+    if (!url.includes('supabase.co/storage/v1/object/public/')) return url;
+    var w = (opts && opts.w) || 800;
+    var q = (opts && opts.q) || 75;
+    var transformed = url.replace(
+      '/storage/v1/object/public/',
+      '/storage/v1/render/image/public/'
+    );
+    var sep = transformed.includes('?') ? '&' : '?';
+    return transformed + sep + 'width=' + w + '&quality=' + q + '&format=webp';
+  } catch(e) { return url; }
+}
+
 function esc2(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
 // ── UNIVERSAL IMAGE LOADER — adds .skel + .img-ready for skeleton fade-in ──
@@ -267,7 +285,7 @@ function buildSlide(s, idx) {
   if (img) {
     // Shimmer placeholder shown while image loads
     html += '<div class="hero-img-shimmer" style="position:absolute;inset:0;z-index:0;background:linear-gradient(110deg,#0d2410 0%,#1a3a1e 40%,#0d2410 100%);background-size:200% 100%;animation:shimmer 1.6s infinite"></div>';
-    html += '<img src="' + esc2(img) + '" alt="' + esc2(s.title || 'Pahadi Roots') + '" fetchpriority="' + (idx === 0 ? 'high' : 'low') + '" decoding="async" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;display:block;z-index:1;opacity:0;transition:opacity .6s ease" onload="this.style.opacity=1;var sh=this.previousElementSibling;if(sh&&sh.classList.contains(\'hero-img-shimmer\'))sh.style.display=\'none\'" onerror="this.style.display=\'none\'">';
+    html += '<img src="' + esc2(imgOpt(img,{w:1400,q:80})) + '" alt="' + esc2(s.title || 'Pahadi Roots') + '" fetchpriority="' + (idx === 0 ? 'high' : 'low') + '" decoding="async" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;display:block;z-index:1;opacity:0;transition:opacity .6s ease" onload="this.style.opacity=1;var sh=this.previousElementSibling;if(sh&&sh.classList.contains(\'hero-img-shimmer\'))sh.style.display=\'none\'" onerror="this.style.display=\'none\'">';
   } else {
     html += '<div style="position:absolute;inset:0;background:linear-gradient(150deg,#071a09 0%,#0d2410 30%,#1a3a1e 65%,#2d5233 100%);z-index:0"></div>';
   }
@@ -341,7 +359,7 @@ function initHeroSlider(settings) {
   // ── Cache hero image URLs in localStorage so next visit can preload instantly ──
   if (slides.length) {
     try {
-      var urls = slides.map(function(s){ return s.img; }).filter(Boolean);
+      var urls = slides.map(function(s){ return imgOpt(s.img,{w:1400,q:80}); }).filter(Boolean);
       localStorage.setItem('pr_hero_imgs', JSON.stringify(urls));
     } catch(e) {}
   }
@@ -556,7 +574,7 @@ function initCollectionImages(settings) {
         var sk = this.previousElementSibling;
         if (sk && sk.classList.contains('pimg-skel')) sk.style.display = 'none';
       };
-      img.src = url;
+      img.src = imgOpt(url, {w:200, q:75});
       box.appendChild(img);
     } else {
       var emoEl = document.createElement('span');
@@ -887,11 +905,14 @@ async function loadData() {
           ts: Date.now(),
           products: PRODUCTS.map(function(p) {
             return { id:p.id, slug:p.slug, name:p.name, price:p.price,
-              original_price:p.original_price, image_url:p.image_url,
+              original_price:p.original_price, mrp:p.mrp, image_url:p.image_url,
               _images:p._images||[], category_id:p.category_id,
               state_id:p.state_id, description:p.description,
-              short_description:p.short_description, unit:p.unit,
-              stock:p.stock, emoji:p.emoji, badge_label:p.badge_label };
+              short_description:p.short_description, long_description:p.long_description,
+              unit:p.unit, stock:p.stock, available_stock:p.available_stock,
+              emoji:p.emoji, badge_label:p.badge_label, badge_type:p.badge_type,
+              region:p.region, card_bg:p.card_bg, review_count:p.review_count,
+              limited_batch:p.limited_batch, badges:p.badges };
           })
         };
         localStorage.setItem('pr_products_cache', JSON.stringify(cachePayload));
@@ -950,7 +971,7 @@ function mkProd(p) {
   var inWL   = wishlist.findIndex(function(x){ return String(x) === String(p.id); }) > -1;
   var slug   = getProductSlug(p);
   var imgHtml = p.image_url
-    ? '<div class="pimg-skel" style="position:absolute;inset:0;z-index:0;border-radius:inherit"></div><img src="' + p.image_url + '" alt="' + p.name + '" loading="lazy" decoding="async" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;opacity:0;transition:opacity .45s" onload="this.style.opacity=1;var sk=this.previousElementSibling;if(sk)sk.style.display=\'none\';this.closest(\'.piw\')&&this.closest(\'.piw\').classList.add(\'img-ready\')" onerror="this.style.display=\'none\'">'
+    ? '<div class="pimg-skel" style="position:absolute;inset:0;z-index:0;border-radius:inherit"></div><img src="' + imgOpt(p.image_url,{w:400,q:75}) + '" alt="' + p.name + '" loading="lazy" decoding="async" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;opacity:0;transition:opacity .45s" onload="this.style.opacity=1;var sk=this.previousElementSibling;if(sk)sk.style.display=\'none\';this.closest(\'.piw\')&&this.closest(\'.piw\').classList.add(\'img-ready\')" onerror="this.style.display=\'none\'">'
     : '';
   var img = '<div class="piw" style="background:' + (p.card_bg||'#f9f4ec') + '">' +
     imgHtml +
@@ -1120,7 +1141,7 @@ function renderStates() {
   tb.innerHTML = STATES.map(function(s, i) {
     var imgSrc = (s._uploadedImgs && s._uploadedImgs[0]) || s._uploadedImg || s.tab_photo_url || '';
     var imgHtml = imgSrc
-      ? '<div class="stab-thumb skel skel-dark"><img data-src="' + imgSrc + '" src="" alt="' + s.name + '" loading="lazy"></div>'
+      ? '<div class="stab-thumb skel skel-dark"><img src="' + imgOpt(imgSrc,{w:80,q:70}) + '" alt="' + s.name + '" loading="lazy" onload="this.closest(\'.stab-thumb\').classList.add(\'img-ready\')" onerror="this.style.display=\'none\'"></div>'
       : '<div class="stab-thumb stab-thumb-emo">' + s.emoji + '</div>';
     return '<button class="stab' + (i===0?' active':'') + '" onclick="swState(\'' + s.id + '\')" id="t-' + s.id + '">' +
       imgHtml +
@@ -1145,7 +1166,7 @@ function renderStates() {
     var photoHtml;
     if (stateImgs.length > 1) {
       var slidesHtml = stateImgs.map(function(url, si) {
-        return '<img class="sshdr-img' + (si===0?' active':'') + '" src="' + url + '" alt="' + s.name + '" loading="lazy" onerror="this.style.display=\'none\'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;display:block;opacity:' + (si===0?'1':'0') + ';transition:opacity 1s ease;z-index:1">';
+        return '<img class="sshdr-img' + (si===0?' active':'') + '" src="' + imgOpt(url,{w:800,q:75}) + '" alt="' + s.name + '" loading="lazy" onerror="this.style.display=\'none\'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;display:block;opacity:' + (si===0?'1':'0') + ';transition:opacity 1s ease;z-index:1">';
       }).join('');
       var dotsHtml = stateImgs.map(function(_,si){
         return '<span class="sshdr-dot' + (si===0?' active':'') + '" onclick="event.stopPropagation();goStateSlide(\'' + s.id + '\',' + si + ')"></span>';
@@ -1159,7 +1180,7 @@ function renderStates() {
     } else {
       photoHtml = '<div class="shdr-img-col" style="position:relative;background:' + bg + '">' +
         '<div class="shdr-fallback" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:80px;opacity:.35">' + s.emoji + '</div>' +
-        (coverSrc ? '<img src="' + coverSrc + '" alt="' + s.name + ' culture" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;display:block" loading="lazy" onerror="this.style.display=\'none\'">' : '') +
+        (coverSrc ? '<img src="' + imgOpt(coverSrc,{w:800,q:75}) + '" alt="' + s.name + ' culture" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;display:block" loading="lazy" onerror="this.style.display=\'none\'">' : '') +
         '<div style="position:absolute;inset:0;background:linear-gradient(to right,rgba(0,0,0,.15),transparent)"></div>' +
       '</div>';
     }
@@ -1178,37 +1199,7 @@ function renderStates() {
     '</div>';
   }).join('');
 
-  // Wire skeleton fade-in for state tab thumbnails
-  setTimeout(function() {
-    document.querySelectorAll('.stab-thumb img[data-src]').forEach(function(img) {
-      var wrap = img.closest('.stab-thumb');
-      var src = img.getAttribute('data-src');
-      if (!src) return;
-      var tmp = new Image();
-      tmp.onload = function() {
-        img.src = src; img.removeAttribute('data-src');
-        if (wrap) { wrap.classList.add('img-ready'); setTimeout(function(){ wrap.classList.remove('skel'); }, 420); }
-      };
-      tmp.onerror = function() { if (wrap) { wrap.classList.remove('skel'); wrap.classList.add('img-ready'); } };
-      tmp.src = src;
-    });
-    // Wire skeleton fade-in for state header (shdr-img-col) images
-    document.querySelectorAll('.shdr-img-col img').forEach(function(img) {
-      var wrap = img.closest('.shdr-img-col');
-      if (!wrap || wrap.classList.contains('img-ready')) return;
-      if (!img.src && !img.getAttribute('data-src')) return;
-      var src = img.getAttribute('data-src') || img.src;
-      if (!src) return;
-      if (wrap) wrap.classList.add('skel', 'skel-dark');
-      var tmp = new Image();
-      tmp.onload = function() {
-        if (img.getAttribute('data-src')) { img.src = src; img.removeAttribute('data-src'); }
-        if (wrap) { wrap.classList.add('img-ready'); setTimeout(function(){ wrap.classList.remove('skel'); }, 600); }
-      };
-      tmp.onerror = function() { if (wrap) { wrap.classList.remove('skel'); wrap.classList.add('img-ready'); } };
-      tmp.src = src;
-    });
-  }, 0);
+  // State tab thumbnails now use direct src with onload — no deferred loading needed
 }
 
 
@@ -1231,7 +1222,7 @@ function renderStoryCards(activeId) {
   el.innerHTML = STATES.map(function(s) {
     var imgSrc = (s._uploadedImgs && s._uploadedImgs[0]) || s._uploadedImg || s.tab_photo_url || '';
     var imgHtml = imgSrc
-      ? '<img class="story-card-img" data-src="' + imgSrc + '" src="" alt="' + s.name + '" loading="lazy">'
+      ? '<img class="story-card-img" src="' + imgOpt(imgSrc,{w:400,q:75}) + '" alt="' + s.name + '" loading="lazy" style="opacity:0;transition:opacity .4s" onload="this.style.opacity=1" onerror="this.style.display=\'none\'">'
       : '<div class="story-card-emo" style="background:' + (s.panel_bg||'linear-gradient(135deg,#1a3a1e,#2d5233)') + '">' + s.emoji + '</div>';
     var snippet = _storySnippets[s.id] || s.description.substring(0, 90) + '…';
     var isActive = s.id === (activeId || STATES[0].id);
@@ -1245,23 +1236,7 @@ function renderStoryCards(activeId) {
     '</div>';
   }).join('');
 
-  // Wire skeleton fade-in for story card images
-  setTimeout(function() {
-    document.querySelectorAll('.story-card-img[data-src]').forEach(function(img) {
-      var wrap = img.closest('.story-card');
-      var src = img.getAttribute('data-src');
-      if (!src) return;
-      var tmp = new Image();
-      tmp.onload = function() {
-        img.src = src;
-        img.removeAttribute('data-src');
-        img.style.opacity = '1';
-        if (wrap) wrap.classList.add('img-ready');
-      };
-      tmp.onerror = function() { img.style.display = 'none'; if (wrap) wrap.classList.add('img-ready'); };
-      tmp.src = src;
-    });
-  }, 0);
+  // Story card images now use direct src with onload — no deferred loading needed
 }
 
 function swState(id) {
@@ -1604,7 +1579,7 @@ function uCart() {
   }
   ciw.innerHTML = cart.map(function(i) {
     var imgContent = i.image
-      ? '<div style="position:relative;width:100%;height:100%"><div class="pimg-skel" style="position:absolute;inset:0;border-radius:8px"></div><img src="' + i.image + '" alt="' + i.name + '" loading="eager" style="position:relative;z-index:1;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .4s" onload="this.style.opacity=1;var s=this.previousElementSibling;if(s)s.style.display=\'none\'" onerror="this.style.display=\'none\'"></div>'
+      ? '<div style="position:relative;width:100%;height:100%"><div class="pimg-skel" style="position:absolute;inset:0;border-radius:8px"></div><img src="' + imgOpt(i.image,{w:120,q:70}) + '" alt="' + i.name + '" loading="eager" style="position:relative;z-index:1;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .4s" onload="this.style.opacity=1;var s=this.previousElementSibling;if(s)s.style.display=\'none\'" onerror="this.style.display=\'none\'"></div>'
       : '<span style="font-size:26px">' + (i.emoji||'🌿') + '</span>';
     return '<div class="ci">' +
       '<div class="cimg">' + imgContent + '</div>' +
@@ -2244,7 +2219,7 @@ function renderUpsell() {
   section.style.display = 'block';
   strip.innerHTML = suggestions.map(function(p) {
     var imgHtml = p.image_url
-      ? '<div style="position:relative;width:100%;height:100%"><div class="pimg-skel" style="position:absolute;inset:0;border-radius:8px"></div><img src="'+p.image_url+'" loading="lazy" style="position:relative;z-index:1;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .4s" onload="this.style.opacity=1;var s=this.previousElementSibling;if(s)s.style.display=\'none\'" onerror="this.style.display=\'none\'"></div>'
+      ? '<div style="position:relative;width:100%;height:100%"><div class="pimg-skel" style="position:absolute;inset:0;border-radius:8px"></div><img src="'+imgOpt(p.image_url,{w:120,q:70})+'" loading="lazy" style="position:relative;z-index:1;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .4s" onload="this.style.opacity=1;var s=this.previousElementSibling;if(s)s.style.display=\'none\'" onerror="this.style.display=\'none\'"></div>'
       : '<span style="font-size:28px">'+(p.emoji||'🌿')+'</span>';
     var addBtn = '<button onclick="addToCart(\'' + p.id + '\')" style="margin-top:6px;background:var(--g);color:#fff;border:none;border-radius:6px;padding:4px 10px;font-size:11px;font-weight:600;cursor:pointer;width:100%">+ Add</button>';
     return '<div class="cu-item"><div class="cu-img">'+imgHtml+'</div><div class="cu-name">'+p.name+'</div><div class="cu-price">&#8377;'+p.price+'</div>'+addBtn+'</div>';
@@ -2352,7 +2327,7 @@ function openQV(id) {
     '<button class="qv-close" onclick="closeQV()">✕</button>' +
     '<div class="qv-inner">' +
       '<div class="qv-img-col">' + (p.emoji||'🌿') +
-        (p.image_url ? '<div class="qv-img-wrap" style="position:relative"><div class="pimg-skel" style="position:absolute;inset:0;border-radius:12px"></div><img src="' + p.image_url + '" alt="' + p.name + '" loading="eager" fetchpriority="high" style="position:relative;z-index:1;opacity:0;transition:opacity .4s;width:100%;height:100%;object-fit:cover;border-radius:12px" onload="this.style.opacity=1;var sk=this.previousElementSibling;if(sk)sk.style.display=\'none\'" onerror="this.style.display=\'none\'">' + '</div>' : '') +
+        (p.image_url ? '<div class="qv-img-wrap" style="position:relative"><div class="pimg-skel" style="position:absolute;inset:0;border-radius:12px"></div><img src="' + imgOpt(p.image_url,{w:600,q:80}) + '" alt="' + p.name + '" loading="eager" fetchpriority="high" style="position:relative;z-index:1;opacity:0;transition:opacity .4s;width:100%;height:100%;object-fit:cover;border-radius:12px" onload="this.style.opacity=1;var sk=this.previousElementSibling;if(sk)sk.style.display=\'none\'" onerror="this.style.display=\'none\'">' + '</div>' : '') +
       '</div>' +
       '<div class="qv-content">' +
         '<div class="qv-region">📍 ' + (p.region||'') + '</div>' +
@@ -2441,7 +2416,7 @@ function renderRecentlyViewed() {
     return '<div class="rv-mini" onclick="goToProductPage(\'' + getProductSlug(p) + '\')" style="cursor:pointer">' +
       '<div class="rv-mini-img" style="position:relative">' +
         (p.image_url
-          ? '<div class="pimg-skel" style="position:absolute;inset:0;border-radius:8px"></div><img src="' + p.image_url + '" alt="' + p.name + '" loading="lazy" style="position:relative;z-index:1;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .4s" onload="this.style.opacity=1;var s=this.previousElementSibling;if(s)s.style.display=\'none\'" onerror="this.style.display=\'none\'">'
+          ? '<div class="pimg-skel" style="position:absolute;inset:0;border-radius:8px"></div><img src="' + imgOpt(p.image_url,{w:80,q:70}) + '" alt="' + p.name + '" loading="lazy" style="position:relative;z-index:1;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .4s" onload="this.style.opacity=1;var s=this.previousElementSibling;if(s)s.style.display=\'none\'" onerror="this.style.display=\'none\'">'
           : (p.emoji||'🌿'))
       + '</div>' +
       '<div class="rv-mini-info"><div class="rv-mini-name">' + p.name + '</div><div class="rv-mini-price">₹' + p.price + '</div></div>' +
