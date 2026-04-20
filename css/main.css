@@ -2808,3 +2808,55 @@ html[data-theme="valley"] .hslide-btn-primary { background: #4a7c59; }
 
 /* ── Quick view image wrapper ── */
 .qv-img-wrap { position: relative; width: 100%; height: 100%; border-radius: 12px; overflow: hidden; }
+
+/* ══════════════════════════════════════════════════════
+   IMAGE PERFORMANCE OPTIMIZATIONS
+   ══════════════════════════════════════════════════════ */
+
+/* GPU-accelerate image fade-ins so they don't cause repaints */
+.piw img,
+.ccat-v2-box img,
+.stab-thumb img,
+.shdr-img-col img,
+.story-card-img,
+.qv-img-wrap img {
+  will-change: opacity;
+  transform: translateZ(0); /* force compositing layer */
+}
+
+/* Faster skeleton pulse — 1.2s feels snappier than 1.4s */
+@keyframes skelshimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+.skel::before {
+  animation-duration: 1.2s !important;
+}
+
+/* Product image wrapper — explicit aspect-ratio prevents layout shift */
+.piw {
+  contain: layout paint; /* browser can skip off-screen layout */
+}
+
+/* Category card box — fix height so skeleton shows properly */
+.ccat-v2-box {
+  will-change: transform;
+}
+
+/* Prevent CLS (cumulative layout shift) on product cards */
+.pcard {
+  contain: layout;
+}
+
+/* Hero image — ensure shimmer never flashes after load */
+.hero-img-shimmer {
+  transition: opacity .3s ease;
+}
+
+/* Reduce transition on slow connections via prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  .piw img,
+  .ccat-v2-box img,
+  .story-card-img { transition: none !important; opacity: 1 !important; }
+  .skel::before { animation: none !important; }
+}

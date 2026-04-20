@@ -1066,7 +1066,7 @@ async function loadTeamSection() {
       <div class="team-card fade-up">
         <div class="team-photo">
           ${m.image_url
-            ? `<img src="${m.image_url}" alt="${m.name||''}" loading="lazy">`
+            ? `<img src="${m.image_url}" alt="${m.name||''}" loading="lazy" onerror="this.style.display='none';this.parentElement.textContent='👤'">`
             : '👤'}
         </div>
         ${m.is_founder ? '<div class="team-founder-badge">Founder</div>' : ''}

@@ -41,7 +41,10 @@
       // Preload the image
       var pl = document.createElement('link');
       var _ou=prod.image_url;
-        if(_ou&&_ou.includes('supabase.co/storage/v1/object/public/')){_ou=_ou.replace('/storage/v1/object/public/','/storage/v1/render/image/public/');_ou+=(_ou.includes('?')?'&':'?')+'width=900&quality=82&format=webp';}
+        if(_ou&&_ou.includes('supabase.co/storage/v1/object/public/')){
+          _ou=_ou.replace('/storage/v1/object/public/','/storage/v1/render/image/public/');
+          _ou+=(_ou.includes('?')?'&':'?')+'width=900&quality=82&format=webp';
+        }
         pl.rel='preload'; pl.as='image'; pl.href=_ou; pl.setAttribute('fetchpriority','high');
       document.head.appendChild(pl);
     } catch(e){}
@@ -971,16 +974,26 @@ function updateShippingUI() {
 
 
 // ── IMAGE OPTIMIZER — Supabase transform API ──
+var _imgOptFailed = {};
 function imgOpt(url, opts) {
   if (!url) return url;
   try {
     if (!url.includes('supabase.co/storage/v1/object/public/')) return url;
+    var baseKey = url.split('?')[0];
+    if (_imgOptFailed[baseKey]) return url;
     var w = (opts && opts.w) || 800;
     var q = (opts && opts.q) || 75;
-    var t = url.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/');
-    var sep = t.includes('?') ? '&' : '?';
-    return t + sep + 'width=' + w + '&quality=' + q + '&format=webp';
+    var transformed = url.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/');
+    var sep = transformed.includes('?') ? '&' : '?';
+    return transformed + sep + 'width=' + w + '&quality=' + q + '&format=webp';
   } catch(e) { return url; }
+}
+function imgOptFallback(el, originalUrl) {
+  if (!originalUrl || el.dataset.fbDone) return;
+  el.dataset.fbDone = '1';
+  var baseKey = originalUrl.split('?')[0];
+  _imgOptFailed[baseKey] = true;
+  el.src = originalUrl;
 }
 async function loadProduct() {
   var slug = getSlug();
@@ -1117,7 +1130,7 @@ function renderProduct(p, images, related, data, stateMap, stateImgMap) {
         (p.mrp&&p.price&&p.mrp>p.price?'<div class="disc-badge">-'+Math.round((1-p.price/p.mrp)*100)+'%</div>':'') +
         (allImgs.length>1?'<button class="img-arrow prev" onclick="event.stopPropagation();_goImg(-1)">&#8249;</button>':'') +
         '<div class="main-img-skel" style="position:absolute;inset:0;background:linear-gradient(110deg,#ede8df 25%,#f7f2ea 50%,#ede8df 75%);background-size:200% 100%;animation:shimmer 1.4s infinite linear;z-index:0"></div>' +
-        '<img id="main-img" src="'+imgOpt(allImgs[0],{w:900,q:82})+'" alt="'+p.name+'" loading="eager" fetchpriority="high" decoding="async" style="position:relative;z-index:1;opacity:0;transition:opacity .5s ease" onload="this.style.opacity=1;var sk=document.querySelector(\'.main-img-skel\');if(sk)sk.style.display=\'none\'">' +
+        '<img id="main-img" src="'+imgOpt(allImgs[0],{w:900,q:82})+'" alt="'+p.name+'" loading="eager" fetchpriority="high" decoding="async" width="900" height="900" style="position:relative;z-index:1;opacity:0;transition:opacity .5s ease" onload="this.style.opacity=1;var sk=document.querySelector(\'.main-img-skel\');if(sk)sk.style.display=\'none\'">' +
         (allImgs.length>1?'<button class="img-arrow next" onclick="event.stopPropagation();_goImg(1)">&#8250;</button>':'') +
         (allImgs.length>1?'<div class="img-counter" id="img-counter">1 / '+allImgs.length+'</div>':'') +
       '</div>'
@@ -1221,7 +1234,7 @@ function renderProduct(p, images, related, data, stateMap, stateImgMap) {
         var rPrice = Number(r.price)||0;
         return '<div class="rel-card">' +
           '<div class="rel-img" onclick="goToProduct(\'' + rSlug + '\')" style="cursor:pointer">' +
-            (r.image_url ? '<div style="position:relative;width:100%;height:100%"><div style="position:absolute;inset:0;background:linear-gradient(110deg,#ede8df 25%,#f7f2ea 50%,#ede8df 75%);background-size:200% 100%;animation:shimmer 1.4s infinite linear"></div><img src="' + imgOpt(r.image_url,{w:400,q:75}) + '" alt="' + rNameSafe + '" loading="lazy" decoding="async" style="position:relative;z-index:1;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .4s" onload="this.style.opacity=1;var s=this.previousElementSibling;if(s)s.style.display=\'none\'" onerror="this.style.display=\'none\'"></div>' : '<div class="rel-img-placeholder">' + rEmojiSafe + '</div>') +
+            (r.image_url ? '<div style="position:relative;width:100%;height:100%"><div style="position:absolute;inset:0;background:linear-gradient(110deg,#ede8df 25%,#f7f2ea 50%,#ede8df 75%);background-size:200% 100%;animation:shimmer 1.4s infinite linear"></div><img src="' + imgOpt(r.image_url,{w:400,q:75}) + '" alt="' + rNameSafe + '" loading="lazy" decoding="async" style="position:relative;z-index:1;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .4s" onload="this.style.opacity=1;var s=this.previousElementSibling;if(s)s.style.display=\'none\'" onerror="imgOptFallback(this,r.image_url)"></div>' : '<div class="rel-img-placeholder">' + rEmojiSafe + '</div>') +
             (rDisc > 0 ? '<span class="rel-disc">-' + rDisc + '%</span>' : '') +
           '</div>' +
           '<div class="rel-body">' +

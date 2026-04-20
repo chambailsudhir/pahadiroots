@@ -255,9 +255,9 @@
         // Preload the actual image
         // Optimize URL for fast load (Supabase transform API)
         var optUrl = url;
-        if (url.includes('supabase.co/storage/v1/object/public/')) {
-          optUrl = url.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/');
-          optUrl += (optUrl.includes('?') ? '&' : '?') + 'width=1400&quality=80&format=webp';
+        if (url && url.includes('supabase.co/storage/v1/object/public/')) {
+          var _t = url.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/');
+          optUrl = _t + (_t.includes('?') ? '&' : '?') + 'width=1400&quality=80&format=webp';
         }
         var link = document.createElement('link');
         link.rel = 'preload';

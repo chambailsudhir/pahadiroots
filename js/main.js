@@ -236,13 +236,16 @@ var _heroSlideIndex = 0;
 var _heroSlideTimer = null;
 var _heroSlideCount = 0;
 
-// ── IMAGE OPTIMIZER — rewrites Supabase URLs to use built-in transform API ──
-// Converts full-res images (2-5MB) → resized WebP (30-150KB) = up to 30x faster
-// Supabase: /storage/v1/render/image/public/... ?width=W&quality=Q&format=webp
+// ── IMAGE OPTIMIZER — Supabase transform API (WebP + resize = 3-5x faster) ──
+// Auto-falls back to direct URL if transform add-on is not enabled on Supabase.
+var _imgOptFailed = {}; // tracks URLs where transform returned 404
+
 function imgOpt(url, opts) {
   if (!url) return url;
   try {
     if (!url.includes('supabase.co/storage/v1/object/public/')) return url;
+    var baseKey = url.split('?')[0];
+    if (_imgOptFailed[baseKey]) return url; // already failed — use direct
     var w = (opts && opts.w) || 800;
     var q = (opts && opts.q) || 75;
     var transformed = url.replace(
@@ -252,6 +255,15 @@ function imgOpt(url, opts) {
     var sep = transformed.includes('?') ? '&' : '?';
     return transformed + sep + 'width=' + w + '&quality=' + q + '&format=webp';
   } catch(e) { return url; }
+}
+
+// Attach to onerror: tries direct URL when transform API fails
+function imgOptFallback(el, originalUrl) {
+  if (!originalUrl || el.dataset.fbDone) return;
+  el.dataset.fbDone = '1';
+  var baseKey = originalUrl.split('?')[0];
+  _imgOptFailed[baseKey] = true;
+  el.src = originalUrl;
 }
 
 function esc2(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
@@ -267,7 +279,10 @@ function imgLoad(el, url, wrapSelector) {
     else { el.style.backgroundImage = 'url(' + url + ')'; }
     if (wrap) { wrap.classList.add('img-ready'); setTimeout(function(){ wrap.classList.remove('skel'); }, 400); }
   };
-  tmp.onerror = function() { if (wrap) { wrap.classList.add('img-ready'); wrap.classList.remove('skel'); } };
+  tmp.onerror = function() {
+    if (wrap) { wrap.classList.add('img-ready'); wrap.classList.remove('skel'); }
+    if (el.tagName === 'IMG') { el.style.display = 'none'; }
+  };
   tmp.src = url;
 }
 
@@ -285,7 +300,7 @@ function buildSlide(s, idx) {
   if (img) {
     // Shimmer placeholder shown while image loads
     html += '<div class="hero-img-shimmer" style="position:absolute;inset:0;z-index:0;background:linear-gradient(110deg,#0d2410 0%,#1a3a1e 40%,#0d2410 100%);background-size:200% 100%;animation:shimmer 1.6s infinite"></div>';
-    html += '<img src="' + esc2(imgOpt(img,{w:1400,q:80})) + '" alt="' + esc2(s.title || 'Pahadi Roots') + '" fetchpriority="' + (idx === 0 ? 'high' : 'low') + '" decoding="async" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;display:block;z-index:1;opacity:0;transition:opacity .6s ease" onload="this.style.opacity=1;var sh=this.previousElementSibling;if(sh&&sh.classList.contains(\'hero-img-shimmer\'))sh.style.display=\'none\'" onerror="this.style.display=\'none\'">';
+    html += '<img src="' + esc2(imgOpt(img,{w:1400,q:80})) + '" alt="' + esc2(s.title || 'Pahadi Roots') + '" fetchpriority="' + (idx === 0 ? 'high' : 'low') + '" decoding="async" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;display:block;z-index:1;opacity:0;transition:opacity .6s ease" onload="this.style.opacity=1;var sh=this.previousElementSibling;if(sh&&sh.classList.contains(\'hero-img-shimmer\'))sh.style.display=\'none\'" onerror="imgOptFallback(this,\''+esc2(img)+'\')">';
   } else {
     html += '<div style="position:absolute;inset:0;background:linear-gradient(150deg,#071a09 0%,#0d2410 30%,#1a3a1e 65%,#2d5233 100%);z-index:0"></div>';
   }
@@ -971,7 +986,7 @@ function mkProd(p) {
   var inWL   = wishlist.findIndex(function(x){ return String(x) === String(p.id); }) > -1;
   var slug   = getProductSlug(p);
   var imgHtml = p.image_url
-    ? '<div class="pimg-skel" style="position:absolute;inset:0;z-index:0;border-radius:inherit"></div><img src="' + imgOpt(p.image_url,{w:400,q:75}) + '" alt="' + p.name + '" loading="lazy" decoding="async" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;opacity:0;transition:opacity .45s" onload="this.style.opacity=1;var sk=this.previousElementSibling;if(sk)sk.style.display=\'none\';this.closest(\'.piw\')&&this.closest(\'.piw\').classList.add(\'img-ready\')" onerror="this.style.display=\'none\'">'
+    ? '<div class="pimg-skel" style="position:absolute;inset:0;z-index:0;border-radius:inherit"></div><img src="' + imgOpt(p.image_url,{w:400,q:75}) + '" alt="' + p.name + '" loading="lazy" decoding="async" width="400" height="500" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;opacity:0;transition:opacity .45s" onload="this.style.opacity=1;var sk=this.previousElementSibling;if(sk)sk.style.display=\'none\';this.closest(\'.piw\')&&this.closest(\'.piw\').classList.add(\'img-ready\')" onerror="imgOptFallback(this,\''+p.image_url+'\')">''
     : '';
   var img = '<div class="piw" style="background:' + (p.card_bg||'#f9f4ec') + '">' +
     imgHtml +
@@ -2251,7 +2266,7 @@ function onSearch(q) {
   if (!res) return;
   res.innerHTML = hits.map(function(p) {
     return '<div class="srch-item" onclick="closeSearch();goToProductPage(\'' + getProductSlug(p) + '\')" style="cursor:pointer">' +
-      '<div class="srch-thumb">' + (p.image_url ? '<img src="' + p.image_url + '" alt="' + p.name + '" loading="lazy">' : (p.emoji||'🌿')) + '</div>' +
+      '<div class="srch-thumb">' + (p.image_url ? '<img src="' + imgOpt(p.image_url,{w:80,q:70}) + '" alt="' + p.name + '" loading="lazy" onerror="imgOptFallback(this,\''+p.image_url+'\')" width="80" height="80">' : (p.emoji||'🌿')) + '</div>' +
       '<div><div class="srch-iname">' + p.name + '</div>' +
       '<div class="srch-iregion">📍 ' + (p.region||'') + '</div>' +
       '<div class="srch-iprice">₹' + p.price + (p.unit||'') + '</div></div>' +
@@ -2301,7 +2316,7 @@ function renderWishlist() {
   body.innerHTML = '<div class="wl-grid">' + items.map(function(p) {
     return '<div class="wl-card" onclick="closeWishlist();goToProductPage(\'' + getProductSlug(p) + '\')" style="cursor:pointer">' +
       '<button class="wl-irm" onclick="event.stopPropagation();toggleWishlist(\'' + p.id + '\');renderWishlist()">✕</button>' +
-      '<div class="wl-img">' + (p.image_url ? '<img src="' + p.image_url + '" alt="' + p.name + '" loading="lazy">' : (p.emoji||'🌿')) + '</div>' +
+      '<div class="wl-img">' + (p.image_url ? '<img src="' + imgOpt(p.image_url,{w:80,q:70}) + '" alt="' + p.name + '" loading="lazy" onerror="imgOptFallback(this,\''+p.image_url+'\')" width="80" height="80">' : (p.emoji||'🌿')) + '</div>' +
       '<div class="wl-info"><div class="wl-iname">' + p.name + '</div><div class="wl-iprice">₹' + p.price + '</div>' +
       '<button class="wl-iadd" onclick="event.stopPropagation();addToCart(\'' + p.id + '\')" >Add to Cart</button></div>' +
     '</div>';
