@@ -84,12 +84,12 @@ nav#mNav.shadow{box-shadow:0 2px 16px rgba(0,0,0,.08)}
 .btn-g:hover{background:var(--gd2);transform:translateY(-2px);box-shadow:0 8px 24px rgba(200,146,10,.35)}
 .btn-w{padding:14px 28px;border-radius:30px;font-size:14px;font-weight:800;letter-spacing:.5px;background:rgba(255,255,255,.12);color:#fff;border:1.5px solid rgba(255,255,255,.35);transition:all .25s;display:inline-block}
 .btn-w:hover{background:rgba(255,255,255,.22)}
-.hstats{display:flex;gap:0;justify-content:center;background:transparent;width:100%;padding:0;flex-wrap:wrap;position:relative;z-index:1}
-.hstat{text-align:center;padding:0 28px}
-.hstat-num{font-family:'Playfair Display',serif;font-size:clamp(22px,3vw,34px);font-weight:900;color:var(--gd2)}
+.hstats{display:flex;align-items:center;justify-content:center;gap:0;width:100%;padding:14px 40px;box-sizing:border-box;flex-wrap:wrap}
+.hstat{display:flex;align-items:center;text-align:center}
+.hstat-num{font-family:'Playfair Display',serif;font-size:clamp(20px,2.2vw,30px);font-weight:900;color:var(--gd2);line-height:1.1;padding:0 28px}
 .hstat-num em{font-size:.55em;font-style:normal;opacity:.8}
-.hstat-lbl{font-size:10.5px;color:rgba(255,255,255,.52);letter-spacing:1px;margin-top:3px}
-.hstat-div{width:1px;background:rgba(255,255,255,.15);align-self:stretch;margin:4px 0}
+.hstat-lbl{font-size:10px;color:rgba(255,255,255,.52);letter-spacing:1px;margin-top:3px;text-transform:uppercase;padding:0 28px}
+.hstat-div{width:1px;height:36px;background:rgba(255,255,255,.15);flex-shrink:0;align-self:center}
 .sca{position:absolute;bottom:90px;left:50%;transform:translateX(-50%);color:rgba(255,255,255,.4);font-size:11px;letter-spacing:2px;display:flex;flex-direction:column;align-items:center;gap:4px;animation:bob 2s ease infinite;z-index:1}
 @keyframes bob{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(5px)}}
 
@@ -753,8 +753,10 @@ footer{background:#132b17;padding:0;position:relative;overflow:hidden}
   .trust{grid-template-columns:1fr 1fr}
   .nlf{flex-direction:column}
   .f-bot{flex-direction:column;gap:8px;text-align:center}
-  .hstats{gap:0}
-  .hstat{padding:0 12px}
+  .hstats{padding:12px 8px}
+  .hstat-num{font-size:clamp(18px,5vw,24px);padding:0 14px}
+  .hstat-lbl{padding:0 14px;font-size:9px}
+  .hstat-div{height:28px}
 }
 
 
