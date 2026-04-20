@@ -670,6 +670,30 @@ async function loadData() {
   STATES   = FALLBACK_STATES.map(s => Object.assign({}, s));
   renderStates(); uCart(); observeRv();
   initAllStateSlides(); initProductHoverImages();
+
+  // ── INSTANT RENDER from localStorage cache (stale-while-revalidate) ──
+  // Renders products/hero immediately so the page feels instant on every visit.
+  // Fresh data from the API then silently updates in the background below.
+  var _cacheUsed = false;
+  try {
+    var _cached = JSON.parse(localStorage.getItem('pr_products_cache') || 'null');
+    // Use cache if it exists and is less than 5 minutes old
+    if (_cached && Array.isArray(_cached.products) && _cached.products.length &&
+        (Date.now() - (_cached.ts || 0)) < 5 * 60 * 1000) {
+      PRODUCTS = _cached.products;
+      renderProds();
+      _cacheUsed = true;
+    }
+  } catch(e) {}
+
+  // Also render hero instantly from cached settings
+  try {
+    var _cachedSettings = JSON.parse(localStorage.getItem('pr_site_settings') || 'null');
+    if (_cachedSettings) {
+      initHeroSlider(_cachedSettings);
+    }
+  } catch(e) {}
+
   // Open cart instantly if redirected from product page
   if (window.location.search.includes('opencart=1')) {
     history.replaceState(null, '', '/');
@@ -685,7 +709,7 @@ async function loadData() {
     }
   }
 
-  // Step 2: try DB
+  // Step 2: try DB (background refresh — updates cache + re-renders silently)
   try {
     var r = await fetch(getStoreApiBase() + '/store-data');
     if (!r.ok) throw new Error('store-data HTTP ' + r.status);
@@ -791,6 +815,8 @@ async function loadData() {
       initTrustBar(data.settings);   // Editable trust bar
       initAnnBar(data.settings);     // Announcement bar
       initTickerBar(data.settings);  // Scrolling ticker
+      // ── Cache settings so hero + UI renders instantly on next page load ──
+      try { localStorage.setItem('pr_site_settings', JSON.stringify(data.settings)); } catch(e) {}
     }
     var updated  = false;
 
@@ -2943,7 +2969,7 @@ function initPremium() {
 }
 
 window.addEventListener('DOMContentLoaded', function() {
-  initHeroSlideshow([]);
+  // loadData() handles hero init: from cache instantly, then refreshes from API
   loadData();
   initPremium();
 });
