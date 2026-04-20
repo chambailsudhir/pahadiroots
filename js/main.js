@@ -335,11 +335,24 @@ function buildSlide(s, idx) {
   return html;
 }
 
+var _heroSliderInited = false;
+var _heroSliderImgKey = ''; // tracks which images are currently loaded
+
 function initHeroSlider(settings) {
   var track  = document.getElementById('hsliderTrack');
   var dotsEl = document.getElementById('hsliderDots');
   var fallback = document.getElementById('hslide-fallback');
   if (!track) return;
+
+  // Build a fingerprint of the slide image URLs to detect if slides actually changed
+  var newImgKey = '';
+  for (var _n = 1; _n <= 3; _n++) {
+    if (settings && settings['hero_slide_' + _n + '_img']) newImgKey += settings['hero_slide_' + _n + '_img'] + '|';
+  }
+
+  // If slider already built with the same images, skip re-init entirely
+  if (_heroSliderInited && newImgKey === _heroSliderImgKey) return;
+  _heroSliderImgKey = newImgKey;
 
   var slides = [];
   for (var n = 1; n <= 3; n++) {
@@ -380,8 +393,19 @@ function initHeroSlider(settings) {
     return;
   }
 
-  // Hide fallback, inject real slides
-  if (fallback) fallback.style.display = 'none';
+  // If re-initialising with different slides, remove old ones first
+  if (_heroSliderInited) {
+    track.querySelectorAll('[data-slide]').forEach(function(el) { el.remove(); });
+    clearInterval(_heroSlideTimer);
+  }
+
+  // Fade out fallback smoothly instead of instant hide (no jarring flash)
+  if (fallback) {
+    fallback.style.transition = 'opacity 0.4s ease';
+    fallback.style.opacity = '0';
+    setTimeout(function() { if (fallback) fallback.style.display = 'none'; }, 400);
+  }
+
   var slidesHtml = slides.map(function(s, i) { return buildSlide(s, i); }).join('');
   // Insert slides before arrows
   var prevBtn = document.getElementById('hsliderPrev');
@@ -390,6 +414,8 @@ function initHeroSlider(settings) {
   } else {
     track.insertAdjacentHTML('afterbegin', slidesHtml);
   }
+
+  _heroSliderInited = true;
 
   _heroSlideCount = slides.length;
   _heroSlideIndex = 0;
@@ -2973,6 +2999,32 @@ window.addEventListener('DOMContentLoaded', function() {
   loadData();
   initPremium();
 });
+
+// ── BACK BUTTON / bfcache — re-inject hero when browser restores from cache ──
+// When a user navigates away and hits Back, the browser may restore a frozen
+// snapshot (bfcache). In that case DOMContentLoaded doesn't fire again, but
+// pageshow does — with event.persisted = true. We re-init the hero from the
+// cached settings so the image is visible immediately without a dark flash.
+window.addEventListener('pageshow', function(e) {
+  if (e.persisted) {
+    // Page was restored from bfcache — re-init hero from cached settings
+    try {
+      var s = JSON.parse(localStorage.getItem('pr_site_settings') || 'null');
+      if (s) {
+        // Reset init flag so slider re-renders cleanly
+        _heroSliderInited = false;
+        _heroSliderImgKey = '';
+        // Clear any existing slides first
+        var track = document.getElementById('hsliderTrack');
+        if (track) track.querySelectorAll('[data-slide]').forEach(function(el){ el.remove(); });
+        var fallback = document.getElementById('hslide-fallback');
+        if (fallback) { fallback.style.display = ''; fallback.style.opacity = '1'; }
+        initHeroSlider(s);
+      }
+    } catch(err) {}
+  }
+});
+
 // ── OPENCART URL PARAM — from product page checkout ─────────────────
 // When product.html redirects to /?opencart=1, auto-open cart
 (function() {

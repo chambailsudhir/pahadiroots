@@ -257,16 +257,47 @@
             document.head.appendChild(pre);
           }
         } catch(e) {}
-        // Preload the actual image
-        // Optimize URL for fast load (Supabase transform API)
-        var optUrl = url; // direct URL
+        // Preload the actual image with high priority
         var link = document.createElement('link');
         link.rel = 'preload';
         link.as = 'image';
-        link.href = optUrl;
+        link.href = url;
         if (i === 0) link.setAttribute('fetchpriority', 'high');
         document.head.appendChild(link);
       });
+
+      // ── INSTANT HERO: inject first image directly into the fallback div NOW ──
+      // This runs synchronously before DOMContentLoaded so the image appears
+      // immediately with zero JS delay — no dark flash, no waiting for API.
+      var firstUrl = cached[0];
+      if (firstUrl) {
+        // We can't query DOM yet (body not parsed), so use a tiny DOMContentLoaded
+        // that fires before main.js has a chance to run
+        document.addEventListener('DOMContentLoaded', function() {
+          var fallback = document.getElementById('hslide-fallback');
+          // Only inject if main.js hasn't already replaced the fallback
+          if (fallback && !document.querySelector('[data-slide]')) {
+            // Insert the real image behind the fallback text content
+            var img = document.createElement('img');
+            img.src = firstUrl;
+            img.alt = 'Pahadi Roots Hero';
+            img.fetchpriority = 'high';
+            img.decoding = 'async';
+            img.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;display:block;z-index:0;opacity:0;transition:opacity 0.5s ease';
+            img.onload = function() {
+              this.style.opacity = '1';
+              // Add overlay so text stays readable
+              var overlay = document.createElement('div');
+              overlay.style.cssText = 'position:absolute;inset:0;background:linear-gradient(100deg,rgba(5,20,8,.82) 0%,rgba(5,20,8,.6) 45%,rgba(5,20,8,.15) 70%,rgba(5,20,8,.05) 100%);z-index:1';
+              fallback.insertBefore(overlay, fallback.firstChild);
+              // Move fallback text above overlay
+              var textDiv = fallback.querySelector('div[style*="align-items"]');
+              if (textDiv) textDiv.style.zIndex = '2';
+            };
+            fallback.insertBefore(img, fallback.firstChild);
+          }
+        }, {once: true});
+      }
     }
   } catch(e) {}
 })();
