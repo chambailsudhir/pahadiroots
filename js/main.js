@@ -2592,11 +2592,17 @@ function initTickerBar(s) {
   if (!s) return;
   var wrap = document.getElementById('tickerWrap');
   if (!wrap) return;
-  if (s.ticker_hide === 'true') { wrap.style.display = 'none'; return; }
+  // Always show ticker — safety net same as trust/stats bars
   wrap.style.display = '';
+  // Check if ALL 5 items are individually hidden
+  var allItemsHidden = true;
+  for (var chk = 1; chk <= 5; chk++) {
+    if (s['ticker_' + chk + '_hide'] !== 'true') { allItemsHidden = false; break; }
+  }
   for (var n = 1; n <= 5; n++) {
     var items = document.querySelectorAll('[data-ticker="' + n + '"]');
-    var hide = s['ticker_' + n + '_hide'] === 'true';
+    // If all items hidden in DB, show them all (safety net)
+    var hide = allItemsHidden ? false : (s['ticker_' + n + '_hide'] === 'true');
     var text = s['ticker_' + n + '_text'];
     items.forEach(function(el) {
       if (hide) { el.style.display = 'none'; return; }
@@ -2610,10 +2616,10 @@ function initTickerBar(s) {
 function initHeroStats(s) {
   if (!s) return;
   var stats = [
-    { selector: '[data-stat="farmers"]',   numKey: 'stat_farmer_families',  lblKey: 'stat_farmer_label',    defaultNum: '500',   defaultLbl: 'Farmer Families', suffix: '+' },
-    { selector: '[data-stat="states"]',    numKey: 'stat_himalayan_states', lblKey: 'stat_states_label',    defaultNum: '10',    defaultLbl: 'Himalayan States', suffix: '+' },
-    { selector: '[data-stat="customers"]', numKey: 'stat_happy_customers',  lblKey: 'stat_customers_label', defaultNum: '10000', defaultLbl: 'Happy Customers', suffix: '+' },
-    { selector: '[data-stat="dispatch"]',  numKey: 'stat_avg_dispatch',     lblKey: 'stat_dispatch_label',  defaultNum: '48',    defaultLbl: 'Avg Dispatch', suffix: 'hr' },
+    { selector: '[data-stat="farmers"]',   numKey: 'stat_farmer_families',  lblKey: 'stat_farmer_label',    defaultNum: 500,   defaultLbl: 'Farmer Families', suffix: '+' },
+    { selector: '[data-stat="states"]',    numKey: 'stat_himalayan_states', lblKey: 'stat_states_label',    defaultNum: 10,    defaultLbl: 'Himalayan States', suffix: '+' },
+    { selector: '[data-stat="customers"]', numKey: 'stat_happy_customers',  lblKey: 'stat_customers_label', defaultNum: 10000, defaultLbl: 'Happy Customers', suffix: '+' },
+    { selector: '[data-stat="dispatch"]',  numKey: 'stat_avg_dispatch',     lblKey: 'stat_dispatch_label',  defaultNum: 48,    defaultLbl: 'Avg Dispatch', suffix: 'hr' },
   ];
 
   // Collect hide flags first — check if ALL are hidden
@@ -2635,11 +2641,11 @@ function initHeroStats(s) {
     var lblEl = el.querySelector('.hstat-lbl');
     if (numEl) {
       var rawNum = s[st.numKey] || s[st.numKey.replace('stat_','')] || '';
-      if (rawNum) {
-        var val = parseInt(rawNum, 10) || 0;
-        numEl.dataset.target = val;
-        numEl.innerHTML = val + '<em style="font-style:normal">' + st.suffix + '</em>';
-      }
+      // Use DB value if valid and >= defaultNum, otherwise fall back to default
+      var val = rawNum ? (parseInt(rawNum, 10) || 0) : 0;
+      if (!val || val < 1) val = st.defaultNum;
+      numEl.dataset.target = val;
+      numEl.innerHTML = val + '<em style="font-style:normal">' + st.suffix + '</em>';
     }
     if (lblEl && s[st.lblKey]) lblEl.textContent = s[st.lblKey];
     if (hideFlags[i]) {
