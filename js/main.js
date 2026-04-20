@@ -2621,33 +2621,27 @@ function initHeroStats(s) {
     if (!el) return;
     var numEl = el.querySelector('.hstat-num');
     var lblEl = el.querySelector('.hstat-lbl');
-    // Update number — use DB value if present, otherwise keep HTML default
     if (numEl) {
       var rawNum = s[st.numKey] || s[st.numKey.replace('stat_','')] || '';
       if (rawNum) {
         var val = parseInt(rawNum, 10) || 0;
         numEl.dataset.target = val;
-        numEl.innerHTML = val + '<em>' + st.suffix + '</em>';
+        numEl.innerHTML = val + '<em style="font-style:normal">' + st.suffix + '</em>';
       }
     }
     if (lblEl && s[st.lblKey]) lblEl.textContent = s[st.lblKey];
-    // Support both hide key formats:
-    //   old admin: stat_hide_stat_farmer_families
-    //   new admin: stat_hide_farmer_families  (without double "stat_" prefix)
     var hidden = s['stat_hide_' + st.numKey] || s['stat_hide_' + st.numKey.replace('stat_','')];
-    var statEl = el.closest('.hstat');
-    if (statEl) {
-      if (hidden === 'true') {
-        statEl.style.display = 'none';
-        var next = statEl.nextElementSibling;
-        if (next && next.classList.contains('hstat-div')) next.style.display = 'none';
-      } else {
-        statEl.style.display = '';
-        visibleCount++;
-      }
+    if (hidden === 'true') {
+      el.style.display = 'none';
+      // hide divider sibling too
+      var next = el.nextElementSibling;
+      if (next && next.classList && next.classList.contains('hstat-div')) next.style.display = 'none';
+    } else {
+      el.style.display = '';
+      visibleCount++;
     }
   });
-  // Always show the stats bar unless ALL four are explicitly hidden in DB
+  // Only hide the whole bar if ALL 4 explicitly hidden — otherwise always show
   var container = document.getElementById('hstats');
   if (container) container.style.display = visibleCount === 0 ? 'none' : 'flex';
 }
@@ -2655,6 +2649,7 @@ function initHeroStats(s) {
 // ── TRUST BAR — editable from admin Settings ──────────────────────
 function initTrustBar(s) {
   if (!s) return;
+  var bar = document.getElementById('trustBar');
   var items = document.querySelectorAll('.tc');
   var visibleCount = 0;
   items.forEach(function(tc, i) {
@@ -2662,7 +2657,6 @@ function initTrustBar(s) {
     var ico  = s['trust_' + n + '_icon']  || s['trust_badge_' + n + '_icon'];
     var lbl  = s['trust_' + n + '_title'] || s['trust_badge_' + n + '_title'];
     var sub  = s['trust_' + n + '_sub']   || s['trust_badge_' + n + '_sub'];
-    // Support both hide key formats: trust_1_hide and trust_badge_1_hide
     var hide = s['trust_' + n + '_hide']  || s['trust_badge_' + n + '_hide'];
     if (hide === 'true') { tc.style.display = 'none'; return; }
     tc.style.display = '';
@@ -2672,11 +2666,10 @@ function initTrustBar(s) {
     var subEl = tc.querySelector('.tds');
     if (icoEl && ico) icoEl.textContent = ico;
     if (lblEl && lbl) lblEl.textContent = lbl;
-    if (subEl && sub) subEl.innerHTML  = sub;
+    if (subEl && sub) subEl.innerHTML = sub;
   });
-  // Collapse entire trust bar only if all 4 items are explicitly hidden
-  var trustBar = document.querySelector('.trust');
-  if (trustBar) trustBar.style.display = visibleCount === 0 ? 'none' : '';
+  // Only collapse bar if ALL 4 explicitly hidden — otherwise always show
+  if (bar) bar.style.display = visibleCount === 0 ? 'none' : 'grid';
 }
 
 function animateCounters() {
@@ -2821,7 +2814,7 @@ window.addEventListener('scroll', function() {
 
 // ── HERO STATS OBSERVER ────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', function() {
-  var hstats = document.querySelector('.hstats');
+  var hstats = document.getElementById('hstats') || document.querySelector('.hstats');
   if (hstats && window.IntersectionObserver) {
     var heroObs = new IntersectionObserver(function(entries) {
       if (entries[0].isIntersecting) { animateCounters(); heroObs.disconnect(); }
