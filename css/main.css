@@ -2743,6 +2743,12 @@ html[data-theme="valley"] .hslide-btn-primary { background: #4a7c59; }
   .hslider-arrows { display: none; }
 }
 
+/* Trust bar responsive */
+@media (max-width: 640px) {
+  #trustBar { grid-template-columns: repeat(2,1fr) !important; }
+  #trustBar .tc { border-right: none !important; border-bottom: 1px solid rgba(255,255,255,.1); }
+}
+
 
 /* ═══════════════════════════════════════════════════════════════
    UNIVERSAL IMAGE SKELETON / FADE-IN SYSTEM
