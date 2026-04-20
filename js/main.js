@@ -980,8 +980,11 @@ async function loadData() {
       var activeStateEl = document.querySelector('.spnl.active');
       var activeStateId = activeStateEl ? activeStateEl.id.replace('p-','') : null;
       renderProds(); renderStates(); observeRv(); injectProductSchema(); renderUpsell();
+      refreshMegaMenu(); // Rebuild mega menu with real product categories
       // Fire event so all-products.html can update its count badge
       try { window.dispatchEvent(new CustomEvent('pahadiProductsLoaded', {detail:{count:PRODUCTS.length}})); } catch(e){}
+      // Fire pahadiDataReady for state.html and all-states.html
+      try { window.dispatchEvent(new CustomEvent('pahadiDataReady', {detail:{states:STATES,products:PRODUCTS}})); } catch(e){}
       // Update homepage "View All" count if present
       var tpc2 = document.getElementById('totalProdCount');
       if (tpc2 && PRODUCTS.length) tpc2.textContent = '(' + PRODUCTS.length + ')';
@@ -1007,6 +1010,277 @@ async function loadData() {
   } catch(e) {
     console.error('loadData failed:', e);
     showToast('⚠️ Could not load latest products — showing cached data');
+  }
+}
+
+// ── MEGA MENU ──────────────────────────────────────────────────────
+// Dynamically built from live PRODUCTS + STATES data.
+// Categories derived from product names/descriptions — always up to date.
+// States pulled directly from STATES array — no hardcoding needed.
+
+var _megaOpen = false;
+var _megaBuilt = false;
+
+// Category config: key → {label, icon, filter regex}
+var MEGA_CATEGORIES = [
+  {key:'honey',    label:'Honey',      icon:'🍯', re:/honey/i},
+  {key:'ghee',     label:'Ghee',       icon:'🥛', re:/ghee|butter/i},
+  {key:'saffron',  label:'Saffron',    icon:'🌸', re:/saffron|kesar/i},
+  {key:'tea',      label:'Tea',        icon:'🍵', re:/tea|chai/i},
+  {key:'spices',   label:'Spices',     icon:'🌿', re:/spice|cardamom|turmeric|pepper|chilli|ginger/i},
+  {key:'oil',      label:'Oils',       icon:'🫚', re:/oil/i},
+  {key:'rice',     label:'Rice',       icon:'🌾', re:/rice/i},
+  {key:'juice',    label:'Juice',      icon:'🧃', re:/juice|squash/i},
+  {key:'jams',     label:'Jams',       icon:'🍓', re:/jam|preserve|marmalade/i},
+  {key:'nuts',     label:'Dry Fruits', icon:'🌰', re:/walnut|almond|cashew|pistachio|dry.fruit|apricot|fig/i},
+  {key:'shilajit', label:'Shilajit',   icon:'🪨', re:/shilajit/i},
+  {key:'pulses',   label:'Pulses',     icon:'🫘', re:/pulse|rajma|dal|lentil/i},
+];
+
+var MEGA_CURATED = [
+  {label:'Best Sellers',    icon:'✦', filter:'bestseller'},
+  {label:'New Arrivals',    icon:'✦', filter:'new'},
+  {label:'Gift Sets',       icon:'✦', filter:'gift'},
+  {label:'Pahadi Wellness', icon:'✦', filter:'wellness'},
+  {label:'Natural Honey',   icon:'✦', filter:'honey'},
+  {label:'Pure Spices',     icon:'✦', filter:'spices'},
+];
+
+function buildMegaMenu() {
+  if (_megaBuilt) return;
+
+  // ── Collections column — show only categories with at least 1 product ──
+  var listColl = document.getElementById('megaListCollections');
+  if (listColl) {
+    listColl.innerHTML = '';
+    var shown = 0;
+    MEGA_CATEGORIES.forEach(function(cat) {
+      // Check if any product matches
+      var hasProducts = PRODUCTS.some(function(p) {
+        return cat.re.test(p.name + ' ' + (p.description || '') + ' ' + (p.category_id || ''));
+      });
+      if (!hasProducts && PRODUCTS.length > 0) return; // skip empty categories (only when data loaded)
+      if (shown >= 12) return; // max 12 rows
+      var li = document.createElement('li');
+      var btn = document.createElement('button');
+      btn.innerHTML = '<span class="mega-icon">' + cat.icon + '</span>' + cat.label;
+      btn.onclick = function() {
+        closeMegaMenu();
+        // Navigate to shop section and apply filter
+        var shopEl = document.getElementById('shop') || document.getElementById('pgrid');
+        if (shopEl) shopEl.scrollIntoView({behavior:'smooth', block:'start'});
+        setTimeout(function() {
+          // Apply the filter
+          var filterBtn = document.querySelector('[data-filter="' + cat.key + '"]') ||
+                          document.querySelector('.filter-btn[data-filter="' + cat.key + '"]');
+          setFilter(cat.key, filterBtn);
+        }, 300);
+      };
+      li.appendChild(btn);
+      listColl.appendChild(li);
+      shown++;
+    });
+  }
+
+  // ── States column — live from STATES array ──
+  var listStates = document.getElementById('megaListStates');
+  if (listStates) {
+    listStates.innerHTML = '';
+    var statesData = (STATES && STATES.length) ? STATES : FALLBACK_STATES;
+    statesData.forEach(function(st) {
+      var li = document.createElement('li');
+      var btn = document.createElement('button');
+      btn.innerHTML = '<span class="mega-icon">🏔️</span>' + st.name;
+      btn.onclick = (function(stId, stName) {
+        return function() {
+          closeMegaMenu();
+          // If on homepage, scroll to states section; otherwise go to state page
+          var statesEl = document.getElementById('states');
+          if (statesEl) {
+            statesEl.scrollIntoView({behavior:'smooth', block:'start'});
+            setTimeout(function() { swState(stId); }, 300);
+          } else {
+            window.location.href = '/state.html?id=' + stId;
+          }
+        };
+      })(st.id, st.name);
+      li.appendChild(btn);
+      // Also add a direct link for middle-click / open in new tab
+      var link = document.createElement('a');
+      link.href = '/state.html?id=' + st.id;
+      link.style.cssText = 'display:none';
+      li.appendChild(link);
+      listStates.appendChild(li);
+    });
+  }
+
+  // ── Curated picks column ──
+  var listCurated = document.getElementById('megaListCurated');
+  if (listCurated) {
+    listCurated.innerHTML = '';
+    MEGA_CURATED.forEach(function(item) {
+      var li = document.createElement('li');
+      var btn = document.createElement('button');
+      btn.innerHTML = '<span class="mega-icon">' + item.icon + '</span>' + item.label;
+      btn.onclick = function() {
+        closeMegaMenu();
+        var shopEl = document.getElementById('shop') || document.getElementById('pgrid');
+        if (shopEl) shopEl.scrollIntoView({behavior:'smooth', block:'start'});
+        setTimeout(function() {
+          var filterBtn = document.querySelector('[data-filter="' + item.filter + '"]') ||
+                          document.querySelector('.filter-btn[data-filter="' + item.filter + '"]');
+          setFilter(item.filter, filterBtn);
+        }, 300);
+      };
+      li.appendChild(btn);
+      listCurated.appendChild(li);
+    });
+  }
+
+  // Add View All States link to states column
+  var listStatesEl = document.getElementById('megaListStates');
+  if (listStatesEl && listStatesEl.parentNode) {
+    var existingViewAll = listStatesEl.parentNode.querySelector('.mega-view-all-states');
+    if (!existingViewAll) {
+      var viewAllStates = document.createElement('a');
+      viewAllStates.href = '/all-states.html';
+      viewAllStates.className = 'mega-view-all mega-view-all-states';
+      viewAllStates.innerHTML = '🗺️ View All Regions →';
+      viewAllStates.onclick = function() { closeMegaMenu(); };
+      listStatesEl.parentNode.appendChild(viewAllStates);
+    }
+  }
+
+  _megaBuilt = true;
+}
+
+function openMegaMenu() {
+  buildMegaMenu();
+  var menu = document.getElementById('shopMegaMenu');
+  var li   = document.getElementById('shopNavLi');
+  if (!menu || !li) return;
+  menu.classList.add('open');
+  li.classList.add('open');
+  _megaOpen = true;
+}
+
+function closeMegaMenu() {
+  var menu = document.getElementById('shopMegaMenu');
+  var li   = document.getElementById('shopNavLi');
+  if (!menu || !li) return;
+  menu.classList.remove('open');
+  li.classList.remove('open');
+  _megaOpen = false;
+}
+
+function toggleMegaMenu() {
+  _megaOpen ? closeMegaMenu() : openMegaMenu();
+}
+
+// Wire up hover + click on the Shop trigger
+document.addEventListener('DOMContentLoaded', function() {
+  var li      = document.getElementById('shopNavLi');
+  var trigger = document.getElementById('shopNavTrigger');
+  var menu    = document.getElementById('shopMegaMenu');
+  if (!li || !trigger || !menu) return;
+
+  var _mouseInMenu = false;
+  var _mouseInTrigger = false;
+
+  // Hover open/close — reliable flag-based approach
+  li.addEventListener('mouseenter', function() {
+    _mouseInTrigger = true;
+    openMegaMenu();
+  });
+  li.addEventListener('mouseleave', function() {
+    _mouseInTrigger = false;
+    setTimeout(function() {
+      if (!_mouseInMenu && !_mouseInTrigger) closeMegaMenu();
+    }, 100);
+  });
+  menu.addEventListener('mouseenter', function() {
+    _mouseInMenu = true;
+  });
+  menu.addEventListener('mouseleave', function() {
+    _mouseInMenu = false;
+    setTimeout(function() {
+      if (!_mouseInMenu && !_mouseInTrigger) closeMegaMenu();
+    }, 100);
+  });
+
+  // Click toggle (for keyboard/touch users)
+  trigger.addEventListener('click', function(e) {
+    e.preventDefault();
+    toggleMegaMenu();
+  });
+
+  // Close on outside click
+  document.addEventListener('click', function(e) {
+    if (_megaOpen && !li.contains(e.target) && !menu.contains(e.target)) {
+      closeMegaMenu();
+    }
+  });
+
+  // Close on Escape
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && _megaOpen) closeMegaMenu();
+  });
+});
+
+// Re-build menu after data loads (so categories reflect real products)
+function refreshMegaMenu() {
+  _megaBuilt = false;
+  buildMegaMenu();
+  buildMobMega();
+}
+
+function buildMobMega() {
+  // Mobile collections
+  var mobColl = document.getElementById('mobMegaColl');
+  if (mobColl && MEGA_CATEGORIES) {
+    mobColl.innerHTML = '';
+    MEGA_CATEGORIES.forEach(function(cat) {
+      var hasProducts = PRODUCTS.some(function(p) {
+        return cat.re.test(p.name + ' ' + (p.description || '') + ' ' + (p.category_id || ''));
+      });
+      if (!hasProducts && PRODUCTS.length > 0) return;
+      var a = document.createElement('a');
+      a.href = '#shop';
+      a.style.cssText = 'display:flex;align-items:center;gap:10px;padding:9px 14px;color:var(--tx);font-weight:600;border-radius:10px;font-size:14px;text-decoration:none';
+      a.innerHTML = '<span style="font-size:16px;width:22px;text-align:center">' + cat.icon + '</span>' + cat.label;
+      a.onclick = function() {
+        closeMobNav();
+        setTimeout(function() {
+          var el = document.getElementById('shop') || document.getElementById('pgrid');
+          if (el) el.scrollIntoView({behavior:'smooth'});
+          setTimeout(function() { setFilter(cat.key, null); }, 200);
+        }, 150);
+        return false;
+      };
+      mobColl.appendChild(a);
+    });
+  }
+  // Mobile states
+  var mobStates = document.getElementById('mobMegaStates');
+  if (mobStates) {
+    mobStates.innerHTML = '';
+    var statesData = (STATES && STATES.length) ? STATES : FALLBACK_STATES;
+    statesData.forEach(function(st) {
+      var a = document.createElement('a');
+      a.href = '#states';
+      a.style.cssText = 'display:flex;align-items:center;gap:10px;padding:9px 14px;color:var(--tx);font-weight:600;border-radius:10px;font-size:14px;text-decoration:none';
+      a.innerHTML = '<span style="font-size:16px;width:22px;text-align:center">🏔️</span>' + st.name;
+      a.onclick = function() {
+        closeMobNav();
+        setTimeout(function() {
+          var el = document.getElementById('states');
+          if (el) el.scrollIntoView({behavior:'smooth'});
+          setTimeout(function() { swState(st.id); }, 300);
+        }, 150);
+        return false;
+      };
+      mobStates.appendChild(a);
+    });
   }
 }
 
@@ -1255,6 +1529,7 @@ function renderStates() {
         '</div>' +
       '</div>' +
       '<div class="spgrid">' + prodsHtml + '</div>' +
+      (stProds.length ? '<div style="text-align:center;padding:24px 0 8px"><a href="/state.html?id=' + s.id + '" style="display:inline-flex;align-items:center;gap:7px;padding:11px 24px;background:var(--g);color:#fff;border-radius:22px;text-decoration:none;font-weight:800;font-family:'Lato',sans-serif;font-size:13px;letter-spacing:.3px;box-shadow:0 3px 14px rgba(26,58,30,.2);transition:all .2s" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">View All ' + s.name + ' Products →</a></div>' : '') +
     '</div>';
   }).join('');
 
@@ -1278,14 +1553,17 @@ var _storySnippets = {
 function renderStoryCards(activeId) {
   var el = document.getElementById('storyCards');
   if (!el) return;
-  el.innerHTML = STATES.map(function(s) {
+  var storyStates = STATES.slice(0, 5); // Show only 5 on homepage
+  el.innerHTML = storyStates.map(function(s) {
     var imgSrc = (s._uploadedImgs && s._uploadedImgs[0]) || s._uploadedImg || s.tab_photo_url || '';
     var imgHtml = imgSrc
       ? '<img class="story-card-img" src="' + imgOpt(imgSrc,{w:400,q:75}) + '" alt="' + s.name + '" loading="lazy" style="opacity:0;transition:opacity .4s" onload="this.style.opacity=1" onerror="this.style.display=\'none\'">'
       : '<div class="story-card-emo" style="background:' + (s.panel_bg||'linear-gradient(135deg,#1a3a1e,#2d5233)') + '">' + s.emoji + '</div>';
     var snippet = _storySnippets[s.id] || s.description.substring(0, 90) + '…';
     var isActive = s.id === (activeId || STATES[0].id);
-    return '<div class="story-card' + (isActive ? ' active-state' : '') + '" onclick="swState(\''+s.id+'\');renderStoryCards(\''+s.id+'\')">'+
+    // On homepage: switch tabs. Middle-click/right-click: go to state page
+    var cardUrl = '/state.html?id=' + s.id;
+    return '<div class="story-card' + (isActive ? ' active-state' : '') + '" onclick="swState(\''+s.id+'\');renderStoryCards(\''+s.id+'\')" data-state-href="' + cardUrl + '" title="View all products from ' + s.name + '">'+
       imgHtml +
       '<div class="story-card-body">'+
         '<div class="story-card-name">' + s.emoji + ' ' + s.name + '</div>'+
@@ -1293,7 +1571,15 @@ function renderStoryCards(activeId) {
         '<div class="story-card-line">' + snippet + '</div>'+
       '</div>'+
     '</div>';
-  }).join('');
+  }).join('') +
+    // "View All States" card
+    '<a href="/all-states.html" class="story-card" style="text-decoration:none;color:inherit;background:var(--g);display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:160px;cursor:pointer">' +
+      '<div style="font-size:40px;margin-bottom:10px">🗺️</div>' +
+      '<div class="story-card-body" style="background:transparent;text-align:center">' +
+        '<div class="story-card-name" style="color:#fff;font-size:14px">View All States</div>' +
+        '<div class="story-card-tag" style="color:rgba(255,255,255,.6)">10+ Regions →</div>' +
+      '</div>' +
+    '</a>';
 
   // Story card images now use direct src with onload — no deferred loading needed
 }
@@ -2998,6 +3284,8 @@ window.addEventListener('DOMContentLoaded', function() {
   // loadData() handles hero init: from cache instantly, then refreshes from API
   loadData();
   initPremium();
+  // Pre-populate mobile mega menu from fallback/cached data immediately
+  setTimeout(buildMobMega, 0);
 });
 
 // ── BACK BUTTON / bfcache — re-inject hero when browser restores from cache ──

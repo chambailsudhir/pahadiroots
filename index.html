@@ -158,6 +158,64 @@
     #hsliderTrack{position:relative;width:100%;height:75vh;min-height:500px;max-height:750px;overflow:hidden;background:#071a09}
     #hstats{background:rgba(5,20,8,.97)}
     @media(max-width:820px){.nav-links{display:none}}
+
+    /* ── MEGA MENU ─────────────────────────────────────────────── */
+    .mega-parent{position:static}
+    .mega-trigger{cursor:pointer;user-select:none;display:flex;align-items:center;gap:3px}
+    .mega-trigger .arr{font-size:10px;transition:transform .25s ease;display:inline-block;margin-left:2px}
+    .mega-parent.open .mega-trigger .arr{transform:rotate(180deg)}
+
+    .mega-menu{
+      position:fixed;top:64px;left:0;right:0;
+      background:#fff;border-bottom:1px solid #e8e8e8;
+      box-shadow:0 16px 48px rgba(0,0,0,.13);
+      z-index:499;padding:28px 40px 32px;
+      display:flex;gap:0;align-items:flex-start;
+      /* Hidden state */
+      visibility:hidden;
+      opacity:0;pointer-events:none;
+      transform:translateY(-6px);
+      transition:opacity .2s ease,transform .2s ease,visibility 0s linear .2s;
+    }
+    .mega-menu.open{
+      visibility:visible;
+      opacity:1;pointer-events:auto;
+      transform:translateY(0);
+      transition:opacity .2s ease,transform .2s ease,visibility 0s linear 0s;
+    }
+    .mega-col{flex:1;min-width:0;padding:0 24px}
+    .mega-col:first-child{padding-left:0}
+    .mega-col:last-child{padding-right:0}
+    .mega-heading{font-size:10px;font-weight:800;letter-spacing:1.8px;text-transform:uppercase;color:#999;margin-bottom:14px}
+    .mega-list{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:2px}
+    .mega-list li a,.mega-list li button{
+      display:flex;align-items:center;gap:8px;
+      width:100%;padding:7px 10px;border-radius:8px;
+      font-size:14px;font-weight:600;color:#2a2a2a;
+      text-decoration:none;background:none;border:none;
+      cursor:pointer;text-align:left;
+      transition:background .15s,color .15s;white-space:nowrap;
+    }
+    .mega-list li a:hover,.mega-list li button:hover{background:rgba(26,58,30,.07);color:#1a3a1e}
+    .mega-list li .mega-icon{font-size:15px;width:20px;text-align:center;flex-shrink:0}
+    .mega-divider{width:1px;background:#f0f0f0;align-self:stretch;flex-shrink:0;margin:0 8px}
+    .mega-view-all{
+      display:inline-flex;align-items:center;gap:4px;
+      margin-top:14px;padding:7px 10px;border-radius:8px;
+      font-size:13px;font-weight:700;color:#1a3a1e;
+      text-decoration:none;transition:background .15s;
+    }
+    .mega-view-all:hover{background:rgba(26,58,30,.07)}
+
+    /* Dark mode */
+    body.dark .mega-menu{background:#0d1a0f;border-color:#1e3a22}
+    body.dark .mega-list li a,body.dark .mega-list li button{color:#d4e8d4}
+    body.dark .mega-list li a:hover,body.dark .mega-list li button:hover{background:rgba(255,255,255,.06);color:#7ec87e}
+    body.dark .mega-heading{color:#556b55}
+    body.dark .mega-divider{background:#1e3a22}
+    body.dark .mega-view-all{color:#7ec87e}
+    /* Mobile — hide desktop mega, show mobile nav instead */
+    @media(max-width:820px){.mega-menu{display:none!important}}
   </style>
   <link rel="stylesheet" href="/css/main.css">
   <script src="https://checkout.razorpay.com/v1/checkout.js" defer></script>
@@ -329,8 +387,30 @@
     <div class="logo-words"><div class="logo-name">5 Pahadi Roots</div><div class="logo-tl">Himalayan Natural Store</div></div>
   </a>
   <ul class="nav-links">
-    <li><a href="#home">Home</a></li><li><a href="/our-story">Our Story</a></li><li><a href="#shop">Shop</a></li>
-    <li><a href="#states">By State</a></li><li><a href="#regions">Regions</a></li><li><a href="#pay-sec">Payment</a></li><li><a href="#contact">Contact</a></li>
+    <li><a href="#home">Home</a></li>
+    <li><a href="/our-story">Our Story</a></li>
+    <li class="mega-parent" id="shopNavLi">
+      <a href="#shop" class="mega-trigger" id="shopNavTrigger" onclick="return false;">Shop <span class="arr">▾</span></a>
+      <div class="mega-menu" id="shopMegaMenu" role="menu">
+        <div class="mega-col" id="megaColCollections">
+          <div class="mega-heading">ALL COLLECTIONS</div>
+          <ul class="mega-list" id="megaListCollections"></ul>
+          <a href="/all-products.html" class="mega-view-all">View All Products →</a>
+        </div>
+        <div class="mega-divider"></div>
+        <div class="mega-col" id="megaColStates">
+          <div class="mega-heading">SHOP BY REGION</div>
+          <ul class="mega-list" id="megaListStates"></ul>
+        </div>
+        <div class="mega-divider"></div>
+        <div class="mega-col" id="megaColCurated">
+          <div class="mega-heading">CURATED PICKS</div>
+          <ul class="mega-list" id="megaListCurated"></ul>
+        </div>
+      </div>
+    </li>
+    <li><a href="#pay-sec">Payment</a></li>
+    <li><a href="#contact">Contact</a></li>
   </ul>
   <div class="nav-right">
     <button class="nib" onclick="openSearch()" title="Search products" aria-label="Search">🔍</button>
@@ -411,8 +491,16 @@
   <div class="mob-nav-panel">
   <button class="mob-close" onclick="closeMobNav()">✕</button>
   <a href="#home" onclick="closeMobNav()">Home</a>
-  <a href="#shop" onclick="closeMobNav()">Shop</a>
-  <a href="#states" onclick="closeMobNav()">By State</a>
+  <a href="/all-products.html" onclick="closeMobNav()">Shop All</a>
+  <a href="/all-states.html" onclick="closeMobNav()">By State / Region</a>
+  <!-- Mobile Shop accordion -->
+  <div style="border-top:1px solid rgba(0,0,0,.07);margin:4px 0"></div>
+  <div style="padding:8px 14px;font-size:11px;font-weight:800;letter-spacing:1.5px;color:#999;text-transform:uppercase">Collections</div>
+  <div id="mobMegaColl" style="display:flex;flex-direction:column;gap:2px"></div>
+  <div style="border-top:1px solid rgba(0,0,0,.07);margin:4px 0"></div>
+  <div style="padding:8px 14px;font-size:11px;font-weight:800;letter-spacing:1.5px;color:#999;text-transform:uppercase">By State</div>
+  <div id="mobMegaStates" style="display:flex;flex-direction:column;gap:2px"></div>
+  <div style="border-top:1px solid rgba(0,0,0,.07);margin:8px 0"></div>
   <a href="/our-story" onclick="closeMobNav()">Our Story</a>
   <a href="#pay-sec" onclick="closeMobNav()">Payment</a>
   <a href="#contact" onclick="closeMobNav()">Contact</a>
@@ -551,12 +639,15 @@
   </div>
 </section>
 <section class="sec state-sec" id="states">
-  <div class="rv" id="regions" style="margin-bottom:20px">
-    <div class="chip">Explore by Region</div>
-    <h2 class="sh2">Discover the Himalayas</h2>
-    <p class="ssub" style="margin-bottom:0">Each state carries its own story — ancient forests, sacred rivers, and flavours shaped by altitude. Click to explore.</p>
+  <div class="rv" id="regions" style="margin-bottom:20px;display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:12px">
+    <div>
+      <div class="chip">Explore by Region</div>
+      <h2 class="sh2" style="margin-bottom:6px">Discover the Himalayas</h2>
+      <p class="ssub" style="margin-bottom:0">Each state carries its own story — ancient forests, sacred rivers, and flavours shaped by altitude.</p>
+    </div>
+    <a href="/all-states.html" style="display:inline-flex;align-items:center;gap:7px;padding:11px 22px;background:var(--g);color:#fff;border-radius:22px;text-decoration:none;font-weight:800;font-family:'Lato',sans-serif;font-size:13px;letter-spacing:.3px;flex-shrink:0;box-shadow:0 3px 14px rgba(26,58,30,.22);transition:all .2s" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 7px 22px rgba(26,58,30,.32)'" onmouseout="this.style.transform='';this.style.boxShadow='0 3px 14px rgba(26,58,30,.22)'">🗺️ View All States →</a>
   </div>
-  <!-- Region Storytelling Cards -->
+  <!-- Region Storytelling Cards — shows 5, rest on all-states.html -->
   <div id="storyCards" style="display:flex;gap:14px;overflow-x:auto;padding:0 0 18px;scrollbar-width:none;margin-bottom:8px"></div>
   <div class="stabs" id="stabs"></div>
   <div class="spnls" id="spnls"></div>
@@ -893,7 +984,7 @@
       <div class="fh">Company</div>
       <ul class="ful">
         <li><a href="/our-story">Our Story</a></li>
-        <li><a href="/#states">By Region</a></li>
+        <li><a href="/all-states.html">By Region</a></li>
         <li><a href="/terms#returns">Returns &amp; Refunds</a></li>
         <li><a href="/terms#shipping">Shipping Policy</a></li>
         <li><a href="/terms#privacy">Privacy Policy</a></li>

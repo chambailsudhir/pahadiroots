@@ -2860,3 +2860,11 @@ html[data-theme="valley"] .hslide-btn-primary { background: #4a7c59; }
   .story-card-img { transition: none !important; opacity: 1 !important; }
   .skel::before { animation: none !important; }
 }
+
+/* ── MOBILE MEGA NAV items ─────────────────────────────────────── */
+#mobMegaColl a:hover, #mobMegaStates a:hover {
+  background: rgba(26,58,30,.07);
+  color: var(--g);
+}
+body.dark #mobMegaColl a, body.dark #mobMegaStates a { color: #d4e8d4; }
+body.dark #mobMegaColl a:hover, body.dark #mobMegaStates a:hover { background: rgba(255,255,255,.06); color: #7ec87e; }
