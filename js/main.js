@@ -364,8 +364,8 @@ function initHeroSlider(settings) {
     var pa2 = document.getElementById('hsliderPrev'); if (pa2) pa2.style.display = 'none';
     var na2 = document.getElementById('hsliderNext'); if (na2) na2.style.display = 'none';
   } else {
-    var pa3 = document.getElementById('hsliderPrev'); if (pa3) pa3.style.display = 'flex';
-    var na3 = document.getElementById('hsliderNext'); if (na3) na3.style.display = 'flex';
+    var pa3 = document.getElementById('hsliderPrev'); if (pa3) { pa3.style.display = 'flex'; pa3.style.alignItems = 'center'; pa3.style.justifyContent = 'center'; }
+    var na3 = document.getElementById('hsliderNext'); if (na3) { na3.style.display = 'flex'; na3.style.alignItems = 'center'; na3.style.justifyContent = 'center'; }
     if (dotsEl) {
       dotsEl.innerHTML = slides.map(function(_, i) {
         return '<button onclick="heroGoTo(' + i + ')" aria-label="Slide ' + (i+1) + '" style="height:6px;border-radius:3px;width:' + (i===0?'28px':'6px') + ';background:' + (i===0?'#fff':'rgba(255,255,255,.45)') + ';border:none;cursor:pointer;transition:all .35s ease;padding:0;flex-shrink:0"></button>';
