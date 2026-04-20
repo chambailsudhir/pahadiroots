@@ -2657,8 +2657,11 @@ function initTrustBar(s) {
     var ico  = s['trust_' + n + '_icon']  || s['trust_badge_' + n + '_icon'];
     var lbl  = s['trust_' + n + '_title'] || s['trust_badge_' + n + '_title'];
     var sub  = s['trust_' + n + '_sub']   || s['trust_badge_' + n + '_sub'];
-    var hide = s['trust_' + n + '_hide']  || s['trust_badge_' + n + '_hide'];
-    if (hide === 'true') { tc.style.display = 'none'; return; }
+    // Only hide if the value is strictly the string 'true' — 'false', '', undefined all mean show
+    var hideVal = s['trust_' + n + '_hide'];
+    if (hideVal === undefined || hideVal === null) hideVal = s['trust_badge_' + n + '_hide'];
+    var hide = (hideVal === 'true');
+    if (hide) { tc.style.display = 'none'; return; }
     tc.style.display = '';
     visibleCount++;
     var icoEl = tc.querySelector('.tico');
@@ -2668,7 +2671,7 @@ function initTrustBar(s) {
     if (lblEl && lbl) lblEl.textContent = lbl;
     if (subEl && sub) subEl.innerHTML = sub;
   });
-  // Only collapse bar if ALL 4 explicitly hidden — otherwise always show
+  // Always show the bar unless ALL 4 are explicitly hidden
   if (bar) bar.style.display = visibleCount === 0 ? 'none' : 'grid';
 }
 
