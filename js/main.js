@@ -1084,7 +1084,6 @@ function buildMegaMenu() {
           window.location.href = '/all-products.html?filter=' + catKey;
         }
       }; })(cat.key);
-      };
       li.appendChild(btn);
       listColl.appendChild(li);
       shown++;
