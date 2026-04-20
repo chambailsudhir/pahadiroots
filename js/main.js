@@ -1099,19 +1099,12 @@ function buildMegaMenu() {
       var li = document.createElement('li');
       var btn = document.createElement('button');
       btn.innerHTML = '<span class="mega-icon">🏔️</span>' + st.name;
-      btn.onclick = (function(stId, stName) {
+      btn.onclick = (function(stId) {
         return function() {
           closeMegaMenu();
-          // If on homepage, scroll to states section; otherwise go to state page
-          var statesEl = document.getElementById('states');
-          if (statesEl) {
-            statesEl.scrollIntoView({behavior:'smooth', block:'start'});
-            setTimeout(function() { swState(stId); }, 300);
-          } else {
-            window.location.href = '/state.html?id=' + stId;
-          }
+          window.location.href = '/state.html?id=' + stId;
         };
-      })(st.id, st.name);
+      })(st.id);
       li.appendChild(btn);
       // Also add a direct link for middle-click / open in new tab
       var link = document.createElement('a');
@@ -1284,15 +1277,7 @@ function buildMobMega() {
       a.innerHTML = '<span style="font-size:16px;width:22px;text-align:center">🏔️</span>' + st.name;
       a.onclick = (function(stId) { return function() {
         closeMobNav();
-        var el = document.getElementById('states');
-        if (el) {
-          setTimeout(function() {
-            el.scrollIntoView({behavior:'smooth'});
-            setTimeout(function() { swState(stId); }, 300);
-          }, 150);
-        } else {
-          window.location.href = '/state.html?id=' + stId;
-        }
+        window.location.href = '/state.html?id=' + stId;
         return false;
       }; })(st.id);
       mobStates.appendChild(a);
