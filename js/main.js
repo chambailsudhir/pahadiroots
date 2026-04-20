@@ -2615,8 +2615,20 @@ function initHeroStats(s) {
     { selector: '[data-stat="customers"]', numKey: 'stat_happy_customers',  lblKey: 'stat_customers_label', defaultNum: '10000', defaultLbl: 'Happy Customers', suffix: '+' },
     { selector: '[data-stat="dispatch"]',  numKey: 'stat_avg_dispatch',     lblKey: 'stat_dispatch_label',  defaultNum: '48',    defaultLbl: 'Avg Dispatch', suffix: 'hr' },
   ];
+
+  // Collect hide flags first — check if ALL are hidden
+  var hideFlags = stats.map(function(st) {
+    var h = s['stat_hide_' + st.numKey];
+    if (h === undefined || h === null) h = s['stat_hide_' + st.numKey.replace('stat_','')];
+    return h === 'true';
+  });
+  var allHidden = hideFlags.every(function(h) { return h; });
+
+  // Safety net: never hide all stats simultaneously
+  if (allHidden) hideFlags = [false, false, false, false];
+
   var visibleCount = 0;
-  stats.forEach(function(st) {
+  stats.forEach(function(st, i) {
     var el = document.querySelector(st.selector);
     if (!el) return;
     var numEl = el.querySelector('.hstat-num');
@@ -2630,10 +2642,8 @@ function initHeroStats(s) {
       }
     }
     if (lblEl && s[st.lblKey]) lblEl.textContent = s[st.lblKey];
-    var hidden = s['stat_hide_' + st.numKey] || s['stat_hide_' + st.numKey.replace('stat_','')];
-    if (hidden === 'true') {
+    if (hideFlags[i]) {
       el.style.display = 'none';
-      // hide divider sibling too
       var next = el.nextElementSibling;
       if (next && next.classList && next.classList.contains('hstat-div')) next.style.display = 'none';
     } else {
@@ -2641,29 +2651,43 @@ function initHeroStats(s) {
       visibleCount++;
     }
   });
-  // Only hide the whole bar if ALL 4 explicitly hidden — otherwise always show
+
+  // Always show stats bar
   var container = document.getElementById('hstats');
-  if (container) container.style.display = visibleCount === 0 ? 'none' : 'flex';
+  if (container) container.style.display = 'flex';
 }
 
 // ── TRUST BAR — editable from admin Settings ──────────────────────
 function initTrustBar(s) {
   if (!s) return;
   var bar = document.getElementById('trustBar');
+  if (!bar) return;
   var items = document.querySelectorAll('.tc');
-  var visibleCount = 0;
+
+  // Collect hide flags first
+  var hideFlags = [];
+  var allHidden = true;
   items.forEach(function(tc, i) {
     var n = i + 1;
-    var ico  = s['trust_' + n + '_icon']  || s['trust_badge_' + n + '_icon'];
-    var lbl  = s['trust_' + n + '_title'] || s['trust_badge_' + n + '_title'];
-    var sub  = s['trust_' + n + '_sub']   || s['trust_badge_' + n + '_sub'];
-    // Only hide if the value is strictly the string 'true' — 'false', '', undefined all mean show
     var hideVal = s['trust_' + n + '_hide'];
     if (hideVal === undefined || hideVal === null) hideVal = s['trust_badge_' + n + '_hide'];
     var hide = (hideVal === 'true');
-    if (hide) { tc.style.display = 'none'; return; }
+    hideFlags.push(hide);
+    if (!hide) allHidden = false;
+  });
+
+  // Safety net: if ALL badges are hidden in DB (admin accident / fresh install),
+  // show them all — the bar must never fully disappear
+  if (allHidden || items.length === 0) hideFlags = [false, false, false, false];
+
+  // Apply visibility + update content from DB
+  items.forEach(function(tc, i) {
+    var n = i + 1;
+    var ico = s['trust_' + n + '_icon']  || s['trust_badge_' + n + '_icon'];
+    var lbl = s['trust_' + n + '_title'] || s['trust_badge_' + n + '_title'];
+    var sub = s['trust_' + n + '_sub']   || s['trust_badge_' + n + '_sub'];
+    if (hideFlags[i]) { tc.style.display = 'none'; return; }
     tc.style.display = '';
-    visibleCount++;
     var icoEl = tc.querySelector('.tico');
     var lblEl = tc.querySelector('.tlb');
     var subEl = tc.querySelector('.tds');
@@ -2671,8 +2695,9 @@ function initTrustBar(s) {
     if (lblEl && lbl) lblEl.textContent = lbl;
     if (subEl && sub) subEl.innerHTML = sub;
   });
-  // Always show the bar unless ALL 4 are explicitly hidden
-  if (bar) bar.style.display = visibleCount === 0 ? 'none' : 'grid';
+
+  // Always show the bar — individual badges can be hidden but bar itself never hides
+  bar.style.display = 'grid';
 }
 
 function animateCounters() {
