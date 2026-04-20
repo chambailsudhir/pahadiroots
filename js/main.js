@@ -2580,18 +2580,24 @@ function initHeroStats(s) {
     if (!el) return;
     var numEl = el.querySelector('.hstat-num');
     var lblEl = el.querySelector('.hstat-lbl');
-    if (numEl && s[st.numKey]) {
-      var val = parseInt(s[st.numKey], 10) || 0;
-      numEl.dataset.target = val;
-      numEl.innerHTML = val + '<em>' + st.suffix + '</em>';
+    // Update number — use DB value if present, otherwise keep HTML default
+    if (numEl) {
+      var rawNum = s[st.numKey] || s[st.numKey.replace('stat_','')] || '';
+      if (rawNum) {
+        var val = parseInt(rawNum, 10) || 0;
+        numEl.dataset.target = val;
+        numEl.innerHTML = val + '<em>' + st.suffix + '</em>';
+      }
     }
     if (lblEl && s[st.lblKey]) lblEl.textContent = s[st.lblKey];
-    var hidden = s['stat_hide_' + st.numKey];
+    // Support both hide key formats:
+    //   old admin: stat_hide_stat_farmer_families
+    //   new admin: stat_hide_farmer_families  (without double "stat_" prefix)
+    var hidden = s['stat_hide_' + st.numKey] || s['stat_hide_' + st.numKey.replace('stat_','')];
     var statEl = el.closest('.hstat');
     if (statEl) {
       if (hidden === 'true') {
         statEl.style.display = 'none';
-        // also hide the divider after this stat
         var next = statEl.nextElementSibling;
         if (next && next.classList.contains('hstat-div')) next.style.display = 'none';
       } else {
@@ -2600,7 +2606,7 @@ function initHeroStats(s) {
       }
     }
   });
-  // If ALL stats are hidden, collapse the entire stats bar so no black gap shows
+  // Always show the stats bar unless ALL four are explicitly hidden in DB
   var container = document.getElementById('hstats');
   if (container) container.style.display = visibleCount === 0 ? 'none' : 'flex';
 }
@@ -2612,10 +2618,11 @@ function initTrustBar(s) {
   var visibleCount = 0;
   items.forEach(function(tc, i) {
     var n = i + 1;
-    var ico  = s['trust_' + n + '_icon'];
-    var lbl  = s['trust_' + n + '_title'];
-    var sub  = s['trust_' + n + '_sub'];
-    var hide = s['trust_' + n + '_hide'];
+    var ico  = s['trust_' + n + '_icon']  || s['trust_badge_' + n + '_icon'];
+    var lbl  = s['trust_' + n + '_title'] || s['trust_badge_' + n + '_title'];
+    var sub  = s['trust_' + n + '_sub']   || s['trust_badge_' + n + '_sub'];
+    // Support both hide key formats: trust_1_hide and trust_badge_1_hide
+    var hide = s['trust_' + n + '_hide']  || s['trust_badge_' + n + '_hide'];
     if (hide === 'true') { tc.style.display = 'none'; return; }
     tc.style.display = '';
     visibleCount++;
@@ -2626,7 +2633,7 @@ function initTrustBar(s) {
     if (lblEl && lbl) lblEl.textContent = lbl;
     if (subEl && sub) subEl.innerHTML  = sub;
   });
-  // Collapse entire trust bar if all items are hidden
+  // Collapse entire trust bar only if all 4 items are explicitly hidden
   var trustBar = document.querySelector('.trust');
   if (trustBar) trustBar.style.display = visibleCount === 0 ? 'none' : '';
 }

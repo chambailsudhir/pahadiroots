@@ -2425,7 +2425,7 @@ html[data-theme="valley"] .toast { background: #4a7c59; }
   position: relative;
   width: 100%;
   min-height: 500px;
-  max-height: 75vh;
+  max-height: 750px;
   height: 75vh;
   overflow: hidden;
 }
@@ -2438,7 +2438,7 @@ html[data-theme="valley"] .toast { background: #4a7c59; }
   height: 100%;
   min-height: 500px;
   background-size: cover;
-  background-position: center center;
+  background-position: center top;
   background-repeat: no-repeat;
   opacity: 0;
   transition: opacity 0.9s cubic-bezier(0.4, 0, 0.2, 1);
