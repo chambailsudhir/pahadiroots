@@ -1098,7 +1098,11 @@ function buildMegaMenu() {
     statesData.forEach(function(st) {
       var li = document.createElement('li');
       var btn = document.createElement('button');
-      btn.innerHTML = '<span class="mega-icon">🏔️</span>' + st.name;
+      var imgSrc = st.cover_photo_url || st.tab_photo_url || '';
+      var thumbHtml = imgSrc
+        ? '<span class="mega-state-thumb-wrap"><img class="mega-state-thumb" src="' + imgSrc + '" alt="' + st.name + '" width="28" height="28" loading="lazy" decoding="async" onerror="this.parentNode.innerHTML=\'🏔️\'"></span>'
+        : '<span class="mega-state-thumb-wrap">' + (st.emoji || '🏔️') + '</span>';
+      btn.innerHTML = thumbHtml + st.name;
       btn.onclick = (function(stId) {
         return function() {
           closeMegaMenu();
@@ -1274,7 +1278,11 @@ function buildMobMega() {
       var a = document.createElement('a');
       a.href = '/state.html?id=' + st.id;
       a.style.cssText = 'display:flex;align-items:center;gap:10px;padding:9px 14px;color:var(--tx);font-weight:600;border-radius:10px;font-size:14px;text-decoration:none';
-      a.innerHTML = '<span style="font-size:16px;width:22px;text-align:center">🏔️</span>' + st.name;
+      var mobImgSrc = st.cover_photo_url || st.tab_photo_url || '';
+      var mobThumb = mobImgSrc
+        ? '<span style="width:30px;height:30px;border-radius:7px;overflow:hidden;flex-shrink:0;display:flex"><img src="' + mobImgSrc + '" alt="' + st.name + '" width="30" height="30" loading="lazy" decoding="async" style="width:30px;height:30px;object-fit:cover;border-radius:7px" onerror="this.parentNode.innerHTML=\'🏔️\'"></span>'
+        : '<span style="font-size:16px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:7px;background:#dde8dd">' + (st.emoji || '🏔️') + '</span>';
+      a.innerHTML = mobThumb + st.name;
       a.onclick = (function(stId) { return function() {
         closeMobNav();
         window.location.href = '/state.html?id=' + stId;
