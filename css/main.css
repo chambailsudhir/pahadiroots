@@ -2415,7 +2415,11 @@ html[data-theme="valley"] .toast { background: #4a7c59; }
 /* Container */
 .hero-slider {
   position: relative;
-  width: 100%;
+  width: 100vw;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
   overflow: hidden;
   background: #0d2410;
 }
@@ -2450,7 +2454,7 @@ html[data-theme="valley"] .toast { background: #4a7c59; }
 .hslide.active {
   opacity: 1;
   pointer-events: auto;
-  position: relative;
+  position: absolute;
 }
 
 /* Gradient overlay — dark on left for text legibility */
