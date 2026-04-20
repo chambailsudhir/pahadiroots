@@ -2801,3 +2801,7 @@ html[data-theme="valley"] .hslide-btn-primary { background: #4a7c59; }
 .story-card.img-ready .story-card-img { opacity: 1; }
 /* Hero banner background — starts as solid dark, fades in */
 .hslide[data-img-ready="true"] { transition: background-image .001s; }
+
+/* Hero slider arrow buttons */
+#hsliderPrev:hover,#hsliderNext:hover{background:rgba(10,30,12,.95)!important;border-color:#fff!important;}
+#hsliderPrev,#hsliderNext{box-sizing:border-box;}
