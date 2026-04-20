@@ -236,34 +236,26 @@ var _heroSlideIndex = 0;
 var _heroSlideTimer = null;
 var _heroSlideCount = 0;
 
-// ── IMAGE OPTIMIZER — Supabase transform API (WebP + resize = 3-5x faster) ──
-// Auto-falls back to direct URL if transform add-on is not enabled on Supabase.
-var _imgOptFailed = {}; // tracks URLs where transform returned 404
-
+// ── IMAGE HELPER — direct Supabase URLs (no transform add-on required) ──
 function imgOpt(url, opts) {
   if (!url) return url;
-  try {
-    if (!url.includes('supabase.co/storage/v1/object/public/')) return url;
-    var baseKey = url.split('?')[0];
-    if (_imgOptFailed[baseKey]) return url; // already failed — use direct
-    var w = (opts && opts.w) || 800;
-    var q = (opts && opts.q) || 75;
-    var transformed = url.replace(
-      '/storage/v1/object/public/',
-      '/storage/v1/render/image/public/'
-    );
-    var sep = transformed.includes('?') ? '&' : '?';
-    return transformed + sep + 'width=' + w + '&quality=' + q + '&format=webp';
-  } catch(e) { return url; }
+  return url; // direct URL — always works
 }
 
-// Attach to onerror: tries direct URL when transform API fails
+// onerror fallback — hides broken img cleanly
 function imgOptFallback(el, originalUrl) {
-  if (!originalUrl || el.dataset.fbDone) return;
+  if (!el || el.dataset.fbDone) return;
   el.dataset.fbDone = '1';
-  var baseKey = originalUrl.split('?')[0];
-  _imgOptFailed[baseKey] = true;
-  el.src = originalUrl;
+  // If src is already the direct URL and still failing, hide it
+  if (originalUrl && el.src !== originalUrl) {
+    el.src = originalUrl;
+  } else {
+    el.style.display = 'none';
+    var sk = el.previousElementSibling;
+    if (sk && (sk.classList.contains('pimg-skel') || sk.classList.contains('hero-img-shimmer'))) {
+      sk.style.display = 'none';
+    }
+  }
 }
 
 function esc2(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }

@@ -41,10 +41,7 @@
       // Preload the image
       var pl = document.createElement('link');
       var _ou=prod.image_url;
-        if(_ou&&_ou.includes('supabase.co/storage/v1/object/public/')){
-          _ou=_ou.replace('/storage/v1/object/public/','/storage/v1/render/image/public/');
-          _ou+=(_ou.includes('?')?'&':'?')+'width=900&quality=82&format=webp';
-        }
+        // direct URL — no transform
         pl.rel='preload'; pl.as='image'; pl.href=_ou; pl.setAttribute('fetchpriority','high');
       document.head.appendChild(pl);
     } catch(e){}
@@ -976,24 +973,14 @@ function updateShippingUI() {
 // ── IMAGE OPTIMIZER — Supabase transform API ──
 var _imgOptFailed = {};
 function imgOpt(url, opts) {
+  // Direct URL — Supabase image transform add-on not active
   if (!url) return url;
-  try {
-    if (!url.includes('supabase.co/storage/v1/object/public/')) return url;
-    var baseKey = url.split('?')[0];
-    if (_imgOptFailed[baseKey]) return url;
-    var w = (opts && opts.w) || 800;
-    var q = (opts && opts.q) || 75;
-    var transformed = url.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/');
-    var sep = transformed.includes('?') ? '&' : '?';
-    return transformed + sep + 'width=' + w + '&quality=' + q + '&format=webp';
-  } catch(e) { return url; }
+  return url;
 }
 function imgOptFallback(el, originalUrl) {
   if (!originalUrl || el.dataset.fbDone) return;
   el.dataset.fbDone = '1';
-  var baseKey = originalUrl.split('?')[0];
-  _imgOptFailed[baseKey] = true;
-  el.src = originalUrl;
+  if (el.src !== originalUrl) el.src = originalUrl;
 }
 async function loadProduct() {
   var slug = getSlug();
