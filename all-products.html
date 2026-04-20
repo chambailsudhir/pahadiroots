@@ -642,6 +642,20 @@
   // Signal to main.js: all-products page — paginated, no homepage limit
   window.IS_ALL_PRODUCTS_PAGE = true;
 
+  // Apply ?filter= param from URL (e.g. when navigating from mega menu on another page)
+  window.addEventListener('pahadiProductsLoaded', function() {
+    var urlFilter = new URLSearchParams(window.location.search).get('filter');
+    if (urlFilter) {
+      var filterBtn = document.querySelector('.filter-btn[data-filter="' + urlFilter + '"]') ||
+                      Array.from(document.querySelectorAll('.filter-btn')).find(function(b){
+                        return b.getAttribute('onclick') && b.getAttribute('onclick').indexOf("'" + urlFilter + "'") > -1;
+                      });
+      setFilter(urlFilter, filterBtn);
+      // Clean URL without reload
+      try { history.replaceState(null, '', window.location.pathname); } catch(e) {}
+    }
+  });
+
   // Update count badge when products load from DB
   window.addEventListener('pahadiProductsLoaded', function(e) {
     var count = e.detail && e.detail.count;

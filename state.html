@@ -429,12 +429,25 @@ function _spRenderOtherStates(currentState, states, products) {
   document.getElementById('spOtherStates').style.display = 'block';
 }
 
-// Boot: try immediately, then listen for data ready event
+// Boot: try immediately, poll until data ready, and listen for data ready event
 window.addEventListener('pahadiDataReady', _spInit);
 document.addEventListener('DOMContentLoaded', function(){
-  setTimeout(function(){
-    if (window.PRODUCTS && window.PRODUCTS.length) _spInit();
-  }, 150);
+  // Poll up to 8 seconds for data to be loaded from main.js (async fetch)
+  var _spPollCount = 0;
+  var _spPoll = setInterval(function(){
+    _spPollCount++;
+    if (_spReady || (window.PRODUCTS && window.PRODUCTS.length && window.STATES && window.STATES.length)) {
+      clearInterval(_spPoll);
+      _spInit();
+    } else if (window.FALLBACK_STATES && window.FALLBACK_STATES.length && _spPollCount > 5) {
+      // Fallback: render with hardcoded data if API hasn't loaded yet
+      clearInterval(_spPoll);
+      _spInit();
+    } else if (_spPollCount > 80) {
+      clearInterval(_spPoll);
+      _spInit(); // try anyway
+    }
+  }, 100);
 });
 </script>
 <script src="/js/main.js"></script>

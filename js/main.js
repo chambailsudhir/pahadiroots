@@ -74,6 +74,12 @@ const FALLBACK_PRODUCTS = [
 
 // ── RUNTIME STATE ─────────────────────────────────────────────────
 let STATES = [], PRODUCTS = [], PRODUCT_VARIANTS = [];
+
+// ── Expose data globals on window so state.html / all-states.html can access them ──
+window.FALLBACK_STATES   = FALLBACK_STATES;
+window.FALLBACK_PRODUCTS = FALLBACK_PRODUCTS;
+Object.defineProperty(window, 'STATES',   { get: function(){ return STATES;   }, configurable: true });
+Object.defineProperty(window, 'PRODUCTS', { get: function(){ return PRODUCTS; }, configurable: true });
 let cart = [];
 try { cart = JSON.parse(localStorage.getItem('pr_cart')||'[]'); } catch(e){ cart=[]; }
 const sv = () => {
@@ -1064,17 +1070,20 @@ function buildMegaMenu() {
       var li = document.createElement('li');
       var btn = document.createElement('button');
       btn.innerHTML = '<span class="mega-icon">' + cat.icon + '</span>' + cat.label;
-      btn.onclick = function() {
+      btn.onclick = (function(catKey) { return function() {
         closeMegaMenu();
-        // Navigate to shop section and apply filter
         var shopEl = document.getElementById('shop') || document.getElementById('pgrid');
-        if (shopEl) shopEl.scrollIntoView({behavior:'smooth', block:'start'});
-        setTimeout(function() {
-          // Apply the filter
-          var filterBtn = document.querySelector('[data-filter="' + cat.key + '"]') ||
-                          document.querySelector('.filter-btn[data-filter="' + cat.key + '"]');
-          setFilter(cat.key, filterBtn);
-        }, 300);
+        if (shopEl) {
+          shopEl.scrollIntoView({behavior:'smooth', block:'start'});
+          setTimeout(function() {
+            var filterBtn = document.querySelector('[data-filter="' + catKey + '"]') ||
+                            document.querySelector('.filter-btn[data-filter="' + catKey + '"]');
+            setFilter(catKey, filterBtn);
+          }, 300);
+        } else {
+          window.location.href = '/all-products.html?filter=' + catKey;
+        }
+      }; })(cat.key);
       };
       li.appendChild(btn);
       listColl.appendChild(li);
@@ -1245,18 +1254,22 @@ function buildMobMega() {
       });
       if (!hasProducts && PRODUCTS.length > 0) return;
       var a = document.createElement('a');
-      a.href = '#shop';
+      a.href = '/all-products.html?filter=' + cat.key;
       a.style.cssText = 'display:flex;align-items:center;gap:10px;padding:9px 14px;color:var(--tx);font-weight:600;border-radius:10px;font-size:14px;text-decoration:none';
       a.innerHTML = '<span style="font-size:16px;width:22px;text-align:center">' + cat.icon + '</span>' + cat.label;
-      a.onclick = function() {
+      a.onclick = (function(catKey) { return function() {
         closeMobNav();
-        setTimeout(function() {
-          var el = document.getElementById('shop') || document.getElementById('pgrid');
-          if (el) el.scrollIntoView({behavior:'smooth'});
-          setTimeout(function() { setFilter(cat.key, null); }, 200);
-        }, 150);
+        var el = document.getElementById('shop') || document.getElementById('pgrid');
+        if (el) {
+          setTimeout(function() {
+            el.scrollIntoView({behavior:'smooth'});
+            setTimeout(function() { setFilter(catKey, null); }, 200);
+          }, 150);
+        } else {
+          window.location.href = '/all-products.html?filter=' + catKey;
+        }
         return false;
-      };
+      }; })(cat.key);
       mobColl.appendChild(a);
     });
   }
@@ -1267,18 +1280,22 @@ function buildMobMega() {
     var statesData = (STATES && STATES.length) ? STATES : FALLBACK_STATES;
     statesData.forEach(function(st) {
       var a = document.createElement('a');
-      a.href = '#states';
+      a.href = '/state.html?id=' + st.id;
       a.style.cssText = 'display:flex;align-items:center;gap:10px;padding:9px 14px;color:var(--tx);font-weight:600;border-radius:10px;font-size:14px;text-decoration:none';
       a.innerHTML = '<span style="font-size:16px;width:22px;text-align:center">🏔️</span>' + st.name;
-      a.onclick = function() {
+      a.onclick = (function(stId) { return function() {
         closeMobNav();
-        setTimeout(function() {
-          var el = document.getElementById('states');
-          if (el) el.scrollIntoView({behavior:'smooth'});
-          setTimeout(function() { swState(st.id); }, 300);
-        }, 150);
+        var el = document.getElementById('states');
+        if (el) {
+          setTimeout(function() {
+            el.scrollIntoView({behavior:'smooth'});
+            setTimeout(function() { swState(stId); }, 300);
+          }, 150);
+        } else {
+          window.location.href = '/state.html?id=' + stId;
+        }
         return false;
-      };
+      }; })(st.id);
       mobStates.appendChild(a);
     });
   }
