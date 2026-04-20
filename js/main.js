@@ -2641,9 +2641,12 @@ function initHeroStats(s) {
     var lblEl = el.querySelector('.hstat-lbl');
     if (numEl) {
       var rawNum = s[st.numKey] || s[st.numKey.replace('stat_','')] || '';
-      // Use DB value if valid and >= defaultNum, otherwise fall back to default
+      // Use DB value only if it exists and is a positive number; else use hardcoded default
       var val = rawNum ? (parseInt(rawNum, 10) || 0) : 0;
       if (!val || val < 1) val = st.defaultNum;
+      // Extra guard: if DB value is lower than the hardcoded default, prefer the default
+      // (prevents stale/wrong DB values like 100 farmers showing instead of 500)
+      if (val < st.defaultNum) val = st.defaultNum;
       numEl.dataset.target = val;
       numEl.innerHTML = val + '<em style="font-style:normal">' + st.suffix + '</em>';
     }
