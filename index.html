@@ -302,41 +302,83 @@
   <a href="#contact" onclick="closeMobNav()">Contact</a>
   </div>
 </div>
-<section class="hero-slider" id="home">
-  <!-- Slides + stats all inside hslider-track so stats overlays the image -->
-  <div class="hslider-track" id="hsliderTrack">
-    <!-- Fallback slide shown before JS loads / if no banners configured -->
-    <div class="hslide hslide-fallback active">
-      <div class="hslide-overlay"></div>
-      <div class="hslide-content">
-        <div class="hslide-eyebrow">🌿 Pure · Himalayan · Natural</div>
-        <h1 class="hslide-title">Born in the<br><em>Himalayas,</em><br>For Your Table</h1>
-        <p class="hslide-sub">Handpicked from the purest altitudes — where clean air, ancient soil, and tradition create nature's finest.</p>
-        <div class="hslide-btns">
-          <a href="#shop" class="hslide-btn-primary">Explore Our Store</a>
-          <a href="/our-story" class="hslide-btn-secondary">Our Story</a>
+<!-- ═══════════════════════════════════════════════════
+     HERO SECTION — rebuilt from Next.js HeroBanner.tsx
+     Uses <img> + object-fit (not background-image) so it
+     always covers 100% with no right-edge gap or clipping.
+     All layout via inline styles — zero CSS class dependency.
+═══════════════════════════════════════════════════ -->
+<section id="home" style="display:block;width:100%;margin:0;padding:0">
+
+  <!-- ── Slider track: fixed height, clips slides ── -->
+  <div id="hsliderTrack" style="position:relative;width:100%;height:75vh;min-height:500px;max-height:750px;overflow:hidden;background:#071a09">
+
+    <!-- FALLBACK SLIDE (shown before JS / if no banners set) -->
+    <div id="hslide-fallback" style="position:absolute;inset:0;opacity:1;transition:opacity 0.9s cubic-bezier(0.4,0,0.2,1);background:linear-gradient(150deg,#071a09 0%,#0d2410 30%,#1a3a1e 65%,#2d5233 100%)">
+      <!-- Content centred vertically -->
+      <div style="position:absolute;inset:0;display:flex;align-items:center">
+        <div style="max-width:600px;padding:0 0 0 72px;display:flex;flex-direction:column">
+          <div style="display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.75);background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:30px;padding:5px 14px;width:fit-content;margin-bottom:18px;backdrop-filter:blur(4px)">
+            🌿 Pure · Himalayan · Natural
+          </div>
+          <h1 style="font-family:'Playfair Display',Georgia,serif;font-size:clamp(32px,4.5vw,62px);font-weight:900;line-height:1.05;color:#fff;margin:0 0 16px;text-shadow:0 2px 20px rgba(0,0,0,.4);letter-spacing:-1px">
+            Born in the<br><em style="font-style:italic;color:#c8920a">Himalayas,</em><br>For Your Table
+          </h1>
+          <p style="font-size:clamp(13px,1.5vw,16px);color:rgba(255,255,255,.8);line-height:1.6;margin:0 0 28px;max-width:440px">
+            Handpicked from the purest altitudes — where clean air, ancient soil, and tradition create nature's finest.
+          </p>
+          <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+            <a href="#shop" style="display:inline-flex;align-items:center;gap:6px;background:#1a3a1e;color:#fff;font-size:14px;font-weight:800;padding:13px 28px;border-radius:50px;text-decoration:none;box-shadow:0 4px 20px rgba(0,0,0,.25);letter-spacing:.2px">Explore Our Store</a>
+            <a href="/our-story" style="display:inline-flex;align-items:center;font-size:13px;font-weight:700;color:rgba(255,255,255,.85);text-decoration:none;padding:12px 0;gap:6px">Our Story →</a>
+          </div>
         </div>
       </div>
     </div>
+    <!-- END FALLBACK SLIDE -->
 
-    <!-- Navigation arrows -->
-    <button class="hslider-arrow hslider-prev" id="hsliderPrev" onclick="heroSlide(-1)" aria-label="Previous">&#8249;</button>
-    <button class="hslider-arrow hslider-next" id="hsliderNext" onclick="heroSlide(1)" aria-label="Next">&#8250;</button>
+    <!-- JS-built slides injected here by initHeroSlider() -->
+
+    <!-- Prev / Next arrows -->
+    <button id="hsliderPrev" onclick="heroSlide(-1)" aria-label="Previous" style="display:none;position:absolute;left:20px;top:50%;transform:translateY(-50%);z-index:20;background:rgba(0,0,0,.35);backdrop-filter:blur(10px);border:1.5px solid rgba(255,255,255,.4);color:#fff;width:46px;height:46px;border-radius:50%;font-size:26px;cursor:pointer;box-shadow:0 2px 12px rgba(0,0,0,.4)">&#8249;</button>
+    <button id="hsliderNext" onclick="heroSlide(1)"  aria-label="Next"     style="display:none;position:absolute;right:20px;top:50%;transform:translateY(-50%);z-index:20;background:rgba(0,0,0,.35);backdrop-filter:blur(10px);border:1.5px solid rgba(255,255,255,.4);color:#fff;width:46px;height:46px;border-radius:50%;font-size:26px;cursor:pointer;box-shadow:0 2px 12px rgba(0,0,0,.4)">&#8250;</button>
 
     <!-- Dots -->
-    <div class="hslider-dots" id="hsliderDots"></div>
+    <div id="hsliderDots" style="position:absolute;bottom:20px;left:50%;transform:translateX(-50%);display:flex;gap:8px;z-index:10"></div>
   </div>
+  <!-- END slider track -->
 
-  <!-- Stats bar — sits directly on hero-slider, above the track/slides -->
-  <div class="hstats" id="hstats">
-    <div class="hstat" data-stat="farmers"><div class="hstat-num" data-target="500">0<em>+</em></div><div class="hstat-lbl">Farmer Families</div></div>
-    <div class="hstat-div"></div>
-    <div class="hstat" data-stat="states"><div class="hstat-num" data-target="10">0<em>+</em></div><div class="hstat-lbl">Himalayan States</div></div>
-    <div class="hstat-div"></div>
-    <div class="hstat" data-stat="customers"><div class="hstat-num" data-target="10000">0<em>+</em></div><div class="hstat-lbl">Happy Customers</div></div>
-    <div class="hstat-div"></div>
-    <div class="hstat" data-stat="dispatch"><div class="hstat-num" data-target="48">0<em>hr</em></div><div class="hstat-lbl">Avg Dispatch</div></div>
+  <!-- ── Stats bar — OUTSIDE track, sits directly below ── -->
+  <div id="hstats" style="background:rgba(5,20,8,.97);display:flex;align-items:center;justify-content:center;gap:0;padding:16px 40px;flex-wrap:wrap;margin-top:0;position:relative;z-index:10">
+    <div class="hstat" data-stat="farmers" style="display:flex;align-items:center">
+      <div style="text-align:center;padding:0 32px">
+        <div class="hstat-num" data-target="500" style="font-family:'Playfair Display',Georgia,serif;font-size:clamp(22px,2.5vw,32px);font-weight:900;color:#e8b84b;line-height:1.1">500<em style="font-style:normal">+</em></div>
+        <div class="hstat-lbl" style="font-size:10.5px;color:rgba(255,255,255,.5);letter-spacing:1px;margin-top:3px;text-transform:uppercase">Farmer Families</div>
+      </div>
+      <div class="hstat-div" style="width:1px;height:36px;background:rgba(255,255,255,.15);flex-shrink:0"></div>
+    </div>
+    <div class="hstat" data-stat="states" style="display:flex;align-items:center">
+      <div style="text-align:center;padding:0 32px">
+        <div class="hstat-num" data-target="10" style="font-family:'Playfair Display',Georgia,serif;font-size:clamp(22px,2.5vw,32px);font-weight:900;color:#e8b84b;line-height:1.1">10<em style="font-style:normal">+</em></div>
+        <div class="hstat-lbl" style="font-size:10.5px;color:rgba(255,255,255,.5);letter-spacing:1px;margin-top:3px;text-transform:uppercase">Himalayan States</div>
+      </div>
+      <div class="hstat-div" style="width:1px;height:36px;background:rgba(255,255,255,.15);flex-shrink:0"></div>
+    </div>
+    <div class="hstat" data-stat="customers" style="display:flex;align-items:center">
+      <div style="text-align:center;padding:0 32px">
+        <div class="hstat-num" data-target="10000" style="font-family:'Playfair Display',Georgia,serif;font-size:clamp(22px,2.5vw,32px);font-weight:900;color:#e8b84b;line-height:1.1">10K<em style="font-style:normal">+</em></div>
+        <div class="hstat-lbl" style="font-size:10.5px;color:rgba(255,255,255,.5);letter-spacing:1px;margin-top:3px;text-transform:uppercase">Happy Customers</div>
+      </div>
+      <div class="hstat-div" style="width:1px;height:36px;background:rgba(255,255,255,.15);flex-shrink:0"></div>
+    </div>
+    <div class="hstat" data-stat="dispatch" style="display:flex;align-items:center">
+      <div style="text-align:center;padding:0 32px">
+        <div class="hstat-num" data-target="48" style="font-family:'Playfair Display',Georgia,serif;font-size:clamp(22px,2.5vw,32px);font-weight:900;color:#e8b84b;line-height:1.1">48<em style="font-style:normal">hr</em></div>
+        <div class="hstat-lbl" style="font-size:10.5px;color:rgba(255,255,255,.5);letter-spacing:1px;margin-top:3px;text-transform:uppercase">Avg Dispatch</div>
+      </div>
+    </div>
   </div>
+  <!-- END stats bar -->
+
 </section>
 
 
