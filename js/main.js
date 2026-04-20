@@ -1529,7 +1529,7 @@ function renderStates() {
         '</div>' +
       '</div>' +
       '<div class="spgrid">' + prodsHtml + '</div>' +
-      (stProds.length ? '<div style="text-align:center;padding:24px 0 8px"><a href="/state.html?id=' + s.id + '" style="display:inline-flex;align-items:center;gap:7px;padding:11px 24px;background:var(--g);color:#fff;border-radius:22px;text-decoration:none;font-weight:800;font-family:'Lato',sans-serif;font-size:13px;letter-spacing:.3px;box-shadow:0 3px 14px rgba(26,58,30,.2);transition:all .2s" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">View All ' + s.name + ' Products →</a></div>' : '') +
+      (stProds.length ? '<div style="text-align:center;padding:24px 0 8px"><a href="/state.html?id=' + s.id + '" style="display:inline-flex;align-items:center;gap:7px;padding:11px 24px;background:var(--g);color:#fff;border-radius:22px;text-decoration:none;font-weight:800;font-size:13px;letter-spacing:.3px;box-shadow:0 3px 14px rgba(26,58,30,.2)" >View All ' + s.name + ' Products →</a></div>' : '') +
     '</div>';
   }).join('');
 
