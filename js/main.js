@@ -2644,9 +2644,8 @@ function initHeroStats(s) {
       // Use DB value only if it exists and is a positive number; else use hardcoded default
       var val = rawNum ? (parseInt(rawNum, 10) || 0) : 0;
       if (!val || val < 1) val = st.defaultNum;
-      // Extra guard: if DB value is lower than the hardcoded default, prefer the default
-      // (prevents stale/wrong DB values like 100 farmers showing instead of 500)
-      if (val < st.defaultNum) val = st.defaultNum;
+      // NOTE: Removed the "val < defaultNum" override — it was blocking admin edits from
+      // taking effect whenever the admin set a value lower than the old hardcoded default.
       numEl.dataset.target = val;
       numEl.innerHTML = val + '<em style="font-style:normal">' + st.suffix + '</em>';
     }
