@@ -644,7 +644,7 @@ async function loadData() {
   // Step 1: render states fallback only — skip fake products to avoid price flash
   STATES   = FALLBACK_STATES.map(s => Object.assign({}, s));
   renderStates(); uCart(); observeRv();
-  initAllStateSlides(); initProductHoverImages(); observeProductImages();
+  initAllStateSlides(); initProductHoverImages();
   // Open cart instantly if redirected from product page
   if (window.location.search.includes('opencart=1')) {
     history.replaceState(null, '', '/');
@@ -881,6 +881,21 @@ async function loadData() {
 
     // ── Render everything now that all data (including images) is ready ──
     if (updated) {
+      // Cache products for fast product page loads
+      try {
+        var cachePayload = {
+          ts: Date.now(),
+          products: PRODUCTS.map(function(p) {
+            return { id:p.id, slug:p.slug, name:p.name, price:p.price,
+              original_price:p.original_price, image_url:p.image_url,
+              _images:p._images||[], category_id:p.category_id,
+              state_id:p.state_id, description:p.description,
+              short_description:p.short_description, unit:p.unit,
+              stock:p.stock, emoji:p.emoji, badge_label:p.badge_label };
+          })
+        };
+        localStorage.setItem('pr_products_cache', JSON.stringify(cachePayload));
+      } catch(e) {}
       // Preserve currently active state before re-render
       var activeStateEl = document.querySelector('.spnl.active');
       var activeStateId = activeStateEl ? activeStateEl.id.replace('p-','') : null;
@@ -896,7 +911,7 @@ async function loadData() {
       if (activeStateId && activeStateId !== STATES[0].id) {
         swState(activeStateId);
       }
-      initAllStateSlides(); initProductHoverImages(); observeProductImages();
+      initAllStateSlides(); initProductHoverImages();
     }
 
     // ── Product Variants ──
@@ -935,7 +950,7 @@ function mkProd(p) {
   var inWL   = wishlist.findIndex(function(x){ return String(x) === String(p.id); }) > -1;
   var slug   = getProductSlug(p);
   var imgHtml = p.image_url
-    ? '<div class="pimg-skel" style="position:absolute;inset:0;z-index:0;border-radius:inherit"></div><img data-lazysrc="' + p.image_url + '" src="" alt="' + p.name + '" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;opacity:0;transition:opacity .45s" onload="if(this.src&&this.src!==window.location.href){this.style.opacity=1;var sk=this.previousElementSibling;if(sk)sk.style.display=\'none\';this.closest(\'.piw\')&&this.closest(\'.piw\').classList.add(\'img-ready\')}" onerror="this.style.display=\'none\'">'
+    ? '<div class="pimg-skel" style="position:absolute;inset:0;z-index:0;border-radius:inherit"></div><img src="' + p.image_url + '" alt="' + p.name + '" loading="lazy" decoding="async" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;opacity:0;transition:opacity .45s" onload="this.style.opacity=1;var sk=this.previousElementSibling;if(sk)sk.style.display=\'none\';this.closest(\'.piw\')&&this.closest(\'.piw\').classList.add(\'img-ready\')" onerror="this.style.display=\'none\'">'
     : '';
   var img = '<div class="piw" style="background:' + (p.card_bg||'#f9f4ec') + '">' +
     imgHtml +
@@ -1029,7 +1044,7 @@ function renderProds() {
     }
   }
   updateAllWLButtons();
-  setTimeout(function() { initProductHoverImages(); observeProductImages(); }, 50);
+  setTimeout(function() { initProductHoverImages(); }, 50);
 }
 
 function _apLoadMore() {
@@ -1056,7 +1071,7 @@ function _apLoadMore() {
     _apLoadingMore = false;
     _apUpdateLoadMore(total);
     updateAllWLButtons();
-    setTimeout(function() { initProductHoverImages(); observeProductImages(); }, 50);
+    setTimeout(function() { initProductHoverImages(); }, 50);
   }, 120);
 }
 
