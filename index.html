@@ -127,6 +127,7 @@
 <!-- ══ FONTS ═════════════════════════════════════════════════════════════ -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://ulyrhnpoiypuvaurlqqi.supabase.co" crossorigin>
 <link rel="preconnect" href="https://checkout.razorpay.com">
 <link rel="dns-prefetch" href="https://lh3.googleusercontent.com">
 <link rel="dns-prefetch" href="https://images.unsplash.com">
@@ -252,10 +253,16 @@
           }
         } catch(e) {}
         // Preload the actual image
+        // Optimize URL for fast load (Supabase transform API)
+        var optUrl = url;
+        if (url.includes('supabase.co/storage/v1/object/public/')) {
+          optUrl = url.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/');
+          optUrl += (optUrl.includes('?') ? '&' : '?') + 'width=1400&quality=80&format=webp';
+        }
         var link = document.createElement('link');
         link.rel = 'preload';
         link.as = 'image';
-        link.href = url;
+        link.href = optUrl;
         if (i === 0) link.setAttribute('fetchpriority', 'high');
         document.head.appendChild(link);
       });

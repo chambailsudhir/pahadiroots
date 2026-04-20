@@ -17,8 +17,36 @@
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400&family=Lato:wght@300;400;700;900&family=Josefin+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://ulyrhnpoiypuvaurlqqi.supabase.co" crossorigin>
+  <link rel="dns-prefetch" href="https://checkout.razorpay.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400&family=Lato:wght@300;400;700;900&family=Josefin+Sans:wght@300;400;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Lato:wght@400;700&display=swap" rel="stylesheet"></noscript>
   <link rel="stylesheet" href="/css/main.css">
+  <script>
+  /* Preload current product image from cache for instant display */
+  (function() {
+    try {
+      var slug = location.pathname.replace(/\/products\//,'').replace(/\//,'').toLowerCase();
+      if (!slug) return;
+      var cached = JSON.parse(localStorage.getItem('pr_products_cache') || 'null');
+      if (!cached || !cached.products) return;
+      var prod = cached.products.find(function(p){ return (p.slug||'').toLowerCase()===slug||String(p.id)===slug; });
+      if (!prod || !prod.image_url) return;
+      // Preconnect to image host
+      try {
+        var imgOrigin = new URL(prod.image_url).origin;
+        var pc = document.createElement('link'); pc.rel='preconnect'; pc.href=imgOrigin; pc.crossOrigin='anonymous';
+        document.head.appendChild(pc);
+      } catch(e){}
+      // Preload the image
+      var pl = document.createElement('link');
+      var _ou=prod.image_url;
+        if(_ou&&_ou.includes('supabase.co/storage/v1/object/public/')){_ou=_ou.replace('/storage/v1/object/public/','/storage/v1/render/image/public/');_ou+=(_ou.includes('?')?'&':'?')+'width=900&quality=82&format=webp';}
+        pl.rel='preload'; pl.as='image'; pl.href=_ou; pl.setAttribute('fetchpriority','high');
+      document.head.appendChild(pl);
+    } catch(e){}
+  })();
+  </script>
 <script type="application/ld+json" id="product-jsonld">{"@context":"https://schema.org/","@type":"Product","name":"5 Pahadi Roots Product","brand":{"@type":"Brand","name":"5 Pahadi Roots"}}</script>
 
 <style>
@@ -98,7 +126,7 @@ button{font-family:'Inter',sans-serif;cursor:pointer}
 /* ══ IMAGE GALLERY ══ */
 .img-section{position:sticky;top:80px;width:100%}
 .main-img-wrap{position:relative;border-radius:20px;overflow:hidden;background:var(--bg2);aspect-ratio:4/5;cursor:zoom-in;box-shadow:0 8px 40px rgba(0,0,0,.14)}
-.main-img-wrap img{width:100%;height:100%;object-fit:cover;transition:transform .55s cubic-bezier(.25,.46,.45,.94)}
+.main-img-wrap img{width:100%;height:100%;object-fit:cover;transition:opacity .5s ease, transform .55s cubic-bezier(.25,.46,.45,.94)}
 .main-img-wrap:hover img{transform:scale(1.07)}
 .main-img-wrap::after{content:'';position:absolute;inset:0;background:rgba(26,58,30,0);transition:background .35s ease;pointer-events:none;border-radius:20px}
 .main-img-wrap:hover::after{background:rgba(26,58,30,0.18)}
@@ -720,9 +748,19 @@ body{letter-spacing:.01em}
 <!-- MAIN CONTENT -->
 <div style="background:#faf6ee">
 <div id="main-content" style="min-height:70vh">
-  <div class="loading-wrap">
-    <div class="spinner"></div>
-    <p style="color:var(--tx3);font-size:14px">Loading product…</p>
+  <!-- Skeleton loader — replaced instantly by renderProduct() -->
+  <div class="prod-skeleton" style="max-width:1200px;margin:0 auto;padding:32px 24px;display:grid;grid-template-columns:1fr 1fr;gap:40px">
+    <div style="border-radius:16px;overflow:hidden;aspect-ratio:1/1;background:linear-gradient(110deg,#ede8df 25%,#f7f2ea 50%,#ede8df 75%);background-size:200% 100%;animation:shimmer 1.4s infinite linear"></div>
+    <div style="display:flex;flex-direction:column;gap:16px;padding-top:12px">
+      <div style="height:14px;width:40%;border-radius:8px;background:linear-gradient(110deg,#ede8df 25%,#f7f2ea 50%,#ede8df 75%);background-size:200% 100%;animation:shimmer 1.4s infinite linear"></div>
+      <div style="height:36px;width:85%;border-radius:8px;background:linear-gradient(110deg,#ede8df 25%,#f7f2ea 50%,#ede8df 75%);background-size:200% 100%;animation:shimmer 1.4s infinite linear"></div>
+      <div style="height:28px;width:30%;border-radius:8px;background:linear-gradient(110deg,#ede8df 25%,#f7f2ea 50%,#ede8df 75%);background-size:200% 100%;animation:shimmer 1.4s infinite linear"></div>
+      <div style="height:1px;background:#e8e0d0;margin:8px 0"></div>
+      <div style="height:14px;width:100%;border-radius:6px;background:linear-gradient(110deg,#ede8df 25%,#f7f2ea 50%,#ede8df 75%);background-size:200% 100%;animation:shimmer 1.4s infinite linear"></div>
+      <div style="height:14px;width:90%;border-radius:6px;background:linear-gradient(110deg,#ede8df 25%,#f7f2ea 50%,#ede8df 75%);background-size:200% 100%;animation:shimmer 1.4s infinite linear"></div>
+      <div style="height:14px;width:75%;border-radius:6px;background:linear-gradient(110deg,#ede8df 25%,#f7f2ea 50%,#ede8df 75%);background-size:200% 100%;animation:shimmer 1.4s infinite linear"></div>
+      <div style="height:52px;width:60%;border-radius:50px;margin-top:12px;background:linear-gradient(110deg,#c5dbc8 25%,#d8eada 50%,#c5dbc8 75%);background-size:200% 100%;animation:shimmer 1.4s infinite linear"></div>
+    </div>
   </div>
 </div>
 
@@ -931,6 +969,19 @@ function updateShippingUI() {
   }
 }
 
+
+// ── IMAGE OPTIMIZER — Supabase transform API ──
+function imgOpt(url, opts) {
+  if (!url) return url;
+  try {
+    if (!url.includes('supabase.co/storage/v1/object/public/')) return url;
+    var w = (opts && opts.w) || 800;
+    var q = (opts && opts.q) || 75;
+    var t = url.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/');
+    var sep = t.includes('?') ? '&' : '?';
+    return t + sep + 'width=' + w + '&quality=' + q + '&format=webp';
+  } catch(e) { return url; }
+}
 async function loadProduct() {
   var slug = getSlug();
   if (!slug || slug === 'product.html' || slug === 'product') {
@@ -938,6 +989,23 @@ async function loadProduct() {
     aiGenerateProduct('Himalayan Wild Honey', true);
     return;
   }
+
+  // ── INSTANT RENDER from localStorage cache (stale-while-revalidate) ──
+  var _renderedFromCache = false;
+  try {
+    var cached = JSON.parse(localStorage.getItem('pr_products_cache') || 'null');
+    var maxAge = 30 * 60 * 1000; // 30 minutes — serve from cache, always refresh in bg
+    if (cached && cached.products) {
+      var cp = cached.products.find(function(p){ return (p.slug||'').toLowerCase() === slug; });
+      if (!cp) cp = cached.products.find(function(p){ return String(p.id) === String(slug); });
+      if (cp) {
+        ALL_PRODUCTS = cached.products;
+        renderProduct(cp, [], [], {}, {}, {});
+        _renderedFromCache = true;
+      }
+    }
+  } catch(e) {}
+
   var controller = new AbortController();
   var _timer = setTimeout(function(){ controller.abort(); }, 12000);
   try {
@@ -981,6 +1049,7 @@ async function loadProduct() {
       initTickerBar(data.settings);
     }
     updateShippingUI(); /* patch ticker + cart note with live admin values */
+    // If already rendered from cache, only patch what's changed (images, variants, related)
     renderProduct(prod, prodImages, related, data, stateMap, stateImgMap);
     /* Silently trigger AI benefits after product renders */
     triggerAiBenefits(prod.name, prod.short_description || prod.name);
@@ -1047,7 +1116,8 @@ function renderProduct(p, images, related, data, stateMap, stateImgMap) {
         (p.limited_batch?'<div class="ribbon">🏔️ Limited Batch</div>':'') +
         (p.mrp&&p.price&&p.mrp>p.price?'<div class="disc-badge">-'+Math.round((1-p.price/p.mrp)*100)+'%</div>':'') +
         (allImgs.length>1?'<button class="img-arrow prev" onclick="event.stopPropagation();_goImg(-1)">&#8249;</button>':'') +
-        '<img id="main-img" src="'+allImgs[0]+'" alt="'+p.name+'" loading="eager">' +
+        '<div class="main-img-skel" style="position:absolute;inset:0;background:linear-gradient(110deg,#ede8df 25%,#f7f2ea 50%,#ede8df 75%);background-size:200% 100%;animation:shimmer 1.4s infinite linear;z-index:0"></div>' +
+        '<img id="main-img" src="'+imgOpt(allImgs[0],{w:900,q:82})+'" alt="'+p.name+'" loading="eager" fetchpriority="high" decoding="async" style="position:relative;z-index:1;opacity:0;transition:opacity .5s ease" onload="this.style.opacity=1;var sk=document.querySelector(\'.main-img-skel\');if(sk)sk.style.display=\'none\'">' +
         (allImgs.length>1?'<button class="img-arrow next" onclick="event.stopPropagation();_goImg(1)">&#8250;</button>':'') +
         (allImgs.length>1?'<div class="img-counter" id="img-counter">1 / '+allImgs.length+'</div>':'') +
       '</div>'
@@ -1056,7 +1126,10 @@ function renderProduct(p, images, related, data, stateMap, stateImgMap) {
   var thumbHtml = allImgs.length > 1
     ? '<div class="thumb-row">' + allImgs.map(function(src,i){
         return '<div class="thumb'+(i===0?' active':'')+'" onclick="switchImg(\''+src+'\',this,'+(i+1)+','+allImgs.length+')">' +
-          '<img src="'+src+'" loading="lazy" alt="">' +
+          '<div style="position:relative;width:100%;height:100%">' +
+            '<div style="position:absolute;inset:0;border-radius:8px;background:linear-gradient(110deg,#ede8df 25%,#f7f2ea 50%,#ede8df 75%);background-size:200% 100%;animation:shimmer 1.4s infinite linear"></div>' +
+            '<img src="'+imgOpt(src,{w:120,q:72})+'" loading="lazy" decoding="async" alt="" style="position:relative;z-index:1;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .4s" onload="this.style.opacity=1;var s=this.previousElementSibling;if(s)s.style.display=\'none\'">' +
+          '</div>' +
         '</div>';
       }).join('') + '</div>'
     : '';
@@ -1148,7 +1221,7 @@ function renderProduct(p, images, related, data, stateMap, stateImgMap) {
         var rPrice = Number(r.price)||0;
         return '<div class="rel-card">' +
           '<div class="rel-img" onclick="goToProduct(\'' + rSlug + '\')" style="cursor:pointer">' +
-            (r.image_url ? '<img src="' + r.image_url + '" alt="' + rNameSafe + '" loading="lazy">' : '<div class="rel-img-placeholder">' + rEmojiSafe + '</div>') +
+            (r.image_url ? '<div style="position:relative;width:100%;height:100%"><div style="position:absolute;inset:0;background:linear-gradient(110deg,#ede8df 25%,#f7f2ea 50%,#ede8df 75%);background-size:200% 100%;animation:shimmer 1.4s infinite linear"></div><img src="' + imgOpt(r.image_url,{w:400,q:75}) + '" alt="' + rNameSafe + '" loading="lazy" decoding="async" style="position:relative;z-index:1;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .4s" onload="this.style.opacity=1;var s=this.previousElementSibling;if(s)s.style.display=\'none\'" onerror="this.style.display=\'none\'"></div>' : '<div class="rel-img-placeholder">' + rEmojiSafe + '</div>') +
             (rDisc > 0 ? '<span class="rel-disc">-' + rDisc + '%</span>' : '') +
           '</div>' +
           '<div class="rel-body">' +
@@ -1598,10 +1671,16 @@ async function aiGenerateProduct(input, isAuto) {
 /* ══ IMAGE FUNCTIONS ══ */
 function switchImg(src, thumb, idx, total) {
   var mi = document.getElementById('main-img');
-  if (mi) mi.src = src;
+  var sk = document.querySelector('.main-img-skel');
+  if (sk) sk.style.display = '';
+  if (mi) {
+    mi.style.opacity = '0';
+    mi.src = imgOpt(src, {w:900, q:82});
+    mi.onload = function(){ this.style.opacity='1'; if(sk) sk.style.display='none'; };
+  }
   document.querySelectorAll('.thumb').forEach(function(t){ t.classList.remove('active'); });
   thumb.classList.add('active');
-  document.getElementById('zoom-img').src = src;
+  document.getElementById('zoom-img').src = src; // zoom shows full-res
   var wrap = document.getElementById('main-img-wrap');
   if (wrap) wrap.onclick = function(){ openZoom(src); };
   var ctr = document.getElementById('img-counter');
