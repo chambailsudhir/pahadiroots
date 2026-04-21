@@ -1100,8 +1100,8 @@ function buildMegaMenu() {
       var btn = document.createElement('button');
       var imgSrc = st.cover_photo_url || st.tab_photo_url || '';
       var thumbHtml = imgSrc
-        ? '<span class="mega-state-thumb-wrap"><img class="mega-state-thumb" src="' + imgSrc + '" alt="' + st.name + '" width="28" height="28" loading="lazy" decoding="async" onerror="this.parentNode.innerHTML=\'🏔️\'"></span>'
-        : '<span class="mega-state-thumb-wrap">' + (st.emoji || '🏔️') + '</span>';
+        ? '<span class="mega-state-thumb-wrap"><img class="mega-state-thumb" src="' + imgSrc + '" alt="' + st.name + '" width="44" height="44" loading="eager" decoding="async" onload="this.classList.add(\'loaded\');this.parentNode.classList.add(\'img-ok\')" onerror="this.style.display=\'none\';this.parentNode.classList.add(\'img-ok\')"></span>'
+        : '<span class="mega-state-thumb-wrap img-ok">' + (st.emoji || '🏔️') + '</span>';
       btn.innerHTML = thumbHtml + st.name;
       btn.onclick = (function(stId) {
         return function() {
@@ -1183,6 +1183,18 @@ function toggleMegaMenu() {
 }
 
 // Wire up hover + click on the Shop trigger
+// ── Preload state images before menu opens ──
+var _stateImgsPreloaded = false;
+function preloadStateImages() {
+  if (_stateImgsPreloaded) return;
+  _stateImgsPreloaded = true;
+  var statesData = (STATES && STATES.length) ? STATES : FALLBACK_STATES;
+  statesData.forEach(function(st) {
+    var src = st.cover_photo_url || st.tab_photo_url || '';
+    if (src) { var img = new Image(); img.src = src; }
+  });
+}
+
 document.addEventListener('DOMContentLoaded', function() {
   var li      = document.getElementById('shopNavLi');
   var trigger = document.getElementById('shopNavTrigger');
@@ -1194,6 +1206,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Hover open/close — reliable flag-based approach
   li.addEventListener('mouseenter', function() {
+    preloadStateImages(); // start loading images on hover intent
     _mouseInTrigger = true;
     openMegaMenu();
   });
@@ -1280,8 +1293,8 @@ function buildMobMega() {
       a.style.cssText = 'display:flex;align-items:center;gap:10px;padding:9px 14px;color:var(--tx);font-weight:600;border-radius:10px;font-size:14px;text-decoration:none';
       var mobImgSrc = st.cover_photo_url || st.tab_photo_url || '';
       var mobThumb = mobImgSrc
-        ? '<span style="width:30px;height:30px;border-radius:7px;overflow:hidden;flex-shrink:0;display:flex"><img src="' + mobImgSrc + '" alt="' + st.name + '" width="30" height="30" loading="lazy" decoding="async" style="width:30px;height:30px;object-fit:cover;border-radius:7px" onerror="this.parentNode.innerHTML=\'🏔️\'"></span>'
-        : '<span style="font-size:16px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:7px;background:#dde8dd">' + (st.emoji || '🏔️') + '</span>';
+        ? '<span style="width:42px;height:42px;border-radius:8px;overflow:hidden;flex-shrink:0;display:flex;background:linear-gradient(90deg,#e8ede8 25%,#d4e0d4 50%,#e8ede8 75%)"><img src="' + mobImgSrc + '" alt="' + st.name + '" width="42" height="42" loading="eager" decoding="async" style="width:42px;height:42px;object-fit:cover;border-radius:8px;opacity:0;transition:opacity .2s" onload="this.style.opacity=1;this.parentNode.style.background=\'none\'" onerror="this.style.display=\'none\';this.parentNode.style.background=\'none\'" /></span>'
+        : '<span style="font-size:18px;width:42px;height:42px;display:flex;align-items:center;justify-content:center;border-radius:8px;background:#dde8dd;flex-shrink:0">' + (st.emoji || '🏔️') + '</span>';
       a.innerHTML = mobThumb + st.name;
       a.onclick = (function(stId) { return function() {
         closeMobNav();
