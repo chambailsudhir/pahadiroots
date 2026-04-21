@@ -580,11 +580,10 @@ function initCollectionImages(settings) {
     else if (/oil/i.test(slug)) filterKey = 'oil';
 
     var card = document.createElement('a');
-    card.href = '#products';
+    card.href = '/category.html?id=' + slug;
     card.className = 'ccat-v2 rv';
     card.id = 'ccat-' + slug;
     card.style.transitionDelay = (i * 0.05) + 's';
-    card.setAttribute('onclick', "setTimeout(function(){setFilter('" + filterKey + "',document.querySelector('[onclick*=" + filterKey + "]'))},50)");
 
     // Image box
     var box = document.createElement('div');
@@ -723,6 +722,7 @@ async function loadData() {
     var _cachedSettings = JSON.parse(localStorage.getItem('pr_site_settings') || 'null');
     if (_cachedSettings) {
       initHeroSlider(_cachedSettings);
+      window.SITE_SETTINGS = _cachedSettings; // expose early for category.html
     }
   } catch(e) {}
 
@@ -849,6 +849,7 @@ async function loadData() {
       initTickerBar(data.settings);  // Scrolling ticker
       // ── Cache settings so hero + UI renders instantly on next page load ──
       try { localStorage.setItem('pr_site_settings', JSON.stringify(data.settings)); } catch(e) {}
+      window.SITE_SETTINGS = data.settings; // expose for category.html
     }
     var updated  = false;
 
@@ -991,6 +992,24 @@ async function loadData() {
       try { window.dispatchEvent(new CustomEvent('pahadiProductsLoaded', {detail:{count:PRODUCTS.length}})); } catch(e){}
       // Fire pahadiDataReady for state.html and all-states.html
       try { window.dispatchEvent(new CustomEvent('pahadiDataReady', {detail:{states:STATES,products:PRODUCTS}})); } catch(e){}
+      // Fire callback for category.html
+      if (typeof window._onStoreDataReady === 'function') { try { window._onStoreDataReady(); } catch(e){} }
+      // Preload state + collection images immediately after data loads (eliminates mega menu delay)
+      setTimeout(function() {
+        var statesData = (STATES && STATES.length) ? STATES : FALLBACK_STATES;
+        statesData.forEach(function(st) {
+          var src = st.cover_photo_url || st.tab_photo_url || '';
+          if (src) { var img = new Image(); img.src = src; }
+        });
+        if (window.SITE_SETTINGS) {
+          Object.keys(window.SITE_SETTINGS).forEach(function(k) {
+            if (k.startsWith('coll_img_')) {
+              var src = window.SITE_SETTINGS[k];
+              if (src && src.trim()) { var img = new Image(); img.src = src.trim(); }
+            }
+          });
+        }
+      }, 500); // small delay so critical page content renders first
       // Update homepage "View All" count if present
       var tpc2 = document.getElementById('totalProdCount');
       if (tpc2 && PRODUCTS.length) tpc2.textContent = '(' + PRODUCTS.length + ')';
@@ -1072,17 +1091,7 @@ function buildMegaMenu() {
       btn.innerHTML = '<span class="mega-icon">' + cat.icon + '</span>' + cat.label;
       btn.onclick = (function(catKey) { return function() {
         closeMegaMenu();
-        var shopEl = document.getElementById('shop') || document.getElementById('pgrid');
-        if (shopEl) {
-          shopEl.scrollIntoView({behavior:'smooth', block:'start'});
-          setTimeout(function() {
-            var filterBtn = document.querySelector('[data-filter="' + catKey + '"]') ||
-                            document.querySelector('.filter-btn[data-filter="' + catKey + '"]');
-            setFilter(catKey, filterBtn);
-          }, 300);
-        } else {
-          window.location.href = '/all-products.html?filter=' + catKey;
-        }
+        window.location.href = '/category.html?id=' + catKey;
       }; })(cat.key);
       li.appendChild(btn);
       listColl.appendChild(li);
@@ -1263,20 +1272,12 @@ function buildMobMega() {
       });
       if (!hasProducts && PRODUCTS.length > 0) return;
       var a = document.createElement('a');
-      a.href = '/all-products.html?filter=' + cat.key;
+      a.href = '/category.html?id=' + cat.key;
       a.style.cssText = 'display:flex;align-items:center;gap:10px;padding:9px 14px;color:var(--tx);font-weight:600;border-radius:10px;font-size:14px;text-decoration:none';
       a.innerHTML = '<span style="font-size:16px;width:22px;text-align:center">' + cat.icon + '</span>' + cat.label;
       a.onclick = (function(catKey) { return function() {
         closeMobNav();
-        var el = document.getElementById('shop') || document.getElementById('pgrid');
-        if (el) {
-          setTimeout(function() {
-            el.scrollIntoView({behavior:'smooth'});
-            setTimeout(function() { setFilter(catKey, null); }, 200);
-          }, 150);
-        } else {
-          window.location.href = '/all-products.html?filter=' + catKey;
-        }
+        window.location.href = '/category.html?id=' + catKey;
         return false;
       }; })(cat.key);
       mobColl.appendChild(a);
