@@ -557,8 +557,26 @@ function initCollectionImages(settings) {
     }
   });
 
-  // Get ALL known slugs (with or without images), excluding hidden ones
-  var slugs = Object.keys(allSlugsSet).filter(function(s) { return !hiddenMap[s]; });
+  // Get slugs that: are not hidden AND have at least 1 matching product (when products loaded)
+  var FILTER_RE_MAP = {
+    honey:/honey/i, ghee:/ghee|butter/i, saffron:/saffron|kesar/i,
+    tea:/tea|chai/i, spices:/spice|cardamom|turmeric|pepper|chilli|ginger|herb/i,
+    oil:/oil/i, oils:/oil/i, rice:/rice/i, juice:/juice|squash/i,
+    jams:/jam|preserve|marmalade/i, nuts:/walnut|almond|cashew|pistachio|dry.fruit|apricot|fig|nut/i,
+    shilajit:/shilajit/i, pulses:/pulse|rajma|dal|lentil/i
+  };
+  var slugs = Object.keys(allSlugsSet).filter(function(s) {
+    if (hiddenMap[s]) return false;
+    // If products are loaded, only show slugs with matching products
+    if (window.PRODUCTS && window.PRODUCTS.length) {
+      var re = FILTER_RE_MAP[s];
+      if (!re) return false; // unknown slug with no products — hide it
+      return window.PRODUCTS.some(function(p) {
+        return re.test(p.name + ' ' + (p.description||'') + ' ' + (p.category_id||'') + ' ' + (p.slug||''));
+      });
+    }
+    return true; // products not loaded yet — show optimistically
+  });
   slugs.sort(function(a, b) {
     return (orderMap[a] || 99) - (orderMap[b] || 99) || a.localeCompare(b);
   });
@@ -988,6 +1006,10 @@ async function loadData() {
       var activeStateId = activeStateEl ? activeStateEl.id.replace('p-','') : null;
       renderProds(); renderStates(); observeRv(); injectProductSchema(); renderUpsell();
       refreshMegaMenu(); // Rebuild mega menu with real product categories
+      // Re-render collection cards now that products are loaded (removes fake categories)
+      if (window.SITE_SETTINGS && document.getElementById('cgrid')) {
+        try { initCollectionImages(window.SITE_SETTINGS); } catch(e){}
+      }
       // Fire event so all-products.html can update its count badge
       try { window.dispatchEvent(new CustomEvent('pahadiProductsLoaded', {detail:{count:PRODUCTS.length}})); } catch(e){}
       // Fire pahadiDataReady for state.html and all-states.html
