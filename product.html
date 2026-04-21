@@ -973,8 +973,25 @@ function updateShippingUI() {
 // ── IMAGE OPTIMIZER — Supabase transform API ──
 var _imgOptFailed = {};
 function imgOpt(url, opts) {
-  // Direct URL — Supabase image transform add-on not active
   if (!url) return url;
+  opts = opts || {};
+  var w = opts.w || 400;
+  var q = opts.q || 80;
+  try {
+    if (url.indexOf('images.unsplash.com') !== -1) {
+      var u = new URL(url);
+      u.searchParams.set('w', w);
+      u.searchParams.set('q', q);
+      u.searchParams.set('fm', 'webp');
+      u.searchParams.set('auto', 'format,compress');
+      u.searchParams.set('fit', 'crop');
+      return u.toString();
+    }
+    if (url.indexOf('supabase.co/storage') !== -1) {
+      var sep = url.indexOf('?') !== -1 ? '&' : '?';
+      return url + sep + 'width=' + w + '&quality=' + q + '&resize=cover';
+    }
+  } catch(e) {}
   return url;
 }
 function imgOptFallback(el, originalUrl) {
@@ -1925,7 +1942,7 @@ function renderCartDrawer() {
   if (!cart.length) { body.innerHTML='<div class="cd-empty"><div class="ce-icon">🛒</div><p>Your cart is empty.<br>Add products to get started.</p></div>'; return; }
   body.innerHTML = cart.map(function(item,idx){
     return '<div class="cart-item">' +
-      '<div class="ci-img">'+(item.image?'<img src="'+item.image+'" alt="">':'<span style="font-size:24px">'+(item.emoji||'🌿')+'</span>')+'</div>' +
+      '<div class="ci-img">'+(item.image?'<img src="'+imgOpt(item.image,{w:120,q:75})+'" alt="" loading="lazy" decoding="async">':'<span style="font-size:24px">'+(item.emoji||'🌿')+'</span>')+'</div>' +
       '<div class="ci-info"><div class="ci-name">'+item.name+'</div><div class="ci-var">₹'+item.price+' each</div><div class="ci-bottom"><div class="ci-qty-ctrl"><button class="ci-qbtn" onclick="cAdjQty('+idx+',-1)">−</button><span class="ci-qnum">'+item.qty+'</span><button class="ci-qbtn" onclick="cAdjQty('+idx+',1)">+</button></div><button class="ci-remove" onclick="cRemove('+idx+')">Remove</button></div></div>' +
       '<span class="ci-price">₹'+(item.price*item.qty).toLocaleString('en-IN')+'</span>' +
     '</div>';

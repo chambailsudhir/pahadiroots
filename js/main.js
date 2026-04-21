@@ -245,7 +245,27 @@ var _heroSlideCount = 0;
 // ── IMAGE HELPER — direct Supabase URLs (no transform add-on required) ──
 function imgOpt(url, opts) {
   if (!url) return url;
-  return url; // direct URL — always works
+  opts = opts || {};
+  var w = opts.w || 400;
+  var q = opts.q || 80;
+  try {
+    // Unsplash CDN — supports w, q, fm, auto params
+    if (url.indexOf('images.unsplash.com') !== -1) {
+      var u = new URL(url);
+      u.searchParams.set('w', w);
+      u.searchParams.set('q', q);
+      u.searchParams.set('fm', 'webp');
+      u.searchParams.set('auto', 'format,compress');
+      u.searchParams.set('fit', 'crop');
+      return u.toString();
+    }
+    // Supabase Storage — supports transform via query params
+    if (url.indexOf('supabase.co/storage') !== -1) {
+      var sep = url.indexOf('?') !== -1 ? '&' : '?';
+      return url + sep + 'width=' + w + '&quality=' + q + '&resize=cover';
+    }
+  } catch(e) {}
+  return url;
 }
 
 // onerror fallback — hides broken img cleanly
@@ -610,7 +630,15 @@ function initCollectionImages(settings) {
     if (url) {
       var img = document.createElement('img');
       img.alt = label;
-      img.loading = 'lazy';
+      // First 4 cards are visible on load — load eagerly with high priority
+      if (i < 4) {
+        img.loading = 'eager';
+        img.fetchPriority = 'high';
+        img.decoding = 'async';
+      } else {
+        img.loading = 'lazy';
+        img.decoding = 'async';
+      }
       img.onerror = function() {
         this.style.display = 'none';
         var emoEl = document.createElement('span');
@@ -630,7 +658,8 @@ function initCollectionImages(settings) {
         var sk = this.previousElementSibling;
         if (sk && sk.classList.contains('pimg-skel')) sk.style.display = 'none';
       };
-      img.src = imgOpt(url, {w:200, q:75});
+      // Use 320px wide WebP for category thumbnails — enough for the card size
+      img.src = imgOpt(url, {w:320, q:75});
       box.appendChild(img);
     } else {
       var emoEl = document.createElement('span');
@@ -1021,13 +1050,13 @@ async function loadData() {
         var statesData = (STATES && STATES.length) ? STATES : FALLBACK_STATES;
         statesData.forEach(function(st) {
           var src = st.cover_photo_url || st.tab_photo_url || '';
-          if (src) { var img = new Image(); img.src = src; }
+          if (src) { var img = new Image(); img.src = imgOpt(src, {w:800, q:75}); }
         });
         if (window.SITE_SETTINGS) {
           Object.keys(window.SITE_SETTINGS).forEach(function(k) {
             if (k.startsWith('coll_img_')) {
               var src = window.SITE_SETTINGS[k];
-              if (src && src.trim()) { var img = new Image(); img.src = src.trim(); }
+              if (src && src.trim()) { var img = new Image(); img.src = imgOpt(src.trim(), {w:320, q:75}); }
             }
           });
         }
@@ -1131,7 +1160,7 @@ function buildMegaMenu() {
       var btn = document.createElement('button');
       var imgSrc = st.cover_photo_url || st.tab_photo_url || '';
       var thumbHtml = imgSrc
-        ? '<span class="mega-state-thumb-wrap"><img class="mega-state-thumb" src="' + imgSrc + '" alt="' + st.name + '" width="44" height="44" loading="eager" decoding="async" onload="this.classList.add(\'loaded\');this.parentNode.classList.add(\'img-ok\')" onerror="this.style.display=\'none\';this.parentNode.classList.add(\'img-ok\')"></span>'
+        ? '<span class="mega-state-thumb-wrap"><img class="mega-state-thumb" src="' + imgOpt(imgSrc,{w:88,q:70}) + '" alt="' + st.name + '" width="44" height="44" loading="eager" decoding="async" onload="this.classList.add(\'loaded\');this.parentNode.classList.add(\'img-ok\')" onerror="this.style.display=\'none\';this.parentNode.classList.add(\'img-ok\')"></span>'
         : '<span class="mega-state-thumb-wrap img-ok">' + (st.emoji || '🏔️') + '</span>';
       btn.innerHTML = thumbHtml + st.name;
       btn.onclick = (function(stId) {
@@ -1222,7 +1251,7 @@ function preloadStateImages() {
   var statesData = (STATES && STATES.length) ? STATES : FALLBACK_STATES;
   statesData.forEach(function(st) {
     var src = st.cover_photo_url || st.tab_photo_url || '';
-    if (src) { var img = new Image(); img.src = src; }
+    if (src) { var img = new Image(); img.src = imgOpt(src, {w:800, q:75}); }
   });
 }
 
@@ -1339,7 +1368,7 @@ var FILTER_MAP = {
   oil:     function(p) { return /oil|ghee/i.test(p.name + ' ' + (p.description||'')); },
 };
 
-function mkProd(p) {
+function mkProd(p, idx) {
   var pct    = p.original_price ? Math.round((1 - p.price / p.original_price) * 100) : 0;
   var bc     = p.badge_type || 'bs';
   var stock  = (p.stock !== undefined && p.stock !== null) ? p.stock : 99;
@@ -1348,8 +1377,10 @@ function mkProd(p) {
   var sLbl   = stock <= 0 ? 'Out of Stock' : stock > 20 ? 'In Stock' : ('Only ' + stock + ' left');
   var inWL   = wishlist.findIndex(function(x){ return String(x) === String(p.id); }) > -1;
   var slug   = getProductSlug(p);
+  var imgLoad = (typeof idx === 'number' && idx < 4) ? 'eager' : 'lazy';
+  var imgPri  = (typeof idx === 'number' && idx < 4) ? ' fetchpriority="high"' : '';
   var imgHtml = p.image_url
-    ? '<div class="pimg-skel" style="position:absolute;inset:0;z-index:0;border-radius:inherit"></div><img src="' + imgOpt(p.image_url,{w:400,q:75}) + '" alt="' + p.name + '" loading="lazy" decoding="async" width="400" height="500" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;opacity:0;transition:opacity .45s" onload="this.style.opacity=1;var sk=this.previousElementSibling;if(sk)sk.style.display=\'none\';this.closest(\'.piw\')&&this.closest(\'.piw\').classList.add(\'img-ready\')" onerror="imgOptFallback(this,\''+p.image_url+'\')">'
+    ? '<div class="pimg-skel" style="position:absolute;inset:0;z-index:0;border-radius:inherit"></div><img src="' + imgOpt(p.image_url,{w:400,q:75}) + '" alt="' + p.name + '" loading="' + imgLoad + '"' + imgPri + ' decoding="async" width="400" height="500" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;opacity:0;transition:opacity .45s" onload="this.style.opacity=1;var sk=this.previousElementSibling;if(sk)sk.style.display=\'none\';this.closest(\'.piw\')&&this.closest(\'.piw\').classList.add(\'img-ready\')" onerror="imgOptFallback(this,\''+p.image_url+'\')">'
     : '';
   var img = '<div class="piw" style="background:' + (p.card_bg||'#f9f4ec') + '">' +
     imgHtml +
@@ -1430,13 +1461,13 @@ function renderProds() {
   if (isAllPage) {
     // Show first batch, set up infinite scroll / load more
     var firstBatch = list.slice(0, _apPageSize);
-    g.innerHTML = firstBatch.map(function(p) { return mkProd(p); }).join('');
+    g.innerHTML = firstBatch.map(function(p, i) { return mkProd(p, i); }).join('');
     _apUpdateLoadMore(list.length);
   } else {
     // Homepage: show 8 + View All button (always visible)
     var LIMIT = 8;
     var displayList = list.length > LIMIT ? list.slice(0, LIMIT) : list;
-    g.innerHTML = displayList.map(function(p) { return mkProd(p); }).join('');
+    g.innerHTML = displayList.map(function(p, i) { return mkProd(p, i); }).join('');
     if (smw) {
       smw.style.display = 'block'; // always show View All on homepage
       if (tpc) tpc.textContent = list.length > LIMIT ? '(' + list.length + ')' : '';
@@ -1464,7 +1495,7 @@ function _apLoadMore() {
     var nextBatch = _apCurrentList.slice((_apPage - 1) * _apPageSize, _apPage * _apPageSize);
     var frag = document.createDocumentFragment();
     var tmp = document.createElement('div');
-    tmp.innerHTML = nextBatch.map(function(p) { return mkProd(p); }).join('');
+    tmp.innerHTML = nextBatch.map(function(p) { return mkProd(p, 99); }).join('');
     while (tmp.firstChild) frag.appendChild(tmp.firstChild);
     g.appendChild(frag);
     _apLoadingMore = false;
@@ -1563,7 +1594,7 @@ function renderStates() {
       '</div>';
     }
     var prodsHtml = stProds.length
-      ? stProds.map(function(p) { return mkProd(p); }).join('')
+      ? stProds.map(function(p, i) { return mkProd(p, i); }).join('')
       : '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--tx3);font-family:\'Playfair Display\',serif;font-style:italic">🏔️ Products coming soon from ' + s.name + '…</div>';
     return '<div class="spnl' + (i===0?' active':'') + '" id="p-' + s.id + '">' +
       '<div class="shdr">' + photoHtml +
@@ -1712,7 +1743,7 @@ function initProductHoverImages() {
       hoverImgs.forEach(function(src, hi) {
         var img = document.createElement('img');
         img.className = 'phover-img';
-        img.src = src; img.alt = p.name; img.loading = 'lazy';
+        img.src = imgOpt(src, {w:400, q:75}); img.alt = p.name; img.loading = 'lazy'; img.decoding = 'async';
         if (hoverImgs.length > 1) {
           img.style.animationDelay = (hi * 2) + 's';
           img.style.animationDuration = (hoverImgs.length * 2) + 's';
