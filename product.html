@@ -987,9 +987,9 @@ function imgOpt(url, opts) {
       u.searchParams.set('fit', 'crop');
       return u.toString();
     }
+    // Supabase: no transform add-on — return raw URL to avoid 400 errors
     if (url.indexOf('supabase.co/storage') !== -1) {
-      var sep = url.indexOf('?') !== -1 ? '&' : '?';
-      return url + sep + 'width=' + w + '&quality=' + q + '&resize=cover';
+      return url;
     }
   } catch(e) {}
   return url;

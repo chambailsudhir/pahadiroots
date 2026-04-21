@@ -249,7 +249,7 @@ function imgOpt(url, opts) {
   var w = opts.w || 400;
   var q = opts.q || 80;
   try {
-    // Unsplash CDN — supports w, q, fm, auto params
+    // Unsplash CDN — supports w, q, fm, auto params natively
     if (url.indexOf('images.unsplash.com') !== -1) {
       var u = new URL(url);
       u.searchParams.set('w', w);
@@ -259,10 +259,12 @@ function imgOpt(url, opts) {
       u.searchParams.set('fit', 'crop');
       return u.toString();
     }
-    // Supabase Storage — supports transform via query params
+    // Supabase Storage — do NOT add transform params unless Image Transformation
+    // add-on is enabled on the project. Appending ?width= without the add-on
+    // causes Supabase to return a 400 error and the image fails to load entirely.
+    // Return the raw URL so images always load correctly.
     if (url.indexOf('supabase.co/storage') !== -1) {
-      var sep = url.indexOf('?') !== -1 ? '&' : '?';
-      return url + sep + 'width=' + w + '&quality=' + q + '&resize=cover';
+      return url;
     }
   } catch(e) {}
   return url;
