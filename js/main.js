@@ -629,6 +629,15 @@ function initCollectionImages(settings) {
   slugs = slugs.filter(function(s, i) { return slugs.indexOf(s) === i;
   });
 
+  // ── Fingerprint: skip full rebuild if same slugs+images already rendered ──
+  // This prevents the flicker when called from cache then again from API.
+  var _fp = slugs.join(',') + '|' + slugs.map(function(s){ return imgMap[s]||''; }).join(',');
+  if (cgrid.dataset.ccatFp === _fp && cgrid.children.length > 0) return;
+  cgrid.dataset.ccatFp = _fp;
+
+  // Stop any running auto-scroll timer before clearing
+  if (cgrid._ccatTimer) { clearInterval(cgrid._ccatTimer); cgrid._ccatTimer = null; }
+
   // Clear grid and rebuild from scratch
   cgrid.innerHTML = '';
 
@@ -680,14 +689,21 @@ function initCollectionImages(settings) {
       skel.style.cssText = 'position:absolute;inset:0;border-radius:14px;z-index:0';
       box.style.position = 'relative';
       box.appendChild(skel);
-      img.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;position:relative;z-index:1;opacity:0;transition:opacity .4s';
+      img.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;position:relative;z-index:1;opacity:0;transition:opacity .35s';
       img.onload = function() {
         this.style.opacity = '1';
         var sk = this.previousElementSibling;
-        if (sk && sk.classList.contains('pimg-skel')) sk.style.display = 'none';
+        if (sk && sk.classList.contains('pimg-skel')) { sk.style.display = 'none'; }
       };
       // Use 320px wide WebP for category thumbnails — enough for the card size
       img.src = imgOpt(url, {w:320, q:75});
+      // If already cached by browser (preloaded), show immediately without waiting for onload
+      if (img.complete && img.naturalWidth) {
+        img.style.opacity = '1';
+        img.style.transition = 'none';
+        var sk2 = img.previousElementSibling;
+        if (sk2 && sk2.classList.contains('pimg-skel')) sk2.style.display = 'none';
+      }
       box.appendChild(img);
     } else {
       var emoEl = document.createElement('span');
@@ -760,7 +776,7 @@ function initCollectionImages(settings) {
     cgrid.appendChild(clone);
   });
 
-  var timer = setInterval(scrollOneCard, 2500);
+  cgrid._ccatTimer = setInterval(scrollOneCard, 2500);
 
   cgrid.addEventListener('mouseenter', function() { isPaused = true; });
   cgrid.addEventListener('mouseleave', function() { isPaused = false; });
