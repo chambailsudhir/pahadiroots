@@ -1013,7 +1013,7 @@ async function loadData() {
           badge_type:     bt,
           badge_label:    loc.badge_label    || badgeMap[bt]       || 'Bestseller',
           card_bg:        loc.card_bg        || '#f9f4ec',
-          active:         db.is_active === true || db.is_active === 'true',
+          active:         db.status === 'active',
           category_id:    db.category_id,
           sku:            db.sku,
           tags:           db.tags,
@@ -1434,36 +1434,18 @@ function buildMobMega() {
 // ── PRODUCT CARD ───────────────────────────────────────────────────
 // ── FILTER MAP — rebuilt from DB_CATEGORIES when available ────
 // Uses category_id match (exact, reliable) with regex fallback
-var FILTER_REGEX = {
-  honey:   /honey/i,
-  ghee:    /ghee|butter/i,
-  spices:  /spice|cardamom|turmeric|pepper|saffron|chilli|ginger/i,
-  tea:     /tea|chai/i,
-  saffron: /saffron|kesar/i,
-  oil:     /oil/i,
+// Simple, reliable filter map — regex on product name+description
+// Works immediately without waiting for DB_CATEGORIES to load
+var FILTER_MAP = {
+  honey:   function(p) { return /honey/i.test(p.name + ' ' + (p.description||'')); },
+  ghee:    function(p) { return /ghee|butter/i.test(p.name + ' ' + (p.description||'')); },
+  spices:  function(p) { return /spice|cardamom|turmeric|pepper|saffron|chilli|ginger/i.test(p.name + ' ' + (p.description||'')); },
+  tea:     function(p) { return /tea|chai/i.test(p.name + ' ' + (p.description||'')); },
+  saffron: function(p) { return /saffron|kesar/i.test(p.name + ' ' + (p.description||'')); },
+  oil:     function(p) { return /oil/i.test(p.name + ' ' + (p.description||'')); },
 };
 
-var FILTER_MAP = {};
-
-function rebuildFilterMap() {
-  var dbCats = window.DB_CATEGORIES || [];
-  var keys = Object.keys(FILTER_REGEX);
-  keys.forEach(function(filterKey) {
-    // Find matching DB category by slug
-    var cat = dbCats.find(function(c) {
-      return (c.slug || '').toLowerCase() === filterKey.toLowerCase();
-    });
-    if (cat && cat.id) {
-      var catId = String(cat.id);
-      FILTER_MAP[filterKey] = function(p) { return String(p.category_id) === catId; };
-    } else {
-      // Fallback to regex if no DB category found for this filter
-      var re = FILTER_REGEX[filterKey];
-      FILTER_MAP[filterKey] = function(p) { return re.test(p.name + ' ' + (p.description||'')); };
-    }
-  });
-}
-rebuildFilterMap(); // initial build (DB_CATEGORIES may be empty on first run)
+function rebuildFilterMap() { /* no-op — FILTER_MAP is now hardcoded, always ready */ }
 
 function mkProd(p, idx) {
   var pct    = p.original_price ? Math.round((1 - p.price / p.original_price) * 100) : 0;
