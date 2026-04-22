@@ -558,11 +558,13 @@ function initCollectionImages(settings) {
       '#cgrid::-webkit-scrollbar{display:none;}',
       '.ccat-v2{flex:0 0 calc((100% - 80px) / 6);min-width:0;display:flex;flex-direction:column;align-items:center;gap:12px;text-decoration:none;cursor:pointer;transition:transform .2s;}',
       '.ccat-v2:hover{transform:translateY(-4px);}',
-      '.ccat-v2-box{width:100%;aspect-ratio:1/1;border-radius:16px;border:2px solid #c9a84c;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:0 2px 12px rgba(201,168,76,.18);transition:border-color .2s,box-shadow .2s;position:relative;}',
+      '.ccat-v2-box{width:100%;aspect-ratio:1/1;border-radius:16px;border:2px solid #c9a84c;background:#f0ede6;display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:0 2px 12px rgba(201,168,76,.18);transition:border-color .2s,box-shadow .2s;position:relative;}',
       '.ccat-v2:hover .ccat-v2-box{border-color:#a07830;box-shadow:0 6px 24px rgba(201,168,76,.32);}',
       '.ccat-v2-box img{width:100%;height:100%;object-fit:cover;display:block;}',
       '.ccat-v2-box .ccat-v2-emo{font-size:52px;line-height:1;}',
       '.ccat-v2-label{font-family:"Playfair Display",serif;font-size:14px;font-weight:700;color:#1a3a1e;text-align:center;line-height:1.3;padding:0 4px;width:100%;}',
+      /* GPU-composite card images — prevents repaint/decode flash during scroll loop */
+      '.ccat-v2-box img{will-change:transform;backface-visibility:hidden;transform:translateZ(0);}',
     ].join('');
     document.head.appendChild(st);
   }
@@ -574,10 +576,28 @@ function initCollectionImages(settings) {
 
   // Emoji map keyed by category name (lowercase) for display only
   var emoMap = {
-    honey:'🍯', jams:'🍓', juice:'🧃', oil:'🫚', oils:'🫚',
+    honey:'🍯', jams:'🍓', 'fruit jams':'🍓', juice:'🧃', oil:'🫚', oils:'🫚',
     spices:'🌿', 'spices of india':'🌿', tea:'🍵', rice:'🌾',
     pulses:'🫘', shilajit:'🪨', default:'🌿'
   };
+
+  // Display name overrides: DB names → clean display labels
+  var displayNameMap = {
+    'honey':'Wild Honey', 'wild natural honey':'Wild Honey',
+    'jams':'Jams & Preserves', 'fruit jams':'Jams & Preserves',
+    'juice':'Fresh Juices',
+    'oil':'Oils', 'oils':'Oils',
+    'pulses':'Pulses & Dal',
+    'rice':'Heritage Rice',
+    'shilajit':'Shilajit',
+    'spices':'Herbs & Spices', 'spices of india':'Herbs & Spices',
+    'tea':'Himalayan Teas',
+  };
+
+  function getDisplayName(cat) {
+    var key = (cat.name || '').toLowerCase().trim();
+    return displayNameMap[key] || cat.name;
+  }
 
   // Admin-set image URLs from site_settings (coll_img_<slug>)
   // Also support matching by category name slug (lowercased, spaces→hyphens)
@@ -591,15 +611,29 @@ function initCollectionImages(settings) {
   });
 
   function getImgForCat(cat) {
-    // 1. Try coll_img_<slug> where slug = cat.slug
-    if (imgMapBySlug[cat.slug]) return imgMapBySlug[cat.slug];
-    // 2. Try coll_img_<nameSlug> where nameSlug = lowercased name with spaces→hyphens
-    var nameSlug = cat.name.toLowerCase().replace(/\s+/g, '-');
-    if (imgMapBySlug[nameSlug]) return imgMapBySlug[nameSlug];
-    // 3. Try simple lowercase first word (honey, tea, oil etc.)
-    var firstWord = cat.name.toLowerCase().split(/\s+/)[0];
-    if (imgMapBySlug[firstWord]) return imgMapBySlug[firstWord];
-    // 4. DB image_url
+    // Pre-compute all lookup keys for this category
+    var slugKey     = (cat.slug  || '').toLowerCase().trim();
+    var nameLower   = (cat.name  || '').toLowerCase().trim();
+    var nameHyphen  = nameLower.replace(/\s+/g, '-');           // "fruit-jams"
+    var nameFirst   = nameLower.split(/\s+/)[0];               // "jams" (from name "Jams")
+    var slugFirst   = slugKey.split(/\s+/)[0];                 // "fruit" (from slug "Fruit jams") — unreliable!
+
+    // Try most-specific to least-specific:
+    // 1. Exact slug match (works when slug = "honey", "oil", etc.)
+    if (imgMapBySlug[slugKey])    return imgMapBySlug[slugKey];
+    // 2. Exact name match lowercased (e.g. "jams", "pulses", "spices")
+    if (imgMapBySlug[nameLower])  return imgMapBySlug[nameLower];
+    // 3. Name hyphenated (e.g. "fruit-jams")
+    if (imgMapBySlug[nameHyphen]) return imgMapBySlug[nameHyphen];
+    // 4. First word of NAME — this is the reliable one:
+    //    name="Jams"   → "jams"   → matches coll_img_jams   ✅
+    //    name="Pulses" → "pulses" → matches coll_img_pulses ✅
+    //    name="Honey"  → "honey"  → matches coll_img_honey  ✅
+    //    name="Spices" → "spices" → matches coll_img_spices ✅
+    if (imgMapBySlug[nameFirst])  return imgMapBySlug[nameFirst];
+    // 5. First word of slug (less reliable — "Fruit jams" → "fruit" — but try anyway)
+    if (imgMapBySlug[slugFirst])  return imgMapBySlug[slugFirst];
+    // 6. DB image_url column
     if (cat.image_url) return cat.image_url;
     return '';
   }
@@ -632,7 +666,7 @@ function initCollectionImages(settings) {
 
   function buildCard(cat, i) {
     var url   = getImgForCat(cat);
-    var label = cat.name;
+    var label = getDisplayName(cat);
     var emoji = getEmojiForCat(cat);
     // Link uses category ID so it matches products by category_id FK
     var href  = '/category.html?id=' + encodeURIComponent(cat.slug || cat.id);
@@ -698,6 +732,16 @@ function initCollectionImages(settings) {
     card.appendChild(lbl);
     cgrid.appendChild(card);
   }
+
+  // ── PREWARM: decode all images into GPU memory BEFORE building cards ──
+  // Images are already decoded when cards appear — zero flash on scroll loop.
+  cats.forEach(function(cat) {
+    var url = getImgForCat(cat);
+    if (!url) return;
+    var pre = new Image();
+    pre.decoding = 'async';
+    pre.src = url;
+  });
 
   cats.forEach(buildCard);
 
