@@ -316,7 +316,21 @@
 ──────────────────────────────────────────────────────────────────────── */
 (function() {
   try {
+    // Primary: use cached hero image list
     var cached = JSON.parse(localStorage.getItem('pr_hero_imgs') || '[]');
+    // Fallback for first visit: read directly from cached site settings
+    if (!Array.isArray(cached) || !cached.length || !cached[0]) {
+      try {
+        var s = JSON.parse(localStorage.getItem('pr_site_settings') || 'null');
+        if (s) {
+          cached = [];
+          for (var n = 1; n <= 3; n++) {
+            var u = s['hero_slide_' + n + '_img'];
+            if (u && u.trim()) cached.push(u.trim());
+          }
+        }
+      } catch(e) {}
+    }
     if (!Array.isArray(cached) || !cached.length || !cached[0]) return;
     var firstUrl = cached[0];
 
@@ -378,9 +392,15 @@
   try {
     var s = JSON.parse(localStorage.getItem('pr_site_settings') || 'null');
     if (!s) return;
-    var slugs = ['honey','shilajit','pulses','juice','tea','spices','rice','oil','jams'];
+    // Use cached DB categories if available, fallback to hardcoded slugs
+    var cats = [];
+    try {
+      var _cc = JSON.parse(localStorage.getItem('pr_categories') || 'null');
+      if (Array.isArray(_cc) && _cc.length) cats = _cc.map(function(c){ return c.slug || String(c.id); });
+    } catch(e) {}
+    if (!cats.length) cats = ['honey','shilajit','pulses','juice','tea','spices','rice','oil','jams'];
     var count = 0;
-    slugs.forEach(function(slug) {
+    cats.forEach(function(slug) {
       var url = s['coll_img_' + slug];
       if (!url || !url.trim()) return;
       if (count >= 6) return;
