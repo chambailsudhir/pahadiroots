@@ -1013,7 +1013,7 @@ async function loadData() {
           badge_type:     bt,
           badge_label:    loc.badge_label    || badgeMap[bt]       || 'Bestseller',
           card_bg:        loc.card_bg        || '#f9f4ec',
-          active:         db.status === 'active',
+          active:         db.is_active === true || db.is_active === 'true',
           category_id:    db.category_id,
           sku:            db.sku,
           tags:           db.tags,
@@ -1091,7 +1091,9 @@ async function loadData() {
               unit:p.unit, stock:p.stock, available_stock:p.available_stock,
               emoji:p.emoji, badge_label:p.badge_label, badge_type:p.badge_type,
               region:p.region, card_bg:p.card_bg, review_count:p.review_count,
-              limited_batch:p.limited_batch, badges:p.badges };
+              limited_batch:p.limited_batch, badges:p.badges,
+              gst_rate:p.gst_rate||5, extra_image_url:p.extra_image_url||null,
+              active:p.active };
           })
         };
         localStorage.setItem('pr_products_cache', JSON.stringify(cachePayload));
@@ -2356,7 +2358,12 @@ async function checkoutRazorpay() {
       email: email.trim() || 'customer@pahadiroots.com'
     },
     notes: {
-      address: addr.trim()+', '+city.trim()+', '+state+' - '+pin.trim()
+      name:    name.trim(),
+      phone:   phone.trim(),
+      email:   email.trim(),
+      address: addr.trim()+', '+city.trim()+', '+state+' - '+pin.trim(),
+      // items passed as JSON so webhook can recover order if admin-api fails
+      items:   JSON.stringify(cart.map(function(i){ return {id:i.id,variantId:i.variantId||null,qty:i.qty,price:i.price,name:i.name}; }))
     },
     theme: { color: '#2d6a4f' },
     handler: async function(response) {
@@ -2601,11 +2608,14 @@ function applyCoupon() {
       if(msg){msg.className='coup-msg coup-bad';msg.textContent='❌ Login required to use this coupon';}
       return;
     }
-    // Check order history via auth API
+    // Check order history via auth API — use orders array length, not profile.order_count
     callAuth('get_profile', {}, true).then(function(d) {
-      var profile = d && d.profile;
-      var hasOrders = profile && profile.order_count && profile.order_count > 0;
-      if (hasOrders) {
+      var orders = (d && Array.isArray(d.orders)) ? d.orders : [];
+      // Filter only confirmed/delivered/paid orders — ignore cancelled
+      var validOrders = orders.filter(function(o){
+        return o.order_status !== 'cancelled' && o.payment_status !== 'failed';
+      });
+      if (validOrders.length > 0) {
         if(msg){msg.className='coup-msg coup-bad';msg.textContent='❌ This coupon is valid for first order only';}
         return;
       }
