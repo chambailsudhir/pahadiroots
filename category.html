@@ -590,8 +590,19 @@ function _cpInit() {
   document.getElementById('ogTitle').setAttribute('content', title);
   document.getElementById('pageCanonical').setAttribute('href', 'https://pahadiroots.com/category.html?id='+_cpCatId);
 
+  // Try to match by DB category_id first (exact, reliable)
+  // Fall back to regex on name+description if no category_id match found
+  var dbCats = window.DB_CATEGORIES || [];
+  var matchedCat = dbCats.find(function(c) {
+    return (c.slug || '').toLowerCase() === _cpCatId.toLowerCase();
+  });
+  var matchedCatId = matchedCat ? String(matchedCat.id) : null;
+
   _cpProducts = products.filter(function(p) {
-    return meta.re.test(p.name+' '+(p.description||'')+' '+(p.category_id||'')+' '+(p.slug||''));
+    if (matchedCatId && p.category_id) {
+      return String(p.category_id) === matchedCatId;
+    }
+    return meta.re.test(p.name+' '+(p.description||'')+' '+(p.slug||''));
   });
 
   var catImgUrl = (settings['coll_img_'+_cpCatId]||'').trim();

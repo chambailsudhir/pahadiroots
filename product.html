@@ -1807,7 +1807,7 @@ function addToCartProduct(mode) {
   /* Always add to cart first */
   var ex = cart.find(function(x){ return String(x.cartKey||x.id)===String(cartKey); });
   if (ex) ex.qty += qty;
-  else cart.push({cartKey:cartKey,id:PRODUCT.id,variantId:variantId,name:displayName,emoji:PRODUCT.emoji||'🌿',image:PRODUCT.image_url||'',price:price,qty:qty});
+  else cart.push({cartKey:cartKey,id:PRODUCT.id,variantId:variantId,name:displayName,emoji:PRODUCT.emoji||'🌿',image:PRODUCT.image_url||'',price:price,gst_rate:PRODUCT.gst_rate||5,qty:qty});
   try { localStorage.setItem('pr_cart', JSON.stringify(cart)); } catch(e){}
   updateNavCart();
 
@@ -1966,10 +1966,10 @@ function relATCBtn(btn){
   var price=parseFloat(btn.getAttribute('data-price'))||0;
   var image=btn.getAttribute('data-img')||'';
   var emoji=btn.getAttribute('data-emoji')||'🌿';
-  var cKey='rel_'+id;
-  var ex=cart.find(function(x){return String(x.cartKey)===String(cKey);});
+  var cKey=id;  // use product id directly so it merges with homepage cart items
+  var ex=cart.find(function(x){return String(x.cartKey||x.id)===String(cKey);});
   if(ex)ex.qty+=1;
-  else cart.push({cartKey:cKey,id:id,name:name,emoji:emoji,image:image,price:price,qty:1});
+  else cart.push({cartKey:cKey,id:id,name:name,emoji:emoji,image:image,price:price,gst_rate:5,qty:1});
   try{localStorage.setItem('pr_cart',JSON.stringify(cart));}catch(e){}
   updateNavCart();
   showToast('✅ '+name+' added!');
