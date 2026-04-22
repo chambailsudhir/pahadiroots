@@ -448,18 +448,30 @@ function initHeroSlider(settings) {
   _heroSlideCount = slides.length;
   _heroSlideIndex = 0;
 
-  // ── INSTANT DISPLAY: if first slide image is already in browser cache, show it now ──
-  // This eliminates the opacity-0 flash on return visits where the image is cached.
-  requestAnimationFrame(function() {
-    var firstSlide = track.querySelector('[data-slide="0"] img');
-    if (firstSlide && firstSlide.complete && firstSlide.naturalWidth) {
-      firstSlide.style.opacity = '1';
-      firstSlide.style.transition = 'none';
-      var shimmer = firstSlide.previousElementSibling;
-      if (shimmer && shimmer.classList.contains('hero-img-shimmer')) shimmer.style.display = 'none';
-      // Hide fallback immediately too
-      if (fallback) { fallback.style.opacity = '0'; fallback.style.display = 'none'; }
+  // ── REHYDRATE hero images: force onload for any img that didn't fire ──
+  // This handles the case where the browser has the image cached but the
+  // node was replaced (DOM re-render), so onload never fired → stays opacity:0
+  function rehydrateHeroImg(img) {
+    if (!img) return;
+    if (img.complete && img.naturalWidth) {
+      // Already cached — show instantly, no transition
+      img.style.opacity = '1';
+      img.style.transition = 'none';
+      var sh = img.previousElementSibling;
+      if (sh && sh.classList.contains('hero-img-shimmer')) sh.style.display = 'none';
+      if (fallback) { fallback.style.opacity = '0'; setTimeout(function(){ if(fallback) fallback.style.display='none'; }, 50); }
+    } else if (img.src) {
+      // Not cached: force re-trigger by resetting src
+      var saved = img.src;
+      img.src = '';
+      img.src = saved;
     }
+  }
+
+  requestAnimationFrame(function() {
+    track.querySelectorAll('[data-slide] img').forEach(function(img, idx) {
+      rehydrateHeroImg(img);
+    });
   });
 
   if (slides.length < 2) {
@@ -645,9 +657,12 @@ function initCollectionImages(settings) {
       img.loading = i < 4 ? 'eager' : 'lazy';
       img.fetchPriority = i < 4 ? 'high' : 'auto';
       img.decoding = 'async';
+      // Start hidden — revealed by onload or rehydrateImages()
       img.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;position:relative;z-index:1;opacity:0;transition:opacity .3s';
+      img.dataset.src = url; // store for rehydration
       img.onload = function() {
         this.style.opacity = '1';
+        this.style.transition = 'opacity .3s';
         var sk = this.previousElementSibling;
         if (sk && sk.classList.contains('pimg-skel')) sk.style.display = 'none';
       };
@@ -656,18 +671,18 @@ function initCollectionImages(settings) {
         var sk = this.previousElementSibling;
         if (sk) sk.style.display = 'none';
         var emo = document.createElement('span');
-        emo.className = 'ccat-v2-emo';
-        emo.textContent = emoji;
+        emo.className = 'ccat-v2-emo'; emo.textContent = emoji;
         box.appendChild(emo);
       };
+      box.appendChild(img);
+      // Set src AFTER appending to DOM — guarantees browser fires onload/onerror
       img.src = url;
-      // If already in browser cache (preloaded), show instantly
+      // If already browser-cached, show instantly (complete=true fires synchronously)
       if (img.complete && img.naturalWidth) {
         img.style.opacity = '1';
         img.style.transition = 'none';
         skel.style.display = 'none';
       }
-      box.appendChild(img);
     } else {
       var emo2 = document.createElement('span');
       emo2.className = 'ccat-v2-emo';
@@ -715,14 +730,59 @@ function initCollectionImages(settings) {
     requestAnimationFrame(animate);
   }
 
-  // Clone cards for seamless loop
+  // ── rehydrateImages: force-reload all imgs in container ────────────
+  // cloneNode(true) copies img elements but doesn't re-trigger load.
+  // Setting src='' then src=originalSrc forces the browser to fire onload.
+  function rehydrateImages(container) {
+    container.querySelectorAll('img[data-src]').forEach(function(img) {
+      var src = img.dataset.src || img.getAttribute('src');
+      if (!src) return;
+      if (img.complete && img.naturalWidth) {
+        // Already in cache — show instantly
+        img.style.opacity = '1';
+        img.style.transition = 'none';
+        var sk = img.previousElementSibling;
+        if (sk && sk.classList.contains('pimg-skel')) sk.style.display = 'none';
+        return;
+      }
+      // Force re-trigger load event
+      var saved = src;
+      img.src = '';
+      img.src = saved;
+    });
+  }
+
+  // ── waitForImages: wait until all imgs visible/errored, then callback ──
+  function waitForImages(container, callback) {
+    var imgs = Array.from(container.querySelectorAll('img[data-src]'));
+    if (!imgs.length) { callback(); return; }
+    var remaining = imgs.length;
+    function done() { remaining--; if (remaining <= 0) callback(); }
+    imgs.forEach(function(img) {
+      if (img.complete) { done(); return; }
+      img.addEventListener('load',  done, {once:true});
+      img.addEventListener('error', done, {once:true});
+    });
+    // Safety timeout — start scrolling after 1.5s regardless
+    setTimeout(callback, 1500);
+  }
+
+  // Clone cards for seamless infinite loop
   Array.from(cgrid.children).forEach(function(card) {
     var clone = card.cloneNode(true);
     clone.setAttribute('aria-hidden', 'true');
     cgrid.appendChild(clone);
   });
 
-  cgrid._ccatTimer = setInterval(scrollOneCard, 2500);
+  // Rehydrate ALL images (originals + clones) after DOM is built
+  rehydrateImages(cgrid);
+
+  // Start autoscroll only after images have loaded — no blank-card scroll
+  waitForImages(cgrid, function() {
+    if (!cgrid._ccatTimer) {
+      cgrid._ccatTimer = setInterval(scrollOneCard, 2500);
+    }
+  });
   cgrid.addEventListener('mouseenter', function() { isPaused = true; });
   cgrid.addEventListener('mouseleave', function() { isPaused = false; });
   cgrid.addEventListener('touchstart', function() { isPaused = true; }, {passive:true});
