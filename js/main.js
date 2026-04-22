@@ -562,7 +562,8 @@ function initHeroSlideshow()     { initHeroSlider({}); }
 // ═══════════════════════════════════════════════════════════════
 // BROWSE COLLECTIONS — "What the Mountains Offer"
 // Source of truth: window.DB_CATEGORIES from /api/store-data
-// Images: site_settings keys "coll_img_<slug>" (slug = honey/tea/jams etc)
+// Images: site_settings keys "coll_img_<name.toLowerCase()>" OR cat.image_url
+// Display name: cat.name directly from DB (no hardcoded LABEL map)
 // ═══════════════════════════════════════════════════════════════
 function initCollectionImages(settings) {
   if (!settings) return;
@@ -602,30 +603,34 @@ function initCollectionImages(settings) {
   }
 
   // ── Helpers ───────────────────────────────────────────────────
-  var EMOJI = {
-    honey:'🍯', jams:'🍓', juice:'🧃', oil:'🫚',
-    pulses:'🫘', rice:'🌾', shilajit:'🪨', spices:'🌿', tea:'🍵'
-  };
-  var LABEL = {
-    honey:'Wild Honey',      jams:'Jams & Preserves', juice:'Fresh Juices',
-    oil:'Oils',              pulses:'Pulses & Dal',   rice:'Heritage Rice',
-    shilajit:'Shilajit',     spices:'Herbs & Spices', tea:'Himalayan Teas'
-  };
+  // Emoji fallback by slug (used if cat.emoji is not set in DB)
+  function emojiFor(cat) {
+    var bySlug = {
+      honey:'🍯', jams:'🍓', juice:'🧃', oil:'🫚',
+      pulses:'🫘', rice:'🌾', shilajit:'🪨', spices:'🌿', tea:'🍵'
+    };
+    return cat.emoji || bySlug[cat.slug || ''] || '🌿';
+  }
 
   function imgFor(cat) {
-    // site_settings key = "coll_img_" + slug  (e.g. coll_img_honey)
-    var v = (settings['coll_img_' + cat.slug] || '').trim();
+    // Key matches exactly what admin saves: coll_img_{slug}
+    var key = cat.slug || String(cat.id);
+    var v = (settings['coll_img_' + key] || '').trim();
     if (v) return v;
     return (cat.image_url || '').trim();
   }
 
-  // ── Sort categories by sort_order ─────────────────────────────
-  var cats = dbCats.slice().sort(function(a,b){
+  // ── Filter out admin-hidden categories ───────────────────────
+  // Admin saves coll_hidden_{slug} = 'true' to hide from homepage
+  var cats = dbCats.filter(function(cat) {
+    var key = cat.slug || String(cat.id);
+    return settings['coll_hidden_' + key] !== 'true';
+  }).sort(function(a,b){
     return (a.sort_order||99)-(b.sort_order||99) || a.name.localeCompare(b.name);
   });
 
   // ── Fingerprint — prevent redundant re-renders ────────────────
-  var fp = cats.map(function(c){ return c.id+':'+imgFor(c); }).join('|');
+  var fp = cats.map(function(c){ return c.id+':'+c.name+':'+imgFor(c); }).join('|');
   if (cgrid.dataset.fp === fp && cgrid.querySelectorAll('.cc').length > 0) return;
   cgrid.dataset.fp = fp;
 
@@ -642,9 +647,9 @@ function initCollectionImages(settings) {
   // ── Build cards ───────────────────────────────────────────────
   cats.forEach(function(cat, i) {
     var url   = imgFor(cat);
-    var slug  = cat.slug || '';
-    var label = LABEL[slug] || cat.name;
-    var emoji = EMOJI[slug] || '🌿';
+    var slug  = cat.slug || String(cat.id);
+    var label = cat.name;              // Use DB name directly — matches admin panel exactly
+    var emoji = emojiFor(cat);         // DB emoji first, then slug fallback
 
     var card = document.createElement('a');
     card.href      = '/category.html?id=' + slug;
