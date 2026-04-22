@@ -1052,6 +1052,7 @@ async function loadData() {
     if (Array.isArray(data.product_images) && data.product_images.length) {
       var byProd = {};
       data.product_images.forEach(function(row) {
+        if (!row.product_id || !row.image_url) return; // skip rows missing key fields
         if (!byProd[row.product_id]) byProd[row.product_id] = [];
         byProd[row.product_id].push(row);
       });
@@ -1062,11 +1063,18 @@ async function loadData() {
         var pr = PRODUCTS.find(function(p){ return String(p.id) === String(pid); });
         if (pr) {
           pr._images = urls;
-          if (urls[0]) pr.image_url = urls[0]; // first image = main
+          pr.image_url = urls[0]; // always override — product_images table is source of truth
         }
       });
       updated = true;
     }
+
+    // ── Final pass: for any product still missing image_url, try extra_image_url ──
+    PRODUCTS.forEach(function(p) {
+      if (!p.image_url && p.extra_image_url) {
+        p.image_url = p.extra_image_url;
+      }
+    });
 
     // ── Render everything now that all data (including images) is ready ──
     if (updated) {
@@ -1143,6 +1151,11 @@ async function loadData() {
 
   } catch(e) {
     console.error('loadData failed:', e);
+    // If DB failed and PRODUCTS is still empty, render fallback so page is never blank
+    if (!PRODUCTS.length) {
+      PRODUCTS = FALLBACK_PRODUCTS.map(function(p){ return Object.assign({}, p); });
+      renderProds();
+    }
     showToast('⚠️ Could not load latest products — showing cached data');
   }
 }
@@ -1461,8 +1474,9 @@ function mkProd(p, idx) {
   var slug   = getProductSlug(p);
   var imgLoad = (typeof idx === 'number' && idx < 4) ? 'eager' : 'lazy';
   var imgPri  = (typeof idx === 'number' && idx < 4) ? ' fetchpriority="high"' : '';
-  var imgHtml = p.image_url
-    ? '<div class="pimg-skel" style="position:absolute;inset:0;z-index:0;border-radius:inherit"></div><img src="' + imgOpt(p.image_url,{w:400,q:75}) + '" alt="' + p.name + '" loading="' + imgLoad + '"' + imgPri + ' decoding="async" width="400" height="500" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;opacity:0;transition:opacity .45s" onload="this.style.opacity=1;var sk=this.previousElementSibling;if(sk)sk.style.display=\'none\';this.closest(\'.piw\')&&this.closest(\'.piw\').classList.add(\'img-ready\')" onerror="imgOptFallback(this,\''+p.image_url+'\')">'
+  var resolvedImg = p.image_url || p.extra_image_url || '';
+  var imgHtml = resolvedImg
+    ? '<div class="pimg-skel" style="position:absolute;inset:0;z-index:0;border-radius:inherit"></div><img src="' + imgOpt(resolvedImg,{w:400,q:75}) + '" alt="' + p.name + '" loading="' + imgLoad + '"' + imgPri + ' decoding="async" width="400" height="500" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;opacity:0;transition:opacity .45s" onload="this.style.opacity=1;var sk=this.previousElementSibling;if(sk)sk.style.display=\'none\';this.closest(\'.piw\')&&this.closest(\'.piw\').classList.add(\'img-ready\')" onerror="imgOptFallback(this,\''+resolvedImg+'\')">'
     : '';
   var img = '<div class="piw" style="background:' + (p.card_bg||'#f9f4ec') + '">' +
     imgHtml +
