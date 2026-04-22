@@ -311,64 +311,92 @@
 (function() {
   try {
     var cached = JSON.parse(localStorage.getItem('pr_hero_imgs') || '[]');
-    var seenOrigins = {};
-    if (Array.isArray(cached) && cached.length) {
-      cached.forEach(function(url, i) {
-        if (!url) return;
-        // DNS-prefetch the image host (e.g. Supabase storage)
-        try {
-          var origin = new URL(url).origin;
-          if (!seenOrigins[origin]) {
-            seenOrigins[origin] = true;
-            var pre = document.createElement('link');
-            pre.rel = 'preconnect';
-            pre.href = origin;
-            pre.crossOrigin = 'anonymous';
-            document.head.appendChild(pre);
-          }
-        } catch(e) {}
-        // Preload the actual image with high priority
-        var link = document.createElement('link');
-        link.rel = 'preload';
-        link.as = 'image';
-        link.href = url;
-        if (i === 0) link.setAttribute('fetchpriority', 'high');
-        document.head.appendChild(link);
-      });
+    if (!Array.isArray(cached) || !cached.length) return;
 
-      // ── INSTANT HERO: inject first image directly into the fallback div NOW ──
-      // This runs synchronously before DOMContentLoaded so the image appears
-      // immediately with zero JS delay — no dark flash, no waiting for API.
-      var firstUrl = cached[0];
-      if (firstUrl) {
-        // We can't query DOM yet (body not parsed), so use a tiny DOMContentLoaded
-        // that fires before main.js has a chance to run
-        document.addEventListener('DOMContentLoaded', function() {
-          var fallback = document.getElementById('hslide-fallback');
-          // Only inject if main.js hasn't already replaced the fallback
-          if (fallback && !document.querySelector('[data-slide]')) {
-            // Insert the real image behind the fallback text content
-            var img = document.createElement('img');
-            img.src = firstUrl;
-            img.alt = 'Pahadi Roots Hero';
-            img.fetchpriority = 'high';
-            img.decoding = 'async';
-            img.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;display:block;z-index:0;opacity:0;transition:opacity 0.5s ease';
-            img.onload = function() {
-              this.style.opacity = '1';
-              // Add overlay so text stays readable
-              var overlay = document.createElement('div');
-              overlay.style.cssText = 'position:absolute;inset:0;background:linear-gradient(100deg,rgba(5,20,8,.82) 0%,rgba(5,20,8,.6) 45%,rgba(5,20,8,.15) 70%,rgba(5,20,8,.05) 100%);z-index:1';
-              fallback.insertBefore(overlay, fallback.firstChild);
-              // Move fallback text above overlay
-              var textDiv = fallback.querySelector('div[style*="align-items"]');
-              if (textDiv) textDiv.style.zIndex = '2';
-            };
-            fallback.insertBefore(img, fallback.firstChild);
-          }
-        }, {once: true});
+    // Step 1: preconnect to image host
+    try {
+      var origin = new URL(cached[0]).origin;
+      var pre = document.createElement('link');
+      pre.rel = 'preconnect'; pre.href = origin; pre.crossOrigin = 'anonymous';
+      document.head.appendChild(pre);
+    } catch(e) {}
+
+    // Step 2: <link rel=preload> for ALL cached hero images so browser fetches in parallel
+    cached.forEach(function(url, i) {
+      if (!url) return;
+      var link = document.createElement('link');
+      link.rel = 'preload'; link.as = 'image'; link.href = url;
+      link.setAttribute('fetchpriority', i === 0 ? 'high' : 'low');
+      document.head.appendChild(link);
+    });
+
+    // Step 3: inject first image DIRECTLY into the page background as a real <img>
+    // before body is parsed — use document.write-safe inline style trick:
+    // We register a DOMContentLoaded listener that fires at the very start of body parse.
+    var firstUrl = cached[0];
+    if (!firstUrl) return;
+
+    document.addEventListener('DOMContentLoaded', function() {
+      var fallback = document.getElementById('hslide-fallback');
+      if (!fallback) return;
+
+      // Create the hero image element
+      var img = document.createElement('img');
+      img.src = firstUrl;
+      img.alt = '';
+      img.setAttribute('fetchpriority', 'high');
+      img.decoding = 'sync'; // SYNC decode — no async delay, shows immediately
+      img.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;display:block;z-index:0;';
+
+      // Overlay for text readability
+      var overlay = document.createElement('div');
+      overlay.style.cssText = 'position:absolute;inset:0;background:linear-gradient(100deg,rgba(5,20,8,.82) 0%,rgba(5,20,8,.6) 45%,rgba(5,20,8,.15) 70%,rgba(5,20,8,.05) 100%);z-index:1;pointer-events:none';
+
+      // Insert: img first (z-index:0), then overlay (z-index:1), existing content stays above
+      fallback.insertBefore(overlay, fallback.firstChild);
+      fallback.insertBefore(img, fallback.firstChild);
+
+      // If image is already in browser cache → complete immediately, no flash at all
+      // If not cached → show immediately when it arrives (no opacity fade needed — 
+      // the dark green gradient fallback is already showing behind it)
+      if (!img.complete) {
+        // Not cached: hide overlay until image loads so gradient shows cleanly
+        overlay.style.opacity = '0';
+        img.style.opacity = '0';
+        img.style.transition = 'opacity 0.4s ease';
+        overlay.style.transition = 'opacity 0.4s ease';
+        img.onload = function() {
+          img.style.opacity = '1';
+          overlay.style.opacity = '1';
+        };
       }
-    }
+
+      // Lift fallback text content above overlay
+      var textDiv = fallback.querySelector('div[style*="align-items"]');
+      if (textDiv) textDiv.style.zIndex = '2';
+    }, {once: true});
+
+  } catch(e) {}
+})();
+</script>
+<script>
+/* Preload collection card images from cached settings — runs before DOMContentLoaded */
+(function() {
+  try {
+    var s = JSON.parse(localStorage.getItem('pr_site_settings') || 'null');
+    if (!s) return;
+    var slugs = ['honey','shilajit','pulses','juice','tea','spices','rice','oil','jams'];
+    var count = 0;
+    slugs.forEach(function(slug) {
+      var url = s['coll_img_' + slug];
+      if (!url || !url.trim()) return;
+      if (count >= 6) return;
+      var link = document.createElement('link');
+      link.rel = 'preload'; link.as = 'image'; link.href = url.trim();
+      link.setAttribute('fetchpriority', count < 3 ? 'high' : 'low');
+      document.head.appendChild(link);
+      count++;
+    });
   } catch(e) {}
 })();
 </script>
