@@ -320,7 +320,7 @@ function buildSlide(s, idx) {
   if (img) {
     // Shimmer placeholder shown while image loads
     html += '<div class="hero-img-shimmer" style="position:absolute;inset:0;z-index:0;background:linear-gradient(110deg,#0d2410 0%,#1a3a1e 40%,#0d2410 100%);background-size:200% 100%;animation:shimmer 1.6s infinite"></div>';
-    html += '<img src="' + esc2(imgOpt(img,{w:1400,q:80})) + '" alt="' + esc2(s.title || 'Pahadi Roots') + '" fetchpriority="' + (idx === 0 ? 'high' : 'low') + '" decoding="async" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;display:block;z-index:1;opacity:0;transition:opacity .6s ease" onload="this.style.opacity=1;var sh=this.previousElementSibling;if(sh&&sh.classList.contains(\'hero-img-shimmer\'))sh.style.display=\'none\'" onerror="imgOptFallback(this,\''+esc2(img)+'\')">';
+    html += '<img src="' + esc2(imgOpt(img,{w:1400,q:80})) + '" alt="' + esc2(s.title || 'Pahadi Roots') + '" fetchpriority="' + (idx === 0 ? 'high' : 'low') + '" loading="' + (idx === 0 ? 'eager' : 'lazy') + '" decoding="async" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;display:block;z-index:1;opacity:0;transition:opacity .5s ease" onload="this.style.opacity=1;var sh=this.previousElementSibling;if(sh&&sh.classList.contains(\'hero-img-shimmer\'))sh.style.display=\'none\'" onerror="imgOptFallback(this,\''+esc2(img)+'\')">';
   } else {
     html += '<div style="position:absolute;inset:0;background:linear-gradient(150deg,#071a09 0%,#0d2410 30%,#1a3a1e 65%,#2d5233 100%);z-index:0"></div>';
   }
@@ -448,6 +448,20 @@ function initHeroSlider(settings) {
   _heroSlideCount = slides.length;
   _heroSlideIndex = 0;
 
+  // ── INSTANT DISPLAY: if first slide image is already in browser cache, show it now ──
+  // This eliminates the opacity-0 flash on return visits where the image is cached.
+  requestAnimationFrame(function() {
+    var firstSlide = track.querySelector('[data-slide="0"] img');
+    if (firstSlide && firstSlide.complete && firstSlide.naturalWidth) {
+      firstSlide.style.opacity = '1';
+      firstSlide.style.transition = 'none';
+      var shimmer = firstSlide.previousElementSibling;
+      if (shimmer && shimmer.classList.contains('hero-img-shimmer')) shimmer.style.display = 'none';
+      // Hide fallback immediately too
+      if (fallback) { fallback.style.opacity = '0'; fallback.style.display = 'none'; }
+    }
+  });
+
   if (slides.length < 2) {
     if (dotsEl) dotsEl.style.display = 'none';
     var pa2 = document.getElementById('hsliderPrev'); if (pa2) pa2.style.display = 'none';
@@ -561,46 +575,58 @@ function initCollectionImages(settings) {
     turmeric:'Turmeric', herbs:'Herbs & Spices', seeds:'Seeds', shilajit:'Shilajit'
   };
 
-  // Build slug→url and slug→hidden maps + order from settings
-  var imgMap = {}, hiddenMap = {}, orderMap = {}, allSlugsSet = {};
+  // Build slug→url and slug→hidden maps + order from settings (admin-set images)
+  var imgMap = {}, hiddenMap = {}, orderMap = {};
   Object.keys(settings).forEach(function(key) {
     if (key.startsWith('coll_img_')) {
       var slug = key.replace('coll_img_', '');
-      allSlugsSet[slug] = true;
       if (settings[key] && settings[key].trim()) imgMap[slug] = settings[key].trim();
     }
     if (key.startsWith('coll_hidden_') && settings[key] === 'true') {
       hiddenMap[key.replace('coll_hidden_', '')] = true;
     }
     if (key.startsWith('coll_order_')) {
-      var slug2 = key.replace('coll_order_', '');
-      allSlugsSet[slug2] = true;
-      orderMap[slug2] = parseInt(settings[key]) || 99;
+      orderMap[key.replace('coll_order_', '')] = parseInt(settings[key]) || 99;
     }
   });
 
-  // Get slugs that: are not hidden AND have at least 1 matching product (when products loaded)
-  var FILTER_RE_MAP = {
-    honey:/honey/i, ghee:/ghee|butter/i, saffron:/saffron|kesar/i,
-    tea:/tea|chai/i, spices:/spice|cardamom|turmeric|pepper|chilli|ginger|herb/i,
-    oil:/oil/i, oils:/oil/i, rice:/rice/i, juice:/juice|squash/i,
-    jams:/jam|preserve|marmalade/i, nuts:/walnut|almond|cashew|pistachio|dry.fruit|apricot|fig|nut/i,
-    shilajit:/shilajit/i, pulses:/pulse|rajma|dal|lentil/i
-  };
-  var slugs = Object.keys(allSlugsSet).filter(function(s) {
-    if (hiddenMap[s]) return false;
-    // If products are loaded, only show slugs with matching products
-    if (window.PRODUCTS && window.PRODUCTS.length) {
-      var re = FILTER_RE_MAP[s];
-      if (!re) return false; // unknown slug with no products — hide it
-      return window.PRODUCTS.some(function(p) {
-        return re.test(p.name + ' ' + (p.description||'') + ' ' + (p.category_id||'') + ' ' + (p.slug||''));
+  // ── SOURCE OF TRUTH: use DB categories (window.DB_CATEGORIES) ──
+  // DB categories are the canonical list — no fake/phantom categories appear.
+  // Fall back to site_settings keys only if DB categories not yet loaded.
+  var dbCats = window.DB_CATEGORIES || [];
+  var slugs;
+  if (dbCats.length) {
+    // Use DB categories as the definitive slug list
+    slugs = dbCats
+      .filter(function(cat) { return !hiddenMap[cat.slug]; })
+      .map(function(cat) {
+        // Prefer admin-uploaded image (coll_img_*), then DB image_url
+        if (!imgMap[cat.slug] && cat.image_url) imgMap[cat.slug] = cat.image_url;
+        // Prefer DB name over hardcoded labelMap
+        if (!labelMap[cat.slug]) labelMap[cat.slug] = cat.name;
+        if (cat.sort_order !== undefined && !(cat.slug in orderMap)) orderMap[cat.slug] = cat.sort_order || 99;
+        return cat.slug;
       });
-    }
-    return true; // products not loaded yet — show optimistically
-  });
-  slugs.sort(function(a, b) {
-    return (orderMap[a] || 99) - (orderMap[b] || 99) || a.localeCompare(b);
+    slugs.sort(function(a, b) {
+      return (orderMap[a] || 99) - (orderMap[b] || 99) || a.localeCompare(b);
+    });
+  } else {
+    // Fallback: derive slugs from site_settings coll_img_* keys when DB not loaded
+    var allSlugsSet = {};
+    Object.keys(settings).forEach(function(key) {
+      if (key.startsWith('coll_img_') || key.startsWith('coll_order_')) {
+        allSlugsSet[key.replace(/^coll_(img|order)_/, '')] = true;
+      }
+    });
+    // Also include known DB category slugs (honey, shilajit, pulses, juice, tea, spices, rice, oil, jams)
+    ['honey','shilajit','pulses','juice','tea','spices','rice','oil','jams'].forEach(function(s) { allSlugsSet[s] = true; });
+    slugs = Object.keys(allSlugsSet).filter(function(s) { return !hiddenMap[s]; });
+    slugs.sort(function(a, b) {
+      return (orderMap[a] || 99) - (orderMap[b] || 99) || a.localeCompare(b);
+    });
+  }
+  // Deduplicate
+  slugs = slugs.filter(function(s, i) { return slugs.indexOf(s) === i;
   });
 
   // Clear grid and rebuild from scratch
@@ -683,10 +709,9 @@ function initCollectionImages(settings) {
   if (slugs.length > 0) {
     slugs.forEach(buildCard);
   } else {
-    [{slug:'honey',filter:'honey'},{slug:'ghee',filter:'ghee'},
-     {slug:'spices',filter:'spices'},{slug:'tea',filter:'tea'},
-     {slug:'oil',filter:'oil'},{slug:'grains',filter:'all'}
-    ].forEach(function(d,i){ buildCard(d.slug, i); });
+    // Fallback: show all 9 known DB categories
+    ['honey','shilajit','pulses','juice','tea','spices','rice','oil','jams'
+    ].forEach(function(slug, i){ buildCard(slug, i); });
   }
 
   // ── AUTO-SCROLL: one card at a time, every 2.5s ─────────────────
@@ -766,12 +791,21 @@ async function loadData() {
     }
   } catch(e) {}
 
-  // Also render hero instantly from cached settings
+  // Also render hero + collection cards instantly from cached settings
   try {
     var _cachedSettings = JSON.parse(localStorage.getItem('pr_site_settings') || 'null');
     if (_cachedSettings) {
+      // Restore cached DB categories so initCollectionImages uses them as source of truth
+      try {
+        var _cachedCats = JSON.parse(localStorage.getItem('pr_categories') || 'null');
+        if (Array.isArray(_cachedCats) && _cachedCats.length) window.DB_CATEGORIES = _cachedCats;
+      } catch(e) {}
       initHeroSlider(_cachedSettings);
       window.SITE_SETTINGS = _cachedSettings; // expose early for category.html
+      // Render collection cards immediately from cache (eliminates loading skeleton on return visits)
+      if (document.getElementById('cgrid')) {
+        try { initCollectionImages(_cachedSettings); } catch(e) {}
+      }
     }
   } catch(e) {}
 
@@ -797,6 +831,10 @@ async function loadData() {
     var data = await r.json();
     var dbStates = data.states;
     var dbProds  = data.products;
+    // Store DB categories globally so initCollectionImages uses them as source of truth
+    if (Array.isArray(data.categories) && data.categories.length) {
+      window.DB_CATEGORIES = data.categories;
+    }
     // Load DB coupons
     if (Array.isArray(data.coupons) && data.coupons.length) {
       data.coupons.forEach(function(c) {
@@ -898,6 +936,10 @@ async function loadData() {
       initTickerBar(data.settings);  // Scrolling ticker
       // ── Cache settings so hero + UI renders instantly on next page load ──
       try { localStorage.setItem('pr_site_settings', JSON.stringify(data.settings)); } catch(e) {}
+      // Cache DB categories so collection cards load correctly on next visit
+      if (Array.isArray(data.categories) && data.categories.length) {
+        try { localStorage.setItem('pr_categories', JSON.stringify(data.categories)); } catch(e) {}
+      }
       window.SITE_SETTINGS = data.settings; // expose for category.html
     }
     var updated  = false;

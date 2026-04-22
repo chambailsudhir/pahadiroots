@@ -42,7 +42,7 @@ export default async function handler(req, res) {
 
   try {
     // Fetch states, products, site_settings, and image tables in parallel
-    const [states, products, siteSettings, coupons, stateImages, productImages, founderImages, productVariants, teamMembers] = await Promise.all([
+    const [states, products, siteSettings, coupons, stateImages, productImages, founderImages, productVariants, teamMembers, categories] = await Promise.all([
       sbGet('states', 'is_active=eq.true&order=name.asc').catch(() => []),
       sbGet('products', 'select=*,ai_description,ai_health_benefits,ai_how_to_use,ai_storage_tips,ai_who_should_buy&status=eq.active&is_deleted=eq.false&order=name.asc').catch(() => []),
       sbGet('site_settings', 'select=key,value').catch(() => []),
@@ -52,6 +52,7 @@ export default async function handler(req, res) {
       sbGet('founder_images', 'order=sort_order.asc').catch(() => []),
       sbGet('product_variants', 'is_active=eq.true&order=product_id.asc,sort_order.asc').catch(() => []),
       sbGet('team_members', 'is_active=eq.true&order=sort_order.asc').catch(() => []),
+      sbGet('categories', 'is_active=eq.true&select=id,name,slug,image_url,sort_order&order=sort_order.asc,name.asc').catch(() => []),
     ]);
 
     // Convert site_settings array to object
@@ -68,6 +69,7 @@ export default async function handler(req, res) {
       founder_images:   founderImages   || [],
       product_variants: productVariants || [],
       team_members:     teamMembers     || [],
+      categories:       categories      || [],
       razorpay_key:     RAZORPAY_KEY_ID,   // ← served from env, safe
     });
 

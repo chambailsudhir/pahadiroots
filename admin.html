@@ -593,24 +593,36 @@ CREATE INDEX IF NOT EXISTS idx_products_is_deleted ON products(is_deleted);</div
             <input type="text" class="fi" id="cfg-coll-honey" placeholder="https://... image URL">
           </div>
           <div class="fg" style="margin:0">
-            <label style="display:flex;align-items:center;gap:6px">🥛 A2 Ghee</label>
-            <input type="text" class="fi" id="cfg-coll-ghee" placeholder="https://... image URL">
+            <label style="display:flex;align-items:center;gap:6px">🪨 Shilajit</label>
+            <input type="text" class="fi" id="cfg-coll-shilajit" placeholder="https://... image URL">
           </div>
           <div class="fg" style="margin:0">
-            <label style="display:flex;align-items:center;gap:6px">🌿 Herbs & Spices</label>
-            <input type="text" class="fi" id="cfg-coll-spices" placeholder="https://... image URL">
+            <label style="display:flex;align-items:center;gap:6px">🫘 Pulses</label>
+            <input type="text" class="fi" id="cfg-coll-pulses" placeholder="https://... image URL">
+          </div>
+          <div class="fg" style="margin:0">
+            <label style="display:flex;align-items:center;gap:6px">🧃 Fresh Juices</label>
+            <input type="text" class="fi" id="cfg-coll-juice" placeholder="https://... image URL">
           </div>
           <div class="fg" style="margin:0">
             <label style="display:flex;align-items:center;gap:6px">🍵 Himalayan Teas</label>
             <input type="text" class="fi" id="cfg-coll-tea" placeholder="https://... image URL">
           </div>
           <div class="fg" style="margin:0">
-            <label style="display:flex;align-items:center;gap:6px">🌾 Ancient Grains</label>
-            <input type="text" class="fi" id="cfg-coll-grains" placeholder="https://... image URL">
+            <label style="display:flex;align-items:center;gap:6px">🌿 Herbs & Spices</label>
+            <input type="text" class="fi" id="cfg-coll-spices" placeholder="https://... image URL">
           </div>
           <div class="fg" style="margin:0">
-            <label style="display:flex;align-items:center;gap:6px">🌰 Dry Fruits</label>
-            <input type="text" class="fi" id="cfg-coll-dryfruits" placeholder="https://... image URL">
+            <label style="display:flex;align-items:center;gap:6px">🌾 Heritage Rice</label>
+            <input type="text" class="fi" id="cfg-coll-rice" placeholder="https://... image URL">
+          </div>
+          <div class="fg" style="margin:0">
+            <label style="display:flex;align-items:center;gap:6px">🫚 Oils</label>
+            <input type="text" class="fi" id="cfg-coll-oil" placeholder="https://... image URL">
+          </div>
+          <div class="fg" style="margin:0">
+            <label style="display:flex;align-items:center;gap:6px">🍓 Jams & Preserves</label>
+            <input type="text" class="fi" id="cfg-coll-jams" placeholder="https://... image URL">
           </div>
         </div>
         <div id="coll-img-preview" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px"></div>
@@ -2075,8 +2087,8 @@ async function loadSettings(){
         var ec=document.getElementById('hs'+n+'-eyebrow-colour'); if(ec&&s['hero_slide_'+n+'_eyebrow_colour']) ec.value=s['hero_slide_'+n+'_eyebrow_colour'];
       }; _f(_n);
     }
-    // Load collection card images
-    ['honey','ghee','spices','tea','grains','dryfruits'].forEach(cat => {
+    // Load collection card images (DB category slugs)
+    ['honey','shilajit','pulses','juice','tea','spices','rice','oil','jams'].forEach(cat => {
       const el = document.getElementById('cfg-coll-' + cat);
       if (el && s['coll_img_' + cat]) el.value = s['coll_img_' + cat];
     });
@@ -2176,7 +2188,7 @@ async function saveHeroSettings() {
 
 // ── COLLECTION CARD IMAGES ─────────────────────────────────────
 async function saveCollectionImages() {
-  const CATS = ['honey','ghee','spices','tea','grains','dryfruits'];
+  const CATS = ['honey','shilajit','pulses','juice','tea','spices','rice','oil','jams'];
   const keys = CATS.map(cat => ({
     key: 'coll_img_' + cat,
     value: (document.getElementById('cfg-coll-' + cat)?.value || '').trim()
@@ -2195,9 +2207,9 @@ async function saveCollectionImages() {
 }
 
 function renderCollImgPreview() {
-  const CATS = ['honey','ghee','spices','tea','grains','dryfruits'];
-  const EMOJIS = {honey:'🍯',ghee:'🥛',spices:'🌿',tea:'🍵',grains:'🌾',dryfruits:'🌰'};
-  const LABELS = {honey:'Wild Honey',ghee:'A2 Ghee',spices:'Herbs & Spices',tea:'Himalayan Teas',grains:'Ancient Grains',dryfruits:'Dry Fruits'};
+  const CATS = ['honey','shilajit','pulses','juice','tea','spices','rice','oil','jams'];
+  const EMOJIS = {honey:'🍯',shilajit:'🪨',pulses:'🫘',juice:'🧃',tea:'🍵',spices:'🌿',rice:'🌾',oil:'🫚',jams:'🍓'};
+  const LABELS = {honey:'Wild Honey',shilajit:'Shilajit',pulses:'Pulses',juice:'Fresh Juices',tea:'Himalayan Teas',spices:'Herbs & Spices',rice:'Heritage Rice',oil:'Oils',jams:'Jams'};
   const wrap = document.getElementById('coll-img-preview');
   if (!wrap) return;
   wrap.innerHTML = CATS.map(cat => {
