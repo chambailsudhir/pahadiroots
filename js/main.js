@@ -811,7 +811,7 @@ async function loadData() {
       // Restore cached DB categories so initCollectionImages uses them as source of truth
       try {
         var _cachedCats = JSON.parse(localStorage.getItem('pr_categories') || 'null');
-        if (Array.isArray(_cachedCats) && _cachedCats.length) window.DB_CATEGORIES = _cachedCats;
+        if (Array.isArray(_cachedCats) && _cachedCats.length) { window.DB_CATEGORIES = _cachedCats; rebuildFilterMap(); }
       } catch(e) {}
       initHeroSlider(_cachedSettings);
       window.SITE_SETTINGS = _cachedSettings; // expose early for category.html
@@ -847,6 +847,7 @@ async function loadData() {
     // Store DB categories globally so initCollectionImages uses them as source of truth
     if (Array.isArray(data.categories) && data.categories.length) {
       window.DB_CATEGORIES = data.categories;
+      rebuildFilterMap(); // rebuild filter map with real category IDs
     }
     // Load DB coupons
     if (Array.isArray(data.coupons) && data.coupons.length) {
@@ -997,7 +998,7 @@ async function loadData() {
           id:             db.id,
           name:           db.name,
           slug:           db.slug            || null,
-          description:    db.short_description || loc.description || '',
+          description:    db.description || db.short_description || loc.description || '',
           price:          db.price,
           original_price: db.mrp             || loc.original_price || null,
           unit:           db.unit_label      || loc.unit           || '/unit',
@@ -1416,14 +1417,38 @@ function buildMobMega() {
 }
 
 // ── PRODUCT CARD ───────────────────────────────────────────────────
-var FILTER_MAP = {
-  honey:   function(p) { return /honey/i.test(p.name + ' ' + (p.description||'')); },
-  ghee:    function(p) { return /ghee|butter/i.test(p.name + ' ' + (p.description||'')); },
-  spices:  function(p) { return /spice|cardamom|turmeric|pepper|saffron|chilli|ginger/i.test(p.name + ' ' + (p.description||'')); },
-  tea:     function(p) { return /tea|chai/i.test(p.name + ' ' + (p.description||'')); },
-  saffron: function(p) { return /saffron|kesar/i.test(p.name + ' ' + (p.description||'')); },
-  oil:     function(p) { return /oil|ghee/i.test(p.name + ' ' + (p.description||'')); },
+// ── FILTER MAP — rebuilt from DB_CATEGORIES when available ────
+// Uses category_id match (exact, reliable) with regex fallback
+var FILTER_REGEX = {
+  honey:   /honey/i,
+  ghee:    /ghee|butter/i,
+  spices:  /spice|cardamom|turmeric|pepper|saffron|chilli|ginger/i,
+  tea:     /tea|chai/i,
+  saffron: /saffron|kesar/i,
+  oil:     /oil/i,
 };
+
+var FILTER_MAP = {};
+
+function rebuildFilterMap() {
+  var dbCats = window.DB_CATEGORIES || [];
+  var keys = Object.keys(FILTER_REGEX);
+  keys.forEach(function(filterKey) {
+    // Find matching DB category by slug
+    var cat = dbCats.find(function(c) {
+      return (c.slug || '').toLowerCase() === filterKey.toLowerCase();
+    });
+    if (cat && cat.id) {
+      var catId = String(cat.id);
+      FILTER_MAP[filterKey] = function(p) { return String(p.category_id) === catId; };
+    } else {
+      // Fallback to regex if no DB category found for this filter
+      var re = FILTER_REGEX[filterKey];
+      FILTER_MAP[filterKey] = function(p) { return re.test(p.name + ' ' + (p.description||'')); };
+    }
+  });
+}
+rebuildFilterMap(); // initial build (DB_CATEGORIES may be empty on first run)
 
 function mkProd(p, idx) {
   var pct    = p.original_price ? Math.round((1 - p.price / p.original_price) * 100) : 0;
