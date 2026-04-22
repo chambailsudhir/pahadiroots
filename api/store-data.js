@@ -45,8 +45,8 @@ export default async function handler(req, res) {
     // Fetch only what's needed for above-the-fold render: hero + categories + products
     const [siteSettings, categories, products, coupons] = await Promise.all([
       sbGet('site_settings', 'select=key,value').catch(() => []),
-      sbGet('categories', 'is_active=eq.true&select=id,name,slug,image_url,sort_order&order=sort_order.asc,name.asc').catch(() => []),
-      sbGet('products', 'select=id,name,slug,price,mrp,status,image_url,emoji,category_id,state_id,sku,tags,badge_type,badge_label,available_stock,is_deleted,unit_label,short_description,extra_image_url,gst_rate,limited_batch,badges&status=eq.active&is_deleted=eq.false&order=name.asc&limit=200').catch(() => []),
+      sbGet('categories', 'select=id,name,slug,image_url,sort_order&is_active=eq.true&order=sort_order.asc,name.asc').catch(() => []),
+      sbGet('products', 'select=id,name,slug,price,mrp,image_url,emoji,category_id,state_id,sku,tags,badge_type,badge_label,available_stock,is_deleted,unit_label,short_description,extra_image_url,gst_rate,limited_batch,badges&is_active=eq.true&is_deleted=eq.false&order=name.asc&limit=200').catch(() => []),
       sbGet('coupons', 'is_active=eq.true&select=code,type,value,min_order,max_uses,uses_count,expires_at,first_order_only,max_discount').catch(() => []),
     ]);
 

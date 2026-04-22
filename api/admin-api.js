@@ -210,7 +210,7 @@ export default async function handler(req, res) {
           }
         } else if (item.id) {
           const prod = await sbFetch('GET', 'products',
-            `id=eq.${item.id}&select=available_stock,name`
+            `id=eq.${parseInt(item.id)}&select=available_stock,name`
           ).catch(() => []);
           const available = prod && prod[0] && prod[0].available_stock !== null
             ? Number(prod[0].available_stock) : 99;
@@ -260,7 +260,7 @@ export default async function handler(req, res) {
             // Validate base product stock + price
             try {
               const prod = await sbFetch('GET', 'products',
-                `id=eq.${item.id}&select=price,name,available_stock`
+                `id=eq.${parseInt(item.id)}&select=price,name,available_stock`
               ).catch(() => []);
               const dbProd = prod && prod[0];
               if (dbProd) {
@@ -379,32 +379,45 @@ export default async function handler(req, res) {
       //       Razorpay: confirmed(RESERVE+OUT) → already sold
       if (items && items.length) {
         for (const item of items) {
-          if (!item.variantId) continue;
           const qty = parseInt(item.qty) || 1;
           const ref = orderNumber || String(orderId);
-          // Always fire RESERVE first (available-1, reserved+1)
-          await sbFetch('POST', 'stock_movements', '', {
-            variant_id:   item.variantId,
-            type:         'RESERVE',
-            quantity:     qty,
-            source:       'website_order',
-            reference_id: orderId,
-            notes:        `Order ${ref} placed — stock reserved`,
-            performed_by: 'system',
-          }).catch(e => console.warn('RESERVE movement failed:', e));
-          // Razorpay orders are already confirmed — fire OUT immediately
-          // (reserved-1, sold+1, available stays)
-          // COD orders stay in pending — OUT fires when admin confirms
-          if (payMethod === 'razorpay_online') {
+
+          if (item.variantId) {
+            // ── Variant product: use stock_movements table ──
             await sbFetch('POST', 'stock_movements', '', {
               variant_id:   item.variantId,
-              type:         'OUT',
+              type:         'RESERVE',
               quantity:     qty,
               source:       'website_order',
               reference_id: orderId,
-              notes:        `Order ${ref} confirmed (Razorpay) — stock sold`,
+              notes:        `Order ${ref} placed — stock reserved`,
               performed_by: 'system',
-            }).catch(e => console.warn('OUT movement failed:', e));
+            }).catch(e => console.warn('RESERVE movement failed:', e));
+            if (payMethod === 'razorpay_online') {
+              await sbFetch('POST', 'stock_movements', '', {
+                variant_id:   item.variantId,
+                type:         'OUT',
+                quantity:     qty,
+                source:       'website_order',
+                reference_id: orderId,
+                notes:        `Order ${ref} confirmed (Razorpay) — stock sold`,
+                performed_by: 'system',
+              }).catch(e => console.warn('OUT movement failed:', e));
+            }
+          } else if (item.id) {
+            // ── Non-variant product: directly decrement available_stock ──
+            // stock_movements table requires variant_id so we update products directly
+            try {
+              const curr = await sbFetch('GET', 'products', `id=eq.${parseInt(item.id)}&select=available_stock`).catch(() => []);
+              const currStock = curr && curr[0] && curr[0].available_stock !== null
+                ? Number(curr[0].available_stock) : null;
+              if (currStock !== null) {
+                const newStock = Math.max(0, currStock - qty);
+                await sbFetch('PATCH', 'products', `id=eq.${parseInt(item.id)}`, {
+                  available_stock: newStock
+                }).catch(e => console.warn('Stock decrement failed:', e));
+              }
+            } catch(e) { console.warn('Non-variant stock update failed:', e.message); }
           }
         }
       }
