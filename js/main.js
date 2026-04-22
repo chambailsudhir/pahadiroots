@@ -998,7 +998,7 @@ async function loadData() {
           id:             db.id,
           name:           db.name,
           slug:           db.slug            || null,
-          description:    db.description || db.short_description || loc.description || '',
+          description:    db.short_description || loc.description || '',
           price:          db.price,
           original_price: db.mrp             || loc.original_price || null,
           unit:           db.unit_label      || loc.unit           || '/unit',
