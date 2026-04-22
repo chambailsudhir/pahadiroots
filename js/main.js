@@ -307,45 +307,82 @@ function imgLoad(el, url, wrapSelector) {
 }
 
 
+// ═══════════════════════════════════════════════════════════════
+// HERO SLIDER — clean rewrite
+// Settings keys: hero_slide_1_img, hero_slide_1_title, etc.
+// ═══════════════════════════════════════════════════════════════
+
+var _heroSliderInited = false;
+var _heroSliderImgKey = '';
+var _heroSlideIndex   = 0;
+var _heroSlideCount   = 1;
+var _heroSlideTimer   = null;
+
 function buildSlide(s, idx) {
-  var img = s.img || '';
-  var hasCoupon = s.coupon_offer || s.coupon_code || s.coupon_label;
-  var titleColor = s.title_colour || '#fff';
+  var img          = s.img || '';
+  var hasCoupon    = s.coupon_offer || s.coupon_code || s.coupon_label;
+  var titleColor   = s.title_colour   || '#fff';
   var eyebrowColor = s.eyebrow_colour || 'rgba(255,255,255,.75)';
-  var subColor = s.sub_colour || 'rgba(255,255,255,.8)';
+  var subColor     = s.sub_colour     || 'rgba(255,255,255,.8)';
+  var isFirst      = idx === 0;
 
-  var html = '<div data-slide="' + idx + '" style="position:absolute;inset:0;opacity:' + (idx === 0 ? '1' : '0') + ';transition:opacity 0.9s cubic-bezier(0.4,0,0.2,1);pointer-events:' + (idx === 0 ? 'auto' : 'none') + '">';
+  var html = '<div data-slide="' + idx + '" style="position:absolute;inset:0;opacity:' +
+    (isFirst ? '1' : '0') + ';transition:opacity 0.8s ease;pointer-events:' +
+    (isFirst ? 'auto' : 'none') + '">';
 
-  // Background image with blur-up placeholder
   if (img) {
-    // Shimmer placeholder shown while image loads
-    html += '<div class="hero-img-shimmer" style="position:absolute;inset:0;z-index:0;background:linear-gradient(110deg,#0d2410 0%,#1a3a1e 40%,#0d2410 100%);background-size:200% 100%;animation:shimmer 1.6s infinite"></div>';
-    html += '<img src="' + esc2(imgOpt(img,{w:1400,q:80})) + '" alt="' + esc2(s.title || 'Pahadi Roots') + '" fetchpriority="' + (idx === 0 ? 'high' : 'low') + '" loading="' + (idx === 0 ? 'eager' : 'lazy') + '" decoding="async" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;display:block;z-index:1;opacity:0;transition:opacity .5s ease" onload="this.style.opacity=1;var sh=this.previousElementSibling;if(sh&&sh.classList.contains(\'hero-img-shimmer\'))sh.style.display=\'none\'" onerror="imgOptFallback(this,\''+esc2(img)+'\')">';
+    html += '<div class="hero-img-shimmer" style="position:absolute;inset:0;z-index:0;' +
+      'background:linear-gradient(110deg,#0d2410 0%,#1a3a1e 40%,#0d2410 100%);' +
+      'background-size:200% 100%;animation:shimmer 1.6s infinite"></div>';
+    // img starts visible (opacity:1) — onload confirms it painted
+    // Using data-hsrc so we can force-reload after DOM insert
+    html += '<img data-hsrc="' + esc2(img) + '"' +
+      ' fetchpriority="' + (isFirst ? 'high' : 'low') + '"' +
+      ' loading="' + (isFirst ? 'eager' : 'lazy') + '"' +
+      ' decoding="async"' +
+      ' alt="' + esc2(s.title || 'Pahadi Roots') + '"' +
+      ' style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;' +
+      'object-position:center top;display:block;z-index:1;opacity:0;transition:opacity .4s ease"' +
+      ' onload="this.style.opacity=\'1\';var sh=this.previousElementSibling;' +
+      'if(sh&&sh.classList.contains(\'hero-img-shimmer\'))sh.style.display=\'none\'"' +
+      ' onerror="imgOptFallback(this,this.dataset.hsrc)">';
   } else {
-    html += '<div style="position:absolute;inset:0;background:linear-gradient(150deg,#071a09 0%,#0d2410 30%,#1a3a1e 65%,#2d5233 100%);z-index:0"></div>';
+    html += '<div style="position:absolute;inset:0;background:linear-gradient(150deg,' +
+      '#071a09 0%,#0d2410 30%,#1a3a1e 65%,#2d5233 100%);z-index:0"></div>';
   }
 
-  // Dark-left gradient overlay (same as Next.js)
-  html += '<div style="position:absolute;inset:0;background:linear-gradient(100deg,rgba(5,20,8,.82) 0%,rgba(5,20,8,.6) 45%,rgba(5,20,8,.15) 70%,rgba(5,20,8,.05) 100%);z-index:1"></div>';
+  html += '<div style="position:absolute;inset:0;background:linear-gradient(100deg,' +
+    'rgba(5,20,8,.82) 0%,rgba(5,20,8,.6) 45%,rgba(5,20,8,.15) 70%,' +
+    'rgba(5,20,8,.05) 100%);z-index:1"></div>';
 
-  // Content layer
   html += '<div style="position:absolute;inset:0;z-index:2;display:flex;align-items:center">';
   html += '<div style="max-width:600px;padding:0 0 0 72px;display:flex;flex-direction:column">';
 
   if (s.eyebrow) {
-    html += '<div style="display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:' + esc2(eyebrowColor) + ';background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:30px;padding:5px 14px;width:fit-content;margin-bottom:18px;backdrop-filter:blur(4px)">' + esc2(s.eyebrow) + '</div>';
+    html += '<div style="display:inline-flex;align-items:center;gap:6px;font-size:11px;' +
+      'font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:' +
+      esc2(eyebrowColor) + ';background:rgba(255,255,255,.1);border:1px solid ' +
+      'rgba(255,255,255,.18);border-radius:30px;padding:5px 14px;width:fit-content;' +
+      'margin-bottom:18px;backdrop-filter:blur(4px)">' + esc2(s.eyebrow) + '</div>';
   }
 
   if (s.title) {
-    html += '<h1 style="font-family:\'Playfair Display\',Georgia,serif;font-size:clamp(32px,4.5vw,62px);font-weight:900;line-height:1.05;color:' + esc2(titleColor) + ';margin:0 0 16px;text-shadow:0 2px 20px rgba(0,0,0,.4);letter-spacing:-1px">' + s.title.replace(/\*([^*]+)\*/g, '<em style="font-style:italic;color:#c8920a">$1</em>') + '</h1>';
+    html += '<h1 style="font-family:\'Playfair Display\',Georgia,serif;font-size:' +
+      'clamp(32px,4.5vw,62px);font-weight:900;line-height:1.05;color:' +
+      esc2(titleColor) + ';margin:0 0 16px;text-shadow:0 2px 20px rgba(0,0,0,.4);' +
+      'letter-spacing:-1px">' +
+      s.title.replace(/\*([^*]+)\*/g, '<em style="font-style:italic;color:#c8920a">$1</em>') +
+      '</h1>';
   }
 
   if (s.sub) {
-    html += '<p style="font-size:clamp(13px,1.5vw,16px);color:' + esc2(subColor) + ';line-height:1.6;margin:0 0 28px;max-width:440px">' + esc2(s.sub) + '</p>';
+    html += '<p style="font-size:clamp(13px,1.5vw,16px);color:' + esc2(subColor) +
+      ';line-height:1.6;margin:0 0 28px;max-width:440px">' + esc2(s.sub) + '</p>';
   }
 
   if (hasCoupon) {
-    html += '<div style="display:inline-flex;align-items:center;gap:8px;background:#fff;border-radius:8px;padding:8px 16px;width:fit-content;margin-bottom:20px">';
+    html += '<div style="display:inline-flex;align-items:center;gap:8px;background:#fff;' +
+      'border-radius:8px;padding:8px 16px;width:fit-content;margin-bottom:20px">';
     if (s.coupon_label) html += '<span style="font-size:13px;font-weight:800;color:#1a1a1a">' + esc2(s.coupon_label) + '</span>';
     if (s.coupon_offer) html += '<span style="font-size:11px;font-weight:700;color:#c8920a;letter-spacing:.5px">— ' + esc2(s.coupon_offer) + '</span>';
     if (s.coupon_code)  html += '<span style="font-size:10px;font-weight:700;color:#555;letter-spacing:1px">USE CODE: ' + esc2(s.coupon_code) + '</span>';
@@ -353,137 +390,127 @@ function buildSlide(s, idx) {
   }
 
   html += '<div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">';
-  html += '<a href="' + esc2(s.cta_link || '#shop') + '" style="display:inline-flex;align-items:center;gap:6px;background:#1a3a1e;color:#fff;font-size:14px;font-weight:800;padding:13px 28px;border-radius:50px;text-decoration:none;box-shadow:0 4px 20px rgba(0,0,0,.25);letter-spacing:.2px">' + esc2(s.cta_text || 'Explore Our Store') + '</a>';
+  html += '<a href="' + esc2(s.cta_link || '#shop') + '" style="display:inline-flex;' +
+    'align-items:center;gap:6px;background:#1a3a1e;color:#fff;font-size:14px;' +
+    'font-weight:800;padding:13px 28px;border-radius:50px;text-decoration:none;' +
+    'box-shadow:0 4px 20px rgba(0,0,0,.25);letter-spacing:.2px">' +
+    esc2(s.cta_text || 'Explore Our Store') + '</a>';
   if (s.cta2_text) {
-    html += '<a href="' + esc2(s.cta2_link || '/our-story') + '" style="display:inline-flex;align-items:center;font-size:13px;font-weight:700;color:rgba(255,255,255,.85);text-decoration:none;padding:12px 0;gap:6px">' + esc2(s.cta2_text) + ' →</a>';
+    html += '<a href="' + esc2(s.cta2_link || '/our-story') + '" style="display:inline-flex;' +
+      'align-items:center;font-size:13px;font-weight:700;color:rgba(255,255,255,.85);' +
+      'text-decoration:none;padding:12px 0;gap:6px">' + esc2(s.cta2_text) + ' →</a>';
   }
-  html += '</div>';
-
-  html += '</div></div></div>';
+  html += '</div></div></div></div>';
   return html;
 }
 
-var _heroSliderInited = false;
-var _heroSliderImgKey = ''; // tracks which images are currently loaded
+function _heroLoadImg(imgEl) {
+  // Called after img is in the DOM — sets src and handles cache hit
+  var src = imgEl.dataset.hsrc;
+  if (!src) return;
+  imgEl.src = src;
+  // If already in browser cache, complete fires synchronously before onload
+  if (imgEl.complete && imgEl.naturalWidth) {
+    imgEl.style.opacity = '1';
+    imgEl.style.transition = 'none';
+    var sh = imgEl.previousElementSibling;
+    if (sh && sh.classList.contains('hero-img-shimmer')) sh.style.display = 'none';
+  }
+}
 
 function initHeroSlider(settings) {
-  var track  = document.getElementById('hsliderTrack');
-  var dotsEl = document.getElementById('hsliderDots');
+  var track    = document.getElementById('hsliderTrack');
+  var dotsEl   = document.getElementById('hsliderDots');
   var fallback = document.getElementById('hslide-fallback');
   if (!track) return;
 
-  // Build a fingerprint of the slide image URLs to detect if slides actually changed
-  var newImgKey = '';
+  // Fingerprint: only rebuild if slide images changed
+  var newKey = '';
   for (var _n = 1; _n <= 3; _n++) {
-    if (settings && settings['hero_slide_' + _n + '_img']) newImgKey += settings['hero_slide_' + _n + '_img'] + '|';
+    if (settings['hero_slide_' + _n + '_img']) newKey += settings['hero_slide_' + _n + '_img'] + '|';
   }
+  if (_heroSliderInited && newKey === _heroSliderImgKey) return;
+  _heroSliderImgKey = newKey;
 
-  // If slider already built with the same images, skip re-init entirely
-  if (_heroSliderInited && newImgKey === _heroSliderImgKey) return;
-  _heroSliderImgKey = newImgKey;
-
+  // Build slide data
   var slides = [];
   for (var n = 1; n <= 3; n++) {
-    var img = settings && settings['hero_slide_' + n + '_img'];
-    if (!img) continue;
+    var imgUrl = settings['hero_slide_' + n + '_img'];
+    if (!imgUrl) continue;
     slides.push({
-      img:           img,
-      eyebrow:       (settings['hero_slide_' + n + '_eyebrow'])        || '',
-      title:         (settings['hero_slide_' + n + '_title'])           || '',
-      sub:           (settings['hero_slide_' + n + '_sub'])             || '',
-      cta_text:      (settings['hero_slide_' + n + '_cta_text'])        || 'Explore Our Store',
-      cta_link:      (settings['hero_slide_' + n + '_cta_link'])        || '#shop',
-      cta2_text:     (settings['hero_slide_' + n + '_cta2_text'])       || '',
-      cta2_link:     (settings['hero_slide_' + n + '_cta2_link'])       || '',
-      coupon_label:  (settings['hero_slide_' + n + '_coupon_label'])    || '',
-      coupon_offer:  (settings['hero_slide_' + n + '_coupon_offer'])    || '',
-      coupon_code:   (settings['hero_slide_' + n + '_coupon_code'])     || '',
-      eyebrow_colour:(settings['hero_slide_' + n + '_eyebrow_colour'])  || '',
-      title_colour:  (settings['hero_slide_' + n + '_title_colour'])    || '',
-      sub_colour:    (settings['hero_slide_' + n + '_sub_colour'])      || '',
+      img:           imgUrl,
+      eyebrow:       settings['hero_slide_' + n + '_eyebrow']       || '',
+      title:         settings['hero_slide_' + n + '_title']         || '',
+      sub:           settings['hero_slide_' + n + '_sub']           || '',
+      cta_text:      settings['hero_slide_' + n + '_cta_text']      || 'Explore Our Store',
+      cta_link:      settings['hero_slide_' + n + '_cta_link']      || '#shop',
+      cta2_text:     settings['hero_slide_' + n + '_cta2_text']     || '',
+      cta2_link:     settings['hero_slide_' + n + '_cta2_link']     || '',
+      coupon_label:  settings['hero_slide_' + n + '_coupon_label']  || '',
+      coupon_offer:  settings['hero_slide_' + n + '_coupon_offer']  || '',
+      coupon_code:   settings['hero_slide_' + n + '_coupon_code']   || '',
+      eyebrow_colour:settings['hero_slide_' + n + '_eyebrow_colour']|| '',
+      title_colour:  settings['hero_slide_' + n + '_title_colour']  || '',
+      sub_colour:    settings['hero_slide_' + n + '_sub_colour']    || '',
     });
   }
 
-  // ── Cache hero image URLs in localStorage so next visit can preload instantly ──
+  // Cache image URLs for next-visit preloading
   if (slides.length) {
-    try {
-      var urls = slides.map(function(s){ return imgOpt(s.img,{w:1400,q:80}); }).filter(Boolean);
-      localStorage.setItem('pr_hero_imgs', JSON.stringify(urls));
-    } catch(e) {}
+    try { localStorage.setItem('pr_hero_imgs', JSON.stringify(slides.map(function(s){ return s.img; }))); } catch(e) {}
   }
 
   if (!slides.length) {
-    // No slides configured — keep fallback visible, hide arrows/dots
     _heroSlideCount = 1;
     if (dotsEl) dotsEl.style.display = 'none';
-    var pa = document.getElementById('hsliderPrev'); if (pa) pa.style.display = 'none';
-    var na = document.getElementById('hsliderNext'); if (na) na.style.display = 'none';
+    var pa0 = document.getElementById('hsliderPrev'); if (pa0) pa0.style.display = 'none';
+    var na0 = document.getElementById('hsliderNext'); if (na0) na0.style.display = 'none';
     return;
   }
 
-  // If re-initialising with different slides, remove old ones first
+  // Remove old slides
   if (_heroSliderInited) {
     track.querySelectorAll('[data-slide]').forEach(function(el) { el.remove(); });
-    clearInterval(_heroSlideTimer);
+    stopHeroAutoplay();
   }
 
-  // Fade out fallback smoothly instead of instant hide (no jarring flash)
+  // Hide fallback
   if (fallback) {
-    fallback.style.transition = 'opacity 0.4s ease';
+    fallback.style.transition = 'opacity 0.3s ease';
     fallback.style.opacity = '0';
-    setTimeout(function() { if (fallback) fallback.style.display = 'none'; }, 400);
+    setTimeout(function() { if (fallback) fallback.style.display = 'none'; }, 320);
   }
 
-  var slidesHtml = slides.map(function(s, i) { return buildSlide(s, i); }).join('');
-  // Insert slides before arrows
+  // Insert slide HTML
+  var html = slides.map(function(s, i) { return buildSlide(s, i); }).join('');
   var prevBtn = document.getElementById('hsliderPrev');
-  if (prevBtn) {
-    prevBtn.insertAdjacentHTML('beforebegin', slidesHtml);
-  } else {
-    track.insertAdjacentHTML('afterbegin', slidesHtml);
-  }
+  if (prevBtn) prevBtn.insertAdjacentHTML('beforebegin', html);
+  else track.insertAdjacentHTML('afterbegin', html);
+
+  // Now that imgs are in the DOM, set their src (guarantees onload fires)
+  track.querySelectorAll('[data-slide] img[data-hsrc]').forEach(function(imgEl) {
+    _heroLoadImg(imgEl);
+  });
 
   _heroSliderInited = true;
-
-  _heroSlideCount = slides.length;
-  _heroSlideIndex = 0;
-
-  // ── REHYDRATE hero images: force onload for any img that didn't fire ──
-  // This handles the case where the browser has the image cached but the
-  // node was replaced (DOM re-render), so onload never fired → stays opacity:0
-  function rehydrateHeroImg(img) {
-    if (!img) return;
-    if (img.complete && img.naturalWidth) {
-      // Already cached — show instantly, no transition
-      img.style.opacity = '1';
-      img.style.transition = 'none';
-      var sh = img.previousElementSibling;
-      if (sh && sh.classList.contains('hero-img-shimmer')) sh.style.display = 'none';
-      if (fallback) { fallback.style.opacity = '0'; setTimeout(function(){ if(fallback) fallback.style.display='none'; }, 50); }
-    } else if (img.src) {
-      // Not cached: force re-trigger by resetting src
-      var saved = img.src;
-      img.src = '';
-      img.src = saved;
-    }
-  }
-
-  requestAnimationFrame(function() {
-    track.querySelectorAll('[data-slide] img').forEach(function(img, idx) {
-      rehydrateHeroImg(img);
-    });
-  });
+  _heroSlideCount   = slides.length;
+  _heroSlideIndex   = 0;
 
   if (slides.length < 2) {
     if (dotsEl) dotsEl.style.display = 'none';
     var pa2 = document.getElementById('hsliderPrev'); if (pa2) pa2.style.display = 'none';
     var na2 = document.getElementById('hsliderNext'); if (na2) na2.style.display = 'none';
   } else {
-    var pa3 = document.getElementById('hsliderPrev'); if (pa3) { pa3.style.display = 'flex'; pa3.style.alignItems = 'center'; pa3.style.justifyContent = 'center'; }
-    var na3 = document.getElementById('hsliderNext'); if (na3) { na3.style.display = 'flex'; na3.style.alignItems = 'center'; na3.style.justifyContent = 'center'; }
+    var pa3 = document.getElementById('hsliderPrev');
+    var na3 = document.getElementById('hsliderNext');
+    if (pa3) { pa3.style.display = 'flex'; pa3.style.alignItems = 'center'; pa3.style.justifyContent = 'center'; }
+    if (na3) { na3.style.display = 'flex'; na3.style.alignItems = 'center'; na3.style.justifyContent = 'center'; }
     if (dotsEl) {
       dotsEl.innerHTML = slides.map(function(_, i) {
-        return '<button onclick="heroGoTo(' + i + ')" aria-label="Slide ' + (i+1) + '" style="height:6px;border-radius:3px;width:' + (i===0?'28px':'6px') + ';background:' + (i===0?'#fff':'rgba(255,255,255,.45)') + ';border:none;cursor:pointer;transition:all .35s ease;padding:0;flex-shrink:0"></button>';
+        return '<button onclick="heroGoTo(' + i + ')" aria-label="Slide ' + (i+1) +
+          '" style="height:6px;border-radius:3px;width:' + (i===0?'28px':'6px') +
+          ';background:' + (i===0?'#fff':'rgba(255,255,255,.45)') +
+          ';border:none;cursor:pointer;transition:all .35s ease;padding:0;flex-shrink:0"></button>';
       }).join('');
     }
     startHeroAutoplay();
@@ -494,31 +521,14 @@ function heroGoTo(idx) {
   var slides = document.querySelectorAll('[data-slide]');
   var dots   = document.querySelectorAll('#hsliderDots button');
   if (!slides.length) return;
-  // Fade out current
-  if (slides[_heroSlideIndex]) {
-    slides[_heroSlideIndex].style.opacity = '0';
-    slides[_heroSlideIndex].style.pointerEvents = 'none';
-  }
-  if (dots[_heroSlideIndex]) {
-    dots[_heroSlideIndex].style.width = '6px';
-    dots[_heroSlideIndex].style.borderRadius = '3px';
-    dots[_heroSlideIndex].style.background = 'rgba(255,255,255,.45)';
-  }
+  if (slides[_heroSlideIndex]) { slides[_heroSlideIndex].style.opacity = '0'; slides[_heroSlideIndex].style.pointerEvents = 'none'; }
+  if (dots[_heroSlideIndex])   { dots[_heroSlideIndex].style.width = '6px'; dots[_heroSlideIndex].style.background = 'rgba(255,255,255,.45)'; }
   _heroSlideIndex = ((idx % _heroSlideCount) + _heroSlideCount) % _heroSlideCount;
-  // Fade in new
-  if (slides[_heroSlideIndex]) {
-    slides[_heroSlideIndex].style.opacity = '1';
-    slides[_heroSlideIndex].style.pointerEvents = 'auto';
-  }
-  if (dots[_heroSlideIndex]) {
-    dots[_heroSlideIndex].style.width = '28px';
-    dots[_heroSlideIndex].style.borderRadius = '3px';
-    dots[_heroSlideIndex].style.background = '#fff';
-  }
+  if (slides[_heroSlideIndex]) { slides[_heroSlideIndex].style.opacity = '1'; slides[_heroSlideIndex].style.pointerEvents = 'auto'; }
+  if (dots[_heroSlideIndex])   { dots[_heroSlideIndex].style.width = '28px'; dots[_heroSlideIndex].style.background = '#fff'; }
 }
 
 function heroSlide(dir) { stopHeroAutoplay(); heroGoTo(_heroSlideIndex + dir); startHeroAutoplay(); }
-
 function startHeroAutoplay() {
   stopHeroAutoplay();
   if (_heroSlideCount < 2) return;
@@ -539,164 +549,126 @@ document.addEventListener('DOMContentLoaded', function() {
   }, {passive:true});
 });
 
-// Backwards-compat — called from loadData()
 function initHeroPanel(settings) { initHeroSlider(settings || {}); }
 function initHeroSlideshow()     { initHeroSlider({}); }
-// ── COLLECTION CATEGORY IMAGES ─────────────────────────────────────
-// Fully dynamic — builds ALL cards from admin settings, no hardcoded slugs
+
+// ═══════════════════════════════════════════════════════════════
+// COLLECTION CARDS — clean rewrite
+// Source of truth: window.DB_CATEGORIES (from categories table)
+// Image lookup: site_settings key = "coll_img_" + cat.name.toLowerCase()
+// This is simple, direct, and always correct.
+// ═══════════════════════════════════════════════════════════════
+
 function initCollectionImages(settings) {
   if (!settings) return;
   var cgrid = document.getElementById('cgrid');
   if (!cgrid) return;
 
-  // Inject grid + card styles once
+  // ── Styles (injected once) ────────────────────────────────────
   if (!document.getElementById('ccat-style-v2')) {
     var st = document.createElement('style');
     st.id = 'ccat-style-v2';
-    st.textContent = [
-      '#cgrid{display:flex;flex-direction:row;gap:16px;overflow-x:auto;padding:8px 0 28px;scrollbar-width:none;box-sizing:border-box;width:100%;}',
-      '#cgrid::-webkit-scrollbar{display:none;}',
-      '.ccat-v2{flex:0 0 calc((100% - 80px) / 6);min-width:0;display:flex;flex-direction:column;align-items:center;gap:12px;text-decoration:none;cursor:pointer;transition:transform .2s;}',
-      '.ccat-v2:hover{transform:translateY(-4px);}',
-      '.ccat-v2-box{width:100%;aspect-ratio:1/1;border-radius:16px;border:2px solid #c9a84c;background:#f0ede6;display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:0 2px 12px rgba(201,168,76,.18);transition:border-color .2s,box-shadow .2s;position:relative;}',
-      '.ccat-v2:hover .ccat-v2-box{border-color:#a07830;box-shadow:0 6px 24px rgba(201,168,76,.32);}',
-      '.ccat-v2-box img{width:100%;height:100%;object-fit:cover;display:block;}',
-      '.ccat-v2-box .ccat-v2-emo{font-size:52px;line-height:1;}',
-      '.ccat-v2-label{font-family:"Playfair Display",serif;font-size:14px;font-weight:700;color:#1a3a1e;text-align:center;line-height:1.3;padding:0 4px;width:100%;}',
-      /* GPU-composite card images — prevents repaint/decode flash during scroll loop */
-      '.ccat-v2-box img{will-change:transform;backface-visibility:hidden;transform:translateZ(0);}',
-    ].join('');
+    st.textContent =
+      '#cgrid{display:flex;gap:16px;overflow-x:auto;padding:8px 0 28px;scrollbar-width:none;width:100%;}' +
+      '#cgrid::-webkit-scrollbar{display:none;}' +
+      '.ccat-v2{flex:0 0 calc((100% - 80px)/6);min-width:0;display:flex;flex-direction:column;align-items:center;gap:12px;text-decoration:none;cursor:pointer;transition:transform .2s;}' +
+      '.ccat-v2:hover{transform:translateY(-4px);}' +
+      '.ccat-v2-box{width:100%;aspect-ratio:1/1;border-radius:16px;border:2px solid #c9a84c;background:#f0ede6;display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:0 2px 12px rgba(201,168,76,.18);transition:border-color .2s,box-shadow .2s;position:relative;}' +
+      '.ccat-v2:hover .ccat-v2-box{border-color:#a07830;box-shadow:0 6px 24px rgba(201,168,76,.32);}' +
+      '.ccat-v2-box img{width:100%;height:100%;object-fit:cover;display:block;will-change:transform;backface-visibility:hidden;transform:translateZ(0);}' +
+      '.ccat-v2-box .ccat-emoji{font-size:52px;line-height:1;}' +
+      '.ccat-v2-label{font-family:"Playfair Display",serif;font-size:14px;font-weight:700;color:#1a3a1e;text-align:center;line-height:1.3;padding:0 4px;width:100%;}';
     document.head.appendChild(st);
   }
 
-  // ── SOURCE OF TRUTH: DB categories (window.DB_CATEGORIES) ──
-  // Each category has: id (int), name, slug, image_url, sort_order
-  // Products link via category_id (int FK) — we match by ID, not regex.
+  // ── Categories from DB ────────────────────────────────────────
   var dbCats = window.DB_CATEGORIES || [];
+  if (!dbCats.length) return; // wait until DB data arrives
 
-  // Emoji map keyed by category name (lowercase) for display only
-  var emoMap = {
-    honey:'🍯', jams:'🍓', 'fruit jams':'🍓', juice:'🧃', oil:'🫚', oils:'🫚',
-    spices:'🌿', 'spices of india':'🌿', tea:'🍵', rice:'🌾',
-    pulses:'🫘', shilajit:'🪨', default:'🌿'
-  };
+  // ── Image lookup: "coll_img_" + name.toLowerCase() ───────────
 
-  // Display name overrides: DB names → clean display labels
-  var displayNameMap = {
-    'honey':'Wild Honey', 'wild natural honey':'Wild Honey',
-    'jams':'Jams & Preserves', 'fruit jams':'Jams & Preserves',
-    'juice':'Fresh Juices',
-    'oil':'Oils', 'oils':'Oils',
-    'pulses':'Pulses & Dal',
-    'rice':'Heritage Rice',
-    'shilajit':'Shilajit',
-    'spices':'Herbs & Spices', 'spices of india':'Herbs & Spices',
-    'tea':'Himalayan Teas',
-  };
-
-  function getDisplayName(cat) {
-    var key = (cat.name || '').toLowerCase().trim();
-    return displayNameMap[key] || cat.name;
+  // We normalise: lowercase, trim. Admin also saves by name.toLowerCase().
+  function getImage(cat) {
+    // Slug is now clean (honey, jams, pulses, spices, etc.) — direct lookup
+    var bySlug = (settings['coll_img_' + cat.slug] || '').trim();
+    if (bySlug) return bySlug;
+    // Fallback: DB image_url column
+    return (cat.image_url || '').trim();
   }
 
-  // Admin-set image URLs from site_settings (coll_img_<slug>)
-  // Also support matching by category name slug (lowercased, spaces→hyphens)
-  var imgMapBySlug = {};
-  Object.keys(settings).forEach(function(key) {
-    if (key.startsWith('coll_img_')) {
-      var slug = key.replace('coll_img_', '');
-      var val = (settings[key] || '').trim();
-      if (val) imgMapBySlug[slug] = val;
-    }
+  // ── Emoji fallback ────────────────────────────────────────────
+  var EMOJIS = {
+    honey:'🍯', jams:'🍓', juice:'🧃', oil:'🫚',
+    pulses:'🫘', rice:'🌾', shilajit:'🪨', spices:'🌿', tea:'🍵'
+  };
+  function getEmoji(cat) {
+    return EMOJIS[cat.slug] || '🌿';
+  }
+
+  // ── Display names ─────────────────────────────────────────────
+  var DISPLAY = {
+    honey:'Wild Honey', jams:'Jams & Preserves',
+    juice:'Fresh Juices', oil:'Oils', pulses:'Pulses & Dal',
+    rice:'Heritage Rice', shilajit:'Shilajit',
+    spices:'Herbs & Spices', tea:'Himalayan Teas'
+  };
+  function getLabel(cat) {
+    // Use slug as key (now clean) for reliable lookup
+    return DISPLAY[cat.slug] || cat.name;
+  }
+
+  // ── Sort by sort_order ────────────────────────────────────────
+  var cats = dbCats.slice().sort(function(a, b) {
+    return (a.sort_order || 99) - (b.sort_order || 99) || a.name.localeCompare(b.name);
   });
 
-  function getImgForCat(cat) {
-    // Pre-compute all lookup keys for this category
-    var slugKey     = (cat.slug  || '').toLowerCase().trim();
-    var nameLower   = (cat.name  || '').toLowerCase().trim();
-    var nameHyphen  = nameLower.replace(/\s+/g, '-');           // "fruit-jams"
-    var nameFirst   = nameLower.split(/\s+/)[0];               // "jams" (from name "Jams")
-    var slugFirst   = slugKey.split(/\s+/)[0];                 // "fruit" (from slug "Fruit jams") — unreliable!
+  // ── Fingerprint: skip rebuild if nothing changed ──────────────
+  var fp = cats.map(function(c) { return c.id + ':' + getImage(c); }).join('|');
+  if (cgrid.dataset.fp === fp && cgrid.children.length > 0) return;
+  cgrid.dataset.fp = fp;
 
-    // Try most-specific to least-specific:
-    // 1. Exact slug match (works when slug = "honey", "oil", etc.)
-    if (imgMapBySlug[slugKey])    return imgMapBySlug[slugKey];
-    // 2. Exact name match lowercased (e.g. "jams", "pulses", "spices")
-    if (imgMapBySlug[nameLower])  return imgMapBySlug[nameLower];
-    // 3. Name hyphenated (e.g. "fruit-jams")
-    if (imgMapBySlug[nameHyphen]) return imgMapBySlug[nameHyphen];
-    // 4. First word of NAME — this is the reliable one:
-    //    name="Jams"   → "jams"   → matches coll_img_jams   ✅
-    //    name="Pulses" → "pulses" → matches coll_img_pulses ✅
-    //    name="Honey"  → "honey"  → matches coll_img_honey  ✅
-    //    name="Spices" → "spices" → matches coll_img_spices ✅
-    if (imgMapBySlug[nameFirst])  return imgMapBySlug[nameFirst];
-    // 5. First word of slug (less reliable — "Fruit jams" → "fruit" — but try anyway)
-    if (imgMapBySlug[slugFirst])  return imgMapBySlug[slugFirst];
-    // 6. DB image_url column
-    if (cat.image_url) return cat.image_url;
-    return '';
-  }
-
-  function getEmojiForCat(cat) {
-    return emoMap[cat.name.toLowerCase()] || emoMap[cat.slug] || emoMap.default;
-  }
-
-  // Build final category list — only from DB
-  var cats;
-  if (dbCats.length) {
-    cats = dbCats.slice().sort(function(a, b) {
-      return (a.sort_order || 99) - (b.sort_order || 99) || a.name.localeCompare(b.name);
-    });
-  } else {
-    // No DB categories yet (first load, no cache) — show nothing, wait for API
-    return;
-  }
-
-  // Build fingerprint from cat IDs + image URLs to prevent unnecessary re-renders
-  var _fp = cats.map(function(c){ return c.id+':'+getImgForCat(c); }).join(',');
-  if (cgrid.dataset.ccatFp === _fp && cgrid.children.length > 0) return;
-  cgrid.dataset.ccatFp = _fp;
-
-  // Clear any running auto-scroll timer
-  if (cgrid._ccatTimer) { clearInterval(cgrid._ccatTimer); cgrid._ccatTimer = null; }
-
-  // Rebuild grid
+  // Stop any running timer
+  if (cgrid._timer) { clearInterval(cgrid._timer); cgrid._timer = null; }
   cgrid.innerHTML = '';
 
+  // ── Prewarm: start fetching all images before cards are built ─
+  cats.forEach(function(cat) {
+    var url = getImage(cat);
+    if (url) { var p = new Image(); p.src = url; }
+  });
+
+  // ── Build one card ────────────────────────────────────────────
   function buildCard(cat, i) {
-    var url   = getImgForCat(cat);
-    var label = getDisplayName(cat);
-    var emoji = getEmojiForCat(cat);
-    // Link uses category ID so it matches products by category_id FK
-    var href  = '/category.html?id=' + encodeURIComponent(cat.slug || cat.id);
+    var url   = getImage(cat);
+    var label = getLabel(cat);
+    var emoji = getEmoji(cat);
 
     var card = document.createElement('a');
-    card.href = href;
+    card.href      = '/category.html?id=' + cat.slug; // slug is now clean lowercase
     card.className = 'ccat-v2 rv';
-    card.id = 'ccat-' + (cat.slug || cat.id);
-    card.style.transitionDelay = (i * 0.05) + 's';
+    card.id        = 'ccat-' + cat.id;
 
     var box = document.createElement('div');
     box.className = 'ccat-v2-box';
 
     if (url) {
+      // Shimmer while image loads
       var skel = document.createElement('div');
       skel.className = 'pimg-skel';
       skel.style.cssText = 'position:absolute;inset:0;border-radius:14px;z-index:0';
       box.appendChild(skel);
 
       var img = document.createElement('img');
-      img.alt = label;
-      img.loading = i < 4 ? 'eager' : 'lazy';
+      img.alt          = label;
+      img.loading      = i < 4 ? 'eager' : 'lazy';
       img.fetchPriority = i < 4 ? 'high' : 'auto';
-      img.decoding = 'async';
-      // Start hidden — revealed by onload or rehydrateImages()
-      img.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;position:relative;z-index:1;opacity:0;transition:opacity .3s';
-      img.dataset.src = url; // store for rehydration
+      img.decoding     = 'async';
+      img.style.cssText = 'opacity:0;transition:opacity .3s;position:relative;z-index:1;' +
+        'width:100%;height:100%;object-fit:cover;display:block;' +
+        'will-change:transform;backface-visibility:hidden;transform:translateZ(0)';
+
       img.onload = function() {
         this.style.opacity = '1';
-        this.style.transition = 'opacity .3s';
         var sk = this.previousElementSibling;
         if (sk && sk.classList.contains('pimg-skel')) sk.style.display = 'none';
       };
@@ -705,13 +677,16 @@ function initCollectionImages(settings) {
         var sk = this.previousElementSibling;
         if (sk) sk.style.display = 'none';
         var emo = document.createElement('span');
-        emo.className = 'ccat-v2-emo'; emo.textContent = emoji;
+        emo.className = 'ccat-emoji';
+        emo.textContent = emoji;
         box.appendChild(emo);
       };
+
+      // Append FIRST, then set src — guarantees onload fires reliably
       box.appendChild(img);
-      // Set src AFTER appending to DOM — guarantees browser fires onload/onerror
       img.src = url;
-      // If already browser-cached, show instantly (complete=true fires synchronously)
+
+      // Cache hit: already loaded, show instantly
       if (img.complete && img.naturalWidth) {
         img.style.opacity = '1';
         img.style.transition = 'none';
@@ -719,7 +694,7 @@ function initCollectionImages(settings) {
       }
     } else {
       var emo2 = document.createElement('span');
-      emo2.className = 'ccat-v2-emo';
+      emo2.className = 'ccat-emoji';
       emo2.textContent = emoji;
       box.appendChild(emo2);
     }
@@ -733,108 +708,74 @@ function initCollectionImages(settings) {
     cgrid.appendChild(card);
   }
 
-  // ── PREWARM: decode all images into GPU memory BEFORE building cards ──
-  // Images are already decoded when cards appear — zero flash on scroll loop.
-  cats.forEach(function(cat) {
-    var url = getImgForCat(cat);
-    if (!url) return;
-    var pre = new Image();
-    pre.decoding = 'async';
-    pre.src = url;
-  });
-
   cats.forEach(buildCard);
 
-  // ── AUTO-SCROLL: one card every 2.5s, seamless infinite loop ────
-  var isPaused = false;
-  var isScrolling = false;
-
-  function scrollOneCard() {
-    if (isPaused || isScrolling) return;
-    var cards = cgrid.querySelectorAll('.ccat-v2:not([aria-hidden])');
-    if (!cards.length) return;
-    var cardWidth = cards[0].offsetWidth + 16;
-    var halfWidth = cgrid.scrollWidth / 2;
-    isScrolling = true;
-    var start = cgrid.scrollLeft;
-    var target = start + cardWidth;
-    var duration = 500;
-    var startTime = null;
-    function ease(t) { return t < 0.5 ? 2*t*t : -1+(4-2*t)*t; }
-    function animate(ts) {
-      if (!startTime) startTime = ts;
-      var p = Math.min((ts - startTime) / duration, 1);
-      cgrid.scrollLeft = start + (target - start) * ease(p);
-      if (p < 1) { requestAnimationFrame(animate); }
-      else {
-        if (cgrid.scrollLeft >= halfWidth) cgrid.scrollLeft -= halfWidth;
-        isScrolling = false;
-      }
-    }
-    requestAnimationFrame(animate);
-  }
-
-  // ── rehydrateImages: force-reload all imgs in container ────────────
-  // cloneNode(true) copies img elements but doesn't re-trigger load.
-  // Setting src='' then src=originalSrc forces the browser to fire onload.
-  function rehydrateImages(container) {
-    container.querySelectorAll('img[data-src]').forEach(function(img) {
-      var src = img.dataset.src || img.getAttribute('src');
+  // ── Clone for seamless infinite scroll ────────────────────────
+  Array.from(cgrid.children).forEach(function(card) {
+    var clone = card.cloneNode(true);
+    clone.setAttribute('aria-hidden', 'true');
+    // Re-trigger image load on clones (cloneNode doesn't fire onload)
+    clone.querySelectorAll('img').forEach(function(img) {
+      var src = img.src;
       if (!src) return;
       if (img.complete && img.naturalWidth) {
-        // Already in cache — show instantly
         img.style.opacity = '1';
         img.style.transition = 'none';
         var sk = img.previousElementSibling;
         if (sk && sk.classList.contains('pimg-skel')) sk.style.display = 'none';
-        return;
+      } else {
+        img.src = '';
+        img.src = src;
       }
-      // Force re-trigger load event
-      var saved = src;
-      img.src = '';
-      img.src = saved;
     });
-  }
-
-  // ── waitForImages: wait until all imgs visible/errored, then callback ──
-  function waitForImages(container, callback) {
-    var imgs = Array.from(container.querySelectorAll('img[data-src]'));
-    if (!imgs.length) { callback(); return; }
-    var remaining = imgs.length;
-    function done() { remaining--; if (remaining <= 0) callback(); }
-    imgs.forEach(function(img) {
-      if (img.complete) { done(); return; }
-      img.addEventListener('load',  done, {once:true});
-      img.addEventListener('error', done, {once:true});
-    });
-    // Safety timeout — start scrolling after 1.5s regardless
-    setTimeout(callback, 1500);
-  }
-
-  // Clone cards for seamless infinite loop
-  Array.from(cgrid.children).forEach(function(card) {
-    var clone = card.cloneNode(true);
-    clone.setAttribute('aria-hidden', 'true');
     cgrid.appendChild(clone);
   });
 
-  // Rehydrate ALL images (originals + clones) after DOM is built
-  rehydrateImages(cgrid);
+  // ── Auto-scroll: start after images load (max 1.2s wait) ─────
+  function startScroll() {
+    if (cgrid._timer) return;
+    var isPaused = false;
+    var isAnim   = false;
 
-  // Start autoscroll only after images have loaded — no blank-card scroll
-  waitForImages(cgrid, function() {
-    if (!cgrid._ccatTimer) {
-      cgrid._ccatTimer = setInterval(scrollOneCard, 2500);
+    function step() {
+      if (isPaused || isAnim) return;
+      var cards = cgrid.querySelectorAll('.ccat-v2:not([aria-hidden])');
+      if (!cards.length) return;
+      var w = cards[0].offsetWidth + 16;
+      var half = cgrid.scrollWidth / 2;
+      isAnim = true;
+      var from = cgrid.scrollLeft;
+      var to   = from + w;
+      var t0   = null;
+      function ease(t) { return t < 0.5 ? 2*t*t : -1+(4-2*t)*t; }
+      function frame(ts) {
+        if (!t0) t0 = ts;
+        var p = Math.min((ts - t0) / 480, 1);
+        cgrid.scrollLeft = from + (to - from) * ease(p);
+        if (p < 1) requestAnimationFrame(frame);
+        else { if (cgrid.scrollLeft >= half) cgrid.scrollLeft -= half; isAnim = false; }
+      }
+      requestAnimationFrame(frame);
     }
-  });
-  cgrid.addEventListener('mouseenter', function() { isPaused = true; });
-  cgrid.addEventListener('mouseleave', function() { isPaused = false; });
-  cgrid.addEventListener('touchstart', function() { isPaused = true; }, {passive:true});
-  cgrid.addEventListener('touchend', function() {
-    setTimeout(function() { isPaused = false; }, 2000);
-  }, {passive:true});
-}
 
+    cgrid._timer = setInterval(step, 2500);
+    cgrid.addEventListener('mouseenter', function() { isPaused = true; });
+    cgrid.addEventListener('mouseleave', function() { isPaused = false; });
+    cgrid.addEventListener('touchstart', function() { isPaused = true; }, {passive:true});
+    cgrid.addEventListener('touchend',   function() { setTimeout(function(){ isPaused = false; }, 1800); }, {passive:true});
+  }
+
+  // Wait for images before scrolling; fall back after 1.2s
+  var imgs = Array.from(cgrid.querySelectorAll('img'));
+  if (!imgs.length) { startScroll(); return; }
+  var pending = imgs.length;
+  function onDone() { if (--pending <= 0) startScroll(); }
+  imgs.forEach(function(img) {
+    if (img.complete) onDone();
+    else { img.addEventListener('load', onDone, {once:true}); img.addEventListener('error', onDone, {once:true}); }
+  });
+  setTimeout(startScroll, 1200);
+}
 
 async function loadData() {
   // Step 1: render states fallback only — skip fake products to avoid price flash
