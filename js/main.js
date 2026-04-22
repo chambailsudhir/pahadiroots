@@ -559,170 +559,159 @@ function initHeroSlideshow()     { initHeroSlider({}); }
 // This is simple, direct, and always correct.
 // ═══════════════════════════════════════════════════════════════
 
+// ═══════════════════════════════════════════════════════════════
+// BROWSE COLLECTIONS — "What the Mountains Offer"
+// Source of truth: window.DB_CATEGORIES from /api/store-data
+// Images: site_settings keys "coll_img_<slug>" (slug = honey/tea/jams etc)
+// ═══════════════════════════════════════════════════════════════
 function initCollectionImages(settings) {
   if (!settings) return;
   var cgrid = document.getElementById('cgrid');
   if (!cgrid) return;
 
-  // ── Styles (injected once) ────────────────────────────────────
-  if (!document.getElementById('ccat-style-v2')) {
+  var dbCats = window.DB_CATEGORIES || [];
+  if (!dbCats.length) return;
+
+  // ── Inject styles once ───────────────────────────────────────
+  if (!document.getElementById('ccat-style')) {
     var st = document.createElement('style');
-    st.id = 'ccat-style-v2';
-    st.textContent =
-      '#cgrid{display:flex;gap:16px;overflow-x:auto;padding:8px 0 28px;scrollbar-width:none;width:100%;}' +
-      '#cgrid::-webkit-scrollbar{display:none;}' +
-      '.ccat-v2{flex:0 0 calc((100% - 80px)/6);min-width:0;display:flex;flex-direction:column;align-items:center;gap:12px;text-decoration:none;cursor:pointer;transition:transform .2s;}' +
-      '.ccat-v2:hover{transform:translateY(-4px);}' +
-      '.ccat-v2-box{width:100%;aspect-ratio:1/1;border-radius:16px;border:2px solid #c9a84c;background:#f0ede6;display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:0 2px 12px rgba(201,168,76,.18);transition:border-color .2s,box-shadow .2s;position:relative;}' +
-      '.ccat-v2:hover .ccat-v2-box{border-color:#a07830;box-shadow:0 6px 24px rgba(201,168,76,.32);}' +
-      '.ccat-v2-box img{width:100%;height:100%;object-fit:cover;display:block;will-change:transform;backface-visibility:hidden;transform:translateZ(0);}' +
-      '.ccat-v2-box .ccat-emoji{font-size:52px;line-height:1;}' +
-      '.ccat-v2-label{font-family:"Playfair Display",serif;font-size:14px;font-weight:700;color:#1a3a1e;text-align:center;line-height:1.3;padding:0 4px;width:100%;}';
+    st.id = 'ccat-style';
+    st.textContent = [
+      '#cgrid{display:flex;gap:16px;overflow-x:auto;padding:8px 0 28px;',
+        'scrollbar-width:none;-webkit-overflow-scrolling:touch;}',
+      '#cgrid::-webkit-scrollbar{display:none;}',
+      '.cc{flex:0 0 calc((100% - 80px)/6);min-width:140px;display:flex;',
+        'flex-direction:column;align-items:center;gap:10px;text-decoration:none;',
+        'cursor:pointer;transition:transform .2s ease;}',
+      '.cc:hover{transform:translateY(-4px);}',
+      '.cc-box{width:100%;aspect-ratio:1/1;border-radius:16px;border:2px solid #c9a84c;',
+        'background:#f5f1e8;position:relative;overflow:hidden;',
+        'box-shadow:0 2px 12px rgba(201,168,76,.18);',
+        'display:flex;align-items:center;justify-content:center;}',
+      '.cc:hover .cc-box{border-color:#a07830;box-shadow:0 6px 24px rgba(201,168,76,.32);}',
+      '.cc-emo{font-size:48px;line-height:1;position:absolute;z-index:1;',
+        'transition:opacity .3s;}',
+      '.cc-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;',
+        'z-index:2;opacity:0;transition:opacity .35s;',
+        'will-change:transform;backface-visibility:hidden;}',
+      '.cc-img.loaded{opacity:1;}',
+      '.cc-lbl{font-family:"Playfair Display",serif;font-size:13px;font-weight:700;',
+        'color:#1a3a1e;text-align:center;line-height:1.3;padding:0 4px;width:100%;}',
+    ].join('');
     document.head.appendChild(st);
   }
 
-  // ── Categories from DB ────────────────────────────────────────
-  var dbCats = window.DB_CATEGORIES || [];
-  if (!dbCats.length) return; // wait until DB data arrives
-
-  // ── Image lookup: "coll_img_" + name.toLowerCase() ───────────
-
-  // We normalise: lowercase, trim. Admin also saves by name.toLowerCase().
-  function getImage(cat) {
-    // Slug is now clean (honey, jams, pulses, spices, etc.) — direct lookup
-    var bySlug = (settings['coll_img_' + cat.slug] || '').trim();
-    if (bySlug) return bySlug;
-    // Fallback: DB image_url column
-    return (cat.image_url || '').trim();
-  }
-
-  // ── Emoji fallback ────────────────────────────────────────────
-  var EMOJIS = {
+  // ── Helpers ───────────────────────────────────────────────────
+  var EMOJI = {
     honey:'🍯', jams:'🍓', juice:'🧃', oil:'🫚',
     pulses:'🫘', rice:'🌾', shilajit:'🪨', spices:'🌿', tea:'🍵'
   };
-  function getEmoji(cat) {
-    return EMOJIS[cat.slug] || '🌿';
-  }
-
-  // ── Display names ─────────────────────────────────────────────
-  var DISPLAY = {
-    honey:'Wild Honey', jams:'Jams & Preserves',
-    juice:'Fresh Juices', oil:'Oils', pulses:'Pulses & Dal',
-    rice:'Heritage Rice', shilajit:'Shilajit',
-    spices:'Herbs & Spices', tea:'Himalayan Teas'
+  var LABEL = {
+    honey:'Wild Honey',      jams:'Jams & Preserves', juice:'Fresh Juices',
+    oil:'Oils',              pulses:'Pulses & Dal',   rice:'Heritage Rice',
+    shilajit:'Shilajit',     spices:'Herbs & Spices', tea:'Himalayan Teas'
   };
-  function getLabel(cat) {
-    // Use slug as key (now clean) for reliable lookup
-    return DISPLAY[cat.slug] || cat.name;
+
+  function imgFor(cat) {
+    // site_settings key = "coll_img_" + slug  (e.g. coll_img_honey)
+    var v = (settings['coll_img_' + cat.slug] || '').trim();
+    if (v) return v;
+    return (cat.image_url || '').trim();
   }
 
-  // ── Sort by sort_order ────────────────────────────────────────
-  var cats = dbCats.slice().sort(function(a, b) {
-    return (a.sort_order || 99) - (b.sort_order || 99) || a.name.localeCompare(b.name);
+  // ── Sort categories by sort_order ─────────────────────────────
+  var cats = dbCats.slice().sort(function(a,b){
+    return (a.sort_order||99)-(b.sort_order||99) || a.name.localeCompare(b.name);
   });
 
-  // ── Fingerprint: skip rebuild if nothing changed ──────────────
-  var fp = cats.map(function(c) { return c.id + ':' + getImage(c); }).join('|');
-  if (cgrid.dataset.fp === fp && cgrid.children.length > 0) return;
+  // ── Fingerprint — prevent redundant re-renders ────────────────
+  var fp = cats.map(function(c){ return c.id+':'+imgFor(c); }).join('|');
+  if (cgrid.dataset.fp === fp && cgrid.querySelectorAll('.cc').length > 0) return;
   cgrid.dataset.fp = fp;
 
-  // Stop any running timer
-  if (cgrid._timer) { clearInterval(cgrid._timer); cgrid._timer = null; }
+  // ── Stop any running scroll timer ────────────────────────────
+  if (cgrid._t) { clearInterval(cgrid._t); cgrid._t = null; }
   cgrid.innerHTML = '';
 
-  // ── Prewarm: start fetching all images before cards are built ─
+  // ── Prewarm all images ────────────────────────────────────────
   cats.forEach(function(cat) {
-    var url = getImage(cat);
-    if (url) { var p = new Image(); p.src = url; }
+    var u = imgFor(cat);
+    if (u) { var p = new Image(); p.src = u; }
   });
 
-  // ── Build one card ────────────────────────────────────────────
-  function buildCard(cat, i) {
-    var url   = getImage(cat);
-    var label = getLabel(cat);
-    var emoji = getEmoji(cat);
+  // ── Build cards ───────────────────────────────────────────────
+  cats.forEach(function(cat, i) {
+    var url   = imgFor(cat);
+    var slug  = cat.slug || '';
+    var label = LABEL[slug] || cat.name;
+    var emoji = EMOJI[slug] || '🌿';
 
     var card = document.createElement('a');
-    card.href      = '/category.html?id=' + cat.slug; // slug is now clean lowercase
-    card.className = 'ccat-v2 rv';
-    card.id        = 'ccat-' + cat.id;
+    card.href      = '/category.html?id=' + slug;
+    card.className = 'cc';
+    card.setAttribute('aria-label', label);
 
     var box = document.createElement('div');
-    box.className = 'ccat-v2-box';
+    box.className = 'cc-box';
 
+    // Emoji always present as background (z-index:1)
+    var emoEl = document.createElement('span');
+    emoEl.className = 'cc-emo';
+    emoEl.textContent = emoji;
+    box.appendChild(emoEl);
+
+    // Image on top (z-index:2), fades in when loaded
     if (url) {
-      // Shimmer while image loads
-      var skel = document.createElement('div');
-      skel.className = 'pimg-skel';
-      skel.style.cssText = 'position:absolute;inset:0;border-radius:14px;z-index:0';
-      box.appendChild(skel);
-
       var img = document.createElement('img');
+      img.className    = 'cc-img';
       img.alt          = label;
       img.loading      = i < 4 ? 'eager' : 'lazy';
-      img.fetchPriority = i < 4 ? 'high' : 'auto';
+      img.setAttribute('fetchpriority', i < 4 ? 'high' : 'auto');
       img.decoding     = 'async';
-      img.style.cssText = 'opacity:0;transition:opacity .3s;position:relative;z-index:1;' +
-        'width:100%;height:100%;object-fit:cover;display:block;' +
-        'will-change:transform;backface-visibility:hidden;transform:translateZ(0)';
 
       img.onload = function() {
-        this.style.opacity = '1';
-        var sk = this.previousElementSibling;
-        if (sk && sk.classList.contains('pimg-skel')) sk.style.display = 'none';
+        this.classList.add('loaded');
+        // Hide emoji once image is visible (cleaner look)
+        var emo = this.previousElementSibling;
+        if (emo && emo.classList.contains('cc-emo')) emo.style.opacity = '0';
       };
       img.onerror = function() {
-        this.style.display = 'none';
-        var sk = this.previousElementSibling;
-        if (sk) sk.style.display = 'none';
-        var emo = document.createElement('span');
-        emo.className = 'ccat-emoji';
-        emo.textContent = emoji;
-        box.appendChild(emo);
+        // Image broken — emoji stays visible, just remove the broken img
+        this.remove();
       };
 
-      // Append FIRST, then set src — guarantees onload fires reliably
+      // APPEND TO DOM FIRST, then set src
       box.appendChild(img);
       img.src = url;
 
-      // Cache hit: already loaded, show instantly
+      // Already cached by browser — show instantly
       if (img.complete && img.naturalWidth) {
-        img.style.opacity = '1';
-        img.style.transition = 'none';
-        skel.style.display = 'none';
+        img.classList.add('loaded');
+        emoEl.style.opacity = '0';
       }
-    } else {
-      var emo2 = document.createElement('span');
-      emo2.className = 'ccat-emoji';
-      emo2.textContent = emoji;
-      box.appendChild(emo2);
     }
 
     var lbl = document.createElement('div');
-    lbl.className = 'ccat-v2-label';
+    lbl.className   = 'cc-lbl';
     lbl.textContent = label;
 
     card.appendChild(box);
     card.appendChild(lbl);
     cgrid.appendChild(card);
-  }
+  });
 
-  cats.forEach(buildCard);
-
-  // ── Clone for seamless infinite scroll ────────────────────────
-  Array.from(cgrid.children).forEach(function(card) {
+  // ── Clone cards for infinite scroll ──────────────────────────
+  Array.from(cgrid.querySelectorAll('.cc')).forEach(function(card) {
     var clone = card.cloneNode(true);
     clone.setAttribute('aria-hidden', 'true');
-    // Re-trigger image load on clones (cloneNode doesn't fire onload)
-    clone.querySelectorAll('img').forEach(function(img) {
+    // Re-trigger img load on clones (cloneNode doesn't fire onload)
+    clone.querySelectorAll('img.cc-img').forEach(function(img) {
       var src = img.src;
       if (!src) return;
       if (img.complete && img.naturalWidth) {
-        img.style.opacity = '1';
-        img.style.transition = 'none';
-        var sk = img.previousElementSibling;
-        if (sk && sk.classList.contains('pimg-skel')) sk.style.display = 'none';
+        img.classList.add('loaded');
+        var emo = img.previousElementSibling;
+        if (emo && emo.classList.contains('cc-emo')) emo.style.opacity = '0';
       } else {
         img.src = '';
         img.src = src;
@@ -731,50 +720,46 @@ function initCollectionImages(settings) {
     cgrid.appendChild(clone);
   });
 
-  // ── Auto-scroll: start after images load (max 1.2s wait) ─────
+  // ── Auto-scroll ───────────────────────────────────────────────
   function startScroll() {
-    if (cgrid._timer) return;
-    var isPaused = false;
-    var isAnim   = false;
+    if (cgrid._t) return;
+    var paused = false, animating = false;
 
-    function step() {
-      if (isPaused || isAnim) return;
-      var cards = cgrid.querySelectorAll('.ccat-v2:not([aria-hidden])');
+    function tick() {
+      if (paused || animating) return;
+      var cards = cgrid.querySelectorAll('.cc:not([aria-hidden])');
       if (!cards.length) return;
-      var w = cards[0].offsetWidth + 16;
+      var step = cards[0].offsetWidth + 16;
       var half = cgrid.scrollWidth / 2;
-      isAnim = true;
-      var from = cgrid.scrollLeft;
-      var to   = from + w;
-      var t0   = null;
-      function ease(t) { return t < 0.5 ? 2*t*t : -1+(4-2*t)*t; }
-      function frame(ts) {
-        if (!t0) t0 = ts;
-        var p = Math.min((ts - t0) / 480, 1);
-        cgrid.scrollLeft = from + (to - from) * ease(p);
-        if (p < 1) requestAnimationFrame(frame);
-        else { if (cgrid.scrollLeft >= half) cgrid.scrollLeft -= half; isAnim = false; }
-      }
-      requestAnimationFrame(frame);
+      animating = true;
+      var s0 = cgrid.scrollLeft, t0 = null;
+      function ease(t){ return t<.5?2*t*t:-1+(4-2*t)*t; }
+      (function frame(ts){
+        if(!t0) t0=ts;
+        var p=Math.min((ts-t0)/460,1);
+        cgrid.scrollLeft=s0+(step*ease(p));
+        if(p<1){ requestAnimationFrame(frame); }
+        else { if(cgrid.scrollLeft>=half) cgrid.scrollLeft-=half; animating=false; }
+      })(performance.now());
     }
 
-    cgrid._timer = setInterval(step, 2500);
-    cgrid.addEventListener('mouseenter', function() { isPaused = true; });
-    cgrid.addEventListener('mouseleave', function() { isPaused = false; });
-    cgrid.addEventListener('touchstart', function() { isPaused = true; }, {passive:true});
-    cgrid.addEventListener('touchend',   function() { setTimeout(function(){ isPaused = false; }, 1800); }, {passive:true});
+    cgrid._t = setInterval(tick, 2500);
+    cgrid.addEventListener('mouseenter', function(){ paused=true; });
+    cgrid.addEventListener('mouseleave', function(){ paused=false; });
+    cgrid.addEventListener('touchstart', function(){ paused=true; }, {passive:true});
+    cgrid.addEventListener('touchend', function(){ setTimeout(function(){ paused=false; },1800); }, {passive:true});
   }
 
-  // Wait for images before scrolling; fall back after 1.2s
-  var imgs = Array.from(cgrid.querySelectorAll('img'));
-  if (!imgs.length) { startScroll(); return; }
-  var pending = imgs.length;
-  function onDone() { if (--pending <= 0) startScroll(); }
-  imgs.forEach(function(img) {
-    if (img.complete) onDone();
-    else { img.addEventListener('load', onDone, {once:true}); img.addEventListener('error', onDone, {once:true}); }
+  // Wait for images before scrolling (max 1.5s)
+  var allImgs = Array.from(cgrid.querySelectorAll('img.cc-img'));
+  if (!allImgs.length) { startScroll(); return; }
+  var left = allImgs.length;
+  function done(){ if(--left<=0) startScroll(); }
+  allImgs.forEach(function(img){
+    if(img.complete) done();
+    else { img.addEventListener('load',done,{once:true}); img.addEventListener('error',done,{once:true}); }
   });
-  setTimeout(startScroll, 1200);
+  setTimeout(startScroll, 1500);
 }
 
 async function loadData() {
