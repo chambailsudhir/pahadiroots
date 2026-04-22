@@ -544,10 +544,9 @@ function initCollectionImages(settings) {
     st.textContent = [
       '#cgrid{display:flex;flex-direction:row;gap:16px;overflow-x:auto;padding:8px 0 28px;scrollbar-width:none;box-sizing:border-box;width:100%;}',
       '#cgrid::-webkit-scrollbar{display:none;}',
-      /* Each card: exactly 1/6 of container, no snap so auto-scroll flows freely */
       '.ccat-v2{flex:0 0 calc((100% - 80px) / 6);min-width:0;display:flex;flex-direction:column;align-items:center;gap:12px;text-decoration:none;cursor:pointer;transition:transform .2s;}',
       '.ccat-v2:hover{transform:translateY(-4px);}',
-      '.ccat-v2-box{width:100%;aspect-ratio:1/1;border-radius:16px;border:2px solid #c9a84c;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:0 2px 12px rgba(201,168,76,.18);transition:border-color .2s,box-shadow .2s;}',
+      '.ccat-v2-box{width:100%;aspect-ratio:1/1;border-radius:16px;border:2px solid #c9a84c;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:0 2px 12px rgba(201,168,76,.18);transition:border-color .2s,box-shadow .2s;position:relative;}',
       '.ccat-v2:hover .ccat-v2-box{border-color:#a07830;box-shadow:0 6px 24px rgba(201,168,76,.32);}',
       '.ccat-v2-box img{width:100%;height:100%;object-fit:cover;display:block;}',
       '.ccat-v2-box .ccat-v2-emo{font-size:52px;line-height:1;}',
@@ -556,163 +555,126 @@ function initCollectionImages(settings) {
     document.head.appendChild(st);
   }
 
-  // Emoji map for known slugs
+  // ── SOURCE OF TRUTH: DB categories (window.DB_CATEGORIES) ──
+  // Each category has: id (int), name, slug, image_url, sort_order
+  // Products link via category_id (int FK) — we match by ID, not regex.
+  var dbCats = window.DB_CATEGORIES || [];
+
+  // Emoji map keyed by category name (lowercase) for display only
   var emoMap = {
-    honey:'🍯', jams:'🍓', juice:'🧃', oil:'🫚', oils:'🫚', ghee:'🥛',
-    spices:'🌿', tea:'🍵', grains:'🌾', rice:'🌾', pulses:'🫘', dryfruits:'🌰',
-    'dry-fruits':'🌰', vegetables:'🥦', fruits:'🍎', masala:'🌶️', atta:'🌾',
-    coffee:'☕', herbs:'🌿', seeds:'🌱', pickles:'🫙', chutney:'🍶',
-    shilajit:'🪨', saffron:'🌸', turmeric:'🟡', default:'🌿'
+    honey:'🍯', jams:'🍓', juice:'🧃', oil:'🫚', oils:'🫚',
+    spices:'🌿', 'spices of india':'🌿', tea:'🍵', rice:'🌾',
+    pulses:'🫘', shilajit:'🪨', default:'🌿'
   };
 
-  // Label overrides for nicer display names
-  var labelMap = {
-    honey:'Wild Honey', jams:'Jams & Preserves', juice:'Fresh Juices',
-    oil:'Oils', oils:'Oils', ghee:'A2 Bilona Ghee', spices:'Herbs & Spices',
-    tea:'Himalayan Teas', grains:'Ancient Grains', rice:'Heritage Rice',
-    pulses:'Pulses & Dal', dryfruits:'Dry Fruits', 'dry-fruits':'Dry Fruits',
-    masala:'Masalas', coffee:'Mountain Coffee', saffron:'Kashmiri Saffron',
-    turmeric:'Turmeric', herbs:'Herbs & Spices', seeds:'Seeds', shilajit:'Shilajit'
-  };
-
-  // Build slug→url and slug→hidden maps + order from settings (admin-set images)
-  var imgMap = {}, hiddenMap = {}, orderMap = {};
+  // Admin-set image URLs from site_settings (coll_img_<slug>)
+  // Also support matching by category name slug (lowercased, spaces→hyphens)
+  var imgMapBySlug = {};
   Object.keys(settings).forEach(function(key) {
     if (key.startsWith('coll_img_')) {
       var slug = key.replace('coll_img_', '');
-      if (settings[key] && settings[key].trim()) imgMap[slug] = settings[key].trim();
-    }
-    if (key.startsWith('coll_hidden_') && settings[key] === 'true') {
-      hiddenMap[key.replace('coll_hidden_', '')] = true;
-    }
-    if (key.startsWith('coll_order_')) {
-      orderMap[key.replace('coll_order_', '')] = parseInt(settings[key]) || 99;
+      var val = (settings[key] || '').trim();
+      if (val) imgMapBySlug[slug] = val;
     }
   });
 
-  // ── SOURCE OF TRUTH: use DB categories (window.DB_CATEGORIES) ──
-  // DB categories are the canonical list — no fake/phantom categories appear.
-  // Fall back to site_settings keys only if DB categories not yet loaded.
-  var dbCats = window.DB_CATEGORIES || [];
-  var slugs;
+  function getImgForCat(cat) {
+    // 1. Try coll_img_<slug> where slug = cat.slug
+    if (imgMapBySlug[cat.slug]) return imgMapBySlug[cat.slug];
+    // 2. Try coll_img_<nameSlug> where nameSlug = lowercased name with spaces→hyphens
+    var nameSlug = cat.name.toLowerCase().replace(/\s+/g, '-');
+    if (imgMapBySlug[nameSlug]) return imgMapBySlug[nameSlug];
+    // 3. Try simple lowercase first word (honey, tea, oil etc.)
+    var firstWord = cat.name.toLowerCase().split(/\s+/)[0];
+    if (imgMapBySlug[firstWord]) return imgMapBySlug[firstWord];
+    // 4. DB image_url
+    if (cat.image_url) return cat.image_url;
+    return '';
+  }
+
+  function getEmojiForCat(cat) {
+    return emoMap[cat.name.toLowerCase()] || emoMap[cat.slug] || emoMap.default;
+  }
+
+  // Build final category list — only from DB
+  var cats;
   if (dbCats.length) {
-    // Use DB categories as the definitive slug list
-    slugs = dbCats
-      .filter(function(cat) { return !hiddenMap[cat.slug]; })
-      .map(function(cat) {
-        // Prefer admin-uploaded image (coll_img_*), then DB image_url
-        if (!imgMap[cat.slug] && cat.image_url) imgMap[cat.slug] = cat.image_url;
-        // Prefer DB name over hardcoded labelMap
-        if (!labelMap[cat.slug]) labelMap[cat.slug] = cat.name;
-        if (cat.sort_order !== undefined && !(cat.slug in orderMap)) orderMap[cat.slug] = cat.sort_order || 99;
-        return cat.slug;
-      });
-    slugs.sort(function(a, b) {
-      return (orderMap[a] || 99) - (orderMap[b] || 99) || a.localeCompare(b);
+    cats = dbCats.slice().sort(function(a, b) {
+      return (a.sort_order || 99) - (b.sort_order || 99) || a.name.localeCompare(b.name);
     });
   } else {
-    // Fallback: derive slugs from site_settings coll_img_* keys when DB not loaded
-    var allSlugsSet = {};
-    Object.keys(settings).forEach(function(key) {
-      if (key.startsWith('coll_img_') || key.startsWith('coll_order_')) {
-        allSlugsSet[key.replace(/^coll_(img|order)_/, '')] = true;
-      }
-    });
-    // Also include known DB category slugs (honey, shilajit, pulses, juice, tea, spices, rice, oil, jams)
-    ['honey','shilajit','pulses','juice','tea','spices','rice','oil','jams'].forEach(function(s) { allSlugsSet[s] = true; });
-    slugs = Object.keys(allSlugsSet).filter(function(s) { return !hiddenMap[s]; });
-    slugs.sort(function(a, b) {
-      return (orderMap[a] || 99) - (orderMap[b] || 99) || a.localeCompare(b);
-    });
+    // No DB categories yet (first load, no cache) — show nothing, wait for API
+    return;
   }
-  // Deduplicate
-  slugs = slugs.filter(function(s, i) { return slugs.indexOf(s) === i;
-  });
 
-  // ── Fingerprint: skip full rebuild if same slugs+images already rendered ──
-  // This prevents the flicker when called from cache then again from API.
-  var _fp = slugs.join(',') + '|' + slugs.map(function(s){ return imgMap[s]||''; }).join(',');
+  // Build fingerprint from cat IDs + image URLs to prevent unnecessary re-renders
+  var _fp = cats.map(function(c){ return c.id+':'+getImgForCat(c); }).join(',');
   if (cgrid.dataset.ccatFp === _fp && cgrid.children.length > 0) return;
   cgrid.dataset.ccatFp = _fp;
 
-  // Stop any running auto-scroll timer before clearing
+  // Clear any running auto-scroll timer
   if (cgrid._ccatTimer) { clearInterval(cgrid._ccatTimer); cgrid._ccatTimer = null; }
 
-  // Clear grid and rebuild from scratch
+  // Rebuild grid
   cgrid.innerHTML = '';
 
-  function buildCard(slug, i) {
-    var url   = imgMap[slug];
-    var label = labelMap[slug] || (slug.charAt(0).toUpperCase() + slug.slice(1).replace(/-/g, ' '));
-    var emoji = emoMap[slug] || emoMap.default;
-
-    var filterKey = 'all';
-    if (/honey/i.test(slug)) filterKey = 'honey';
-    else if (/ghee|butter/i.test(slug)) filterKey = 'ghee';
-    else if (/spice|masala|herb|turmeric|pepper|chilli/i.test(slug)) filterKey = 'spices';
-    else if (/tea|coffee/i.test(slug)) filterKey = 'tea';
-    else if (/saffron|kesar/i.test(slug)) filterKey = 'saffron';
-    else if (/oil/i.test(slug)) filterKey = 'oil';
+  function buildCard(cat, i) {
+    var url   = getImgForCat(cat);
+    var label = cat.name;
+    var emoji = getEmojiForCat(cat);
+    // Link uses category ID so it matches products by category_id FK
+    var href  = '/category.html?id=' + encodeURIComponent(cat.slug || cat.id);
 
     var card = document.createElement('a');
-    card.href = '/category.html?id=' + slug;
+    card.href = href;
     card.className = 'ccat-v2 rv';
-    card.id = 'ccat-' + slug;
+    card.id = 'ccat-' + (cat.slug || cat.id);
     card.style.transitionDelay = (i * 0.05) + 's';
 
-    // Image box
     var box = document.createElement('div');
     box.className = 'ccat-v2-box';
 
     if (url) {
-      var img = document.createElement('img');
-      img.alt = label;
-      // First 4 cards are visible on load — load eagerly with high priority
-      if (i < 4) {
-        img.loading = 'eager';
-        img.fetchPriority = 'high';
-        img.decoding = 'async';
-      } else {
-        img.loading = 'lazy';
-        img.decoding = 'async';
-      }
-      img.onerror = function() {
-        this.style.display = 'none';
-        var emoEl = document.createElement('span');
-        emoEl.className = 'ccat-v2-emo';
-        emoEl.textContent = emoji;
-        box.appendChild(emoEl);
-      };
-      // Shimmer skeleton until image loads
       var skel = document.createElement('div');
       skel.className = 'pimg-skel';
       skel.style.cssText = 'position:absolute;inset:0;border-radius:14px;z-index:0';
-      box.style.position = 'relative';
       box.appendChild(skel);
-      img.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;position:relative;z-index:1;opacity:0;transition:opacity .35s';
+
+      var img = document.createElement('img');
+      img.alt = label;
+      img.loading = i < 4 ? 'eager' : 'lazy';
+      img.fetchPriority = i < 4 ? 'high' : 'auto';
+      img.decoding = 'async';
+      img.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;position:relative;z-index:1;opacity:0;transition:opacity .3s';
       img.onload = function() {
         this.style.opacity = '1';
         var sk = this.previousElementSibling;
-        if (sk && sk.classList.contains('pimg-skel')) { sk.style.display = 'none'; }
+        if (sk && sk.classList.contains('pimg-skel')) sk.style.display = 'none';
       };
-      // Use 320px wide WebP for category thumbnails — enough for the card size
-      img.src = imgOpt(url, {w:320, q:75});
-      // If already cached by browser (preloaded), show immediately without waiting for onload
+      img.onerror = function() {
+        this.style.display = 'none';
+        var sk = this.previousElementSibling;
+        if (sk) sk.style.display = 'none';
+        var emo = document.createElement('span');
+        emo.className = 'ccat-v2-emo';
+        emo.textContent = emoji;
+        box.appendChild(emo);
+      };
+      img.src = url;
+      // If already in browser cache (preloaded), show instantly
       if (img.complete && img.naturalWidth) {
         img.style.opacity = '1';
         img.style.transition = 'none';
-        var sk2 = img.previousElementSibling;
-        if (sk2 && sk2.classList.contains('pimg-skel')) sk2.style.display = 'none';
+        skel.style.display = 'none';
       }
       box.appendChild(img);
     } else {
-      var emoEl = document.createElement('span');
-      emoEl.className = 'ccat-v2-emo';
-      emoEl.textContent = emoji;
-      box.appendChild(emoEl);
+      var emo2 = document.createElement('span');
+      emo2.className = 'ccat-v2-emo';
+      emo2.textContent = emoji;
+      box.appendChild(emo2);
     }
 
-    // Label OUTSIDE the box
     var lbl = document.createElement('div');
     lbl.className = 'ccat-v2-label';
     lbl.textContent = label;
@@ -722,69 +684,53 @@ function initCollectionImages(settings) {
     cgrid.appendChild(card);
   }
 
-  if (slugs.length > 0) {
-    slugs.forEach(buildCard);
-  } else {
-    // Fallback: show all 9 known DB categories
-    ['honey','shilajit','pulses','juice','tea','spices','rice','oil','jams'
-    ].forEach(function(slug, i){ buildCard(slug, i); });
-  }
+  cats.forEach(buildCard);
 
-  // ── AUTO-SCROLL: one card at a time, every 2.5s ─────────────────
+  // ── AUTO-SCROLL: one card every 2.5s, seamless infinite loop ────
   var isPaused = false;
   var isScrolling = false;
 
   function scrollOneCard() {
     if (isPaused || isScrolling) return;
-    var cards = cgrid.querySelectorAll('.ccat-v2');
+    var cards = cgrid.querySelectorAll('.ccat-v2:not([aria-hidden])');
     if (!cards.length) return;
-    var cardWidth = cards[0].offsetWidth + 16; // card + gap
+    var cardWidth = cards[0].offsetWidth + 16;
     var halfWidth = cgrid.scrollWidth / 2;
     isScrolling = true;
-
     var start = cgrid.scrollLeft;
     var target = start + cardWidth;
-    var duration = 500; // ms for slide animation
+    var duration = 500;
     var startTime = null;
-
-    function easeInOut(t) { return t < 0.5 ? 2*t*t : -1+(4-2*t)*t; }
-
+    function ease(t) { return t < 0.5 ? 2*t*t : -1+(4-2*t)*t; }
     function animate(ts) {
       if (!startTime) startTime = ts;
-      var elapsed = ts - startTime;
-      var progress = Math.min(elapsed / duration, 1);
-      cgrid.scrollLeft = start + (target - start) * easeInOut(progress);
-
-      if (progress < 1) {
-        requestAnimationFrame(animate);
-      } else {
-        // Seamless loop — if past halfway, snap back silently
-        if (cgrid.scrollLeft >= halfWidth) {
-          cgrid.scrollLeft = cgrid.scrollLeft - halfWidth;
-        }
+      var p = Math.min((ts - startTime) / duration, 1);
+      cgrid.scrollLeft = start + (target - start) * ease(p);
+      if (p < 1) { requestAnimationFrame(animate); }
+      else {
+        if (cgrid.scrollLeft >= halfWidth) cgrid.scrollLeft -= halfWidth;
         isScrolling = false;
       }
     }
     requestAnimationFrame(animate);
   }
 
-  // Duplicate cards for seamless infinite loop
-  var origCards = Array.from(cgrid.children);
-  origCards.forEach(function(card) {
+  // Clone cards for seamless loop
+  Array.from(cgrid.children).forEach(function(card) {
     var clone = card.cloneNode(true);
     clone.setAttribute('aria-hidden', 'true');
     cgrid.appendChild(clone);
   });
 
   cgrid._ccatTimer = setInterval(scrollOneCard, 2500);
-
   cgrid.addEventListener('mouseenter', function() { isPaused = true; });
   cgrid.addEventListener('mouseleave', function() { isPaused = false; });
   cgrid.addEventListener('touchstart', function() { isPaused = true; }, {passive:true});
-  cgrid.addEventListener('touchend',   function() {
+  cgrid.addEventListener('touchend', function() {
     setTimeout(function() { isPaused = false; }, 2000);
   }, {passive:true});
 }
+
 
 async function loadData() {
   // Step 1: render states fallback only — skip fake products to avoid price flash
