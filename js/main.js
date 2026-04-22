@@ -335,17 +335,31 @@ function buildSlide(s, idx) {
       'background:linear-gradient(110deg,#0d2410 0%,#1a3a1e 40%,#0d2410 100%);' +
       'background-size:200% 100%;animation:shimmer 1.6s infinite"></div>';
     // img starts visible (opacity:1) — onload confirms it painted
-    // Using data-hsrc so we can force-reload after DOM insert
-    html += '<img data-hsrc="' + esc2(img) + '"' +
-      ' fetchpriority="' + (isFirst ? 'high' : 'low') + '"' +
-      ' loading="' + (isFirst ? 'eager' : 'lazy') + '"' +
-      ' decoding="async"' +
-      ' alt="' + esc2(s.title || 'Pahadi Roots') + '"' +
-      ' style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;' +
-      'object-position:center top;display:block;z-index:1;opacity:0;transition:opacity .4s ease"' +
-      ' onload="this.style.opacity=\'1\';var sh=this.previousElementSibling;' +
-      'if(sh&&sh.classList.contains(\'hero-img-shimmer\'))sh.style.display=\'none\'"' +
-      ' onerror="imgOptFallback(this,this.dataset.hsrc)">';
+    // First slide: use src directly + opacity:1 + sync decoding for instant paint.
+    // Subsequent slides: use data-hsrc (lazy load on demand).
+    if (isFirst) {
+      html += '<img src="' + esc2(img) + '"' +
+        ' fetchpriority="high"' +
+        ' loading="eager"' +
+        ' decoding="sync"' +
+        ' alt="' + esc2(s.title || 'Pahadi Roots') + '"' +
+        ' style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;' +
+        'object-position:center top;display:block;z-index:1;opacity:1"' +
+        ' onload="var sh=this.previousElementSibling;' +
+        'if(sh&&sh.classList.contains(\'hero-img-shimmer\'))sh.style.display=\'none\'"' +
+        ' onerror="imgOptFallback(this,this.src)">';
+    } else {
+      html += '<img data-hsrc="' + esc2(img) + '"' +
+        ' fetchpriority="low"' +
+        ' loading="lazy"' +
+        ' decoding="async"' +
+        ' alt="' + esc2(s.title || 'Pahadi Roots') + '"' +
+        ' style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;' +
+        'object-position:center top;display:block;z-index:1;opacity:0;transition:opacity .4s ease"' +
+        ' onload="this.style.opacity=\'1\';var sh=this.previousElementSibling;' +
+        'if(sh&&sh.classList.contains(\'hero-img-shimmer\'))sh.style.display=\'none\'"' +
+        ' onerror="imgOptFallback(this,this.dataset.hsrc)">';
+    }
   } else {
     html += '<div style="position:absolute;inset:0;background:linear-gradient(150deg,' +
       '#071a09 0%,#0d2410 30%,#1a3a1e 65%,#2d5233 100%);z-index:0"></div>';
@@ -405,11 +419,12 @@ function buildSlide(s, idx) {
 }
 
 function _heroLoadImg(imgEl) {
-  // Called after img is in the DOM — sets src and handles cache hit
+  // Called after img is in the DOM — sets src and handles cache hit.
+  // Only used for non-first slides (first slide uses src directly).
   var src = imgEl.dataset.hsrc;
   if (!src) return;
   imgEl.src = src;
-  // If already in browser cache, complete fires synchronously before onload
+  // If already in browser cache, complete fires synchronously — skip fade
   if (imgEl.complete && imgEl.naturalWidth) {
     imgEl.style.opacity = '1';
     imgEl.style.transition = 'none';
@@ -474,11 +489,12 @@ function initHeroSlider(settings) {
     stopHeroAutoplay();
   }
 
-  // Hide fallback
+  // Hide fallback instantly — the first real slide is already at opacity:1,
+  // so no cross-fade is needed. Instant hide removes the double-transition gap.
   if (fallback) {
-    fallback.style.transition = 'opacity 0.3s ease';
+    fallback.style.transition = 'none';
     fallback.style.opacity = '0';
-    setTimeout(function() { if (fallback) fallback.style.display = 'none'; }, 320);
+    fallback.style.display = 'none';
   }
 
   // Insert slide HTML
