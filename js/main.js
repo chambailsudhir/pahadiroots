@@ -638,10 +638,18 @@ function initCollectionImages(settings) {
   if (cgrid._t) { clearInterval(cgrid._t); cgrid._t = null; }
   cgrid.innerHTML = '';
 
-  // ── Prewarm all images ────────────────────────────────────────
+  // ── Prewarm ALL images before building cards ─────────────────
+  // Forces browser to fetch & cache every collection image upfront.
+  // This ensures cloned cards (second pass in infinite scroll) show instantly.
+  var _prewarmed = {};
   cats.forEach(function(cat) {
     var u = imgFor(cat);
-    if (u) { var p = new Image(); p.src = u; }
+    if (u && !_prewarmed[u]) {
+      _prewarmed[u] = true;
+      var p = new Image();
+      p.loading = 'eager';
+      p.src = u;
+    }
   });
 
   // ── Build cards ───────────────────────────────────────────────
@@ -670,8 +678,8 @@ function initCollectionImages(settings) {
       var img = document.createElement('img');
       img.className    = 'cc-img';
       img.alt          = label;
-      img.loading      = i < 4 ? 'eager' : 'lazy';
-      img.setAttribute('fetchpriority', i < 4 ? 'high' : 'auto');
+      img.loading      = 'eager';
+      img.setAttribute('fetchpriority', i < 3 ? 'high' : 'auto');
       img.decoding     = 'async';
 
       img.onload = function() {
@@ -709,18 +717,19 @@ function initCollectionImages(settings) {
   Array.from(cgrid.querySelectorAll('.cc')).forEach(function(card) {
     var clone = card.cloneNode(true);
     clone.setAttribute('aria-hidden', 'true');
-    // Re-trigger img load on clones (cloneNode doesn't fire onload)
+    // Cloned images — always eager, show instantly if browser has them cached
     clone.querySelectorAll('img.cc-img').forEach(function(img) {
-      var src = img.src;
+      img.loading = 'eager';
+      var src = img.getAttribute('src') || '';
       if (!src) return;
       if (img.complete && img.naturalWidth) {
+        // Already cached — show immediately
         img.classList.add('loaded');
         var emo = img.previousElementSibling;
         if (emo && emo.classList.contains('cc-emo')) emo.style.opacity = '0';
-      } else {
-        img.src = '';
-        img.src = src;
       }
+      // Do NOT reset src — browser cache handles it.
+      // Resetting to '' forces a fresh network request for uncached images.
     });
     cgrid.appendChild(clone);
   });
