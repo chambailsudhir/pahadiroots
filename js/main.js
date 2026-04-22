@@ -717,21 +717,28 @@ function initCollectionImages(settings) {
   Array.from(cgrid.querySelectorAll('.cc')).forEach(function(card) {
     var clone = card.cloneNode(true);
     clone.setAttribute('aria-hidden', 'true');
-    // Cloned images — always eager, show instantly if browser has them cached
+    cgrid.appendChild(clone);
+    // After appending to DOM, fix images on clone
     clone.querySelectorAll('img.cc-img').forEach(function(img) {
       img.loading = 'eager';
-      var src = img.getAttribute('src') || '';
-      if (!src) return;
       if (img.complete && img.naturalWidth) {
-        // Already cached — show immediately
+        // Already in browser cache — show instantly
         img.classList.add('loaded');
         var emo = img.previousElementSibling;
         if (emo && emo.classList.contains('cc-emo')) emo.style.opacity = '0';
+      } else {
+        // Not cached yet — re-assign src ONCE after DOM insertion to trigger fetch
+        var src = img.getAttribute('src') || '';
+        if (src) {
+          img.src = src;
+          img.addEventListener('load', function() {
+            this.classList.add('loaded');
+            var emo = this.previousElementSibling;
+            if (emo && emo.classList.contains('cc-emo')) emo.style.opacity = '0';
+          }, { once: true });
+        }
       }
-      // Do NOT reset src — browser cache handles it.
-      // Resetting to '' forces a fresh network request for uncached images.
     });
-    cgrid.appendChild(clone);
   });
 
   // ── Auto-scroll ───────────────────────────────────────────────
@@ -764,16 +771,16 @@ function initCollectionImages(settings) {
     cgrid.addEventListener('touchend', function(){ setTimeout(function(){ paused=false; },1800); }, {passive:true});
   }
 
-  // Wait for images before scrolling (max 1.5s)
+  // Wait for ALL images (originals + clones) before scrolling (max 3s)
   var allImgs = Array.from(cgrid.querySelectorAll('img.cc-img'));
   if (!allImgs.length) { startScroll(); return; }
   var left = allImgs.length;
   function done(){ if(--left<=0) startScroll(); }
   allImgs.forEach(function(img){
-    if(img.complete) done();
+    if(img.complete && img.naturalWidth) done();
     else { img.addEventListener('load',done,{once:true}); img.addEventListener('error',done,{once:true}); }
   });
-  setTimeout(startScroll, 1500);
+  setTimeout(startScroll, 3000);
 }
 
 async function loadData() {
