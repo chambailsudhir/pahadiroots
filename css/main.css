@@ -102,7 +102,7 @@ nav#mNav.shadow{box-shadow:0 2px 16px rgba(0,0,0,.08)}
 .tds{font-size:12px;color:rgba(255,255,255,.6)}
 
 /* SECTION BASE */
-section.sec{padding:52px 40px}
+section.sec{padding:52px 40px;content-visibility:auto;contain-intrinsic-size:0 600px}
 .ct{text-align:center;margin-bottom:28px}
 .chip{display:inline-block;font-size:9.5px;font-weight:800;letter-spacing:4px;text-transform:uppercase;color:var(--gd);border:1px solid rgba(200,146,10,.3);padding:5px 14px;border-radius:20px;margin-bottom:10px}
 .sh2{font-family:'Playfair Display',serif;font-size:clamp(22px,3.5vw,40px);color:var(--g);font-weight:700;margin-bottom:8px}
@@ -257,7 +257,7 @@ section.sec{padding:52px 40px}
 .filter-btn.active{background:var(--g);color:#fff;border-color:var(--g)}
 .filter-sort{border:1.5px solid var(--bd);border-radius:20px;padding:7px 14px;font-size:12.5px;font-weight:700;color:var(--tx2);background:#fff;font-family:'Lato',sans-serif}
 .pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:28px;max-width:1400px;margin:0 auto}
-.pcard{background:#fff;border:1px solid #e8e0d0;border-radius:16px;overflow:hidden;transition:transform .3s,box-shadow .3s;position:relative;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.06);display:flex;flex-direction:column}
+.pcard{background:#fff;border:1px solid #e8e0d0;border-radius:16px;overflow:hidden;transition:transform .3s,box-shadow .3s;position:relative;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.06);display:flex;flex-direction:column;contain:layout style}
 .pcard:hover{transform:translateY(-6px);box-shadow:0 16px 40px rgba(0,0,0,.14)}
 .piw{position:relative;aspect-ratio:4/5;width:100%;overflow:hidden;background:#f5f0e8}
 .pemo{font-size:54px;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:0}
@@ -2867,3 +2867,5 @@ html[data-theme="valley"] .hslide-btn-primary { background: #4a7c59; }
 }
 body.dark #mobMegaColl a, body.dark #mobMegaStates a { color: #d4e8d4; }
 body.dark #mobMegaColl a:hover, body.dark #mobMegaStates a:hover { background: rgba(255,255,255,.06); color: #7ec87e; }
+
+.coll-bg,.rev-bg{content-visibility:visible;contain-intrinsic-size:none}

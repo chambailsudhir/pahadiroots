@@ -141,7 +141,7 @@ body.dark .cp-sec-title::after{background:linear-gradient(to right,#1e3a22,trans
 
 <nav id="mNav">
   <a href="https://pahadiroots.com" class="logo">
-    <div class="logo-icon"><img src="https://ulyrhnpoiypuvaurlqqi.supabase.co/storage/v1/object/public/pahadi-images/5%20pahadi%20roots.png" alt="5 Pahadi Roots" style="height:40px;width:40px;object-fit:contain" onerror="this.style.display='none'"></div>
+    <div class="logo-icon"><img src="https://ulyrhnpoiypuvaurlqqi.supabase.co/storage/v1/object/public/pahadi-images/5%20pahadi%20roots.png" alt="5 Pahadi Roots" width="40" height="40" fetchpriority="high" loading="eager" decoding="sync" style="height:40px;width:40px;object-fit:contain" onerror="this.style.display:'none'"></div>
     <div class="logo-words"><div class="logo-name">5 Pahadi Roots</div><div class="logo-tl">Himalayan Natural Store</div></div>
   </a>
   <ul class="nav-links">
@@ -616,7 +616,7 @@ function _cpRenderHero(meta, imgUrl) {
   var pills = (meta.pills||[]).map(function(p){ return '<span class="cp-pill">'+p+'</span>'; }).join('');
   var imgHtml = imgUrl ? '<img class="cp-hero-bg" src="'+imgUrl+'" alt="'+meta.label+'" loading="eager" onload="this.classList.add(\'loaded\')" onerror="this.style.display=\'none\'">' : '';
   var iconHtml = imgUrl
-    ? '<img class="cp-cat-icon" src="'+imgUrl+'" alt="'+meta.label+'" loading="eager">'
+    ? '<img class="cp-cat-icon" src="'+imgUrl+'" alt="'+meta.label+'" loading="eager" decoding="async">'
     : '<div class="cp-cat-icon-emo">'+meta.emoji+'</div>';
 
   document.getElementById('cpHero').innerHTML =

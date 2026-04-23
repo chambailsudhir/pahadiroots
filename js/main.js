@@ -259,11 +259,21 @@ function imgOpt(url, opts) {
       u.searchParams.set('fit', 'crop');
       return u.toString();
     }
-    // Supabase Storage — do NOT add transform params unless Image Transformation
-    // add-on is enabled on the project. Appending ?width= without the add-on
-    // causes Supabase to return a 400 error and the image fails to load entirely.
-    // Return the raw URL so images always load correctly.
+    // Supabase Storage — use /render/image/public/ path for transform if available.
+    // Falls back to raw URL if not, ensuring images always load.
     if (url.indexOf('supabase.co/storage') !== -1) {
+      try {
+        // Convert /object/public/ to /render/image/public/ for image transforms
+        var renderUrl = url.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/');
+        if (renderUrl !== url) {
+          var u2 = new URL(renderUrl);
+          u2.searchParams.set('width', w);
+          u2.searchParams.set('quality', q);
+          u2.searchParams.set('format', 'webp');
+          u2.searchParams.set('resize', 'cover');
+          return u2.toString();
+        }
+      } catch(e) {}
       return url;
     }
   } catch(e) {}
@@ -553,6 +563,23 @@ function startHeroAutoplay() {
 function stopHeroAutoplay() { if (_heroSlideTimer) { clearInterval(_heroSlideTimer); _heroSlideTimer = null; } }
 
 document.addEventListener('DOMContentLoaded', function() {
+  // ── Hover-intent prefetch: preload key pages on first hover ──
+  var _prefetchDone = {};
+  function prefetchPage(href) {
+    if (_prefetchDone[href]) return;
+    _prefetchDone[href] = true;
+    var l = document.createElement('link');
+    l.rel = 'prefetch'; l.href = href;
+    document.head.appendChild(l);
+  }
+  // Prefetch product page when any product card is hovered
+  document.addEventListener('mouseover', function(e) {
+    var pcard = e.target.closest('.pcard');
+    if (pcard) { prefetchPage('/product.html'); return; }
+    var ccell = e.target.closest('.cc-cell');
+    if (ccell) { prefetchPage('/category.html'); return; }
+  }, { passive: true });
+
   var track = document.getElementById('hsliderTrack');
   if (!track) return;
   track.addEventListener('mouseenter', stopHeroAutoplay);
@@ -728,7 +755,7 @@ function initCollectionImages(settings) {
     cgrid.appendChild(clone);
     // After appending to DOM, fix images on clone
     clone.querySelectorAll('img.cc-img').forEach(function(img) {
-      img.loading = 'eager';
+      img.loading = 'eager'; img.decoding = 'async';
       if (img.complete && img.naturalWidth) {
         // Already in browser cache — show instantly
         img.classList.add('loaded');
@@ -1638,7 +1665,7 @@ function renderStates() {
   tb.innerHTML = STATES.map(function(s, i) {
     var imgSrc = (s._uploadedImgs && s._uploadedImgs[0]) || s._uploadedImg || s.tab_photo_url || '';
     var imgHtml = imgSrc
-      ? '<div class="stab-thumb skel skel-dark"><img src="' + imgOpt(imgSrc,{w:80,q:70}) + '" alt="' + s.name + '" loading="lazy" onload="this.closest(\'.stab-thumb\').classList.add(\'img-ready\')" onerror="this.style.display=\'none\'"></div>'
+      ? '<div class="stab-thumb skel skel-dark"><img src="' + imgOpt(imgSrc,{w:80,q:70}) + '" alt="' + s.name + '" loading="lazy" decoding="async" onload="this.closest(\'.stab-thumb\').classList.add(\'img-ready\')" onerror="this.style.display=\'none\'"></div>'
       : '<div class="stab-thumb stab-thumb-emo">' + s.emoji + '</div>';
     return '<button class="stab' + (i===0?' active':'') + '" onclick="swState(\'' + s.id + '\')" id="t-' + s.id + '">' +
       imgHtml +
@@ -1663,7 +1690,7 @@ function renderStates() {
     var photoHtml;
     if (stateImgs.length > 1) {
       var slidesHtml = stateImgs.map(function(url, si) {
-        return '<img class="sshdr-img' + (si===0?' active':'') + '" src="' + imgOpt(url,{w:800,q:75}) + '" alt="' + s.name + '" loading="lazy" onerror="this.style.display=\'none\'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;display:block;opacity:' + (si===0?'1':'0') + ';transition:opacity 1s ease;z-index:1">';
+        return '<img class="sshdr-img' + (si===0?' active':'') + '" src="' + imgOpt(url,{w:800,q:75}) + '" alt="' + s.name + '" loading="lazy" decoding="async" onerror="this.style.display=\'none\'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;display:block;opacity:' + (si===0?'1':'0') + ';transition:opacity 1s ease;z-index:1">';
       }).join('');
       var dotsHtml = stateImgs.map(function(_,si){
         return '<span class="sshdr-dot' + (si===0?' active':'') + '" onclick="event.stopPropagation();goStateSlide(\'' + s.id + '\',' + si + ')"></span>';
@@ -1721,7 +1748,7 @@ function renderStoryCards(activeId) {
   el.innerHTML = storyStates.map(function(s) {
     var imgSrc = (s._uploadedImgs && s._uploadedImgs[0]) || s._uploadedImg || s.tab_photo_url || '';
     var imgHtml = imgSrc
-      ? '<img class="story-card-img" src="' + imgOpt(imgSrc,{w:400,q:75}) + '" alt="' + s.name + '" loading="lazy" style="opacity:0;transition:opacity .4s" onload="this.style.opacity=1" onerror="this.style.display=\'none\'">'
+      ? '<img class="story-card-img" src="' + imgOpt(imgSrc,{w:400,q:75}) + '" alt="' + s.name + '" loading="lazy" decoding="async" style="opacity:0;transition:opacity .4s" onload="this.style.opacity=1" onerror="this.style.display=\'none\'">'
       : '<div class="story-card-emo" style="background:' + (s.panel_bg||'linear-gradient(135deg,#1a3a1e,#2d5233)') + '">' + s.emoji + '</div>';
     var snippet = _storySnippets[s.id] || s.description.substring(0, 90) + '…';
     var isActive = s.id === (activeId || STATES[0].id);
@@ -2736,7 +2763,7 @@ function renderUpsell() {
   section.style.display = 'block';
   strip.innerHTML = suggestions.map(function(p) {
     var imgHtml = p.image_url
-      ? '<div style="position:relative;width:100%;height:100%"><div class="pimg-skel" style="position:absolute;inset:0;border-radius:8px"></div><img src="'+imgOpt(p.image_url,{w:120,q:70})+'" loading="lazy" style="position:relative;z-index:1;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .4s" onload="this.style.opacity=1;var s=this.previousElementSibling;if(s)s.style.display=\'none\'" onerror="this.style.display=\'none\'"></div>'
+      ? '<div style="position:relative;width:100%;height:100%"><div class="pimg-skel" style="position:absolute;inset:0;border-radius:8px"></div><img src="'+imgOpt(p.image_url,{w:120,q:70})+'" loading="lazy" decoding="async" style="position:relative;z-index:1;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .4s" onload="this.style.opacity=1;var s=this.previousElementSibling;if(s)s.style.display=\'none\'" onerror="this.style.display=\'none\'"></div>'
       : '<span style="font-size:28px">'+(p.emoji||'🌿')+'</span>';
     var addBtn = '<button onclick="addToCart(\'' + p.id + '\')" style="margin-top:6px;background:var(--g);color:#fff;border:none;border-radius:6px;padding:4px 10px;font-size:11px;font-weight:600;cursor:pointer;width:100%">+ Add</button>';
     return '<div class="cu-item"><div class="cu-img">'+imgHtml+'</div><div class="cu-name">'+p.name+'</div><div class="cu-price">&#8377;'+p.price+'</div>'+addBtn+'</div>';
@@ -2933,7 +2960,7 @@ function renderRecentlyViewed() {
     return '<div class="rv-mini" onclick="goToProductPage(\'' + getProductSlug(p) + '\')" style="cursor:pointer">' +
       '<div class="rv-mini-img" style="position:relative">' +
         (p.image_url
-          ? '<div class="pimg-skel" style="position:absolute;inset:0;border-radius:8px"></div><img src="' + imgOpt(p.image_url,{w:80,q:70}) + '" alt="' + p.name + '" loading="lazy" style="position:relative;z-index:1;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .4s" onload="this.style.opacity=1;var s=this.previousElementSibling;if(s)s.style.display=\'none\'" onerror="this.style.display=\'none\'">'
+          ? '<div class="pimg-skel" style="position:absolute;inset:0;border-radius:8px"></div><img src="' + imgOpt(p.image_url,{w:80,q:70}) + '" alt="' + p.name + '" loading="lazy" decoding="async" style="position:relative;z-index:1;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .4s" onload="this.style.opacity=1;var s=this.previousElementSibling;if(s)s.style.display=\'none\'" onerror="this.style.display=\'none\'">'
           : (p.emoji||'🌿'))
       + '</div>' +
       '<div class="rv-mini-info"><div class="rv-mini-name">' + p.name + '</div><div class="rv-mini-price">₹' + p.price + '</div></div>' +
@@ -3366,7 +3393,7 @@ function observeProductImages() {
       if (src) { img.src = src; img.removeAttribute('data-lazysrc'); }
       obs.unobserve(img);
     });
-  }, { rootMargin: '300px 0px' }); // preload 300px before entering viewport
+  }, { rootMargin: '400px 0px', threshold: 0 }); // preload 400px before entering viewport
 
   imgs.forEach(function(img) {
     // If already visible in viewport — load immediately, skip observer
