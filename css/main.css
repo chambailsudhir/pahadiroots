@@ -154,26 +154,26 @@ section.sec{padding:52px 40px}
 .cgrid-arrow.right{right:-18px}
 @media(max-width:640px){.cgrid-arrow{display:none}}
 
-/* Individual card — white, border, image top, name bottom */
+/* Individual card — layout only, no border/bg/overflow here (cc-box owns that) */
 .cc{
   flex:0 0 200px;
   width:200px;
   background:transparent;
-  border-radius:14px;
-  border:1.5px solid #e8e8e8;
-  overflow:hidden;
+  border-radius:0;
+  border:none;
+  overflow:visible;
   cursor:pointer;
   text-decoration:none;
   display:flex;
   flex-direction:column;
   align-items:center;
-  transition:box-shadow .25s, transform .25s, border-color .25s;
-  box-shadow:0 1px 6px rgba(0,0,0,.06);
+  transition:transform .25s;
+  box-shadow:none;
 }
 .cc:hover{
   transform:translateY(-4px);
-  box-shadow:0 8px 28px rgba(0,0,0,.13);
-  border-color:#c8c0b0;
+  box-shadow:none;
+  border-color:transparent;
 }
 
 /* Image area — square, product centered */
