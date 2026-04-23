@@ -102,7 +102,7 @@ nav#mNav.shadow{box-shadow:0 2px 16px rgba(0,0,0,.08)}
 .tds{font-size:12px;color:rgba(255,255,255,.6)}
 
 /* SECTION BASE */
-section.sec{padding:52px 40px;content-visibility:auto;contain-intrinsic-size:0 600px}
+section.sec{padding:52px 40px}
 .ct{text-align:center;margin-bottom:28px}
 .chip{display:inline-block;font-size:9.5px;font-weight:800;letter-spacing:4px;text-transform:uppercase;color:var(--gd);border:1px solid rgba(200,146,10,.3);padding:5px 14px;border-radius:20px;margin-bottom:10px}
 .sh2{font-family:'Playfair Display',serif;font-size:clamp(22px,3.5vw,40px);color:var(--g);font-weight:700;margin-bottom:8px}
@@ -257,7 +257,7 @@ section.sec{padding:52px 40px;content-visibility:auto;contain-intrinsic-size:0 6
 .filter-btn.active{background:var(--g);color:#fff;border-color:var(--g)}
 .filter-sort{border:1.5px solid var(--bd);border-radius:20px;padding:7px 14px;font-size:12.5px;font-weight:700;color:var(--tx2);background:#fff;font-family:'Lato',sans-serif}
 .pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:28px;max-width:1400px;margin:0 auto}
-.pcard{background:#fff;border:1px solid #e8e0d0;border-radius:16px;overflow:hidden;transition:transform .3s,box-shadow .3s;position:relative;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.06);display:flex;flex-direction:column;contain:layout style}
+.pcard{background:#fff;border:1px solid #e8e0d0;border-radius:16px;overflow:hidden;transition:transform .3s,box-shadow .3s;position:relative;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.06);display:flex;flex-direction:column}
 .pcard:hover{transform:translateY(-6px);box-shadow:0 16px 40px rgba(0,0,0,.14)}
 .piw{position:relative;aspect-ratio:4/5;width:100%;overflow:hidden;background:#f5f0e8}
 .pemo{font-size:54px;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:0}
@@ -304,23 +304,21 @@ section.sec{padding:52px 40px;content-visibility:auto;contain-intrinsic-size:0 6
 .state-sec>.ct,.state-sec>#regions{text-align:left;margin-bottom:0}
 .state-sec .sh2{color:var(--g);font-size:clamp(28px,4vw,52px)}
 .state-sec .ssub{color:var(--tx2);margin-bottom:24px}
-/* ── REGION STORYTELLING CARDS — copied exactly from reference Next.js site ── */
-.story-card{border-radius:14px;overflow:hidden;position:relative;cursor:pointer;border:none;padding:0;background:none;box-shadow:0 3px 14px rgba(0,0,0,.1);transform:translateY(0);transition:transform .3s,box-shadow .3s;text-decoration:none;color:inherit;min-width:0;display:block;width:100%}
-.story-card:hover{transform:translateY(-5px);box-shadow:0 14px 36px rgba(0,0,0,.18)}
-/* Image wrapper — matches reference: position relative, 120px height, image absolute fill */
-.sc-img-wrap{width:100%;height:120px;overflow:hidden;background:#1a3a1e;position:relative;display:flex;align-items:center;justify-content:center;font-size:48px}
-.sc-img-wrap img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;display:block}
-.sc-img-emo{position:relative;z-index:1;opacity:.7;user-select:none}
-/* Body — white background, transitions to dark green when active */
-.story-card-body{padding:10px 12px 12px;background:#fff;transition:background .22s}
-.story-card-name{font-family:'Playfair Display',serif;font-size:12px;font-weight:700;color:#1a3a1e;margin-bottom:2px}
-.story-card-tag{font-size:9px;color:#c8920a;font-weight:700;letter-spacing:.5px;margin-bottom:4px}
-.story-card-line{font-size:10px;color:#7a7a7a;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-/* Active state — matches reference isActive styles exactly */
-.story-card.active-state{box-shadow:0 12px 32px rgba(0,0,0,.22)!important;transform:translateY(-5px)!important}
-.story-card.active-state .story-card-body{background:#1a3a1e}
+/* ── REGION STORYTELLING CARDS ──────────────────── */
+.story-card{flex:0 0 auto;width:200px;border-radius:14px;overflow:hidden;position:relative;cursor:pointer;transition:transform .3s,box-shadow .3s;box-shadow:0 3px 14px rgba(0,0,0,.1)}
+.story-card:hover{transform:translateY(-5px);box-shadow:0 12px 32px rgba(0,0,0,.18)}
+/* Skeleton shimmer on top of story card img area before load */
+.story-card:not(.img-ready)::before{content:'';position:absolute;top:0;left:0;right:0;height:130px;z-index:2;background:linear-gradient(90deg,#d4cfc7 25%,#e8e4dc 50%,#d4cfc7 75%);background-size:200% 100%;animation:skelshimmer 1.4s infinite;pointer-events:none}
+.story-card.img-ready::before{display:none}
+.story-card-img{width:100%;height:130px;object-fit:cover;object-position:center top;display:block}
+.story-card-emo{width:100%;height:130px;display:flex;align-items:center;justify-content:center;font-size:52px}
+.story-card-body{padding:12px 14px 14px;background:#fff}
+.story-card-name{font-family:'Playfair Display',serif;font-size:13px;font-weight:700;color:var(--g);margin-bottom:3px}
+.story-card-tag{font-size:10px;color:var(--gd);font-weight:700;letter-spacing:.5px;margin-bottom:5px}
+.story-card-line{font-size:11px;color:var(--tx3);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.story-card.active-state .story-card-body{background:var(--g)}
 .story-card.active-state .story-card-name{color:#fff}
-.story-card.active-state .story-card-tag{color:#e8b84b}
+.story-card.active-state .story-card-tag{color:var(--gd2)}
 .story-card.active-state .story-card-line{color:rgba(255,255,255,.65)}
 #storyCards::-webkit-scrollbar{display:none}
 .stabs{display:flex;flex-wrap:wrap;overflow-x:visible;scrollbar-width:none;background:#f0e8d4;border:none;padding:8px 8px 0;gap:6px}
@@ -2792,11 +2790,14 @@ html[data-theme="valley"] .hslide-btn-primary { background: #4a7c59; }
 .stab-thumb.img-ready img { opacity: 1; }
 .stab-thumb.skel::before { border-radius: 0; }
 
-/* State header image — no opacity fade needed, image shows directly */
-.shdr-img-col img { opacity: 1; transition: transform 10s; }
+/* State header image */
+.shdr-img-col img { opacity: 0; transition: opacity .6s ease; }
+.shdr-img-col.img-ready img { opacity: 1; }
 .shdr-img-col.skel::before { border-radius: 0; z-index: 2; }
 
-/* Story card image fade now handled via .sc-img-wrap img */
+/* Story card image */
+.story-card-img { opacity: 0; transition: opacity .4s ease; display: block; }
+.story-card.img-ready .story-card-img { opacity: 1; }
 /* Hero banner background — starts as solid dark, fades in */
 .hslide[data-img-ready="true"] { transition: background-image .001s; }
 
@@ -2816,7 +2817,7 @@ html[data-theme="valley"] .hslide-btn-primary { background: #4a7c59; }
 .ccat-v2-box img,
 .stab-thumb img,
 .shdr-img-col img,
-.sc-img-wrap img,
+.story-card-img,
 .qv-img-wrap img {
   will-change: opacity;
   transform: translateZ(0); /* force compositing layer */
@@ -2855,7 +2856,7 @@ html[data-theme="valley"] .hslide-btn-primary { background: #4a7c59; }
 @media (prefers-reduced-motion: reduce) {
   .piw img,
   .ccat-v2-box img,
-  .sc-img-wrap img { transition: none !important; opacity: 1 !important; }
+  .story-card-img { transition: none !important; opacity: 1 !important; }
   .skel::before { animation: none !important; }
 }
 
@@ -2866,5 +2867,3 @@ html[data-theme="valley"] .hslide-btn-primary { background: #4a7c59; }
 }
 body.dark #mobMegaColl a, body.dark #mobMegaStates a { color: #d4e8d4; }
 body.dark #mobMegaColl a:hover, body.dark #mobMegaStates a:hover { background: rgba(255,255,255,.06); color: #7ec87e; }
-
-.coll-bg,.rev-bg{content-visibility:visible;contain-intrinsic-size:none}

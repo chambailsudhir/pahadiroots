@@ -138,8 +138,6 @@
 <!-- Prefetch likely next pages so navigation feels instant -->
 <link rel="prefetch" href="/our-story">
 <link rel="prefetch" href="/all-products.html">
-<link rel="prefetch" href="/product.html">
-<link rel="prefetch" href="/category.html">
 <link rel="prefetch" href="/js/main.js">
 <link rel="prefetch" href="/css/main.css">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Lato:wght@300;400;700&family=Nunito:wght@400;600;700;800;900&display=swap&font-display=swap" rel="stylesheet" media="print" onload="this.media='all'">
@@ -438,7 +436,7 @@
 </div>
 <nav id="mNav">
   <a href="https://pahadiroots.com" class="logo">
-    <div class="logo-icon"><img src="https://ulyrhnpoiypuvaurlqqi.supabase.co/storage/v1/object/public/pahadi-images/5%20pahadi%20roots.png" alt="5 Pahadi Roots" width="40" height="40" fetchpriority="high" loading="eager" decoding="sync" style="height:40px;width:40px;object-fit:contain" onerror="this.style.display:'none'"></div>
+    <div class="logo-icon"><img src="https://ulyrhnpoiypuvaurlqqi.supabase.co/storage/v1/object/public/pahadi-images/5%20pahadi%20roots.png" alt="5 Pahadi Roots" style="height:40px;width:40px;object-fit:contain" onerror="this.style.display='none'"></div>
     <div class="logo-words"><div class="logo-name">5 Pahadi Roots</div><div class="logo-tl">Himalayan Natural Store</div></div>
   </a>
   <ul class="nav-links">
@@ -698,13 +696,13 @@
     <div>
       <div class="chip">Explore by Region</div>
       <h2 class="sh2" style="margin-bottom:6px">Discover the Himalayas</h2>
-      <p class="ssub" style="margin-bottom:0">Each state carries its own story — ancient forests, sacred rivers, and flavours shaped by altitude.<br>Click to explore.</p>
+      <p class="ssub" style="margin-bottom:0">Each state carries its own story — ancient forests, sacred rivers, and flavours shaped by altitude.</p>
     </div>
     <a href="/all-states.html" style="display:inline-flex;align-items:center;gap:7px;padding:11px 22px;background:var(--g);color:#fff;border-radius:22px;text-decoration:none;font-weight:800;font-family:'Lato',sans-serif;font-size:13px;letter-spacing:.3px;flex-shrink:0;box-shadow:0 3px 14px rgba(26,58,30,.22);transition:all .2s" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 7px 22px rgba(26,58,30,.32)'" onmouseout="this.style.transform='';this.style.boxShadow='0 3px 14px rgba(26,58,30,.22)'">🗺️ View All States →</a>
   </div>
-  <!-- Region Storytelling Cards — wrapping grid of all states -->
-  <div id="storyCards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px;padding:0 0 18px;margin-bottom:8px"></div>
-  <div class="stabs" id="stabs" style="display:none !important"></div>
+  <!-- Region Storytelling Cards — shows 5, rest on all-states.html -->
+  <div id="storyCards" style="display:flex;gap:14px;overflow-x:auto;padding:0 0 18px;scrollbar-width:none;margin-bottom:8px"></div>
+  <div class="stabs" id="stabs"></div>
   <div class="spnls" id="spnls"></div>
 </section>
 <section class="sec why-bg">
@@ -1294,49 +1292,6 @@
 <div class="cov" id="cov" onclick="closeCart()" style="display:none"></div>
 <div class="toast" id="toast"></div>
 <script src="/js/main.js"></script>
-<script>
-/* Preload state cover images from product cache — eliminates blank state section on first render */
-(function() {
-  try {
-    var cached = JSON.parse(localStorage.getItem('pr_products_cache') || 'null');
-    if (!cached || !cached.products) return;
-    // imgOpt mirror for preload (must stay in sync with main.js imgOpt)
-    function _imgOpt(url, w, q) {
-      if (!url) return url;
-      try {
-        if (url.indexOf('supabase.co/storage') !== -1) {
-          var r = url.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/');
-          if (r !== url) {
-            var u = new URL(r);
-            u.searchParams.set('width', w); u.searchParams.set('quality', q);
-            u.searchParams.set('format', 'webp'); u.searchParams.set('resize', 'cover');
-            return u.toString();
-          }
-        } else if (url.indexOf('images.unsplash.com') !== -1) {
-          var u2 = new URL(url);
-          u2.searchParams.set('w', w); u2.searchParams.set('q', q);
-          u2.searchParams.set('fm', 'webp'); u2.searchParams.set('auto', 'format,compress');
-          u2.searchParams.set('fit', 'crop'); return u2.toString();
-        }
-      } catch(e) {}
-      return url;
-    }
-    // Preload first 5 state images (visible in story cards + first tab)
-    var stateCache = JSON.parse(localStorage.getItem('pr_states_cache') || 'null');
-    if (stateCache && stateCache.states) {
-      stateCache.states.slice(0, 5).forEach(function(st, i) {
-        var src = st.cover_photo_url || st.tab_photo_url || '';
-        if (!src) return;
-        var pl = document.createElement('link');
-        pl.rel = 'preload'; pl.as = 'image';
-        pl.href = _imgOpt(src, i === 0 ? 800 : 400, i === 0 ? 75 : 72);
-        if (i === 0) pl.setAttribute('fetchpriority', 'high');
-        document.head.appendChild(pl);
-      });
-    }
-  } catch(e) {}
-})();
-</script>
 
 
 
@@ -1389,7 +1344,7 @@
     <!-- Header -->
     <div style="background:linear-gradient(135deg,#1a3a1e,#2d6a4f);padding:22px 20px 18px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:2">
       <div style="display:flex;align-items:center;gap:10px">
-        <img src="https://ulyrhnpoiypuvaurlqqi.supabase.co/storage/v1/object/public/pahadi-images/5%20pahadi%20roots.png" alt="5 Pahadi Roots" width="36" height="36" loading="eager" decoding="async" style="height:36px;width:36px;object-fit:contain" onerror="this.style.display:'none'">
+        <img src="https://ulyrhnpoiypuvaurlqqi.supabase.co/storage/v1/object/public/pahadi-images/5%20pahadi%20roots.png" alt="5 Pahadi Roots" style="height:36px;width:36px;object-fit:contain" onerror="this.style.display='none'">
         <div>
           <div style="font-size:15px;font-weight:800;color:#fff;letter-spacing:.2px">5 Pahadi Roots</div>
           <div style="font-size:11px;color:rgba(255,255,255,.65);margin-top:1px">Himalayan Natural Store</div>

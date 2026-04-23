@@ -247,36 +247,23 @@ function imgOpt(url, opts) {
   if (!url) return url;
   opts = opts || {};
   var w = opts.w || 400;
-  var h = opts.h || null;
   var q = opts.q || 80;
   try {
-    // Unsplash CDN — supports w, h, q, fm, auto params natively
+    // Unsplash CDN — supports w, q, fm, auto params natively
     if (url.indexOf('images.unsplash.com') !== -1) {
       var u = new URL(url);
       u.searchParams.set('w', w);
-      if (h) u.searchParams.set('h', h);
       u.searchParams.set('q', q);
       u.searchParams.set('fm', 'webp');
       u.searchParams.set('auto', 'format,compress');
       u.searchParams.set('fit', 'crop');
       return u.toString();
     }
-    // Supabase Storage — use /render/image/public/ path for transform if available.
-    // Falls back to raw URL if not, ensuring images always load.
+    // Supabase Storage — do NOT add transform params unless Image Transformation
+    // add-on is enabled on the project. Appending ?width= without the add-on
+    // causes Supabase to return a 400 error and the image fails to load entirely.
+    // Return the raw URL so images always load correctly.
     if (url.indexOf('supabase.co/storage') !== -1) {
-      try {
-        // Convert /object/public/ to /render/image/public/ for image transforms
-        var renderUrl = url.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/');
-        if (renderUrl !== url) {
-          var u2 = new URL(renderUrl);
-          u2.searchParams.set('width', w);
-          if (h) u2.searchParams.set('height', h);
-          u2.searchParams.set('quality', q);
-          u2.searchParams.set('format', 'webp');
-          u2.searchParams.set('resize', 'cover');
-          return u2.toString();
-        }
-      } catch(e) {}
       return url;
     }
   } catch(e) {}
@@ -566,23 +553,6 @@ function startHeroAutoplay() {
 function stopHeroAutoplay() { if (_heroSlideTimer) { clearInterval(_heroSlideTimer); _heroSlideTimer = null; } }
 
 document.addEventListener('DOMContentLoaded', function() {
-  // ── Hover-intent prefetch: preload key pages on first hover ──
-  var _prefetchDone = {};
-  function prefetchPage(href) {
-    if (_prefetchDone[href]) return;
-    _prefetchDone[href] = true;
-    var l = document.createElement('link');
-    l.rel = 'prefetch'; l.href = href;
-    document.head.appendChild(l);
-  }
-  // Prefetch product page when any product card is hovered
-  document.addEventListener('mouseover', function(e) {
-    var pcard = e.target.closest('.pcard');
-    if (pcard) { prefetchPage('/product.html'); return; }
-    var ccell = e.target.closest('.cc-cell');
-    if (ccell) { prefetchPage('/category.html'); return; }
-  }, { passive: true });
-
   var track = document.getElementById('hsliderTrack');
   if (!track) return;
   track.addEventListener('mouseenter', stopHeroAutoplay);
@@ -758,7 +728,7 @@ function initCollectionImages(settings) {
     cgrid.appendChild(clone);
     // After appending to DOM, fix images on clone
     clone.querySelectorAll('img.cc-img').forEach(function(img) {
-      img.loading = 'eager'; img.decoding = 'async';
+      img.loading = 'eager';
       if (img.complete && img.naturalWidth) {
         // Already in browser cache — show instantly
         img.classList.add('loaded');
@@ -824,7 +794,7 @@ function initCollectionImages(settings) {
 async function loadData() {
   // Step 1: render states fallback only — skip fake products to avoid price flash
   STATES   = FALLBACK_STATES.map(s => Object.assign({}, s));
-  renderStates(); renderStoryCards(); uCart(); observeRv();
+  renderStates(); uCart(); observeRv();
   initAllStateSlides(); initProductHoverImages();
 
   // ── INSTANT RENDER from localStorage cache (stale-while-revalidate) ──
@@ -1135,21 +1105,11 @@ async function loadData() {
           })
         };
         localStorage.setItem('pr_products_cache', JSON.stringify(cachePayload));
-        // Also cache state image URLs for preloading on next page visit
-        try {
-          var statesCachePayload = {
-            ts: Date.now(),
-            states: STATES.map(function(s) {
-              return { id: s.id, cover_photo_url: s.cover_photo_url || '', tab_photo_url: s.tab_photo_url || '' };
-            })
-          };
-          localStorage.setItem('pr_states_cache', JSON.stringify(statesCachePayload));
-        } catch(e) {}
       } catch(e) {}
       // Preserve currently active state before re-render
       var activeStateEl = document.querySelector('.spnl.active');
       var activeStateId = activeStateEl ? activeStateEl.id.replace('p-','') : null;
-      renderProds(); renderStates(); renderStoryCards(); observeRv(); injectProductSchema(); renderUpsell();
+      renderProds(); renderStates(); observeRv(); injectProductSchema(); renderUpsell();
       refreshMegaMenu(); // Rebuild mega menu with real product categories
       // Re-render collection cards now that products are loaded (removes fake categories)
       if (window.SITE_SETTINGS && document.getElementById('cgrid')) {
@@ -1678,7 +1638,7 @@ function renderStates() {
   tb.innerHTML = STATES.map(function(s, i) {
     var imgSrc = (s._uploadedImgs && s._uploadedImgs[0]) || s._uploadedImg || s.tab_photo_url || '';
     var imgHtml = imgSrc
-      ? '<div class="stab-thumb skel skel-dark"><img src="' + imgOpt(imgSrc,{w:80,q:70}) + '" alt="' + s.name + '" loading="' + (i < 4 ? 'eager' : 'lazy') + '" decoding="' + (i < 4 ? 'sync' : 'async') + '" onload="this.closest(\'.stab-thumb\').classList.add(\'img-ready\')" onerror="this.style.display=\'none\'"></div>'
+      ? '<div class="stab-thumb skel skel-dark"><img src="' + imgOpt(imgSrc,{w:80,q:70}) + '" alt="' + s.name + '" loading="lazy" onload="this.closest(\'.stab-thumb\').classList.add(\'img-ready\')" onerror="this.style.display=\'none\'"></div>'
       : '<div class="stab-thumb stab-thumb-emo">' + s.emoji + '</div>';
     return '<button class="stab' + (i===0?' active':'') + '" onclick="swState(\'' + s.id + '\')" id="t-' + s.id + '">' +
       imgHtml +
@@ -1703,13 +1663,12 @@ function renderStates() {
     var photoHtml;
     if (stateImgs.length > 1) {
       var slidesHtml = stateImgs.map(function(url, si) {
-        var onloadAttr = si===0 ? ' onload="this.parentNode.classList.add(\'img-ready\')"' : '';
-        return '<img class="sshdr-img' + (si===0?' active':'') + '" src="' + imgOpt(url,{w:800,q:75}) + '" alt="' + s.name + '" loading="' + (i===0&&si===0?'eager':'lazy') + '" decoding="' + (i===0&&si===0?'sync':'async') + '" ' + (i===0&&si===0?'fetchpriority="high" ':'') + onloadAttr + ' onerror="this.style.display=\'none\'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;display:block;opacity:' + (si===0?'1':'0') + ';transition:opacity 1s ease;z-index:1">';
+        return '<img class="sshdr-img' + (si===0?' active':'') + '" src="' + imgOpt(url,{w:800,q:75}) + '" alt="' + s.name + '" loading="lazy" onerror="this.style.display=\'none\'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;display:block;opacity:' + (si===0?'1':'0') + ';transition:opacity 1s ease;z-index:1">';
       }).join('');
       var dotsHtml = stateImgs.map(function(_,si){
         return '<span class="sshdr-dot' + (si===0?' active':'') + '" onclick="event.stopPropagation();goStateSlide(\'' + s.id + '\',' + si + ')"></span>';
       }).join('');
-      photoHtml = '<div class="shdr-img-col sshdr img-ready" id="sshdr-' + s.id + '" data-sid="' + s.id + '" data-total="' + stateImgs.length + '" data-cur="0" style="position:relative;background:' + bg + '">' +
+      photoHtml = '<div class="shdr-img-col sshdr" id="sshdr-' + s.id + '" data-sid="' + s.id + '" data-total="' + stateImgs.length + '" data-cur="0" style="position:relative;background:' + bg + '">' +
         '<div class="shdr-fallback" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:80px;opacity:.25">' + s.emoji + '</div>' +
         slidesHtml +
         '<div style="position:absolute;inset:0;background:linear-gradient(to right,rgba(0,0,0,.15),transparent);z-index:2;pointer-events:none"></div>' +
@@ -1718,7 +1677,7 @@ function renderStates() {
     } else {
       photoHtml = '<div class="shdr-img-col" style="position:relative;background:' + bg + '">' +
         '<div class="shdr-fallback" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:80px;opacity:.35">' + s.emoji + '</div>' +
-        (coverSrc ? '<img src="' + imgOpt(coverSrc,{w:800,q:75}) + '" alt="' + s.name + ' culture" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;display:block" loading="' + (i===0?'eager':'lazy') + '" decoding="' + (i===0?'sync':'async') + '" ' + (i===0?'fetchpriority="high" ':'') + 'onload="this.parentNode.classList.add(\'img-ready\')" onerror="this.style.display=\'none\'">' : '') +
+        (coverSrc ? '<img src="' + imgOpt(coverSrc,{w:800,q:75}) + '" alt="' + s.name + ' culture" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;display:block" loading="lazy" onerror="this.style.display=\'none\'">' : '') +
         '<div style="position:absolute;inset:0;background:linear-gradient(to right,rgba(0,0,0,.15),transparent)"></div>' +
       '</div>';
     }
@@ -1755,33 +1714,38 @@ var _storySnippets = {
   mn: 'Purple Chakhao rice, Loktak Lake, and a matrilineal society where women rule the market.',
   tr: 'Queen pineapple so sweet it needs no sugar. Wild honey from ancient Chakma bark hives.'
 };
-function renderStoryCards() {
+function renderStoryCards(activeId) {
   var el = document.getElementById('storyCards');
   if (!el) return;
-  var statesData = (STATES && STATES.length) ? STATES : FALLBACK_STATES;
-  el.innerHTML = statesData.map(function(s, i) {
-    var imgSrc = (s._uploadedImgs && s._uploadedImgs[0]) || s._uploadedImg || s.cover_photo_url || s.tab_photo_url || '';
-    // Reference uses position:relative wrapper + absolute fill image — fixes portrait crop
+  var storyStates = STATES.slice(0, 5); // Show only 5 on homepage
+  el.innerHTML = storyStates.map(function(s) {
+    var imgSrc = (s._uploadedImgs && s._uploadedImgs[0]) || s._uploadedImg || s.tab_photo_url || '';
     var imgHtml = imgSrc
-      ? '<div class="sc-img-wrap" style="background:' + (s.panel_bg||'linear-gradient(135deg,#1a3a1e,#2d5233)') + '">' +
-          '<img src="' + imgOpt(imgSrc,{w:480,q:78}) + '" alt="' + s.name + '" loading="' + (i < 6 ? 'eager' : 'lazy') + '" decoding="async" ' + (i < 3 ? 'fetchpriority="high" ' : '') + 'onload="this.closest(\'.story-card\').classList.add(\'img-ready\')" onerror="this.style.display=\'none\'">' +
-          '<span class="sc-img-emo">' + s.emoji + '</span>' +
-        '</div>'
-      : '<div class="sc-img-wrap" style="background:' + (s.panel_bg||'linear-gradient(135deg,#1a3a1e,#2d5233)') + '">' +
-          '<span class="sc-img-emo">' + s.emoji + '</span>' +
-        '</div>';
-    var snippet = _storySnippets[s.id] || (s.description||'').substring(0, 88) + '…';
+      ? '<img class="story-card-img" src="' + imgOpt(imgSrc,{w:400,q:75}) + '" alt="' + s.name + '" loading="lazy" style="opacity:0;transition:opacity .4s" onload="this.style.opacity=1" onerror="this.style.display=\'none\'">'
+      : '<div class="story-card-emo" style="background:' + (s.panel_bg||'linear-gradient(135deg,#1a3a1e,#2d5233)') + '">' + s.emoji + '</div>';
+    var snippet = _storySnippets[s.id] || s.description.substring(0, 90) + '…';
+    var isActive = s.id === (activeId || STATES[0].id);
+    // On homepage: switch tabs. Middle-click/right-click: go to state page
     var cardUrl = '/state.html?id=' + s.id;
-    var onclickAttr = 'var sp=document.getElementById(\'spnls\');if(sp&&sp.children.length){event.preventDefault();swState(\'' + s.id + '\');var el=document.getElementById(\'spnls\');if(el){el.scrollIntoView({behavior:\'smooth\',block:\'start\'});}}'
-    return '<a class="story-card' + (i===0?' active-state':'') + '" href="' + cardUrl + '" data-state="' + s.id + '" title="Explore ' + s.name + '" onclick="' + onclickAttr + '">' +
-        imgHtml +
-        '<div class="story-card-body">' +
-          '<div class="story-card-name">' + s.name + '</div>' +
-          '<div class="story-card-tag">' + (s.tagline||'') + '</div>' +
-          '<div class="story-card-line">' + snippet + '</div>' +
-        '</div>' +
+    return '<div class="story-card' + (isActive ? ' active-state' : '') + '" onclick="swState(\''+s.id+'\');renderStoryCards(\''+s.id+'\')" data-state-href="' + cardUrl + '" title="View all products from ' + s.name + '">'+
+      imgHtml +
+      '<div class="story-card-body">'+
+        '<div class="story-card-name">' + s.emoji + ' ' + s.name + '</div>'+
+        '<div class="story-card-tag">' + (s.tagline||'') + '</div>'+
+        '<div class="story-card-line">' + snippet + '</div>'+
+      '</div>'+
+    '</div>';
+  }).join('') +
+    // "View All States" card
+    '<a href="/all-states.html" class="story-card" style="text-decoration:none;color:inherit;background:var(--g);display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:160px;cursor:pointer">' +
+      '<div style="font-size:40px;margin-bottom:10px">🗺️</div>' +
+      '<div class="story-card-body" style="background:transparent;text-align:center">' +
+        '<div class="story-card-name" style="color:#fff;font-size:14px">View All States</div>' +
+        '<div class="story-card-tag" style="color:rgba(255,255,255,.6)">10+ Regions →</div>' +
+      '</div>' +
     '</a>';
-  }).join('');
+
+  // Story card images now use direct src with onload — no deferred loading needed
 }
 
 function swState(id) {
@@ -2772,7 +2736,7 @@ function renderUpsell() {
   section.style.display = 'block';
   strip.innerHTML = suggestions.map(function(p) {
     var imgHtml = p.image_url
-      ? '<div style="position:relative;width:100%;height:100%"><div class="pimg-skel" style="position:absolute;inset:0;border-radius:8px"></div><img src="'+imgOpt(p.image_url,{w:120,q:70})+'" loading="lazy" decoding="async" style="position:relative;z-index:1;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .4s" onload="this.style.opacity=1;var s=this.previousElementSibling;if(s)s.style.display=\'none\'" onerror="this.style.display=\'none\'"></div>'
+      ? '<div style="position:relative;width:100%;height:100%"><div class="pimg-skel" style="position:absolute;inset:0;border-radius:8px"></div><img src="'+imgOpt(p.image_url,{w:120,q:70})+'" loading="lazy" style="position:relative;z-index:1;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .4s" onload="this.style.opacity=1;var s=this.previousElementSibling;if(s)s.style.display=\'none\'" onerror="this.style.display=\'none\'"></div>'
       : '<span style="font-size:28px">'+(p.emoji||'🌿')+'</span>';
     var addBtn = '<button onclick="addToCart(\'' + p.id + '\')" style="margin-top:6px;background:var(--g);color:#fff;border:none;border-radius:6px;padding:4px 10px;font-size:11px;font-weight:600;cursor:pointer;width:100%">+ Add</button>';
     return '<div class="cu-item"><div class="cu-img">'+imgHtml+'</div><div class="cu-name">'+p.name+'</div><div class="cu-price">&#8377;'+p.price+'</div>'+addBtn+'</div>';
@@ -2969,7 +2933,7 @@ function renderRecentlyViewed() {
     return '<div class="rv-mini" onclick="goToProductPage(\'' + getProductSlug(p) + '\')" style="cursor:pointer">' +
       '<div class="rv-mini-img" style="position:relative">' +
         (p.image_url
-          ? '<div class="pimg-skel" style="position:absolute;inset:0;border-radius:8px"></div><img src="' + imgOpt(p.image_url,{w:80,q:70}) + '" alt="' + p.name + '" loading="lazy" decoding="async" style="position:relative;z-index:1;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .4s" onload="this.style.opacity=1;var s=this.previousElementSibling;if(s)s.style.display=\'none\'" onerror="this.style.display=\'none\'">'
+          ? '<div class="pimg-skel" style="position:absolute;inset:0;border-radius:8px"></div><img src="' + imgOpt(p.image_url,{w:80,q:70}) + '" alt="' + p.name + '" loading="lazy" style="position:relative;z-index:1;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .4s" onload="this.style.opacity=1;var s=this.previousElementSibling;if(s)s.style.display=\'none\'" onerror="this.style.display=\'none\'">'
           : (p.emoji||'🌿'))
       + '</div>' +
       '<div class="rv-mini-info"><div class="rv-mini-name">' + p.name + '</div><div class="rv-mini-price">₹' + p.price + '</div></div>' +
@@ -3402,7 +3366,7 @@ function observeProductImages() {
       if (src) { img.src = src; img.removeAttribute('data-lazysrc'); }
       obs.unobserve(img);
     });
-  }, { rootMargin: '400px 0px', threshold: 0 }); // preload 400px before entering viewport
+  }, { rootMargin: '300px 0px' }); // preload 300px before entering viewport
 
   imgs.forEach(function(img) {
     // If already visible in viewport — load immediately, skip observer

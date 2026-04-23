@@ -125,7 +125,7 @@ body.dark .as-card-desc{color:#666}
 
 <nav id="mNav">
   <a href="https://pahadiroots.com" class="logo">
-    <div class="logo-icon"><img src="https://ulyrhnpoiypuvaurlqqi.supabase.co/storage/v1/object/public/pahadi-images/5%20pahadi%20roots.png" alt="5 Pahadi Roots" width="40" height="40" fetchpriority="high" loading="eager" decoding="sync" style="height:40px;width:40px;object-fit:contain" onerror="this.style.display:'none'"></div>
+    <div class="logo-icon"><img src="https://ulyrhnpoiypuvaurlqqi.supabase.co/storage/v1/object/public/pahadi-images/5%20pahadi%20roots.png" alt="5 Pahadi Roots" style="height:40px;width:40px;object-fit:contain" onerror="this.style.display='none'"></div>
     <div class="logo-words"><div class="logo-name">5 Pahadi Roots</div><div class="logo-tl">Himalayan Natural Store</div></div>
   </a>
   <ul class="nav-links">
@@ -284,7 +284,7 @@ function _asRender(states) {
     var pills = (s.pills||[]).slice(0,3).map(function(p){ return '<span class="as-card-pill">' + p + '</span>'; }).join('');
     var shortDesc = (s.description||'Authentic products from the mountains of ' + s.name + '.').substring(0, 110) + '…';
     var img = imgSrc 
-      ? '<img class="as-card-img" src="' + imgSrc + '" alt="' + s.name + '" loading="' + (i<4?'eager':'lazy') + '" decoding="async" onerror="this.style.display=\'none\'">' 
+      ? '<img class="as-card-img" src="' + imgSrc + '" alt="' + s.name + '" loading="' + (i<4?'eager':'lazy') + '" onerror="this.style.display=\'none\'">' 
       : '';
     return '<a href="/state.html?id=' + s.id + '" class="as-card" style="animation-delay:' + (i*.06) + 's">' +
       '<div class="as-card-img-wrap">' +

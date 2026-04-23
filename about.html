@@ -490,7 +490,7 @@ img { max-width: 100%; }
 <nav class="nav">
   <a href="/" class="logo" style="display:flex;align-items:center;gap:10px;text-decoration:none">
     <div class="logo-icon" style="width:40px;height:40px;border-radius:10px;overflow:hidden;display:flex;align-items:center;justify-content:center;background:var(--g)">
-      <img src="https://ulyrhnpoiypuvaurlqqi.supabase.co/storage/v1/object/public/pahadi-images/5%20pahadi%20roots.png" alt="5 Pahadi Roots" width="40" height="40" fetchpriority="high" loading="eager" decoding="sync" style="width:40px;height:40px;object-fit:contain" onerror="this.style.display:'none';this.parentElement.textContent='🌿'">
+      <img src="https://ulyrhnpoiypuvaurlqqi.supabase.co/storage/v1/object/public/pahadi-images/5%20pahadi%20roots.png" alt="5 Pahadi Roots" style="width:40px;height:40px;object-fit:contain" onerror="this.style.display='none';this.parentElement.textContent='🌿'">
     </div>
     <div class="logo-words">
       <span class="logo-name">5 Pahadi Roots</span>
@@ -696,7 +696,7 @@ img { max-width: 100%; }
             <div class="ph-icon">👤</div>
             <p>Photo coming soon</p>
           </div>
-          <img src="" alt="Sudhir Chambail — Founder, 5 Pahadi Roots" id="founderImg" loading="lazy" decoding="async" style="display:none; position:absolute; inset:0;">
+          <img src="" alt="Sudhir Chambail — Founder, 5 Pahadi Roots" id="founderImg" style="display:none; position:absolute; inset:0;">
           <div class="founder-badge">Founder</div>
         </div>
         <!-- Admin upload option - hidden by default -->
@@ -1072,7 +1072,7 @@ async function loadTeamSection() {
       <div class="team-card fade-up">
         <div class="team-photo">
           ${m.image_url
-            ? `<img src="${m.image_url}" alt="${m.name||''}" loading="lazy" decoding="async" onerror="this.style.display='none';this.parentElement.textContent='👤'">`
+            ? `<img src="${m.image_url}" alt="${m.name||''}" loading="lazy" onerror="this.style.display='none';this.parentElement.textContent='👤'">`
             : '👤'}
         </div>
         ${m.is_founder ? '<div class="team-founder-badge">Founder</div>' : ''}

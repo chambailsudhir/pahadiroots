@@ -38,26 +38,11 @@
         var pc = document.createElement('link'); pc.rel='preconnect'; pc.href=imgOrigin; pc.crossOrigin='anonymous';
         document.head.appendChild(pc);
       } catch(e){}
-      // Preload the image — uses same WebP transform as renderProduct()
+      // Preload the image
       var pl = document.createElement('link');
-      var _ou = prod.image_url;
-      try {
-        if (_ou.indexOf('supabase.co/storage') !== -1) {
-          var renderUrl = _ou.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/');
-          if (renderUrl !== _ou) {
-            var u2 = new URL(renderUrl);
-            u2.searchParams.set('width', 900); u2.searchParams.set('quality', 82);
-            u2.searchParams.set('format', 'webp'); u2.searchParams.set('resize', 'cover');
-            _ou = u2.toString();
-          }
-        } else if (_ou.indexOf('images.unsplash.com') !== -1) {
-          var u3 = new URL(_ou);
-          u3.searchParams.set('w', 900); u3.searchParams.set('q', 82);
-          u3.searchParams.set('fm', 'webp'); u3.searchParams.set('fit', 'crop');
-          _ou = u3.toString();
-        }
-      } catch(e) {}
-      pl.rel = 'preload'; pl.as = 'image'; pl.href = _ou; pl.setAttribute('fetchpriority', 'high');
+      var _ou=prod.image_url;
+        // direct URL — no transform
+        pl.rel='preload'; pl.as='image'; pl.href=_ou; pl.setAttribute('fetchpriority','high');
       document.head.appendChild(pl);
     } catch(e){}
   })();
@@ -676,7 +661,7 @@ body{letter-spacing:.01em}
 <nav id="mNav">
   <a href="/" class="logo">
     <div class="logo-icon">
-      <img src="https://ulyrhnpoiypuvaurlqqi.supabase.co/storage/v1/object/public/pahadi-images/5%20pahadi%20roots.png" alt="5 Pahadi Roots" width="42" height="42" fetchpriority="high" loading="eager" decoding="sync" onerror="this.style.display='none';this.parentElement.innerHTML='🌿'">
+      <img src="https://ulyrhnpoiypuvaurlqqi.supabase.co/storage/v1/object/public/pahadi-images/5%20pahadi%20roots.png" alt="5 Pahadi Roots" onerror="this.style.display='none';this.parentElement.innerHTML='🌿'">
     </div>
     <div class="logo-words">
       <span class="logo-name">5 Pahadi Roots</span>
@@ -1002,19 +987,8 @@ function imgOpt(url, opts) {
       u.searchParams.set('fit', 'crop');
       return u.toString();
     }
-    // Supabase Storage — use /render/image/public/ for WebP transforms
+    // Supabase: no transform add-on — return raw URL to avoid 400 errors
     if (url.indexOf('supabase.co/storage') !== -1) {
-      try {
-        var renderUrl = url.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/');
-        if (renderUrl !== url) {
-          var u2 = new URL(renderUrl);
-          u2.searchParams.set('width', w);
-          u2.searchParams.set('quality', q);
-          u2.searchParams.set('format', 'webp');
-          u2.searchParams.set('resize', 'cover');
-          return u2.toString();
-        }
-      } catch(e) {}
       return url;
     }
   } catch(e) {}
