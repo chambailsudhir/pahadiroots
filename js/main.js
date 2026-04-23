@@ -821,7 +821,7 @@ function initCollectionImages(settings) {
 async function loadData() {
   // Step 1: render states fallback only — skip fake products to avoid price flash
   STATES   = FALLBACK_STATES.map(s => Object.assign({}, s));
-  renderStates(); uCart(); observeRv();
+  renderStates(); renderStoryCards(); uCart(); observeRv();
   initAllStateSlides(); initProductHoverImages();
 
   // ── INSTANT RENDER from localStorage cache (stale-while-revalidate) ──
@@ -1146,7 +1146,7 @@ async function loadData() {
       // Preserve currently active state before re-render
       var activeStateEl = document.querySelector('.spnl.active');
       var activeStateId = activeStateEl ? activeStateEl.id.replace('p-','') : null;
-      renderProds(); renderStates(); observeRv(); injectProductSchema(); renderUpsell();
+      renderProds(); renderStates(); renderStoryCards(); observeRv(); injectProductSchema(); renderUpsell();
       refreshMegaMenu(); // Rebuild mega menu with real product categories
       // Re-render collection cards now that products are loaded (removes fake categories)
       if (window.SITE_SETTINGS && document.getElementById('cgrid')) {
@@ -1700,9 +1700,8 @@ function renderStates() {
     var photoHtml;
     if (stateImgs.length > 1) {
       var slidesHtml = stateImgs.map(function(url, si) {
-        // First slide of first state: eager+high priority; add img-ready on first slide load
-        var onloadCb = si===0 ? 'this.parentNode.classList.add(\\'img-ready\\')' : '';
-        return '<img class="sshdr-img' + (si===0?' active':'') + '" src="' + imgOpt(url,{w:800,q:75}) + '" alt="' + s.name + '" loading="' + (i===0&&si===0?'eager':'lazy') + '" decoding="' + (i===0&&si===0?'sync':'async') + '" ' + (i===0&&si===0?'fetchpriority="high" ':'') + 'onload="' + onloadCb + '" onerror="this.style.display=\'none\'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;display:block;opacity:' + (si===0?'1':'0') + ';transition:opacity 1s ease;z-index:1">';
+        var onloadAttr = si===0 ? ' onload="this.parentNode.classList.add(\'img-ready\')"' : '';
+        return '<img class="sshdr-img' + (si===0?' active':'') + '" src="' + imgOpt(url,{w:800,q:75}) + '" alt="' + s.name + '" loading="' + (i===0&&si===0?'eager':'lazy') + '" decoding="' + (i===0&&si===0?'sync':'async') + '" ' + (i===0&&si===0?'fetchpriority="high" ':'') + onloadAttr + ' onerror="this.style.display=\'none\'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;display:block;opacity:' + (si===0?'1':'0') + ';transition:opacity 1s ease;z-index:1">';
       }).join('');
       var dotsHtml = stateImgs.map(function(_,si){
         return '<span class="sshdr-dot' + (si===0?' active':'') + '" onclick="event.stopPropagation();goStateSlide(\'' + s.id + '\',' + si + ')"></span>';
