@@ -1763,7 +1763,8 @@ function renderStoryCards() {
       : '<div class="story-card-emo" style="background:' + (s.panel_bg||'linear-gradient(135deg,#1a3a1e,#2d5233)') + '">' + s.emoji + '</div>';
     var snippet = _storySnippets[s.id] || (s.description||'').substring(0, 88) + '…';
     var cardUrl = '/state.html?id=' + s.id;
-    return '<a class="story-card" href="' + cardUrl + '" style="text-decoration:none;color:inherit" title="Explore ' + s.name + '">' +
+    var onclickAttr = 'var sp=document.getElementById(\'spnls\');if(sp&&sp.children.length){event.preventDefault();swState(\'' + s.id + '\');var el=document.getElementById(\'spnls\');if(el){el.scrollIntoView({behavior:\'smooth\',block:\'start\'});}}'
+    return '<a class="story-card" href="' + cardUrl + '" style="text-decoration:none;color:inherit" title="Explore ' + s.name + '" onclick="' + onclickAttr + '">' +
       imgHtml +
       '<div class="story-card-body">' +
         '<div class="story-card-name">' + s.emoji + ' ' + s.name + '</div>' +
