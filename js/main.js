@@ -594,29 +594,28 @@ function initCollectionImages(settings) {
     var st = document.createElement('style');
     st.id = 'ccat-style';
     st.textContent = [
-      '#cgrid{display:flex;gap:20px;overflow-x:auto;padding:8px 16px 28px;',
-        'scrollbar-width:none;-webkit-overflow-scrolling:touch;',
-        'scroll-snap-type:x proximity;}',
+      '#cgrid{display:flex;gap:16px;overflow-x:auto;',
+        'padding:8px 0 28px;',
+        'scrollbar-width:none;-webkit-overflow-scrolling:touch;}',
       '#cgrid::-webkit-scrollbar{display:none;}',
-      '.cc{flex:0 0 calc((100% - 100px)/6);min-width:140px;display:flex;',
-        'flex-direction:column;align-items:center;gap:12px;text-decoration:none;',
-        'cursor:pointer;transition:transform .2s ease;scroll-snap-align:start;',
+      /* Each card = (100% - 5 gaps of 16px) / 6 = exact 6 visible */
+      '.cc{flex:0 0 calc((100% - 80px) / 6);min-width:0;display:flex;',
+        'flex-direction:column;align-items:center;gap:10px;text-decoration:none;',
+        'cursor:pointer;transition:transform .2s ease;',
         'background:transparent;border:none;overflow:visible;box-shadow:none;}',
       '.cc:hover{transform:translateY(-5px);}',
       '.cc-box{width:100%;aspect-ratio:1/1;border-radius:16px;border:2px solid #c9a84c;',
-        'background:#f5f1e8;position:relative;overflow:hidden;',
-        'box-shadow:0 2px 12px rgba(201,168,76,.18);',
-        'display:flex;align-items:center;justify-content:center;}',
+        'background:transparent;position:relative;overflow:hidden;',
+        'box-shadow:0 2px 12px rgba(201,168,76,.18);}',
       '.cc:hover .cc-box{border-color:#a07830;box-shadow:0 6px 24px rgba(201,168,76,.32);}',
       '.cc-emo{font-size:48px;line-height:1;position:absolute;z-index:1;',
-        'transition:opacity .3s;}',
+        'top:50%;left:50%;transform:translate(-50%,-50%);transition:opacity .3s;}',
       '.cc-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;',
-        'z-index:2;opacity:0;transition:opacity .35s;',
-        'will-change:transform;backface-visibility:hidden;}',
+        'z-index:2;opacity:0;transition:opacity .35s;}',
       '.cc-img.loaded{opacity:1;}',
       '.cc-lbl{font-family:"Playfair Display",serif;font-size:14px;font-weight:700;',
-        'color:#1a3a1e;text-align:center;line-height:1.3;padding:0 4px;width:100%;',
-        'background:transparent;flex-shrink:0;}',
+        'color:#1a3a1e;text-align:center;line-height:1.3;width:100%;',
+        'background:transparent;padding:0;}',
     ].join('');
     document.head.appendChild(st);
   }
