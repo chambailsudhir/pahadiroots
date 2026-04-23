@@ -821,7 +821,7 @@ function initCollectionImages(settings) {
 async function loadData() {
   // Step 1: render states fallback only — skip fake products to avoid price flash
   STATES   = FALLBACK_STATES.map(s => Object.assign({}, s));
-  renderStates(); uCart(); observeRv();
+  renderStates(); renderStoryCards(); uCart(); observeRv();
   initAllStateSlides(); initProductHoverImages();
 
   // ── INSTANT RENDER from localStorage cache (stale-while-revalidate) ──
@@ -1146,7 +1146,7 @@ async function loadData() {
       // Preserve currently active state before re-render
       var activeStateEl = document.querySelector('.spnl.active');
       var activeStateId = activeStateEl ? activeStateEl.id.replace('p-','') : null;
-      renderProds(); renderStates(); observeRv(); injectProductSchema(); renderUpsell();
+      renderProds(); renderStates(); renderStoryCards(); observeRv(); injectProductSchema(); renderUpsell();
       refreshMegaMenu(); // Rebuild mega menu with real product categories
       // Re-render collection cards now that products are loaded (removes fake categories)
       if (window.SITE_SETTINGS && document.getElementById('cgrid')) {
@@ -1752,38 +1752,26 @@ var _storySnippets = {
   mn: 'Purple Chakhao rice, Loktak Lake, and a matrilineal society where women rule the market.',
   tr: 'Queen pineapple so sweet it needs no sugar. Wild honey from ancient Chakma bark hives.'
 };
-function renderStoryCards(activeId) {
+function renderStoryCards() {
   var el = document.getElementById('storyCards');
   if (!el) return;
-  var storyStates = STATES.slice(0, 5); // Show only 5 on homepage
-  el.innerHTML = storyStates.map(function(s) {
-    var imgSrc = (s._uploadedImgs && s._uploadedImgs[0]) || s._uploadedImg || s.tab_photo_url || '';
+  var statesData = (STATES && STATES.length) ? STATES : FALLBACK_STATES;
+  el.innerHTML = statesData.map(function(s, i) {
+    var imgSrc = (s._uploadedImgs && s._uploadedImgs[0]) || s._uploadedImg || s.cover_photo_url || s.tab_photo_url || '';
     var imgHtml = imgSrc
-      ? '<img class="story-card-img" src="' + imgOpt(imgSrc,{w:400,q:75}) + '" alt="' + s.name + '" loading="eager" decoding="async" fetchpriority="high" onload="this.closest(\'.story-card\').classList.add(\'img-ready\')" onerror="this.style.display=\'none\'">'
+      ? '<img class="story-card-img" src="' + imgOpt(imgSrc,{w:480,q:78}) + '" alt="' + s.name + '" loading="' + (i < 6 ? 'eager' : 'lazy') + '" decoding="async" ' + (i < 3 ? 'fetchpriority="high" ' : '') + 'onload="this.closest(\'.story-card\').classList.add(\'img-ready\')" onerror="this.style.display=\'none\'">'
       : '<div class="story-card-emo" style="background:' + (s.panel_bg||'linear-gradient(135deg,#1a3a1e,#2d5233)') + '">' + s.emoji + '</div>';
-    var snippet = _storySnippets[s.id] || s.description.substring(0, 90) + '…';
-    var isActive = s.id === (activeId || STATES[0].id);
-    // On homepage: switch tabs. Middle-click/right-click: go to state page
+    var snippet = _storySnippets[s.id] || (s.description||'').substring(0, 88) + '…';
     var cardUrl = '/state.html?id=' + s.id;
-    return '<div class="story-card' + (isActive ? ' active-state' : '') + '" onclick="swState(\''+s.id+'\');renderStoryCards(\''+s.id+'\')" data-state-href="' + cardUrl + '" title="View all products from ' + s.name + '">'+
+    return '<a class="story-card" href="' + cardUrl + '" style="text-decoration:none;color:inherit" title="Explore ' + s.name + '">' +
       imgHtml +
-      '<div class="story-card-body">'+
-        '<div class="story-card-name">' + s.emoji + ' ' + s.name + '</div>'+
-        '<div class="story-card-tag">' + (s.tagline||'') + '</div>'+
-        '<div class="story-card-line">' + snippet + '</div>'+
-      '</div>'+
-    '</div>';
-  }).join('') +
-    // "View All States" card
-    '<a href="/all-states.html" class="story-card" style="text-decoration:none;color:inherit;background:var(--g);display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:160px;cursor:pointer">' +
-      '<div style="font-size:40px;margin-bottom:10px">🗺️</div>' +
-      '<div class="story-card-body" style="background:transparent;text-align:center">' +
-        '<div class="story-card-name" style="color:#fff;font-size:14px">View All States</div>' +
-        '<div class="story-card-tag" style="color:rgba(255,255,255,.6)">10+ Regions →</div>' +
+      '<div class="story-card-body">' +
+        '<div class="story-card-name">' + s.emoji + ' ' + s.name + '</div>' +
+        '<div class="story-card-tag">' + (s.tagline||'') + '</div>' +
+        '<div class="story-card-line">' + snippet + '</div>' +
       '</div>' +
     '</a>';
-
-  // Story card images now use direct src with onload — no deferred loading needed
+  }).join('');
 }
 
 function swState(id) {
