@@ -1294,6 +1294,49 @@
 <div class="cov" id="cov" onclick="closeCart()" style="display:none"></div>
 <div class="toast" id="toast"></div>
 <script src="/js/main.js"></script>
+<script>
+/* Preload state cover images from product cache — eliminates blank state section on first render */
+(function() {
+  try {
+    var cached = JSON.parse(localStorage.getItem('pr_products_cache') || 'null');
+    if (!cached || !cached.products) return;
+    // imgOpt mirror for preload (must stay in sync with main.js imgOpt)
+    function _imgOpt(url, w, q) {
+      if (!url) return url;
+      try {
+        if (url.indexOf('supabase.co/storage') !== -1) {
+          var r = url.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/');
+          if (r !== url) {
+            var u = new URL(r);
+            u.searchParams.set('width', w); u.searchParams.set('quality', q);
+            u.searchParams.set('format', 'webp'); u.searchParams.set('resize', 'cover');
+            return u.toString();
+          }
+        } else if (url.indexOf('images.unsplash.com') !== -1) {
+          var u2 = new URL(url);
+          u2.searchParams.set('w', w); u2.searchParams.set('q', q);
+          u2.searchParams.set('fm', 'webp'); u2.searchParams.set('auto', 'format,compress');
+          u2.searchParams.set('fit', 'crop'); return u2.toString();
+        }
+      } catch(e) {}
+      return url;
+    }
+    // Preload first 5 state images (visible in story cards + first tab)
+    var stateCache = JSON.parse(localStorage.getItem('pr_states_cache') || 'null');
+    if (stateCache && stateCache.states) {
+      stateCache.states.slice(0, 5).forEach(function(st, i) {
+        var src = st.cover_photo_url || st.tab_photo_url || '';
+        if (!src) return;
+        var pl = document.createElement('link');
+        pl.rel = 'preload'; pl.as = 'image';
+        pl.href = _imgOpt(src, i === 0 ? 800 : 400, i === 0 ? 75 : 72);
+        if (i === 0) pl.setAttribute('fetchpriority', 'high');
+        document.head.appendChild(pl);
+      });
+    }
+  } catch(e) {}
+})();
+</script>
 
 
 

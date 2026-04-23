@@ -1132,6 +1132,16 @@ async function loadData() {
           })
         };
         localStorage.setItem('pr_products_cache', JSON.stringify(cachePayload));
+        // Also cache state image URLs for preloading on next page visit
+        try {
+          var statesCachePayload = {
+            ts: Date.now(),
+            states: STATES.map(function(s) {
+              return { id: s.id, cover_photo_url: s.cover_photo_url || '', tab_photo_url: s.tab_photo_url || '' };
+            })
+          };
+          localStorage.setItem('pr_states_cache', JSON.stringify(statesCachePayload));
+        } catch(e) {}
       } catch(e) {}
       // Preserve currently active state before re-render
       var activeStateEl = document.querySelector('.spnl.active');
@@ -1665,7 +1675,7 @@ function renderStates() {
   tb.innerHTML = STATES.map(function(s, i) {
     var imgSrc = (s._uploadedImgs && s._uploadedImgs[0]) || s._uploadedImg || s.tab_photo_url || '';
     var imgHtml = imgSrc
-      ? '<div class="stab-thumb skel skel-dark"><img src="' + imgOpt(imgSrc,{w:80,q:70}) + '" alt="' + s.name + '" loading="lazy" decoding="async" onload="this.closest(\'.stab-thumb\').classList.add(\'img-ready\')" onerror="this.style.display=\'none\'"></div>'
+      ? '<div class="stab-thumb skel skel-dark"><img src="' + imgOpt(imgSrc,{w:80,q:70}) + '" alt="' + s.name + '" loading="' + (i < 4 ? 'eager' : 'lazy') + '" decoding="' + (i < 4 ? 'sync' : 'async') + '" onload="this.closest(\'.stab-thumb\').classList.add(\'img-ready\')" onerror="this.style.display=\'none\'"></div>'
       : '<div class="stab-thumb stab-thumb-emo">' + s.emoji + '</div>';
     return '<button class="stab' + (i===0?' active':'') + '" onclick="swState(\'' + s.id + '\')" id="t-' + s.id + '">' +
       imgHtml +
@@ -1690,7 +1700,7 @@ function renderStates() {
     var photoHtml;
     if (stateImgs.length > 1) {
       var slidesHtml = stateImgs.map(function(url, si) {
-        return '<img class="sshdr-img' + (si===0?' active':'') + '" src="' + imgOpt(url,{w:800,q:75}) + '" alt="' + s.name + '" loading="lazy" decoding="async" onerror="this.style.display=\'none\'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;display:block;opacity:' + (si===0?'1':'0') + ';transition:opacity 1s ease;z-index:1">';
+        return '<img class="sshdr-img' + (si===0?' active':'') + '" src="' + imgOpt(url,{w:800,q:75}) + '" alt="' + s.name + '" loading="' + (i===0&&si===0?'eager':'lazy') + '" decoding="' + (i===0&&si===0?'sync':'async') + '" ' + (i===0&&si===0?'fetchpriority="high"':'') + ' onerror="this.style.display=\'none\'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;display:block;opacity:' + (si===0?'1':'0') + ';transition:opacity 1s ease;z-index:1">';
       }).join('');
       var dotsHtml = stateImgs.map(function(_,si){
         return '<span class="sshdr-dot' + (si===0?' active':'') + '" onclick="event.stopPropagation();goStateSlide(\'' + s.id + '\',' + si + ')"></span>';
@@ -1704,7 +1714,7 @@ function renderStates() {
     } else {
       photoHtml = '<div class="shdr-img-col" style="position:relative;background:' + bg + '">' +
         '<div class="shdr-fallback" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:80px;opacity:.35">' + s.emoji + '</div>' +
-        (coverSrc ? '<img src="' + imgOpt(coverSrc,{w:800,q:75}) + '" alt="' + s.name + ' culture" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;display:block" loading="lazy" onerror="this.style.display=\'none\'">' : '') +
+        (coverSrc ? '<img src="' + imgOpt(coverSrc,{w:800,q:75}) + '" alt="' + s.name + ' culture" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;display:block" loading="' + (i===0?'eager':'lazy') + '" decoding="' + (i===0?'sync':'async') + '" ' + (i===0?'fetchpriority="high"':'') + ' onerror="this.style.display=\'none\'">' : '') +
         '<div style="position:absolute;inset:0;background:linear-gradient(to right,rgba(0,0,0,.15),transparent)"></div>' +
       '</div>';
     }
@@ -1748,7 +1758,7 @@ function renderStoryCards(activeId) {
   el.innerHTML = storyStates.map(function(s) {
     var imgSrc = (s._uploadedImgs && s._uploadedImgs[0]) || s._uploadedImg || s.tab_photo_url || '';
     var imgHtml = imgSrc
-      ? '<img class="story-card-img" src="' + imgOpt(imgSrc,{w:400,q:75}) + '" alt="' + s.name + '" loading="lazy" decoding="async" style="opacity:0;transition:opacity .4s" onload="this.style.opacity=1" onerror="this.style.display=\'none\'">'
+      ? '<img class="story-card-img" src="' + imgOpt(imgSrc,{w:400,q:75}) + '" alt="' + s.name + '" loading="eager" decoding="async" fetchpriority="high" style="opacity:0;transition:opacity .4s" onload="this.style.opacity=1" onerror="this.style.display=\'none\'">'
       : '<div class="story-card-emo" style="background:' + (s.panel_bg||'linear-gradient(135deg,#1a3a1e,#2d5233)') + '">' + s.emoji + '</div>';
     var snippet = _storySnippets[s.id] || s.description.substring(0, 90) + '…';
     var isActive = s.id === (activeId || STATES[0].id);
