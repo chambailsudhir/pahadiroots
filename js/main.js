@@ -247,12 +247,14 @@ function imgOpt(url, opts) {
   if (!url) return url;
   opts = opts || {};
   var w = opts.w || 400;
+  var h = opts.h || null;
   var q = opts.q || 80;
   try {
-    // Unsplash CDN — supports w, q, fm, auto params natively
+    // Unsplash CDN — supports w, h, q, fm, auto params natively
     if (url.indexOf('images.unsplash.com') !== -1) {
       var u = new URL(url);
       u.searchParams.set('w', w);
+      if (h) u.searchParams.set('h', h);
       u.searchParams.set('q', q);
       u.searchParams.set('fm', 'webp');
       u.searchParams.set('auto', 'format,compress');
@@ -268,6 +270,7 @@ function imgOpt(url, opts) {
         if (renderUrl !== url) {
           var u2 = new URL(renderUrl);
           u2.searchParams.set('width', w);
+          if (h) u2.searchParams.set('height', h);
           u2.searchParams.set('quality', q);
           u2.searchParams.set('format', 'webp');
           u2.searchParams.set('resize', 'cover');
@@ -1759,7 +1762,7 @@ function renderStoryCards() {
   el.innerHTML = statesData.map(function(s, i) {
     var imgSrc = (s._uploadedImgs && s._uploadedImgs[0]) || s._uploadedImg || s.cover_photo_url || s.tab_photo_url || '';
     var imgHtml = imgSrc
-      ? '<img class="story-card-img" src="' + imgOpt(imgSrc,{w:480,q:78}) + '" alt="' + s.name + '" loading="' + (i < 6 ? 'eager' : 'lazy') + '" decoding="async" ' + (i < 3 ? 'fetchpriority="high" ' : '') + 'onload="this.closest(\'.story-card\').classList.add(\'img-ready\')" onerror="this.style.display=\'none\'">'
+      ? '<img class="story-card-img" src="' + imgOpt(imgSrc,{w:440,h:320,q:78}) + '" alt="' + s.name + '" loading="' + (i < 6 ? 'eager' : 'lazy') + '" decoding="async" ' + (i < 3 ? 'fetchpriority="high" ' : '') + 'onload="this.closest(\'.story-card\').classList.add(\'img-ready\')" onerror="this.style.display=\'none\'">'
       : '<div class="story-card-emo" style="background:' + (s.panel_bg||'linear-gradient(135deg,#1a3a1e,#2d5233)') + '">' + s.emoji + '</div>';
     var snippet = _storySnippets[s.id] || (s.description||'').substring(0, 88) + '…';
     var cardUrl = '/state.html?id=' + s.id;
