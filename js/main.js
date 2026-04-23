@@ -1773,15 +1773,13 @@ function renderStoryCards() {
     var snippet = _storySnippets[s.id] || (s.description||'').substring(0, 88) + '…';
     var cardUrl = '/state.html?id=' + s.id;
     var onclickAttr = 'var sp=document.getElementById(\'spnls\');if(sp&&sp.children.length){event.preventDefault();swState(\'' + s.id + '\');var el=document.getElementById(\'spnls\');if(el){el.scrollIntoView({behavior:\'smooth\',block:\'start\'});}}'
-    return '<a class="story-card' + (i===0?' active-state':'') + '" href="' + cardUrl + '" data-state="' + s.id + '" style="text-decoration:none;color:inherit" title="Explore ' + s.name + '" onclick="' + onclickAttr + '">' +
-      '<div class="story-card-inner">' +
+    return '<a class="story-card' + (i===0?' active-state':'') + '" href="' + cardUrl + '" data-state="' + s.id + '" title="Explore ' + s.name + '" onclick="' + onclickAttr + '">' +
         imgHtml +
         '<div class="story-card-body">' +
-          '<div class="story-card-name">' + s.emoji + ' ' + s.name + '</div>' +
+          '<div class="story-card-name">' + s.name + '</div>' +
           '<div class="story-card-tag">' + (s.tagline||'') + '</div>' +
           '<div class="story-card-line">' + snippet + '</div>' +
         '</div>' +
-      '</div>' +
     '</a>';
   }).join('');
 }
