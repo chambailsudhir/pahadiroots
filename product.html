@@ -38,7 +38,7 @@
         var pc = document.createElement('link'); pc.rel='preconnect'; pc.href=imgOrigin; pc.crossOrigin='anonymous';
         document.head.appendChild(pc);
       } catch(e){}
-      // Preload the image — uses same WebP transform as renderProduct() (w:900,q:82)
+      // Preload the image — uses same WebP transform as renderProduct()
       var pl = document.createElement('link');
       var _ou = prod.image_url;
       try {
@@ -53,12 +53,11 @@
         } else if (_ou.indexOf('images.unsplash.com') !== -1) {
           var u3 = new URL(_ou);
           u3.searchParams.set('w', 900); u3.searchParams.set('q', 82);
-          u3.searchParams.set('fm', 'webp'); u3.searchParams.set('auto', 'format,compress');
-          u3.searchParams.set('fit', 'crop'); _ou = u3.toString();
+          u3.searchParams.set('fm', 'webp'); u3.searchParams.set('fit', 'crop');
+          _ou = u3.toString();
         }
       } catch(e) {}
-      pl.rel = 'preload'; pl.as = 'image'; pl.href = _ou;
-      pl.setAttribute('fetchpriority', 'high');
+      pl.rel = 'preload'; pl.as = 'image'; pl.href = _ou; pl.setAttribute('fetchpriority', 'high');
       document.head.appendChild(pl);
     } catch(e){}
   })();
@@ -1016,7 +1015,7 @@ function imgOpt(url, opts) {
           return u2.toString();
         }
       } catch(e) {}
-      return url; // fallback to raw if transform URL construction fails
+      return url;
     }
   } catch(e) {}
   return url;
