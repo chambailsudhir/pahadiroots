@@ -1773,7 +1773,7 @@ function renderStoryCards() {
     var snippet = _storySnippets[s.id] || (s.description||'').substring(0, 88) + '…';
     var cardUrl = '/state.html?id=' + s.id;
     var onclickAttr = 'var sp=document.getElementById(\'spnls\');if(sp&&sp.children.length){event.preventDefault();swState(\'' + s.id + '\');var el=document.getElementById(\'spnls\');if(el){el.scrollIntoView({behavior:\'smooth\',block:\'start\'});}}'
-    return '<a class="story-card" href="' + cardUrl + '" data-state="' + s.id + '" style="text-decoration:none;color:inherit" title="Explore ' + s.name + '" onclick="' + onclickAttr + '">' +
+    return '<a class="story-card' + (i===0?' active-state':'') + '" href="' + cardUrl + '" data-state="' + s.id + '" style="text-decoration:none;color:inherit" title="Explore ' + s.name + '" onclick="' + onclickAttr + '">' +
       '<div class="story-card-inner">' +
         imgHtml +
         '<div class="story-card-body">' +
