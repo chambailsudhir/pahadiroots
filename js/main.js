@@ -1662,22 +1662,19 @@ function renderStates() {
     }
     var photoHtml;
     if (stateImgs.length > 1) {
-      var slidesHtml = stateImgs.map(function(url, si) {
-        return '<img class="sshdr-img' + (si===0?' active':'') + '" src="' + imgOpt(url,{w:800,q:75}) + '" alt="' + s.name + '" loading="lazy" onerror="this.style.display=\'none\'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;display:block;opacity:' + (si===0?'1':'0') + ';transition:opacity 1s ease;z-index:1">';
-      }).join('');
-      var dotsHtml = stateImgs.map(function(_,si){
-        return '<span class="sshdr-dot' + (si===0?' active':'') + '" onclick="event.stopPropagation();goStateSlide(\'' + s.id + '\',' + si + ')"></span>';
-      }).join('');
       photoHtml = '<div class="shdr-img-col sshdr" id="sshdr-' + s.id + '" data-sid="' + s.id + '" data-total="' + stateImgs.length + '" data-cur="0" style="position:relative;background:' + bg + '">' +
         '<div class="shdr-fallback" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:80px;opacity:.25">' + s.emoji + '</div>' +
-        slidesHtml +
+        stateImgs.map(function(url, si) {
+          var onloadAttr = si===0 ? ' onload="this.parentNode.classList.add(\'img-ready\')"' : '';
+          return '<img class="sshdr-img' + (si===0?' active':'') + '" src="' + imgOpt(url,{w:800,q:75}) + '" alt="' + s.name + '" loading="' + (i===0&&si===0?'eager':'lazy') + '"' + onloadAttr + ' onerror="this.style.display=\'none\'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;display:block;opacity:' + (si===0?'1':'0') + ';transition:opacity 1s ease;z-index:1">';
+        }).join('') +
         '<div style="position:absolute;inset:0;background:linear-gradient(to right,rgba(0,0,0,.15),transparent);z-index:2;pointer-events:none"></div>' +
-        '<div class="sshdr-dots" style="position:absolute;bottom:12px;left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:3">' + dotsHtml + '</div>' +
+        '<div class="sshdr-dots" style="position:absolute;bottom:12px;left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:3">' + stateImgs.map(function(_,si){ return '<span class="sshdr-dot' + (si===0?' active':'') + '" onclick="event.stopPropagation();goStateSlide(\'' + s.id + '\',' + si + ')"></span>'; }).join('') + '</div>' +
       '</div>';
     } else {
       photoHtml = '<div class="shdr-img-col" style="position:relative;background:' + bg + '">' +
         '<div class="shdr-fallback" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:80px;opacity:.35">' + s.emoji + '</div>' +
-        (coverSrc ? '<img src="' + imgOpt(coverSrc,{w:800,q:75}) + '" alt="' + s.name + ' culture" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;display:block" loading="lazy" onerror="this.style.display=\'none\'">' : '') +
+        (coverSrc ? '<img src="' + imgOpt(coverSrc,{w:800,q:75}) + '" alt="' + s.name + ' culture" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;display:block" loading="' + (i===0?'eager':'lazy') + '" onload="this.parentNode.classList.add(\'img-ready\')" onerror="this.style.display=\'none\'">' : '') +
         '<div style="position:absolute;inset:0;background:linear-gradient(to right,rgba(0,0,0,.15),transparent)"></div>' +
       '</div>';
     }
