@@ -594,28 +594,17 @@ function initCollectionImages(settings) {
     var st = document.createElement('style');
     st.id = 'ccat-style';
     st.textContent = [
-      '#cgrid{display:flex;gap:16px;overflow-x:auto;',
-        'padding:8px 0 28px;',
-        'scrollbar-width:none;-webkit-overflow-scrolling:touch;}',
+      '#cgrid{display:flex;gap:16px;overflow-x:auto;padding:8px 0 28px;scrollbar-width:none;-webkit-overflow-scrolling:touch;}',
       '#cgrid::-webkit-scrollbar{display:none;}',
-      /* Each card = (100% - 5 gaps of 16px) / 6 = exact 6 visible */
-      '.cc{flex:0 0 calc((100% - 80px) / 6);min-width:0;display:flex;',
-        'flex-direction:column;align-items:center;gap:10px;text-decoration:none;',
-        'cursor:pointer;transition:transform .2s ease;',
-        'background:transparent;border:none;overflow:visible;box-shadow:none;}',
-      '.cc:hover{transform:translateY(-5px);}',
-      '.cc-box{width:100%;aspect-ratio:1/1;border-radius:16px;border:2px solid #c9a84c;',
-        'background:transparent;position:relative;overflow:hidden;',
-        'box-shadow:0 2px 12px rgba(201,168,76,.18);}',
-      '.cc:hover .cc-box{border-color:#a07830;box-shadow:0 6px 24px rgba(201,168,76,.32);}',
-      '.cc-emo{font-size:48px;line-height:1;position:absolute;z-index:1;',
-        'top:50%;left:50%;transform:translate(-50%,-50%);transition:opacity .3s;}',
-      '.cc-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;',
-        'z-index:2;opacity:0;transition:opacity .35s;}',
+      '.cc-cell{flex:0 0 calc((100% - 80px) / 6);min-width:0;display:flex;flex-direction:column;align-items:center;gap:10px;transition:transform .2s ease;}',
+      '.cc-cell:hover{transform:translateY(-5px);}',
+      '.cc{display:block;width:100%;text-decoration:none;cursor:pointer;background:transparent;border:none;overflow:visible;box-shadow:none;}',
+      '.cc-box{width:100%;aspect-ratio:1/1;border-radius:16px;border:2px solid #c9a84c;background:transparent;position:relative;overflow:hidden;box-shadow:0 2px 12px rgba(201,168,76,.18);}',
+      '.cc-cell:hover .cc-box{border-color:#a07830;box-shadow:0 6px 24px rgba(201,168,76,.32);}',
+      '.cc-emo{font-size:48px;line-height:1;position:absolute;z-index:1;top:50%;left:50%;transform:translate(-50%,-50%);transition:opacity .3s;}',
+      '.cc-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:2;opacity:0;transition:opacity .35s;}',
       '.cc-img.loaded{opacity:1;}',
-      '.cc-lbl{font-family:"Playfair Display",serif;font-size:14px;font-weight:700;',
-        'color:#1a3a1e;text-align:center;line-height:1.3;width:100%;',
-        'background:transparent;padding:0;}',
+      '.cc-lbl{font-family:\"Playfair Display\",serif;font-size:14px;font-weight:700;color:#1a3a1e;text-align:center;line-height:1.3;width:100%;background:transparent;padding:0;margin:0;}',
     ].join('');
     document.head.appendChild(st);
   }
@@ -649,7 +638,7 @@ function initCollectionImages(settings) {
 
   // ── Fingerprint — prevent redundant re-renders ────────────────
   var fp = cats.map(function(c){ return c.id+':'+c.name+':'+imgFor(c); }).join('|');
-  if (cgrid.dataset.fp === fp && cgrid.querySelectorAll('.cc').length > 0) return;
+  if (cgrid.dataset.fp === fp && cgrid.querySelectorAll('.cc-cell').length > 0) return;
   cgrid.dataset.fp = fp;
 
   // ── Stop any running scroll timer ────────────────────────────
@@ -671,12 +660,18 @@ function initCollectionImages(settings) {
   });
 
   // ── Build cards ───────────────────────────────────────────────
+  // Structure: .cc-cell (flex item) > <a class="cc"> (image only) + .cc-lbl (sibling, outside <a>)
   cats.forEach(function(cat, i) {
     var url   = imgFor(cat);
     var slug  = cat.slug || String(cat.id);
-    var label = cat.name;              // Use DB name directly — matches admin panel exactly
-    var emoji = emojiFor(cat);         // DB emoji first, then slug fallback
+    var label = cat.name;
+    var emoji = emojiFor(cat);
 
+    // Cell is the flex item in #cgrid
+    var cell = document.createElement('div');
+    cell.className = 'cc-cell';
+
+    // <a> wraps ONLY the image box — not the label
     var card = document.createElement('a');
     card.href      = '/category.html?id=' + slug;
     card.className = 'cc';
@@ -685,13 +680,11 @@ function initCollectionImages(settings) {
     var box = document.createElement('div');
     box.className = 'cc-box';
 
-    // Emoji always present as background (z-index:1)
     var emoEl = document.createElement('span');
     emoEl.className = 'cc-emo';
     emoEl.textContent = emoji;
     box.appendChild(emoEl);
 
-    // Image on top (z-index:2), fades in when loaded
     if (url) {
       var img = document.createElement('img');
       img.className    = 'cc-img';
@@ -702,37 +695,34 @@ function initCollectionImages(settings) {
 
       img.onload = function() {
         this.classList.add('loaded');
-        // Hide emoji once image is visible (cleaner look)
         var emo = this.previousElementSibling;
         if (emo && emo.classList.contains('cc-emo')) emo.style.opacity = '0';
       };
-      img.onerror = function() {
-        // Image broken — emoji stays visible, just remove the broken img
-        this.remove();
-      };
+      img.onerror = function() { this.remove(); };
 
-      // APPEND TO DOM FIRST, then set src
       box.appendChild(img);
       img.src = url;
 
-      // Already cached by browser — show instantly
       if (img.complete && img.naturalWidth) {
         img.classList.add('loaded');
         emoEl.style.opacity = '0';
       }
     }
 
+    card.appendChild(box);
+
+    // Label is a SIBLING of <a> — lives on section background, not inside card
     var lbl = document.createElement('div');
     lbl.className   = 'cc-lbl';
     lbl.textContent = label;
 
-    card.appendChild(box);
-    card.appendChild(lbl);
-    cgrid.appendChild(card);
+    cell.appendChild(card);
+    cell.appendChild(lbl);
+    cgrid.appendChild(cell);
   });
 
   // ── Clone cards for infinite scroll ──────────────────────────
-  Array.from(cgrid.querySelectorAll('.cc')).forEach(function(card) {
+  Array.from(cgrid.querySelectorAll('.cc-cell')).forEach(function(card) {
     var clone = card.cloneNode(true);
     clone.setAttribute('aria-hidden', 'true');
     cgrid.appendChild(clone);
@@ -766,7 +756,7 @@ function initCollectionImages(settings) {
 
     function tick() {
       if (paused || animating) return;
-      var cards = cgrid.querySelectorAll('.cc:not([aria-hidden])');
+      var cards = cgrid.querySelectorAll('.cc-cell:not([aria-hidden])');
       if (!cards.length) return;
       var step = cards[0].offsetWidth + 16;
       var half = cgrid.scrollWidth / 2;
