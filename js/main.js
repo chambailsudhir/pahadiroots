@@ -596,7 +596,7 @@ function initCollectionImages(settings) {
     st.textContent = [
       '#cgrid{display:flex;overflow-x:scroll;overflow-y:hidden;scrollbar-width:none;width:100%;position:relative;}',
       '#cgrid::-webkit-scrollbar{display:none;}',
-      '.cc-cell{flex:0 0 calc(100% / 6);min-width:0;display:flex;flex-direction:column;align-items:center;gap:10px;padding:0 8px;box-sizing:border-box;transition:transform .2s ease;}',
+      '.cc-cell{flex:0 0 16.666%;min-width:0;display:flex;flex-direction:column;align-items:center;gap:10px;padding:0 8px;box-sizing:border-box;}',
       '.cc-cell:hover{transform:translateY(-5px);}',
       '.cc{display:block;width:100%;text-decoration:none;cursor:pointer;background:transparent;border:none;overflow:visible;box-shadow:none;}',
       '.cc-box{width:100%;aspect-ratio:1/1;border-radius:16px;border:2px solid #c9a84c;background:transparent;position:relative;overflow:hidden;box-shadow:0 2px 12px rgba(201,168,76,.18);}',
@@ -747,11 +747,14 @@ function initCollectionImages(settings) {
 
   var allCells = Array.from(cgrid.querySelectorAll('.cc-cell'));
 
-  var viewW = cgrid.getBoundingClientRect().width; // capture before we change it
+  var viewW = cgrid.getBoundingClientRect().width;
 
   function setWidths() {
-    allCells.forEach(function(c) { c.style.flex='none'; c.style.width=(viewW/6)+'px'; });
-    cgrid.style.width = (allCells.length * (viewW/6)) + 'px';
+    var w = viewW / 6;
+    // The strip (all cells) is wide, but cgrid viewport stays at viewW
+    // We set an inner wrapper approach: just size the cells
+    allCells.forEach(function(c) { c.style.flex='none'; c.style.width=w+'px'; c.style.minWidth=w+'px'; });
+    // cgrid itself stays at viewW - the cells overflow and scrollLeft moves them
   }
   setWidths();
   cgrid.scrollLeft = 0;
