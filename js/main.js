@@ -327,7 +327,7 @@ function buildSlide(s, idx) {
   var isFirst      = idx === 0;
 
   var html = '<div data-slide="' + idx + '" style="position:absolute;inset:0;opacity:' +
-    (isFirst ? '1' : '0') + ';transition:opacity 0.8s ease;pointer-events:' +
+    (isFirst ? '1' : '0') + ';transition:none;pointer-events:' +
     (isFirst ? 'auto' : 'none') + '">';
 
   if (img) {
@@ -480,9 +480,6 @@ function initHeroSlider(settings) {
     if (dotsEl) dotsEl.style.display = 'none';
     var pa0 = document.getElementById('hsliderPrev'); if (pa0) pa0.style.display = 'none';
     var na0 = document.getElementById('hsliderNext'); if (na0) na0.style.display = 'none';
-    // No DB slides — reveal the fallback text content (hidden by default to prevent flash)
-    var fbt = document.getElementById('hslide-fallback-text');
-    if (fbt) fbt.style.display = 'flex';
     return;
   }
 
@@ -540,11 +537,31 @@ function heroGoTo(idx) {
   var slides = document.querySelectorAll('[data-slide]');
   var dots   = document.querySelectorAll('#hsliderDots button');
   if (!slides.length) return;
-  if (slides[_heroSlideIndex]) { slides[_heroSlideIndex].style.opacity = '0'; slides[_heroSlideIndex].style.pointerEvents = 'none'; }
-  if (dots[_heroSlideIndex])   { dots[_heroSlideIndex].style.width = '6px'; dots[_heroSlideIndex].style.background = 'rgba(255,255,255,.45)'; }
+
+  var prevIdx = _heroSlideIndex;
   _heroSlideIndex = ((idx % _heroSlideCount) + _heroSlideCount) % _heroSlideCount;
-  if (slides[_heroSlideIndex]) { slides[_heroSlideIndex].style.opacity = '1'; slides[_heroSlideIndex].style.pointerEvents = 'auto'; }
-  if (dots[_heroSlideIndex])   { dots[_heroSlideIndex].style.width = '28px'; dots[_heroSlideIndex].style.background = '#fff'; }
+  if (prevIdx === _heroSlideIndex) return;
+
+  var prevSlide = slides[prevIdx];
+  var nextSlide = slides[_heroSlideIndex];
+
+  // Update dots
+  if (dots[prevIdx])         { dots[prevIdx].style.width = '6px'; dots[prevIdx].style.background = 'rgba(255,255,255,.45)'; }
+  if (dots[_heroSlideIndex]) { dots[_heroSlideIndex].style.width = '28px'; dots[_heroSlideIndex].style.background = '#fff'; }
+
+  // Snap next slide in instantly (text appears immediately, no ghost overlap)
+  if (nextSlide) { nextSlide.style.transition = 'none'; nextSlide.style.opacity = '1'; nextSlide.style.pointerEvents = 'auto'; }
+
+  // Fade the OLD slide out on top — creates smooth image crossfade without text overlap
+  if (prevSlide) {
+    prevSlide.style.pointerEvents = 'none';
+    prevSlide.style.zIndex = '5'; // sit above next slide during fade-out
+    prevSlide.style.transition = 'opacity 0.75s ease';
+    prevSlide.style.opacity = '0';
+    setTimeout(function() {
+      if (prevSlide) { prevSlide.style.zIndex = ''; prevSlide.style.transition = 'none'; }
+    }, 800);
+  }
 }
 
 function heroSlide(dir) { stopHeroAutoplay(); heroGoTo(_heroSlideIndex + dir); startHeroAutoplay(); }
@@ -3185,13 +3202,8 @@ function initHeroStats(s) {
   });
   var allHidden = hideFlags.every(function(h) { return h; });
 
-  // Check if admin has ever configured stats (any number exists in DB)
-  var hasDBData = stats.some(function(st) {
-    return s[st.numKey] || s[st.numKey.replace('stat_','')];
-  });
-
-  // Safety net ONLY for fresh install (no DB data). If admin configured it, respect their choices.
-  if (!hasDBData && allHidden) hideFlags = [false, false, false, false];
+  // Safety net: never hide all stats simultaneously
+  if (allHidden) hideFlags = [false, false, false, false];
 
   var visibleCount = 0;
   stats.forEach(function(st, i) {
@@ -3220,9 +3232,9 @@ function initHeroStats(s) {
     }
   });
 
-  // Show/hide whole bar based on whether any stats are visible
+  // Always show stats bar
   var container = document.getElementById('hstats');
-  if (container) container.style.display = visibleCount > 0 ? 'flex' : 'none';
+  if (container) container.style.display = 'flex';
 }
 
 // ── TRUST BAR — editable from admin Settings ──────────────────────
@@ -3232,16 +3244,7 @@ function initTrustBar(s) {
   if (!bar) return;
   var items = document.querySelectorAll('.tc');
 
-  // Check if admin has ever configured the trust bar (any title exists in DB)
-  var hasDBData = false;
-  for (var n = 1; n <= 4; n++) {
-    if (s['trust_' + n + '_title'] || s['trust_badge_' + n + '_title']) {
-      hasDBData = true;
-      break;
-    }
-  }
-
-  // Collect hide flags
+  // Collect hide flags first
   var hideFlags = [];
   var allHidden = true;
   items.forEach(function(tc, i) {
@@ -3253,14 +3256,11 @@ function initTrustBar(s) {
     if (!hide) allHidden = false;
   });
 
-  // Only apply safety net if admin has NEVER configured trust bar (fresh install)
-  // If admin has configured it, respect their hide flags — even if all are hidden
-  if (!hasDBData && (allHidden || items.length === 0)) {
-    hideFlags = [false, false, false, false];
-  }
+  // Safety net: if ALL badges are hidden in DB (admin accident / fresh install),
+  // show them all — the bar must never fully disappear
+  if (allHidden || items.length === 0) hideFlags = [false, false, false, false];
 
   // Apply visibility + update content from DB
-  var visibleCount = 0;
   items.forEach(function(tc, i) {
     var n = i + 1;
     var ico = s['trust_' + n + '_icon']  || s['trust_badge_' + n + '_icon'];
@@ -3268,7 +3268,6 @@ function initTrustBar(s) {
     var sub = s['trust_' + n + '_sub']   || s['trust_badge_' + n + '_sub'];
     if (hideFlags[i]) { tc.style.display = 'none'; return; }
     tc.style.display = '';
-    visibleCount++;
     var icoEl = tc.querySelector('.tico');
     var lblEl = tc.querySelector('.tlb');
     var subEl = tc.querySelector('.tds');
@@ -3277,8 +3276,8 @@ function initTrustBar(s) {
     if (subEl && sub) subEl.innerHTML = sub;
   });
 
-  // Hide the whole bar if no badges are visible (admin intentionally hid all)
-  bar.style.display = visibleCount > 0 ? 'grid' : 'none';
+  // Always show the bar — individual badges can be hidden but bar itself never hides
+  bar.style.display = 'grid';
 }
 
 function animateCounters() {
