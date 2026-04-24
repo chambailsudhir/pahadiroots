@@ -320,22 +320,22 @@ section.sec{padding:52px 40px}
 .story-card.active-state .story-card-name{color:#fff}
 .story-card.active-state .story-card-tag{color:var(--gd2)}
 .story-card.active-state .story-card-line{color:rgba(255,255,255,.65)}
+#storyCards:empty{display:none}
 #storyCards::-webkit-scrollbar{display:none}
-#storyCardsScroll::-webkit-scrollbar{display:none}
-.stabs{display:flex;flex-wrap:wrap;overflow-x:visible;scrollbar-width:none;background:#f0e8d4;border:none;padding:8px 8px 0;gap:6px}
+.stabs{display:flex;flex-wrap:wrap;background:#f0e8d4;border:none;padding:14px 8px 0;gap:14px}
 .stabs::-webkit-scrollbar{display:none}
-.stab{flex:0 0 auto;width:140px;padding:0;border:none;border-radius:8px 8px 0 0;background:#fff;cursor:pointer;display:flex;flex-direction:column;align-items:stretch;transition:all .22s;position:relative;font-family:'Lato',sans-serif;box-shadow:0 1px 4px rgba(0,0,0,.08);overflow:hidden}
-.stab:hover{transform:translateY(-2px);box-shadow:0 4px 14px rgba(0,0,0,.14)}
-.stab.active{background:var(--g);box-shadow:0 4px 18px rgba(26,58,30,.3);transform:translateY(-2px)}
-.stab-thumb{width:100%;height:90px;overflow:hidden;display:block;background:#d8cfbb;flex-shrink:0}
-.stab-thumb img{width:100%;height:100%;object-fit:cover;object-position:55% 15%;display:block;transition:transform .4s}
+.stab{flex:0 0 auto;width:200px;padding:0;border:none;border-radius:14px;background:#fff;cursor:pointer;display:flex;flex-direction:column;align-items:stretch;transition:transform .3s,box-shadow .3s;position:relative;font-family:'Lato',sans-serif;box-shadow:0 3px 14px rgba(0,0,0,.1);overflow:hidden}
+.stab:hover{transform:translateY(-5px);box-shadow:0 12px 32px rgba(0,0,0,.18)}
+.stab.active{background:var(--g);box-shadow:0 12px 32px rgba(26,58,30,.3);transform:translateY(-5px)}
+.stab-thumb{width:100%;height:160px;overflow:hidden;display:block;background:#d8cfbb;flex-shrink:0}
+.stab-thumb img{width:100%;height:100%;object-fit:cover;object-position:center top;display:block;transition:transform .4s}
 .stab:hover .stab-thumb img{transform:scale(1.06)}
-.stab-thumb-emo{width:100%;height:88px;display:flex;align-items:center;justify-content:center;font-size:38px;background:linear-gradient(135deg,var(--g),var(--g3))}
-.stab-label{padding:8px 10px 10px;display:flex;flex-direction:column;gap:3px;text-align:center}
-.stab-name{font-size:8.5px;font-weight:800;letter-spacing:.9px;text-transform:uppercase;color:var(--tx);line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.stab-tag{font-size:7.5px;color:var(--tx3);font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;margin-top:1px}
+.stab-thumb-emo{width:100%;height:160px;display:flex;align-items:center;justify-content:center;font-size:52px;background:linear-gradient(135deg,var(--g),var(--g3))}
+.stab-label{padding:10px 12px 12px;display:flex;flex-direction:column;gap:3px;text-align:center}
+.stab-name{font-family:'Playfair Display',serif;font-size:13px;font-weight:700;color:var(--g);line-height:1.3}
+.stab-tag{font-size:10px;color:var(--gd);font-weight:700;letter-spacing:.5px;display:block;margin-top:2px}
 .stab.active .stab-name{color:#fff}
-.stab.active .stab-tag{color:rgba(255,255,255,.6)}
+.stab.active .stab-tag{color:rgba(255,255,255,.7)}
 .spnls{max-width:100%;margin:0;padding:0;margin-top:24px}
 .spnl{display:none}
 .spnl.active{display:block;animation:spIn .35s ease}
@@ -736,8 +736,9 @@ footer{background:#132b17;padding:0;position:relative;overflow:hidden}
   .shdr-img-col{height:200px}
   .shdr-info-col{padding:24px 18px}
   .spgrid{grid-template-columns:1fr 1fr;padding:16px 20px}
-  .stab{flex:0 0 auto;width:110px}
-  .stab-thumb{height:70px}
+  .stab{width:150px}
+  .stab-thumb{height:110px}
+  .stab-thumb-emo{height:110px}
 
   .fname{font-size:clamp(28px,6vw,40px)}
   .cpage-body{grid-template-columns:1fr;overflow:auto}
@@ -748,8 +749,9 @@ footer{background:#132b17;padding:0;position:relative;overflow:hidden}
   .pgr,.rgrid{grid-template-columns:1fr 1fr}
   .pay-opts-wrap{grid-template-columns:1fr 1fr}
   .spgrid{grid-template-columns:1fr}
-  .stab{flex:0 0 auto;width:86px}
-  .stab-thumb{height:56px}
+  .stab{width:120px}
+  .stab-thumb{height:85px}
+  .stab-thumb-emo{height:85px}
   .trust{grid-template-columns:1fr 1fr}
   .nlf{flex-direction:column}
   .f-bot{flex-direction:column;gap:8px;text-align:center}
