@@ -594,9 +594,8 @@ function initCollectionImages(settings) {
     var st = document.createElement('style');
     st.id = 'ccat-style';
     st.textContent = [
-      '#cgrid{display:flex;gap:12px;overflow-x:auto;padding:12px 20px 28px;scrollbar-width:none;-webkit-overflow-scrolling:touch;scroll-snap-type:x mandatory;}',
-      '#cgrid::-webkit-scrollbar{display:none;}',
-      '.cc-cell{flex:0 0 calc((100% - 40px - 60px) / 6);min-width:0;display:flex;flex-direction:column;align-items:center;gap:10px;transition:transform .2s ease;scroll-snap-align:start;}',
+      '#cgrid{display:flex;gap:0;overflow:hidden;width:100%;position:relative;}',
+      '.cc-cell{flex:0 0 calc(100% / 6);min-width:0;display:flex;flex-direction:column;align-items:center;gap:10px;transition:transform .2s ease;padding:0 8px;box-sizing:border-box;}',
       '.cc-cell:hover{transform:translateY(-5px);}',
       '.cc{display:block;width:100%;text-decoration:none;cursor:pointer;background:transparent;border:none;overflow:visible;box-shadow:none;}',
       '.cc-box{width:100%;aspect-ratio:1/1;border-radius:16px;border:2px solid #c9a84c;background:transparent;position:relative;overflow:hidden;box-shadow:0 2px 12px rgba(201,168,76,.18);}',
@@ -644,6 +643,7 @@ function initCollectionImages(settings) {
   // ── Stop any running scroll timer ────────────────────────────
   if (cgrid._t) { clearInterval(cgrid._t); cgrid._t = null; }
   cgrid.innerHTML = '';
+  cgrid.scrollLeft = 0;
 
   // ── Prewarm ALL images before building cards ─────────────────
   // Forces browser to fetch & cache every collection image upfront.
@@ -721,74 +721,79 @@ function initCollectionImages(settings) {
     cgrid.appendChild(cell);
   });
 
-  // ── Clone cards for infinite scroll ──────────────────────────
-  Array.from(cgrid.querySelectorAll('.cc-cell')).forEach(function(card) {
-    var clone = card.cloneNode(true);
+  // ── Infinite carousel — transform based, 1 card at a time ────
+  var origCells = Array.from(cgrid.querySelectorAll('.cc-cell'));
+  var total = origCells.length;
+  if (total < 2) return;
+
+  // Clone all cards for seamless loop
+  origCells.forEach(function(c) {
+    var clone = c.cloneNode(true);
     clone.setAttribute('aria-hidden', 'true');
     cgrid.appendChild(clone);
-    // After appending to DOM, fix images on clone
     clone.querySelectorAll('img.cc-img').forEach(function(img) {
       img.loading = 'eager';
       if (img.complete && img.naturalWidth) {
-        // Already in browser cache — show instantly
         img.classList.add('loaded');
         var emo = img.previousElementSibling;
         if (emo && emo.classList.contains('cc-emo')) emo.style.opacity = '0';
       } else {
-        // Not cached yet — re-assign src ONCE after DOM insertion to trigger fetch
         var src = img.getAttribute('src') || '';
-        if (src) {
-          img.src = src;
-          img.addEventListener('load', function() {
-            this.classList.add('loaded');
-            var emo = this.previousElementSibling;
-            if (emo && emo.classList.contains('cc-emo')) emo.style.opacity = '0';
-          }, { once: true });
-        }
+        if (src) { img.src = src; img.addEventListener('load', function() { this.classList.add('loaded'); var emo = this.previousElementSibling; if (emo && emo.classList.contains('cc-emo')) emo.style.opacity='0'; }, {once:true}); }
       }
     });
   });
 
-  // ── Auto-scroll ───────────────────────────────────────────────
-  function startScroll() {
-    if (cgrid._t) return;
-    var paused = false, animating = false;
+  var allCells = Array.from(cgrid.querySelectorAll('.cc-cell'));
+  var idx = 0;
 
-    function tick() {
-      if (paused || animating) return;
-      var cards = cgrid.querySelectorAll('.cc-cell:not([aria-hidden])');
-      if (!cards.length) return;
-      var step = cards[0].offsetWidth + 16;
-      var half = cgrid.scrollWidth / 2;
-      animating = true;
-      var s0 = cgrid.scrollLeft, t0 = null;
-      function ease(t){ return t<.5?2*t*t:-1+(4-2*t)*t; }
-      (function frame(ts){
-        if(!t0) t0=ts;
-        var p=Math.min((ts-t0)/460,1);
-        cgrid.scrollLeft=s0+(step*ease(p));
-        if(p<1){ requestAnimationFrame(frame); }
-        else { if(cgrid.scrollLeft>=half) cgrid.scrollLeft-=half; animating=false; }
-      })(performance.now());
-    }
+  function cardW() { return cgrid.parentElement.offsetWidth / 6; }
 
-    cgrid._t = setInterval(tick, 2500);
-    cgrid.addEventListener('mouseenter', function(){ paused=true; });
-    cgrid.addEventListener('mouseleave', function(){ paused=false; });
-    cgrid.addEventListener('touchstart', function(){ paused=true; }, {passive:true});
-    cgrid.addEventListener('touchend', function(){ setTimeout(function(){ paused=false; },1800); }, {passive:true});
+  function layout() {
+    var w = cardW();
+    cgrid.style.width = (allCells.length * w) + 'px';
+    allCells.forEach(function(c) { c.style.flex = 'none'; c.style.width = w + 'px'; c.style.padding = '0 6px'; c.style.boxSizing = 'border-box'; });
   }
 
-  // Wait for ALL images (originals + clones) before scrolling (max 3s)
-  var allImgs = Array.from(cgrid.querySelectorAll('img.cc-img'));
-  if (!allImgs.length) { startScroll(); return; }
-  var left = allImgs.length;
-  function done(){ if(--left<=0) startScroll(); }
-  allImgs.forEach(function(img){
-    if(img.complete && img.naturalWidth) done();
-    else { img.addEventListener('load',done,{once:true}); img.addEventListener('error',done,{once:true}); }
-  });
-  setTimeout(startScroll, 3000);
+  function moveTo(i, animate) {
+    cgrid.style.transition = animate ? 'transform 0.5s cubic-bezier(0.25,0.46,0.45,0.94)' : 'none';
+    cgrid.style.transform = 'translateX(-' + (i * cardW()) + 'px)';
+  }
+
+  layout();
+  moveTo(0, false);
+
+  function goNext() {
+    idx++;
+    moveTo(idx, true);
+    if (idx >= total) {
+      setTimeout(function() { idx = 0; moveTo(0, false); }, 520);
+    }
+  }
+
+  function goPrev() {
+    if (idx <= 0) {
+      idx = total; moveTo(idx, false);
+      requestAnimationFrame(function() { requestAnimationFrame(function() { idx--; moveTo(idx, true); }); });
+    } else { idx--; moveTo(idx, true); }
+  }
+
+  // Wire up arrows
+  var wrap = cgrid.parentElement;
+  var lb = wrap.querySelector('.cgrid-arrow.left');
+  var rb = wrap.querySelector('.cgrid-arrow.right');
+  if (lb) { lb.onclick = function() { paused = true; goPrev(); setTimeout(function(){paused=false;},1000); }; }
+  if (rb) { rb.onclick = function() { paused = true; goNext(); setTimeout(function(){paused=false;},1000); }; }
+
+  // Auto-scroll 1 card every 2.5s
+  var paused = false;
+  cgrid._t = setInterval(function() { if (!paused) goNext(); }, 2500);
+  wrap.addEventListener('mouseenter', function() { paused = true; });
+  wrap.addEventListener('mouseleave', function() { paused = false; });
+  wrap.addEventListener('touchstart', function() { paused = true; }, {passive:true});
+  wrap.addEventListener('touchend', function() { setTimeout(function() { paused = false; }, 1800); }, {passive:true});
+
+  window.addEventListener('resize', function() { layout(); moveTo(idx, false); });
 }
 
 async function loadData() {

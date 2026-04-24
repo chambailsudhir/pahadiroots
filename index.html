@@ -657,10 +657,10 @@
     <h2 style="font-family:'Playfair Display',serif;font-size:clamp(28px,4vw,52px);font-weight:700;color:#1a3a1e;text-align:center;margin:0 0 10px;line-height:1.15;font-style:italic">What the Mountains Offer</h2>
     <p class="ssub">Every category tells a story of altitude, tradition, and purity.</p>
   </div>
-  <div style="position:relative;width:100%;box-sizing:border-box;overflow:hidden">
-    <button class="cgrid-arrow left" style="position:absolute;left:4px;top:45%;transform:translateY(-50%);z-index:10" onclick="(function(){var g=document.getElementById('cgrid');var w=g.querySelector('.cc-cell');var jump=w?(w.offsetWidth+12)*6:600;g.scrollBy({left:-jump,behavior:'smooth'})})()">&#8249;</button>
-    <button class="cgrid-arrow right" style="position:absolute;right:4px;top:45%;transform:translateY(-50%);z-index:10" onclick="(function(){var g=document.getElementById('cgrid');var w=g.querySelector('.cc-cell');var jump=w?(w.offsetWidth+12)*6:600;g.scrollBy({left:jump,behavior:'smooth'})})()">&#8250;</button>
-    <div id="cgrid"></div>
+  <div style="position:relative;width:100%;overflow:hidden;padding:12px 0 28px;box-sizing:border-box">
+    <button class="cgrid-arrow left" style="position:absolute;left:8px;top:45%;transform:translateY(-50%);z-index:10" onclick="void(0)">&#8249;</button>
+    <button class="cgrid-arrow right" style="position:absolute;right:8px;top:45%;transform:translateY(-50%);z-index:10" onclick="void(0)">&#8250;</button>
+    <div id="cgrid" style="display:flex;overflow:visible;width:100%"></div>
   </div>
 </section>
 <section class="sec" id="products" style="background:#f5f0e8;padding:36px 40px 48px">
