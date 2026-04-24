@@ -480,6 +480,9 @@ function initHeroSlider(settings) {
     if (dotsEl) dotsEl.style.display = 'none';
     var pa0 = document.getElementById('hsliderPrev'); if (pa0) pa0.style.display = 'none';
     var na0 = document.getElementById('hsliderNext'); if (na0) na0.style.display = 'none';
+    // No DB slides — reveal the fallback text content (hidden by default to prevent flash)
+    var fbt = document.getElementById('hslide-fallback-text');
+    if (fbt) fbt.style.display = 'flex';
     return;
   }
 
