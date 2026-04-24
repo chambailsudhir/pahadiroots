@@ -594,7 +594,8 @@ function initCollectionImages(settings) {
     var st = document.createElement('style');
     st.id = 'ccat-style';
     st.textContent = [
-      '#cgrid{display:flex;overflow:hidden;width:100%;position:relative;}',
+      '#cgrid{display:flex;overflow-x:scroll;overflow-y:hidden;scrollbar-width:none;width:100%;position:relative;}',
+      '#cgrid::-webkit-scrollbar{display:none;}',
       '.cc-cell{flex:0 0 calc(100% / 6);min-width:0;display:flex;flex-direction:column;align-items:center;gap:10px;padding:0 8px;box-sizing:border-box;transition:transform .2s ease;}',
       '.cc-cell:hover{transform:translateY(-5px);}',
       '.cc{display:block;width:100%;text-decoration:none;cursor:pointer;background:transparent;border:none;overflow:visible;box-shadow:none;}',
@@ -746,10 +747,11 @@ function initCollectionImages(settings) {
 
   var allCells = Array.from(cgrid.querySelectorAll('.cc-cell'));
 
+  var viewW = cgrid.getBoundingClientRect().width; // capture before we change it
+
   function setWidths() {
-    var w = cgrid.parentElement.clientWidth / 6;
-    cgrid.style.width = (allCells.length * w) + 'px';
-    allCells.forEach(function(c) { c.style.flex='none'; c.style.width=w+'px'; });
+    allCells.forEach(function(c) { c.style.flex='none'; c.style.width=(viewW/6)+'px'; });
+    cgrid.style.width = (allCells.length * (viewW/6)) + 'px';
   }
   setWidths();
   cgrid.scrollLeft = 0;
@@ -771,7 +773,7 @@ function initCollectionImages(settings) {
 
   function goNext() {
     if (animating) return;
-    var w = cgrid.parentElement.clientWidth / 6;
+    var w = viewW / 6;
     var from = cgrid.scrollLeft;
     var to = from + w;
     animateScroll(from, to, function() {
@@ -781,7 +783,7 @@ function initCollectionImages(settings) {
 
   function goPrev() {
     if (animating) return;
-    var w = cgrid.parentElement.clientWidth / 6;
+    var w = viewW / 6;
     if (cgrid.scrollLeft <= 0) cgrid.scrollLeft = total * w;
     var from = cgrid.scrollLeft;
     animateScroll(from, from - w, null);
@@ -799,7 +801,7 @@ function initCollectionImages(settings) {
   wrap.addEventListener('mouseleave', function(){ paused=false; });
   wrap.addEventListener('touchstart', function(){ paused=true; },{passive:true});
   wrap.addEventListener('touchend', function(){ setTimeout(function(){paused=false;},1800); },{passive:true});
-  window.addEventListener('resize', function(){ setWidths(); cgrid.scrollLeft=0; });
+  window.addEventListener('resize', function(){ viewW = cgrid.getBoundingClientRect().width; setWidths(); cgrid.scrollLeft=0; });
 }
 
 async function loadData() {
