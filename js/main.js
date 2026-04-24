@@ -3224,7 +3224,16 @@ function initTrustBar(s) {
   if (!bar) return;
   var items = document.querySelectorAll('.tc');
 
-  // Collect hide flags first
+  // Check if admin has ever configured the trust bar (any title exists in DB)
+  var hasDBData = false;
+  for (var n = 1; n <= 4; n++) {
+    if (s['trust_' + n + '_title'] || s['trust_badge_' + n + '_title']) {
+      hasDBData = true;
+      break;
+    }
+  }
+
+  // Collect hide flags
   var hideFlags = [];
   var allHidden = true;
   items.forEach(function(tc, i) {
@@ -3236,11 +3245,14 @@ function initTrustBar(s) {
     if (!hide) allHidden = false;
   });
 
-  // Safety net: if ALL badges are hidden in DB (admin accident / fresh install),
-  // show them all — the bar must never fully disappear
-  if (allHidden || items.length === 0) hideFlags = [false, false, false, false];
+  // Only apply safety net if admin has NEVER configured trust bar (fresh install)
+  // If admin has configured it, respect their hide flags — even if all are hidden
+  if (!hasDBData && (allHidden || items.length === 0)) {
+    hideFlags = [false, false, false, false];
+  }
 
   // Apply visibility + update content from DB
+  var visibleCount = 0;
   items.forEach(function(tc, i) {
     var n = i + 1;
     var ico = s['trust_' + n + '_icon']  || s['trust_badge_' + n + '_icon'];
@@ -3248,6 +3260,7 @@ function initTrustBar(s) {
     var sub = s['trust_' + n + '_sub']   || s['trust_badge_' + n + '_sub'];
     if (hideFlags[i]) { tc.style.display = 'none'; return; }
     tc.style.display = '';
+    visibleCount++;
     var icoEl = tc.querySelector('.tico');
     var lblEl = tc.querySelector('.tlb');
     var subEl = tc.querySelector('.tds');
@@ -3256,8 +3269,8 @@ function initTrustBar(s) {
     if (subEl && sub) subEl.innerHTML = sub;
   });
 
-  // Always show the bar — individual badges can be hidden but bar itself never hides
-  bar.style.display = 'grid';
+  // Hide the whole bar if no badges are visible (admin intentionally hid all)
+  bar.style.display = visibleCount > 0 ? 'grid' : 'none';
 }
 
 function animateCounters() {
