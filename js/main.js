@@ -3182,8 +3182,13 @@ function initHeroStats(s) {
   });
   var allHidden = hideFlags.every(function(h) { return h; });
 
-  // Safety net: never hide all stats simultaneously
-  if (allHidden) hideFlags = [false, false, false, false];
+  // Check if admin has ever configured stats (any number exists in DB)
+  var hasDBData = stats.some(function(st) {
+    return s[st.numKey] || s[st.numKey.replace('stat_','')];
+  });
+
+  // Safety net ONLY for fresh install (no DB data). If admin configured it, respect their choices.
+  if (!hasDBData && allHidden) hideFlags = [false, false, false, false];
 
   var visibleCount = 0;
   stats.forEach(function(st, i) {
@@ -3212,9 +3217,9 @@ function initHeroStats(s) {
     }
   });
 
-  // Always show stats bar
+  // Show/hide whole bar based on whether any stats are visible
   var container = document.getElementById('hstats');
-  if (container) container.style.display = 'flex';
+  if (container) container.style.display = visibleCount > 0 ? 'flex' : 'none';
 }
 
 // ── TRUST BAR — editable from admin Settings ──────────────────────
