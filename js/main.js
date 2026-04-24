@@ -747,10 +747,11 @@ function initCollectionImages(settings) {
   var allCells = Array.from(cgrid.querySelectorAll('.cc-cell'));
   var idx = 0;
 
-  function cardW() { return cgrid.parentElement.offsetWidth / 6; }
+  function cardW() { return (cgrid.parentElement.offsetWidth - 80) / 6; }
 
   function layout() {
     var w = cardW();
+    cgrid.style.marginLeft = '40px'; // offset for left arrow space
     cgrid.style.width = (allCells.length * w) + 'px';
     allCells.forEach(function(c) { c.style.flex = 'none'; c.style.width = w + 'px'; c.style.padding = '0 6px'; c.style.boxSizing = 'border-box'; });
   }
