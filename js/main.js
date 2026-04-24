@@ -594,8 +594,8 @@ function initCollectionImages(settings) {
     var st = document.createElement('style');
     st.id = 'ccat-style';
     st.textContent = [
-      '#cgrid{display:flex;gap:0;overflow:hidden;width:100%;position:relative;}',
-      '.cc-cell{flex:0 0 calc(100% / 6);min-width:0;display:flex;flex-direction:column;align-items:center;gap:10px;transition:transform .2s ease;padding:0 8px;box-sizing:border-box;}',
+      '#cgrid{display:flex;overflow:hidden;width:100%;position:relative;}',
+      '.cc-cell{flex:0 0 calc(100% / 6);min-width:0;display:flex;flex-direction:column;align-items:center;gap:10px;padding:0 8px;box-sizing:border-box;transition:transform .2s ease;}',
       '.cc-cell:hover{transform:translateY(-5px);}',
       '.cc{display:block;width:100%;text-decoration:none;cursor:pointer;background:transparent;border:none;overflow:visible;box-shadow:none;}',
       '.cc-box{width:100%;aspect-ratio:1/1;border-radius:16px;border:2px solid #c9a84c;background:transparent;position:relative;overflow:hidden;box-shadow:0 2px 12px rgba(201,168,76,.18);}',
@@ -721,12 +721,12 @@ function initCollectionImages(settings) {
     cgrid.appendChild(cell);
   });
 
-  // ── Infinite carousel — transform based, 1 card at a time ────
+  // ── Infinite carousel — scrollLeft, 1 card at a time ──────────
   var origCells = Array.from(cgrid.querySelectorAll('.cc-cell'));
   var total = origCells.length;
   if (total < 2) return;
 
-  // Clone all cards for seamless loop
+  // Clone for seamless loop
   origCells.forEach(function(c) {
     var clone = c.cloneNode(true);
     clone.setAttribute('aria-hidden', 'true');
@@ -735,66 +735,71 @@ function initCollectionImages(settings) {
       img.loading = 'eager';
       if (img.complete && img.naturalWidth) {
         img.classList.add('loaded');
-        var emo = img.previousElementSibling;
-        if (emo && emo.classList.contains('cc-emo')) emo.style.opacity = '0';
+        var e = img.previousElementSibling;
+        if (e && e.classList.contains('cc-emo')) e.style.opacity = '0';
       } else {
-        var src = img.getAttribute('src') || '';
-        if (src) { img.src = src; img.addEventListener('load', function() { this.classList.add('loaded'); var emo = this.previousElementSibling; if (emo && emo.classList.contains('cc-emo')) emo.style.opacity='0'; }, {once:true}); }
+        var src = img.src;
+        if (src) { img.src = src; img.addEventListener('load', function(){ this.classList.add('loaded'); var e=this.previousElementSibling; if(e&&e.classList.contains('cc-emo')) e.style.opacity='0'; },{once:true}); }
       }
     });
   });
 
   var allCells = Array.from(cgrid.querySelectorAll('.cc-cell'));
-  var idx = 0;
 
-  function cardW() { return (cgrid.parentElement.offsetWidth - 96) / 6; }
-
-  function layout() {
-    var w = cardW();
-    cgrid.style.marginLeft = '48px';
+  function setWidths() {
+    var w = cgrid.parentElement.clientWidth / 6;
     cgrid.style.width = (allCells.length * w) + 'px';
-    allCells.forEach(function(c) { c.style.flex = 'none'; c.style.width = w + 'px'; c.style.padding = '0 6px'; c.style.boxSizing = 'border-box'; });
+    allCells.forEach(function(c) { c.style.flex='none'; c.style.width=w+'px'; });
   }
+  setWidths();
+  cgrid.scrollLeft = 0;
 
-  function moveTo(i, animate) {
-    cgrid.style.transition = animate ? 'transform 0.5s cubic-bezier(0.25,0.46,0.45,0.94)' : 'none';
-    cgrid.style.transform = 'translateX(-' + (i * cardW()) + 'px)';
+  var animating = false;
+
+  function animateScroll(from, to, done) {
+    animating = true;
+    var dur = 500, t0 = null;
+    function ease(t){ return t<.5?2*t*t:-1+(4-2*t)*t; }
+    (function frame(ts){
+      if (!t0) t0 = ts;
+      var p = Math.min((ts-t0)/dur, 1);
+      cgrid.scrollLeft = from + (to-from)*ease(p);
+      if (p < 1) { requestAnimationFrame(frame); }
+      else { cgrid.scrollLeft = to; animating = false; if (done) done(); }
+    })(performance.now());
   }
-
-  layout();
-  moveTo(0, false);
 
   function goNext() {
-    idx++;
-    moveTo(idx, true);
-    if (idx >= total) {
-      setTimeout(function() { idx = 0; moveTo(0, false); }, 520);
-    }
+    if (animating) return;
+    var w = cgrid.parentElement.clientWidth / 6;
+    var from = cgrid.scrollLeft;
+    var to = from + w;
+    animateScroll(from, to, function() {
+      if (cgrid.scrollLeft >= total * w) cgrid.scrollLeft = 0;
+    });
   }
 
   function goPrev() {
-    if (idx <= 0) {
-      idx = total; moveTo(idx, false);
-      requestAnimationFrame(function() { requestAnimationFrame(function() { idx--; moveTo(idx, true); }); });
-    } else { idx--; moveTo(idx, true); }
+    if (animating) return;
+    var w = cgrid.parentElement.clientWidth / 6;
+    if (cgrid.scrollLeft <= 0) cgrid.scrollLeft = total * w;
+    var from = cgrid.scrollLeft;
+    animateScroll(from, from - w, null);
   }
 
-  // Wire up arrows
   var wrap = cgrid.parentElement;
   var lb = wrap.querySelector('.cgrid-arrow.left');
   var rb = wrap.querySelector('.cgrid-arrow.right');
-  if (lb) { lb.onclick = function() { paused = true; goPrev(); setTimeout(function(){paused=false;},1000); }; }
-  if (rb) { rb.onclick = function() { paused = true; goNext(); setTimeout(function(){paused=false;},1000); }; }
+  if (lb) lb.onclick = function(){ paused=true; goPrev(); setTimeout(function(){paused=false;},1000); };
+  if (rb) rb.onclick = function(){ paused=true; goNext(); setTimeout(function(){paused=false;},1000); };
 
-  // Auto-scroll 1 card every 2.5s
   var paused = false;
-  cgrid._t = setInterval(function() { if (!paused) goNext(); }, 2500);
-  wrap.addEventListener('mouseenter', function() { paused = true; });
-  wrap.addEventListener('mouseleave', function() { paused = false; });
-  wrap.addEventListener('touchstart', function() { paused = true; }, {passive:true});
-  wrap.addEventListener('touchend', function() { setTimeout(function() { paused = false; }, 1800); }, {passive:true});
-
-  window.addEventListener('resize', function() { layout(); moveTo(idx, false); });
+  cgrid._t = setInterval(function(){ if(!paused) goNext(); }, 2500);
+  wrap.addEventListener('mouseenter', function(){ paused=true; });
+  wrap.addEventListener('mouseleave', function(){ paused=false; });
+  wrap.addEventListener('touchstart', function(){ paused=true; },{passive:true});
+  wrap.addEventListener('touchend', function(){ setTimeout(function(){paused=false;},1800); },{passive:true});
+  window.addEventListener('resize', function(){ setWidths(); cgrid.scrollLeft=0; });
 }
 
 async function loadData() {

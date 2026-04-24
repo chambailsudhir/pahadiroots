@@ -150,8 +150,8 @@ section.sec{padding:52px 40px}
   flex-shrink:0;
 }
 .cgrid-arrow:hover{background:#f5f5f5;box-shadow:0 4px 16px rgba(0,0,0,.18);border-color:#ccc}
-.cgrid-arrow.left{left:6px}
-.cgrid-arrow.right{right:6px}
+.cgrid-arrow.left{left:8px}
+.cgrid-arrow.right{right:8px}
 @media(max-width:640px){.cgrid-arrow{display:none}}
 
 /* .cc-cell is the flex item (image + label). .cc is only the image <a> link. */
