@@ -594,9 +594,9 @@ function initCollectionImages(settings) {
     var st = document.createElement('style');
     st.id = 'ccat-style';
     st.textContent = [
-      '#cgrid{display:flex;gap:16px;overflow-x:auto;padding:12px 40px 28px;scrollbar-width:none;-webkit-overflow-scrolling:touch;}',
+      '#cgrid{display:flex;gap:12px;overflow-x:auto;padding:12px 20px 28px;scrollbar-width:none;-webkit-overflow-scrolling:touch;scroll-snap-type:x mandatory;}',
       '#cgrid::-webkit-scrollbar{display:none;}',
-      '.cc-cell{flex:0 0 calc((100% - 80px - 64px) / 5);min-width:0;display:flex;flex-direction:column;align-items:center;gap:10px;transition:transform .2s ease;}',
+      '.cc-cell{flex:0 0 calc((100% - 40px - 60px) / 6);min-width:0;display:flex;flex-direction:column;align-items:center;gap:10px;transition:transform .2s ease;scroll-snap-align:start;}',
       '.cc-cell:hover{transform:translateY(-5px);}',
       '.cc{display:block;width:100%;text-decoration:none;cursor:pointer;background:transparent;border:none;overflow:visible;box-shadow:none;}',
       '.cc-box{width:100%;aspect-ratio:1/1;border-radius:16px;border:2px solid #c9a84c;background:transparent;position:relative;overflow:hidden;box-shadow:0 2px 12px rgba(201,168,76,.18);}',

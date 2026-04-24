@@ -658,8 +658,8 @@
     <p class="ssub">Every category tells a story of altitude, tradition, and purity.</p>
   </div>
   <div style="position:relative;width:100%;box-sizing:border-box;overflow:hidden">
-    <button class="cgrid-arrow left" style="position:absolute;left:4px;top:45%;transform:translateY(-50%);z-index:10" onclick="document.getElementById('cgrid').scrollBy({left:-500,behavior:'smooth'})">&#8249;</button>
-    <button class="cgrid-arrow right" style="position:absolute;right:4px;top:45%;transform:translateY(-50%);z-index:10" onclick="document.getElementById('cgrid').scrollBy({left:500,behavior:'smooth'})">&#8250;</button>
+    <button class="cgrid-arrow left" style="position:absolute;left:4px;top:45%;transform:translateY(-50%);z-index:10" onclick="(function(){var g=document.getElementById('cgrid');var w=g.querySelector('.cc-cell');var jump=w?(w.offsetWidth+12)*6:600;g.scrollBy({left:-jump,behavior:'smooth'})})()">&#8249;</button>
+    <button class="cgrid-arrow right" style="position:absolute;right:4px;top:45%;transform:translateY(-50%);z-index:10" onclick="(function(){var g=document.getElementById('cgrid');var w=g.querySelector('.cc-cell');var jump=w?(w.offsetWidth+12)*6:600;g.scrollBy({left:jump,behavior:'smooth'})})()">&#8250;</button>
     <div id="cgrid"></div>
   </div>
 </section>
