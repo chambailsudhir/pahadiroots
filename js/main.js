@@ -1358,32 +1358,12 @@ document.addEventListener('DOMContentLoaded', function() {
   var menu    = document.getElementById('shopMegaMenu');
   if (!li || !trigger || !menu) return;
 
-  var _mouseInMenu = false;
-  var _mouseInTrigger = false;
-
-  // Hover open/close — reliable flag-based approach
+  // Preload state images on trigger hover (without opening menu)
   li.addEventListener('mouseenter', function() {
-    preloadStateImages(); // start loading images on hover intent
-    _mouseInTrigger = true;
-    openMegaMenu();
-  });
-  li.addEventListener('mouseleave', function() {
-    _mouseInTrigger = false;
-    setTimeout(function() {
-      if (!_mouseInMenu && !_mouseInTrigger) closeMegaMenu();
-    }, 100);
-  });
-  menu.addEventListener('mouseenter', function() {
-    _mouseInMenu = true;
-  });
-  menu.addEventListener('mouseleave', function() {
-    _mouseInMenu = false;
-    setTimeout(function() {
-      if (!_mouseInMenu && !_mouseInTrigger) closeMegaMenu();
-    }, 100);
+    preloadStateImages();
   });
 
-  // Click toggle (for keyboard/touch users)
+  // Click toggle only — no hover open/close
   trigger.addEventListener('click', function(e) {
     e.preventDefault();
     toggleMegaMenu();
