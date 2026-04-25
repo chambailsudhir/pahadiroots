@@ -1358,6 +1358,18 @@ document.addEventListener('DOMContentLoaded', function() {
   var menu    = document.getElementById('shopMegaMenu');
   if (!li || !trigger || !menu) return;
 
+  // Dynamically position mega menu exactly below the sticky navbar
+  function updateMegaTop() {
+    var nav = document.getElementById('mNav');
+    if (nav) {
+      var rect = nav.getBoundingClientRect();
+      document.documentElement.style.setProperty('--mega-top', rect.bottom + 'px');
+    }
+  }
+  updateMegaTop();
+  window.addEventListener('scroll', updateMegaTop, {passive: true});
+  window.addEventListener('resize', updateMegaTop, {passive: true});
+
   // Preload state images on trigger hover (without opening menu)
   li.addEventListener('mouseenter', function() {
     preloadStateImages();
@@ -1366,6 +1378,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // Click toggle only — no hover open/close
   trigger.addEventListener('click', function(e) {
     e.preventDefault();
+    updateMegaTop();
     toggleMegaMenu();
   });
 
