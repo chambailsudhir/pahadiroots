@@ -1236,7 +1236,7 @@ function buildMegaMenu() {
       if (shown >= 12) return; // max 12 rows
       var li = document.createElement('li');
       var btn = document.createElement('button');
-      btn.innerHTML = '<span class="mega-icon">' + cat.icon + '</span>' + cat.label;
+      btn.innerHTML = cat.label;
       btn.onclick = (function(catKey) { return function() {
         closeMegaMenu();
         window.location.href = '/category.html?id=' + catKey;
@@ -1255,7 +1255,7 @@ function buildMegaMenu() {
     statesData.forEach(function(st) {
       var li = document.createElement('li');
       var btn = document.createElement('button');
-      btn.innerHTML = '<span class="mega-state-icon">🏔️</span>' + st.name;
+      btn.innerHTML = st.name;
       btn.onclick = (function(stId) {
         return function() {
           closeMegaMenu();
@@ -1279,7 +1279,7 @@ function buildMegaMenu() {
     MEGA_CURATED.forEach(function(item) {
       var li = document.createElement('li');
       var btn = document.createElement('button');
-      btn.innerHTML = '<span class="mega-icon">' + item.icon + '</span>' + item.label;
+      btn.innerHTML = item.label;
       btn.onclick = function() {
         closeMegaMenu();
         var shopEl = document.getElementById('shop') || document.getElementById('pgrid');
@@ -1303,7 +1303,7 @@ function buildMegaMenu() {
       var viewAllStates = document.createElement('a');
       viewAllStates.href = '/all-states.html';
       viewAllStates.className = 'mega-view-all mega-view-all-states';
-      viewAllStates.innerHTML = '🗺️ View All Regions →';
+      viewAllStates.innerHTML = 'View All Regions →';
       viewAllStates.onclick = function() { closeMegaMenu(); };
       listStatesEl.parentNode.appendChild(viewAllStates);
     }
