@@ -152,7 +152,7 @@
     button{cursor:pointer;font-family:inherit}
     img{max-width:100%}
     .ann{background:var(--g);color:#d4af37;text-align:center;padding:9px 20px;font-size:12.5px;letter-spacing:.3px}
-    .ticker-wrap{background:var(--gd);overflow:hidden;padding:7px 0}
+    .ticker-wrap{background:var(--gd);overflow:hidden;padding:7px 0;display:none}
     nav#mNav{background:#fff;border-bottom:1px solid var(--bd);position:sticky;top:0;z-index:500;display:flex;align-items:center;justify-content:space-between;padding:0 32px;height:64px;gap:16px}
     .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
     .logo-name{font-family:'Playfair Display',Georgia,serif;font-size:19px;font-weight:900;color:var(--g);line-height:1.1}
@@ -440,7 +440,7 @@
 <script>
 // Cart opens as overlay - no need to hide main content
 </script>
-<div class="ann" id="annBar">🌿 <span id="annText">Free Shipping above ₹<span id="annShipAmt">799</span> &nbsp;|&nbsp; <a href="#pay-sec">UPI · Cards · COD</a> &nbsp;|&nbsp; 10 Himalayan States Covered</span></div>
+<div class="ann" id="annBar" style="display:none">🌿 <span id="annText">Free Shipping above ₹<span id="annShipAmt">799</span> &nbsp;|&nbsp; <a href="#pay-sec">UPI · Cards · COD</a> &nbsp;|&nbsp; 10 Himalayan States Covered</span></div>
 <!-- Announcement Ticker -->
 <div class="ticker-wrap" id="tickerWrap" aria-label="Announcements">
   <div class="ticker-track" id="tickerTrack">
