@@ -55,6 +55,16 @@ const FALLBACK_STATES = [
     description:"Where Culture Meets Nature — the queen pineapple here is so sweet it needs no sugar. Wild forest honey gathered by Chakma & Tripuri tribes using centuries-old bark hives. And Berma — fermented fish paste — the Northeast's best-kept culinary secret.",
     pills:["🍍 Queen Pineapple","🍯 Wild Forest Honey","🎋 Bamboo Shoots","🌿 Matai Peas","🫙 Berma (Fermented Fish)"],
     cover_photo_url:"", tab_photo_url:""},
+   {id:"ar", name:"Arunachal Pradesh", emoji:"🌄", tagline:"Land of the Rising Sun",
+    panel_bg:"linear-gradient(135deg,#0a2a1f,#1a4d35)",
+    description:"Arunachal Pradesh — the first land in India to greet the rising sun each morning. Home to over 26 major tribes, each with their own language, festivals, and culinary tradition. The Khamti and Adi tribes cultivate rare indigenous rice varieties on hillside terraces above 2,000 metres. The forests here hold wild orchids, medicinal herbs, and the kiwi — once grown nowhere else in India. Black rice from Arunachal, rich in antioxidants, has been a staple of tribal warriors for centuries. And the region's wild hill honey, gathered from rock hives deep in virgin forest, carries the flavour of thousands of Himalayan wildflowers.",
+    pills:["🌾 Black Rice","🍯 Wild Hill Honey","🌿 Medicinal Herbs","🥝 Hill Kiwi","🎋 Bamboo Pickle"],
+    cover_photo_url:"", tab_photo_url:""},
+   {id:"mz", name:"Mizoram", emoji:"🌿", tagline:"Mystical Mizoram",
+    panel_bg:"linear-gradient(135deg,#0d2b1f,#1a4a32)",
+    description:"Mizoram — the Land of the Hill People, where 95% of the land is covered in dense forests rolling across the Blue Mountain range. The Mizo people have one of the highest literacy rates in India and a culture of extraordinary artistry. Their traditional Zawlaidi honey, gathered wild from forest hives, is unlike any other — dark, bittersweet, and medicinal. The forests yield bay leaves, ginger, turmeric, and wild chillies that flavour a cuisine both fiery and aromatic. The Mizo king chilli rivals the Bhut Jolokia in heat and is prized across the Northeast. Anthurium flowers colour every hillside, and the forests hide bamboo shoots that are fermented into a condiment used in every traditional kitchen.",
+    pills:["🍯 Zawlaidi Honey","🌶️ Mizo King Chilli","🎋 Bamboo Shoots","🌿 Wild Turmeric","🍃 Bay Leaves"],
+    cover_photo_url:"", tab_photo_url:""},
 ];
 
 const FALLBACK_PRODUCTS = [
@@ -1653,7 +1663,7 @@ function renderStates() {
 
   pn.innerHTML = STATES.map(function(s, i) {
     var stProds = PRODUCTS.filter(function(p) { return p.state_id === s.id; });
-    var pills   = (s.pills||[]).map(function(p) { return '<span class="sstate-pill">' + p + '</span>'; }).join('');
+    var pills   = (s.pills||[]).map(function(p) { return '<span class="sstate-pill">' + p.replace(/^[\u{1F300}-\u{1FFFF}\u{2600}-\u{27BF}]\s*/u,'') + '</span>'; }).join('');
     var bg      = s.panel_bg || 'linear-gradient(135deg,#1a3a1e,#2d5233)';
     var coverSrc = (s._uploadedImgs && s._uploadedImgs[0]) || s._uploadedImg || s.cover_photo_url || '';
     // Gather all images for this state (multi-image slideshow support)
@@ -1685,11 +1695,11 @@ function renderStates() {
     }
     var prodsHtml = stProds.length
       ? stProds.map(function(p, i) { return mkProd(p, i); }).join('')
-      : '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--tx3);font-family:\'Playfair Display\',serif;font-style:italic">🏔️ Products coming soon from ' + s.name + '…</div>';
+      : '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--tx3);font-family:\'Playfair Display\',serif;font-style:italic">Products coming soon from ' + s.name + '…</div>';
     return '<div class="spnl' + (i===0?' active':'') + '" id="p-' + s.id + '">' +
       '<div class="shdr">' + photoHtml +
         '<div class="shdr-info-col" style="background:' + bg + '">' +
-          '<div class="sstate-title">' + s.emoji + ' ' + s.name + '<span style="font-size:12px;font-weight:400;opacity:.7;display:block;margin-top:2px;font-style:italic">' + (s.tagline||'') + '</span></div>' +
+          '<div class="sstate-title">' + s.name + '<span style="font-size:12px;font-weight:400;opacity:.7;display:block;margin-top:2px;font-style:italic">' + (s.tagline||'') + '</span></div>' +
           '<div class="sstate-desc">' + (s.description||'') + '</div>' +
           '<div class="sstate-pills">' + pills + '</div>' +
         '</div>' +
@@ -1732,7 +1742,7 @@ function renderStoryCards(activeId) {
     return '<div class="story-card' + (isActive ? ' active-state' : '') + '" onclick="swState(\''+s.id+'\');renderStoryCards(\''+s.id+'\')" data-state-href="' + cardUrl + '" title="View all products from ' + s.name + '">'+
       imgHtml +
       '<div class="story-card-body">'+
-        '<div class="story-card-name">' + s.emoji + ' ' + s.name + '</div>'+
+        '<div class="story-card-name">' + s.name + '</div>'+
         '<div class="story-card-tag">' + (s.tagline||'') + '</div>'+
         '<div class="story-card-line">' + snippet + '</div>'+
       '</div>'+
@@ -1740,7 +1750,7 @@ function renderStoryCards(activeId) {
   }).join('') +
     // "View All States" card
     '<a href="/all-states.html" class="story-card" style="text-decoration:none;color:inherit;background:var(--g);display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:160px;cursor:pointer">' +
-      '<div style="font-size:40px;margin-bottom:10px">🗺️</div>' +
+      '<div style="font-size:40px;margin-bottom:10px"></div>' +
       '<div class="story-card-body" style="background:transparent;text-align:center">' +
         '<div class="story-card-name" style="color:#fff;font-size:14px">View All States</div>' +
         '<div class="story-card-tag" style="color:rgba(255,255,255,.6)">10+ Regions →</div>' +
