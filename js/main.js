@@ -998,7 +998,7 @@ async function loadData() {
         if (!db) return local;
         return Object.assign({}, local, {
           name:            db.name         || local.name,
-          description:     db.description  || local.description,
+          description:     (db.description && db.description.trim()) || local.description,
           cover_photo_url: db.image_path   || local.cover_photo_url,
           tab_photo_url:   db.image_path   || local.tab_photo_url,
         });
@@ -1663,7 +1663,7 @@ function renderStates() {
 
   pn.innerHTML = STATES.map(function(s, i) {
     var stProds = PRODUCTS.filter(function(p) { return p.state_id === s.id; });
-    var pills   = (s.pills||[]).map(function(p) { return '<span class="sstate-pill">' + p.replace(/^[\u{1F300}-\u{1FFFF}\u{2600}-\u{27BF}]\s*/u,'') + '</span>'; }).join('');
+    var pills   = (s.pills||[]).map(function(p) { return '<span class="sstate-pill">' + p + '</span>'; }).join('');
     var bg      = s.panel_bg || 'linear-gradient(135deg,#1a3a1e,#2d5233)';
     var coverSrc = (s._uploadedImgs && s._uploadedImgs[0]) || s._uploadedImg || s.cover_photo_url || '';
     // Gather all images for this state (multi-image slideshow support)
