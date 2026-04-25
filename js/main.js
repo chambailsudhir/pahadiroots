@@ -1336,17 +1336,14 @@ function closeMegaMenu() {
 function toggleMegaMenu() {
   _megaOpen ? closeMegaMenu() : openMegaMenu();
 }
-// ── Falling SVG leaves for mega menu ──
+// ── Falling leaves for mega menu ──
 var _leafInterval = null;
-
-// Single leaf SVG — clean simple shape matching brand style
-var _leafSVGs = [
-  '<svg viewBox="0 0 20 28" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 26 C10 26 2 18 2 11 C2 5.5 5.5 2 10 2 C14.5 2 18 5.5 18 11 C18 18 10 26 10 26Z" fill="#4a7c59" opacity="0.82"/><line x1="10" y1="26" x2="10" y2="2" stroke="#2d5233" stroke-width="0.8" stroke-linecap="round"/><path d="M10 14 Q6 10 4 7" stroke="#2d5233" stroke-width="0.5" fill="none" stroke-linecap="round"/><path d="M10 14 Q14 10 16 7" stroke="#2d5233" stroke-width="0.5" fill="none" stroke-linecap="round"/></svg>'
-];
+var _leafEmojis = ['🍂','🍁','🌿','🍃','🍂','🍁','🍃'];
 
 function startLeaves() {
   var menu = document.getElementById('shopMegaMenu');
   if (!menu) return;
+  // make sure menu is positioned relative for absolute children
   menu.style.position = 'relative';
   menu.style.overflow = 'hidden';
 
@@ -1354,27 +1351,26 @@ function startLeaves() {
     if (!_megaOpen) { stopLeaves(); return; }
     var leaf = document.createElement('span');
     leaf.className = 'mega-leaf';
-    var svgStr = _leafSVGs[Math.floor(Math.random() * _leafSVGs.length)];
-    leaf.innerHTML = svgStr;
-    var startX   = 5 + Math.random() * 90;
-    var duration = 4 + Math.random() * 3;
-    var delay    = Math.random() * 0.4;
-    var size     = 14 + Math.random() * 12;
-    var swayAmt  = (Math.random() - 0.5) * 70;
+    leaf.textContent = _leafEmojis[Math.floor(Math.random() * _leafEmojis.length)];
+    var startX = Math.random() * 100; // % across menu width
+    var duration = 3.5 + Math.random() * 3;   // 3.5–6.5s
+    var delay    = Math.random() * 0.5;
+    var size     = 12 + Math.random() * 10;   // 12–22px
+    var swayAmt  = (Math.random() - 0.5) * 80; // horizontal drift
     leaf.style.cssText = [
       'left:' + startX + '%',
-      'width:' + size + 'px',
-      'height:' + size + 'px',
+      'font-size:' + size + 'px',
       'animation-duration:' + duration + 's',
       'animation-delay:' + delay + 's',
       'animation-name:leafFall',
       '--sway:' + swayAmt + 'px'
     ].join(';');
     menu.appendChild(leaf);
+    // Remove after animation completes
     setTimeout(function() {
       if (leaf.parentNode) leaf.parentNode.removeChild(leaf);
     }, (duration + delay + 0.5) * 1000);
-  }, 350);
+  }, 320);
 }
 
 function stopLeaves() {
