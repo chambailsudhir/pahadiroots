@@ -1255,11 +1255,7 @@ function buildMegaMenu() {
     statesData.forEach(function(st) {
       var li = document.createElement('li');
       var btn = document.createElement('button');
-      var imgSrc = st.cover_photo_url || st.tab_photo_url || '';
-      var thumbHtml = imgSrc
-        ? '<span class="mega-state-thumb-wrap"><img class="mega-state-thumb" src="' + imgOpt(imgSrc,{w:88,q:70}) + '" alt="' + st.name + '" width="44" height="44" loading="eager" decoding="async" onload="this.classList.add(\'loaded\');this.parentNode.classList.add(\'img-ok\')" onerror="this.style.display=\'none\';this.parentNode.classList.add(\'img-ok\')"></span>'
-        : '<span class="mega-state-thumb-wrap img-ok">' + (st.emoji || '🏔️') + '</span>';
-      btn.innerHTML = thumbHtml + st.name;
+      btn.innerHTML = '<span class="mega-state-icon">🏔️</span>' + st.name;
       btn.onclick = (function(stId) {
         return function() {
           closeMegaMenu();
