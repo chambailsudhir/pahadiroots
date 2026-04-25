@@ -983,10 +983,10 @@ async function loadData() {
       initCollectionImages(data.settings); // Category card images
       initHeroStats(data.settings);  // Editable stats counters
       initTrustBar(data.settings);   // Editable trust bar
+      // ── Cache settings FIRST so next page load anti-flash script is in sync ──
+      try { localStorage.setItem('pr_site_settings', JSON.stringify(data.settings)); localStorage.setItem('pr_cache_ver', 'v4'); } catch(e) {}
       initAnnBar(data.settings);     // Announcement bar
       initTickerBar(data.settings);  // Scrolling ticker
-      // ── Cache settings so hero + UI renders instantly on next page load ──
-      try { localStorage.setItem('pr_site_settings', JSON.stringify(data.settings)); localStorage.setItem('pr_cache_ver', 'v4'); } catch(e) {}
       // Cache DB categories so collection cards load correctly on next visit
       if (Array.isArray(data.categories) && data.categories.length) {
         try { localStorage.setItem('pr_categories', JSON.stringify(data.categories)); } catch(e) {}
@@ -3125,8 +3125,14 @@ function initAnnBar(s) {
   if (!s) return;
   var bar = document.getElementById('annBar');
   if (!bar) return;
+  // Always remove injected anti-flash style first (same pattern as initTickerBar)
+  document.querySelectorAll('style').forEach(function(st) {
+    if (st.textContent && st.textContent.indexOf('annBar') !== -1) {
+      st.parentNode.removeChild(st);
+    }
+  });
   if (s.ann_hide === 'true') { bar.style.display = 'none'; return; }
-  bar.style.display = 'block';
+  bar.style.display = '';
   if (s.ann_text) {
     var span = document.getElementById('annText');
     if (span) span.innerHTML = s.ann_text;
@@ -3139,15 +3145,16 @@ function initTickerBar(s) {
   if (!s) return;
   var wrap = document.getElementById('tickerWrap');
   if (!wrap) return;
-  // Respect admin ticker_hide toggle — hide entire bar if set to true
-  if (s['ticker_hide'] === 'true') { wrap.style.display = 'none'; return; }
-  // Remove any anti-flash <style> injected by the inline script (it uses !important
-  // and will override wrap.style.display = 'block' when transitioning from hidden→visible)
+  // ALWAYS remove any anti-flash <style> injected by inline script first.
+  // Must happen before checking ticker_hide, otherwise a stale cache hide
+  // followed by a fresh API show gets blocked by the injected style persisting.
   document.querySelectorAll('style').forEach(function(st) {
-    if (st.textContent.indexOf('#tickerWrap') !== -1 && st.textContent.indexOf('display:none') !== -1) {
+    if (st.textContent && st.textContent.indexOf('tickerWrap') !== -1) {
       st.parentNode.removeChild(st);
     }
   });
+  // Now apply correct hide/show state from fresh settings
+  if (s['ticker_hide'] === 'true') { wrap.style.display = 'none'; return; }
   wrap.style.display = '';
   // Check if ALL 5 items are individually hidden — hide whole bar if so
   var allItemsHidden = true;
