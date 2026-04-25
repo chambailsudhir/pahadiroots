@@ -447,7 +447,7 @@ footer{background:#132b17;padding:0;position:relative;overflow:hidden}
 .f-art-frieze svg{display:block;width:100%}
 
 /* Brand row: medallion + text + vine — full width spread */
-.f-brand-row{display:flex;align-items:center;gap:32px;padding:36px 60px 28px;border-bottom:1px solid rgba(200,146,10,.18);width:100%;max-width:100%;box-sizing:border-box}
+.f-brand-row{display:flex;align-items:center;gap:32px;padding:36px 60px 28px;width:100%;max-width:100%;box-sizing:border-box}
 .f-brand-col{flex:1;min-width:0}
 .f-brand-name{font-family:'Playfair Display',serif;font-size:26px;font-weight:900;color:#fff;line-height:1.1;margin-bottom:4px}
 .f-brand-sub{font-size:10.5px;color:#c8920a;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;margin-bottom:12px}
@@ -463,7 +463,7 @@ footer{background:#132b17;padding:0;position:relative;overflow:hidden}
 .f-vine-panel svg{display:block}
 
 /* Main links grid — 3 equal cols, full width, bigger text */
-.f-main{width:100%;box-sizing:border-box;padding:32px 60px 28px;display:grid;grid-template-columns:1fr 1fr 1.4fr;gap:60px;border-bottom:1px solid rgba(200,146,10,.12)}
+.f-main{width:100%;box-sizing:border-box;padding:32px 60px 28px;display:grid;grid-template-columns:1fr 1fr 1.4fr;gap:60px}
 .fh{font-size:11px;font-weight:800;letter-spacing:2.5px;color:#c8920a;text-transform:uppercase;margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid rgba(200,146,10,.22)}
 .ful{list-style:none;display:flex;flex-direction:column;gap:11px}
 .ful li a{font-size:14.5px;color:rgba(255,255,255,.55);transition:all .2s;display:flex;align-items:center;gap:7px}
@@ -475,7 +475,7 @@ footer{background:#132b17;padding:0;position:relative;overflow:hidden}
 .f-contact-text a:hover{color:#fff}
 
 /* Social + FSSAI bar — below the links grid */
-.f-social-bar{width:100%;box-sizing:border-box;padding:24px 60px 28px;border-bottom:1px solid rgba(200,146,10,.12)}
+.f-social-bar{width:100%;box-sizing:border-box;padding:24px 60px 28px}
 .f-social-bar-inner{display:flex;align-items:center;justify-content:flex-start;flex-wrap:wrap;gap:32px}
 .f-soc-row--lg .f-soc{width:46px;height:46px}
 .f-soc-row--lg{gap:12px}
