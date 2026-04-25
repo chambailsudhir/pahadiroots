@@ -853,6 +853,9 @@ async function loadData() {
       if (document.getElementById('cgrid')) {
         try { initCollectionImages(_cachedSettings); } catch(e) {}
       }
+      // Apply ticker + announcement bar visibility instantly from cache (no flash)
+      try { initAnnBar(_cachedSettings); } catch(e) {}
+      try { initTickerBar(_cachedSettings); } catch(e) {}
     }
   } catch(e) {}
 
@@ -3120,13 +3123,6 @@ function stickyAddToCart() { if (_stickyProdId) addToCart(_stickyProdId); }
 // Keys: ann_hide='true', ann_text (custom text override)
 function initAnnBar(s) {
   if (!s) return;
-  // Cache to localStorage so next page load applies instantly (no flash)
-  try {
-    var cached = JSON.parse(localStorage.getItem('pr_site_settings') || '{}');
-    cached.ann_hide    = s.ann_hide    || 'false';
-    cached.ticker_hide = s.ticker_hide || 'false';
-    localStorage.setItem('pr_site_settings', JSON.stringify(cached));
-  } catch(e) {}
   var bar = document.getElementById('annBar');
   if (!bar) return;
   if (s.ann_hide === 'true') { bar.style.display = 'none'; return; }
