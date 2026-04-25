@@ -248,6 +248,23 @@
     body.dark .mega-list li a:hover,body.dark .mega-list li button:hover{background:rgba(255,255,255,.06);color:#7ec87e}
     body.dark .mega-heading{color:#4a6b4a}
     body.dark .mega-view-all{color:#7ec87e;border-color:#1e3a22}
+
+    /* ── Falling leaves animation ── */
+    .mega-leaf{
+      position:absolute;top:-40px;pointer-events:none;z-index:10;
+      animation:leafFall linear infinite;
+      opacity:0;
+      user-select:none;
+      font-size:16px;
+    }
+    @keyframes leafFall{
+      0%  {transform:translateY(0px)   rotate(0deg)   translateX(0px);   opacity:0}
+      5%  {opacity:.9}
+      30% {transform:translateY(140px) rotate(200deg) translateX(20px);  opacity:.85}
+      60% {transform:translateY(310px) rotate(420deg) translateX(-15px); opacity:.7}
+      85% {transform:translateY(450px) rotate(600deg) translateX(25px);  opacity:.4}
+      100%{transform:translateY(530px) rotate(720deg) translateX(var(--sway,30px)); opacity:0}
+    }
     /* Mobile — hide desktop mega, show mobile nav instead */
     @media(max-width:820px){.mega-menu{display:none!important}}
   </style>
