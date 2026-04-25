@@ -153,7 +153,7 @@
     img{max-width:100%}
     .ann{background:var(--g);color:#d4af37;text-align:center;padding:9px 20px;font-size:12.5px;letter-spacing:.3px}
     .ticker-wrap{background:var(--gd);overflow:hidden;padding:7px 0}
-    nav#mNav{background:#fff;border-bottom:1px solid var(--bd);position:sticky;top:0;z-index:500;display:flex;align-items:center;justify-content:space-between;padding:0 32px;height:64px;gap:16px}
+    nav#mNav{background:#fff;border-bottom:1px solid var(--bd);position:sticky;top:0;z-index:600;display:flex;align-items:center;justify-content:space-between;padding:0 32px;height:64px;gap:16px}
     .logo{display:flex;align-items:center;gap:10px;text-decoration:none}
     .logo-name{font-family:'Playfair Display',Georgia,serif;font-size:19px;font-weight:900;color:var(--g);line-height:1.1}
     .logo-tl{font-size:10.5px;color:var(--gd);font-weight:600;letter-spacing:.5px}
@@ -169,17 +169,7 @@
     .mega-trigger .arr{font-size:10px;transition:transform .25s ease;display:inline-block;margin-left:2px}
     .mega-parent.open .mega-trigger .arr{transform:rotate(180deg)}
 
-    /* ── Mega menu wrapper — floating card with rounded corners ── */
-    .mega-menu-backdrop{
-      position:fixed;top:var(--mega-top,64px);left:0;right:0;bottom:0;
-      z-index:500;
-      visibility:hidden;opacity:0;pointer-events:none;
-      transition:opacity .22s,visibility 0s linear .22s;
-    }
-    .mega-menu-backdrop.open{
-      visibility:visible;opacity:1;pointer-events:auto;
-      transition:opacity .22s,visibility 0s linear 0s;
-    }
+    /* ── Mega menu floating card ── */
     .mega-menu{
       position:fixed;top:var(--mega-top,64px);
       left:50%;transform:translateX(-50%) translateY(-10px);
@@ -187,7 +177,7 @@
       background:#fff;
       border-radius:0 0 20px 20px;
       box-shadow:0 20px 60px rgba(0,0,0,.14),0 4px 16px rgba(0,0,0,.06);
-      z-index:501;
+      z-index:599;
       display:flex;gap:0;align-items:stretch;
       overflow:hidden;
       /* Hidden state */
@@ -484,23 +474,7 @@
     <li><a href="/our-story">Our Story</a></li>
     <li class="mega-parent" id="shopNavLi">
       <a href="#shop" class="mega-trigger" id="shopNavTrigger" onclick="return false;">Shop <span class="arr">▾</span></a>
-      <div class="mega-menu" id="shopMegaMenu" role="menu">
-        <div class="mega-col" id="megaColCollections">
-          <div class="mega-heading">ALL COLLECTIONS</div>
-          <ul class="mega-list" id="megaListCollections"></ul>
-          <a href="/all-products.html" class="mega-view-all">View All Products →</a>
-        </div>
-        <div class="mega-divider"></div>
-        <div class="mega-col" id="megaColStates">
-          <div class="mega-heading">SHOP BY REGION</div>
-          <ul class="mega-list" id="megaListStates"></ul>
-        </div>
-        <div class="mega-divider"></div>
-        <div class="mega-col" id="megaColCurated">
-          <div class="mega-heading">CURATED PICKS</div>
-          <ul class="mega-list" id="megaListCurated"></ul>
-        </div>
-      </div>
+
     </li>
     <li><a href="#pay-sec">Payment</a></li>
     <li><a href="#contact">Contact</a></li>
@@ -578,6 +552,24 @@
     <button class="mob-menu-btn" onclick="openMobNav()" aria-label="Menu">☰</button>
   </div>
 </nav>
+<!-- Mega menu — outside nav so it never overlaps logo/links -->
+<div class="mega-menu" id="shopMegaMenu" role="menu">
+  <div class="mega-col" id="megaColCollections">
+    <div class="mega-heading">ALL COLLECTIONS</div>
+    <ul class="mega-list" id="megaListCollections"></ul>
+    <a href="/all-products.html" class="mega-view-all">View All Products →</a>
+  </div>
+  <div class="mega-divider"></div>
+  <div class="mega-col" id="megaColStates">
+    <div class="mega-heading">SHOP BY REGION</div>
+    <ul class="mega-list" id="megaListStates"></ul>
+  </div>
+  <div class="mega-divider"></div>
+  <div class="mega-col" id="megaColCurated">
+    <div class="mega-heading">CURATED PICKS</div>
+    <ul class="mega-list" id="megaListCurated"></ul>
+  </div>
+</div>
 <!-- Mobile nav -->
 <div class="mob-nav" id="mobNav">
   <div class="mob-nav-bg" onclick="closeMobNav()"></div>
