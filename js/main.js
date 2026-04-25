@@ -1320,6 +1320,7 @@ function openMegaMenu() {
   menu.classList.add('open');
   li.classList.add('open');
   _megaOpen = true;
+  startLeaves();
 }
 
 function closeMegaMenu() {
@@ -1329,11 +1330,58 @@ function closeMegaMenu() {
   menu.classList.remove('open');
   li.classList.remove('open');
   _megaOpen = false;
+  stopLeaves();
 }
 
 function toggleMegaMenu() {
   _megaOpen ? closeMegaMenu() : openMegaMenu();
 }
+// ── Falling leaves for mega menu ──
+var _leafInterval = null;
+var _leafEmojis = ['🍂','🍁','🌿','🍃','🍂','🍁','🍃'];
+
+function startLeaves() {
+  var menu = document.getElementById('shopMegaMenu');
+  if (!menu) return;
+  // make sure menu is positioned relative for absolute children
+  menu.style.position = 'relative';
+  menu.style.overflow = 'hidden';
+
+  _leafInterval = setInterval(function() {
+    if (!_megaOpen) { stopLeaves(); return; }
+    var leaf = document.createElement('span');
+    leaf.className = 'mega-leaf';
+    leaf.textContent = _leafEmojis[Math.floor(Math.random() * _leafEmojis.length)];
+    var startX = Math.random() * 100; // % across menu width
+    var duration = 3.5 + Math.random() * 3;   // 3.5–6.5s
+    var delay    = Math.random() * 0.5;
+    var size     = 12 + Math.random() * 10;   // 12–22px
+    var swayAmt  = (Math.random() - 0.5) * 80; // horizontal drift
+    leaf.style.cssText = [
+      'left:' + startX + '%',
+      'font-size:' + size + 'px',
+      'animation-duration:' + duration + 's',
+      'animation-delay:' + delay + 's',
+      'animation-name:leafFall',
+      '--sway:' + swayAmt + 'px'
+    ].join(';');
+    menu.appendChild(leaf);
+    // Remove after animation completes
+    setTimeout(function() {
+      if (leaf.parentNode) leaf.parentNode.removeChild(leaf);
+    }, (duration + delay + 0.5) * 1000);
+  }, 320);
+}
+
+function stopLeaves() {
+  if (_leafInterval) { clearInterval(_leafInterval); _leafInterval = null; }
+  var menu = document.getElementById('shopMegaMenu');
+  if (menu) {
+    var leaves = menu.querySelectorAll('.mega-leaf');
+    leaves.forEach(function(l){ if(l.parentNode) l.parentNode.removeChild(l); });
+  }
+}
+
 
 // Wire up hover + click on the Shop trigger
 // ── Preload state images before menu opens ──
