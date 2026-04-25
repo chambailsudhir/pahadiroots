@@ -1338,7 +1338,7 @@ function toggleMegaMenu() {
 }
 // ── Falling leaves for mega menu ──
 var _leafInterval = null;
-var _leafEmojis = ['🍂','🍁','🌿','🍃','🍂','🍁','🍃'];
+var _leafEmojis = ['🌿','🍃','🌿','🍃','🌿'];
 
 function startLeaves() {
   var menu = document.getElementById('shopMegaMenu');
