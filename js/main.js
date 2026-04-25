@@ -3143,17 +3143,18 @@ function initTickerBar(s) {
   if (!s) return;
   var wrap = document.getElementById('tickerWrap');
   if (!wrap) return;
-  // Always show ticker — safety net same as trust/stats bars
+  // Respect admin ticker_hide toggle — hide entire bar if set to true
+  if (s['ticker_hide'] === 'true') { wrap.style.display = 'none'; return; }
   wrap.style.display = '';
-  // Check if ALL 5 items are individually hidden
+  // Check if ALL 5 items are individually hidden — hide whole bar if so
   var allItemsHidden = true;
   for (var chk = 1; chk <= 5; chk++) {
     if (s['ticker_' + chk + '_hide'] !== 'true') { allItemsHidden = false; break; }
   }
+  if (allItemsHidden) { wrap.style.display = 'none'; return; }
   for (var n = 1; n <= 5; n++) {
     var items = document.querySelectorAll('[data-ticker="' + n + '"]');
-    // If all items hidden in DB, show them all (safety net)
-    var hide = allItemsHidden ? false : (s['ticker_' + n + '_hide'] === 'true');
+    var hide = s['ticker_' + n + '_hide'] === 'true';
     var text = s['ticker_' + n + '_text'];
     items.forEach(function(el) {
       if (hide) { el.style.display = 'none'; return; }
