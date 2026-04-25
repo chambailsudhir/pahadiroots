@@ -439,15 +439,24 @@
 <body data-theme="pahadi">
 <script>
 // Anti-flash: synchronously apply bar visibility from localStorage before render
+// Uses a cache version key — if version mismatch, clears stale settings (no hidden bars)
 (function(){
   try {
+    var CACHE_VER = 'v4';
+    var ver = localStorage.getItem('pr_cache_ver');
+    if (ver !== CACHE_VER) {
+      // Stale or old cache — clear it so bars show by default until fresh data loads
+      localStorage.removeItem('pr_site_settings');
+      localStorage.setItem('pr_cache_ver', CACHE_VER);
+      return; // don't hide anything — let JS show correct state after API call
+    }
     var s = JSON.parse(localStorage.getItem('pr_site_settings') || 'null');
     if (s) {
       if (s.ticker_hide === 'true') {
-        document.write('<style>#tickerWrap{display:none!important}</style>');
+        document.write('<style>#tickerWrap{display:none!important}<\/style>');
       }
       if (s.ann_hide === 'true') {
-        document.write('<style>#annBar{display:none!important}</style>');
+        document.write('<style>#annBar{display:none!important}<\/style>');
       }
     }
   } catch(e) {}

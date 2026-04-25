@@ -986,7 +986,7 @@ async function loadData() {
       initAnnBar(data.settings);     // Announcement bar
       initTickerBar(data.settings);  // Scrolling ticker
       // ── Cache settings so hero + UI renders instantly on next page load ──
-      try { localStorage.setItem('pr_site_settings', JSON.stringify(data.settings)); } catch(e) {}
+      try { localStorage.setItem('pr_site_settings', JSON.stringify(data.settings)); localStorage.setItem('pr_cache_ver', 'v4'); } catch(e) {}
       // Cache DB categories so collection cards load correctly on next visit
       if (Array.isArray(data.categories) && data.categories.length) {
         try { localStorage.setItem('pr_categories', JSON.stringify(data.categories)); } catch(e) {}
