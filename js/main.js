@@ -998,7 +998,7 @@ async function loadData() {
         if (!db) return local;
         return Object.assign({}, local, {
           name:            db.name         || local.name,
-          description:     (db.description && db.description.trim()) || local.description,
+          description:     (db.description && db.description.trim().length > 80 && db.description.trim() !== local.tagline) ? db.description.trim() : local.description,
           cover_photo_url: db.image_path   || local.cover_photo_url,
           tab_photo_url:   db.image_path   || local.tab_photo_url,
         });
