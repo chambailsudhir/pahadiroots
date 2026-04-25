@@ -3126,7 +3126,7 @@ function initAnnBar(s) {
   var bar = document.getElementById('annBar');
   if (!bar) return;
   if (s.ann_hide === 'true') { bar.style.display = 'none'; return; }
-  bar.style.display = '';
+  bar.style.display = 'block';
   if (s.ann_text) {
     var span = document.getElementById('annText');
     if (span) span.innerHTML = s.ann_text;
@@ -3141,7 +3141,7 @@ function initTickerBar(s) {
   if (!wrap) return;
   // Respect admin ticker_hide toggle — hide entire bar if set to true
   if (s['ticker_hide'] === 'true') { wrap.style.display = 'none'; return; }
-  wrap.style.display = '';
+  wrap.style.display = 'block';
   // Check if ALL 5 items are individually hidden — hide whole bar if so
   var allItemsHidden = true;
   for (var chk = 1; chk <= 5; chk++) {
