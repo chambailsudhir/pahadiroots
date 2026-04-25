@@ -453,10 +453,10 @@
     var s = JSON.parse(localStorage.getItem('pr_site_settings') || 'null');
     if (s) {
       if (s.ticker_hide === 'true') {
-        document.write('<style>#tickerWrap{display:none!important}<\/style>');
+        document.write('<style>#tickerWrap{display:none}<\/style>');
       }
       if (s.ann_hide === 'true') {
-        document.write('<style>#annBar{display:none!important}<\/style>');
+        document.write('<style>#annBar{display:none}<\/style>');
       }
     }
   } catch(e) {}

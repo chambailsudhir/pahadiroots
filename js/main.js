@@ -3141,7 +3141,14 @@ function initTickerBar(s) {
   if (!wrap) return;
   // Respect admin ticker_hide toggle — hide entire bar if set to true
   if (s['ticker_hide'] === 'true') { wrap.style.display = 'none'; return; }
-  wrap.style.display = 'block';
+  // Remove any anti-flash <style> injected by the inline script (it uses !important
+  // and will override wrap.style.display = 'block' when transitioning from hidden→visible)
+  document.querySelectorAll('style').forEach(function(st) {
+    if (st.textContent.indexOf('#tickerWrap') !== -1 && st.textContent.indexOf('display:none') !== -1) {
+      st.parentNode.removeChild(st);
+    }
+  });
+  wrap.style.display = '';
   // Check if ALL 5 items are individually hidden — hide whole bar if so
   var allItemsHidden = true;
   for (var chk = 1; chk <= 5; chk++) {
