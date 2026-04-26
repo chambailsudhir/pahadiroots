@@ -31,10 +31,10 @@
 @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
 
 /* ── Hero ── */
-.cp-hero{position:relative;height:260px;display:flex;align-items:center;overflow:hidden;background:linear-gradient(135deg,#0d1a0f,#1a3a1e)}
-.cp-hero-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 30%;filter:brightness(.38) saturate(1.5);transform:scale(1.04);transition:transform 8s ease;will-change:transform}
+.cp-hero{position:relative;height:260px;display:flex;align-items:center;overflow:hidden;background:#1a3a1e}
+.cp-hero-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 30%;filter:brightness(.55) saturate(1.2);transform:scale(1.04);transition:transform 8s ease;will-change:transform}
 .cp-hero-bg.loaded{transform:scale(1)}
-.cp-hero-overlay{position:absolute;inset:0;background:linear-gradient(105deg,rgba(0,0,0,.72) 0%,rgba(0,0,0,.3) 60%,rgba(0,0,0,.15) 100%)}
+.cp-hero-overlay{position:absolute;inset:0;background:linear-gradient(105deg,rgba(15,35,16,.82) 0%,rgba(15,35,16,.55) 55%,rgba(15,35,16,.2) 100%)}
 .cp-hero-content{position:relative;z-index:2;padding:0 64px;width:100%;box-sizing:border-box;animation:heroIn .5s cubic-bezier(.22,1,.36,1) both;display:flex;align-items:center;gap:28px}
 .cp-breadcrumb{font-size:10px;color:rgba(255,255,255,.45);display:flex;align-items:center;gap:6px;font-family:'Lato',sans-serif;letter-spacing:.6px;text-transform:uppercase;margin-bottom:6px}
 .cp-breadcrumb a{color:rgba(255,255,255,.45);text-decoration:none;transition:color .15s}.cp-breadcrumb a:hover{color:#c8920a}
@@ -62,7 +62,7 @@
 .cp-sort select:focus{border-color:#c8920a}
 
 /* ── Products section ── */
-.cp-products-sec{padding:48px 48px 72px;max-width:1440px;margin:0 auto;width:100%;box-sizing:border-box}
+.cp-products-sec{padding:48px 48px 72px;max-width:1440px;margin:0 auto;width:100%;box-sizing:border-box;background:#faf6ee}
 .cp-sec-title{font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:#1a3a1e;margin-bottom:28px;display:flex;align-items:center;gap:12px}
 .cp-sec-title::after{content:'';flex:1;height:1px;background:linear-gradient(to right,#e0d8cc,transparent)}
 .cp-empty{text-align:center;padding:100px 20px}
@@ -120,6 +120,11 @@ body.dark .cp-other-card:hover .cp-other-img-wrap{border-color:#c8920a}
 body.dark .cp-other-card-name{color:#d4e8d4}
 body.dark .cp-sec-title{color:#7ec87e}
 body.dark .cp-sec-title::after{background:linear-gradient(to right,#1e3a22,transparent)}
+
+/* Page background — matches product page cream */
+html, body { background: #faf6ee !important; }
+.cp-toolbar { background: rgba(250,246,238,0.97); border-bottom: 1px solid rgba(26,58,30,.1); }
+#cpOtherCats { background: #f2eadc; }
 </style>
 </head>
 <body data-theme="pahadi">
