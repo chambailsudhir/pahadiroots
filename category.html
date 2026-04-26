@@ -604,6 +604,22 @@ function _cpInit() {
   var products = (window.PRODUCTS && window.PRODUCTS.length) ? window.PRODUCTS : window.FALLBACK_PRODUCTS;
   var settings = window.SITE_SETTINGS || {};
   if (!products || !products.length) return;
+
+  // If DB_CATEGORIES not loaded yet, wait up to 3s then proceed anyway (regex fallback will kick in)
+  var dbCats = window.DB_CATEGORIES || [];
+  if (!dbCats.length) {
+    var _dbWait = 0;
+    var _dbPoll = setInterval(function() {
+      _dbWait++;
+      var cats = window.DB_CATEGORIES || [];
+      if (cats.length || _dbWait > 15) { // 15 × 200ms = 3s max wait
+        clearInterval(_dbPoll);
+        _cpInit();
+      }
+    }, 200);
+    return; // wait for DB_CATEGORIES
+  }
+
   _cpReady = true;
 
   var dbCats = window.DB_CATEGORIES || [];
@@ -759,7 +775,23 @@ function _cpRenderOtherCats(currentMeta, allProducts, settings, dbCats) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-  if (window.PRODUCTS && window.PRODUCTS.length) setTimeout(_cpInit, 50);
+  // Try immediately if data already loaded (cache hit)
+  if (window.PRODUCTS && window.PRODUCTS.length) {
+    setTimeout(_cpInit, 50);
+    return;
+  }
+  // Otherwise poll — main.js fires _onStoreDataReady when ready, but as a safety net
+  // also poll every 200ms for up to 8 seconds
+  var _cpPollCount = 0;
+  var _cpPoll = setInterval(function() {
+    _cpPollCount++;
+    if (window.PRODUCTS && window.PRODUCTS.length) {
+      clearInterval(_cpPoll);
+      _cpInit();
+    } else if (_cpPollCount > 40) {
+      clearInterval(_cpPoll); // give up after 8s
+    }
+  }, 200);
 });
 </script>
 <script 

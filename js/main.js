@@ -837,6 +837,8 @@ async function loadData() {
       PRODUCTS = _cached.products;
       renderProds();
       _cacheUsed = true;
+      // Also notify category.html if it's waiting for data
+      if (typeof window._onStoreDataReady === 'function') { try { setTimeout(window._onStoreDataReady, 0); } catch(e){} }
     }
   } catch(e) {}
 
