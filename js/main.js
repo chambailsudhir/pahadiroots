@@ -849,7 +849,7 @@ async function loadData() {
       // Restore cached DB categories so initCollectionImages uses them as source of truth
       try {
         var _cachedCats = JSON.parse(localStorage.getItem('pr_categories') || 'null');
-        if (Array.isArray(_cachedCats) && _cachedCats.length) { window.DB_CATEGORIES = _cachedCats; rebuildFilterMap(); }
+        if (Array.isArray(_cachedCats) && _cachedCats.length) { window.DB_CATEGORIES = _cachedCats; rebuildFilterMap(); rebuildMegaCategories(); }
       } catch(e) {}
       initHeroSlider(_cachedSettings);
       window.SITE_SETTINGS = _cachedSettings; // expose early for category.html
@@ -891,7 +891,8 @@ async function loadData() {
     // Store DB categories globally so initCollectionImages uses them as source of truth
     if (Array.isArray(data.categories) && data.categories.length) {
       window.DB_CATEGORIES = data.categories;
-      rebuildFilterMap(); // rebuild filter map with real category IDs
+      rebuildFilterMap();        // rebuild FILTER_MAP with category_id-based functions
+      rebuildMegaCategories();   // rebuild MEGA_CATEGORIES + filter pills from DB
     }
     // Load DB coupons
     if (Array.isArray(data.coupons) && data.coupons.length) {
@@ -1215,20 +1216,45 @@ var _megaOpen = false;
 var _megaBuilt = false;
 
 // Category config: key → {label, icon, filter regex}
-var MEGA_CATEGORIES = [
-  {key:'honey',    label:'Honey',      icon:'🍯', re:/honey/i},
-  {key:'ghee',     label:'Ghee',       icon:'🥛', re:/ghee|butter/i},
-  {key:'saffron',  label:'Saffron',    icon:'🌸', re:/saffron|kesar/i},
-  {key:'tea',      label:'Tea',        icon:'🍵', re:/tea|chai/i},
-  {key:'spices',   label:'Spices',     icon:'🌿', re:/spice|cardamom|turmeric|pepper|chilli|ginger/i},
-  {key:'oil',      label:'Oils',       icon:'🫚', re:/oil/i},
-  {key:'rice',     label:'Rice',       icon:'🌾', re:/rice/i},
-  {key:'juice',    label:'Juice',      icon:'🧃', re:/juice|squash/i},
-  {key:'jams',     label:'Jams',       icon:'🍓', re:/jam|preserve|marmalade/i},
-  {key:'nuts',     label:'Dry Fruits', icon:'🌰', re:/walnut|almond|cashew|pistachio|dry.fruit|apricot|fig/i},
-  {key:'shilajit', label:'Shilajit',   icon:'🪨', re:/shilajit/i},
-  {key:'pulses',   label:'Pulses',     icon:'🫘', re:/pulse|rajma|dal|lentil/i},
-];
+// MEGA_CATEGORIES — built dynamically from DB_CATEGORIES when available
+// Falls back to empty array; rebuilt by rebuildMegaCategories() after API loads
+var MEGA_CATEGORIES = [];
+
+// Emoji fallback if DB category has no emoji
+function _catEmoji(name) {
+  var n = (name||'').toLowerCase();
+  if (/honey/.test(n))   return '🍯';
+  if (/shilajit/.test(n)) return '🪨';
+  if (/pulse|dal|rajma/.test(n)) return '🫘';
+  if (/juice|squash/.test(n)) return '🧃';
+  if (/tea|chai/.test(n)) return '🍵';
+  if (/herb|spice|turmeric|cardamom/.test(n)) return '🌿';
+  if (/rice/.test(n)) return '🌾';
+  if (/oil|ghee/.test(n)) return '🫚';
+  if (/jam|preserve/.test(n)) return '🍓';
+  return '🌿';
+}
+
+function _toSlug(name) {
+  return (name||'').toLowerCase().replace(/&/g,'and').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+}
+
+function rebuildMegaCategories() {
+  var dbCats = window.DB_CATEGORIES || [];
+  if (!dbCats.length) return;
+  MEGA_CATEGORIES = dbCats.filter(function(c){ return c.is_active !== false; }).map(function(c) {
+    return {
+      key:   _toSlug(c.slug || c.name),  // e.g. "herbs-and-spices"
+      label: c.name,                      // e.g. "Herbs & Spices"
+      icon:  c.emoji || _catEmoji(c.name),
+      dbId:  String(c.id),
+    };
+  });
+  // Rebuild mega menu and filter pills with fresh categories
+  _megaBuilt = false;
+  buildMegaMenu();
+  buildFilterPills();
+}
 
 var MEGA_CURATED = [
   {label:'Best Sellers',    icon:'✦', filter:'bestseller'},
@@ -1248,9 +1274,9 @@ function buildMegaMenu() {
     listColl.innerHTML = '';
     var shown = 0;
     MEGA_CATEGORIES.forEach(function(cat) {
-      // Check if any product matches
+      // Check if any product belongs to this category (by category_id)
       var hasProducts = PRODUCTS.some(function(p) {
-        return cat.re.test(p.name + ' ' + (p.description || '') + ' ' + (p.category_id || ''));
+        return cat.dbId ? String(p.category_id) === cat.dbId : true;
       });
       if (!hasProducts && PRODUCTS.length > 0) return; // skip empty categories (only when data loaded)
       if (shown >= 12) return; // max 12 rows
@@ -1425,7 +1451,7 @@ function buildMobMega() {
     mobColl.innerHTML = '';
     MEGA_CATEGORIES.forEach(function(cat) {
       var hasProducts = PRODUCTS.some(function(p) {
-        return cat.re.test(p.name + ' ' + (p.description || '') + ' ' + (p.category_id || ''));
+        return cat.dbId ? String(p.category_id) === cat.dbId : true;
       });
       if (!hasProducts && PRODUCTS.length > 0) return;
       var a = document.createElement('a');
@@ -1465,20 +1491,43 @@ function buildMobMega() {
 }
 
 // ── PRODUCT CARD ───────────────────────────────────────────────────
-// ── FILTER MAP — rebuilt from DB_CATEGORIES when available ────
-// Uses category_id match (exact, reliable) with regex fallback
-// Simple, reliable filter map — regex on product name+description
-// Works immediately without waiting for DB_CATEGORIES to load
-var FILTER_MAP = {
-  honey:   function(p) { return /honey/i.test(p.name + ' ' + (p.description||'')); },
-  ghee:    function(p) { return /ghee|butter/i.test(p.name + ' ' + (p.description||'')); },
-  spices:  function(p) { return /spice|cardamom|turmeric|pepper|saffron|chilli|ginger/i.test(p.name + ' ' + (p.description||'')); },
-  tea:     function(p) { return /tea|chai/i.test(p.name + ' ' + (p.description||'')); },
-  saffron: function(p) { return /saffron|kesar/i.test(p.name + ' ' + (p.description||'')); },
-  oil:     function(p) { return /oil/i.test(p.name + ' ' + (p.description||'')); },
-};
+// ── FILTER MAP — built from DB_CATEGORIES, keyed by slug ─────────────
+// Each key maps to a function that returns true if a product belongs to that category
+var FILTER_MAP = {};
 
-function rebuildFilterMap() { /* no-op — FILTER_MAP is now hardcoded, always ready */ }
+function rebuildFilterMap() {
+  var dbCats = window.DB_CATEGORIES || [];
+  FILTER_MAP = {};
+  dbCats.forEach(function(c) {
+    var key = _toSlug(c.slug || c.name);
+    var dbId = String(c.id);
+    FILTER_MAP[key] = function(p) {
+      return p.category_id && String(p.category_id) === dbId;
+    };
+  });
+}
+
+// Build and inject filter pills into all-products.html filter bar
+function buildFilterPills() {
+  var bar = document.getElementById('filterBar');
+  if (!bar) return;
+  var dbCats = window.DB_CATEGORIES || [];
+  if (!dbCats.length) return;
+  // Remove old dynamic pills (keep the "All" button)
+  bar.querySelectorAll('.filter-btn[data-dynamic]').forEach(function(b){ b.remove(); });
+  var sort = bar.querySelector('.filter-sort');
+  dbCats.filter(function(c){ return c.is_active !== false; }).forEach(function(c) {
+    var key = _toSlug(c.slug || c.name);
+    var btn = document.createElement('button');
+    btn.className = 'filter-btn';
+    btn.setAttribute('data-dynamic', '1');
+    btn.setAttribute('data-filter', key);
+    btn.textContent = (c.emoji || _catEmoji(c.name)) + ' ' + c.name;
+    btn.onclick = function(){ setFilter(key, btn); };
+    // Insert before the sort dropdown
+    bar.insertBefore(btn, sort);
+  });
+}
 
 function mkProd(p, idx) {
   var pct    = p.original_price ? Math.round((1 - p.price / p.original_price) * 100) : 0;
