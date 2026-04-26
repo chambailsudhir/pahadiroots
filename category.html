@@ -659,10 +659,9 @@ function _cpInit() {
   document.getElementById('ogTitle').setAttribute('content', title);
   document.getElementById('pageCanonical').setAttribute('href', 'https://pahadiroots.com/collections/' + canonicalSlug);
 
+  // Filter products by DB category_id — clean, no regex, DB is source of truth
   _cpProducts = products.filter(function(p) {
-    if (_cpMeta.dbId && p.category_id) return String(p.category_id) === _cpMeta.dbId;
-    if (_cpMeta.re) return _cpMeta.re.test(p.name + ' ' + (p.description || '') + ' ' + (p.slug || ''));
-    return false;
+    return _cpMeta.dbId && p.category_id && String(p.category_id) === _cpMeta.dbId;
   });
 
   var catImgUrl = (settings['coll_img_' + canonicalSlug] || settings['coll_img_' + _cpCatSlug] || '').trim();
@@ -712,6 +711,21 @@ function _cpRenderProducts(meta) {
   grid.style.display = '';
   empty.style.display = 'none';
   if (typeof observeRv === 'function') observeRv();
+  // Force-reveal images — runs at 100ms, 600ms, 2000ms to catch all load timings
+  function _cpRevealImgs() {
+    grid.querySelectorAll('.piw img').forEach(function(img) {
+      if (img.complete && img.naturalWidth > 0) {
+        img.style.opacity = '1';
+        var sk = img.previousElementSibling;
+        if (sk) sk.style.display = 'none';
+        var piw = img.closest('.piw');
+        if (piw) piw.classList.add('img-ready');
+      }
+    });
+  }
+  setTimeout(_cpRevealImgs, 100);
+  setTimeout(_cpRevealImgs, 600);
+  setTimeout(_cpRevealImgs, 2000);
 }
 
 function cpSortProducts(v) {

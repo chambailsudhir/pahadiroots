@@ -52,7 +52,7 @@ export default async function handler(req, res) {
       sbGet('founder_images', 'order=sort_order.asc').catch(() => []),
       sbGet('product_variants', 'is_active=eq.true&order=product_id.asc,sort_order.asc').catch(() => []),
       sbGet('team_members', 'is_active=eq.true&order=sort_order.asc').catch(() => []),
-      sbGet('categories', 'select=id,name,slug,image_url,sort_order&is_active=eq.true&order=sort_order.asc,name.asc').catch(() => []),
+      sbGet('categories', 'select=id,name,slug,emoji,description,image_url,sort_order&is_active=eq.true&order=sort_order.asc,name.asc').catch(() => []),
     ]);
 
     // Convert site_settings array to object
