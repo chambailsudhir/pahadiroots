@@ -248,10 +248,6 @@ function getStoreApiBase() {
 //   hero_slide_1_coupon_label, hero_slide_1_coupon_offer, hero_slide_1_coupon_code
 //   (repeat for _2_ and _3_)
 // ══════════════════════════════════════════════════════════════
-var _heroSlideIndex = 0;
-var _heroSlideTimer = null;
-var _heroSlideCount = 0;
-
 // ── IMAGE HELPER — direct Supabase URLs (no transform add-on required) ──
 function imgOpt(url, opts) {
   if (!url) return url;
@@ -856,6 +852,9 @@ async function loadData() {
       // Apply ticker + announcement bar visibility instantly from cache (no flash)
       try { initAnnBar(_cachedSettings); } catch(e) {}
       try { initTickerBar(_cachedSettings); } catch(e) {}
+      // Apply stats + trust bar from cache so no snap/flash on repeat visits
+      try { initHeroStats(_cachedSettings); } catch(e) {}
+      try { initTrustBar(_cachedSettings); } catch(e) {}
     }
   } catch(e) {}
 
@@ -876,7 +875,7 @@ async function loadData() {
 
   // Step 2: try DB (background refresh — updates cache + re-renders silently)
   try {
-    var r = await fetch(getStoreApiBase() + '/store-data');
+    var r = await fetch(getStoreApiBase() + '/store-data?_=' + Date.now(), { cache: 'no-store' });
     if (!r.ok) throw new Error('store-data HTTP ' + r.status);
     var data = await r.json();
     var dbStates = data.states;
@@ -977,16 +976,16 @@ async function loadData() {
       // Hide COD button if disabled in admin settings
       var codBtn = document.getElementById('btn-cod');
       if (codBtn) codBtn.style.display = (data.settings.cod_enabled === 'false') ? 'none' : '';
-      updateShipAmountDisplays();
       uCart(); // Recalculate cart total with correct shipping settings from DB
       initHeroPanel(data.settings); // Hero panel images + sale badge
       initCollectionImages(data.settings); // Category card images
       initHeroStats(data.settings);  // Editable stats counters
       initTrustBar(data.settings);   // Editable trust bar
       // ── Cache settings FIRST so next page load anti-flash script is in sync ──
-      try { localStorage.setItem('pr_site_settings', JSON.stringify(data.settings)); localStorage.setItem('pr_cache_ver', 'v4'); } catch(e) {}
+      try { localStorage.setItem('pr_site_settings', JSON.stringify(data.settings)); localStorage.setItem('pr_cache_ver', 'v5'); } catch(e) {}
       initAnnBar(data.settings);     // Announcement bar
-      initTickerBar(data.settings);  // Scrolling ticker
+      initTickerBar(data.settings);  // Scrolling ticker — rebuilds track HTML
+      updateShipAmountDisplays();    // AFTER ticker rebuild so fresh dynShipAmt spans get correct value
       // Cache DB categories so collection cards load correctly on next visit
       if (Array.isArray(data.categories) && data.categories.length) {
         try { localStorage.setItem('pr_categories', JSON.stringify(data.categories)); } catch(e) {}
@@ -2686,7 +2685,7 @@ function updateShipAmountDisplays() {
   document.querySelectorAll('.dynShipAmt').forEach(function(el) {
     el.textContent = freeAll ? 'all orders' : amt;
   });
-  // Update announcement bar
+  // Update announcement bar (only if using default text — skip if admin set custom ann_text)
   var ann = document.getElementById('annShipAmt');
   if (ann) {
     if (freeAll) {
@@ -2695,6 +2694,10 @@ function updateShipAmountDisplays() {
       ann.textContent = amt;
     }
   }
+  // If custom ann_text is set and contains a dynShipAmt placeholder, update it too
+  document.querySelectorAll('#annText .dynShipAmt').forEach(function(el) {
+    el.textContent = freeAll ? 'all orders' : amt;
+  });
   // Update ticker items
   document.querySelectorAll('.ticker-item').forEach(function(el) {
     if (el.textContent.indexOf('Free shipping') !== -1) {
@@ -3119,59 +3122,121 @@ function hideStickyAtc() { var sa = document.getElementById('stickyAtc'); if(sa)
 function stickyAddToCart() { if (_stickyProdId) addToCart(_stickyProdId); }
 
 // ── HERO STATS COUNTER ────────────────────────────────────────────
-// ── ANNOUNCEMENT BAR — editable from admin Settings ───────────────────────────
-// Keys: ann_hide='true', ann_text (custom text override)
+// ══════════════════════════════════════════════════════════════
+// ANNOUNCEMENT BAR
+// DB keys: ann_hide='true'|'false', ann_text (optional custom HTML)
+// ══════════════════════════════════════════════════════════════
 function initAnnBar(s) {
   if (!s) return;
   var bar = document.getElementById('annBar');
   if (!bar) return;
-  // Always remove injected anti-flash style first (same pattern as initTickerBar)
-  document.querySelectorAll('style').forEach(function(st) {
-    if (st.textContent && st.textContent.indexOf('annBar') !== -1) {
-      st.parentNode.removeChild(st);
-    }
+
+  // Step 1 — nuke any injected anti-flash <style> that hides #annBar.
+  // The anti-flash script uses document.write so the style tag lands
+  // in <body> before DOMContentLoaded. We must remove it here so
+  // bar.style.display can take effect (inline style beats stylesheet).
+  document.querySelectorAll('style').forEach(function(el) {
+    if (el.textContent && el.textContent.indexOf('#annBar') !== -1) el.remove();
   });
-  if (s.ann_hide === 'true') { bar.style.display = 'none'; return; }
+
+  // Step 2 — apply admin setting
+  if (s.ann_hide === 'true') {
+    bar.style.display = 'none';
+    return;
+  }
   bar.style.display = '';
-  if (s.ann_text) {
+
+  // Step 3 — custom text (optional; leave blank to use default HTML)
+  if (s.ann_text && s.ann_text.trim()) {
     var span = document.getElementById('annText');
-    if (span) span.innerHTML = s.ann_text;
+    if (span) span.innerHTML = s.ann_text.trim();
   }
 }
 
-// ── TICKER BAR — editable from admin Settings ──────────────────────────────
-// Keys: ticker_hide='true', ticker_1..5_text, ticker_1..5_hide='true'
+// ══════════════════════════════════════════════════════════════
+// TICKER BAR  (complete rewrite — fresh, no patches)
+//
+// DB keys (flat strings, saved by admin/settings/page.jsx):
+//   ticker_hide        = 'true' | 'false'   — whole bar on/off
+//   ticker_1_text …    ticker_5_text         — item text (HTML ok)
+//   ticker_1_hide …    ticker_5_hide         = 'true' | 'false'
+//
+// HTML structure (index.html):
+//   <div id="tickerWrap"> <div id="tickerTrack">
+//     items 1-5 (data-ticker="N"), then items 1-5 again for seamless loop
+//   </div> </div>
+//
+// CSS (main.css):
+//   .ticker-wrap  { display:block; overflow:hidden; }
+//   .ticker-track { display:flex; animation:tick 28s linear infinite; }
+//   .ticker-item  { padding:0 32px; white-space:nowrap; }
+//   @keyframes tick { to { transform:translateX(-50%); } }
+//
+// The track is exactly 2× the visible items so translateX(-50%)
+// lands back at the start — seamless loop. Hiding items by
+// display:none breaks this (track shrinks, loop jumps). Instead
+// we rebuild the track HTML with only visible items, duplicated.
+// ══════════════════════════════════════════════════════════════
 function initTickerBar(s) {
   if (!s) return;
-  var wrap = document.getElementById('tickerWrap');
-  if (!wrap) return;
-  // ALWAYS remove any anti-flash <style> injected by inline script first.
-  // Must happen before checking ticker_hide, otherwise a stale cache hide
-  // followed by a fresh API show gets blocked by the injected style persisting.
-  document.querySelectorAll('style').forEach(function(st) {
-    if (st.textContent && st.textContent.indexOf('tickerWrap') !== -1) {
-      st.parentNode.removeChild(st);
-    }
+  var wrap  = document.getElementById('tickerWrap');
+  var track = document.getElementById('tickerTrack');
+  if (!wrap || !track) return;
+
+  // Step 1 — remove any injected anti-flash style for tickerWrap
+  document.querySelectorAll('style').forEach(function(el) {
+    if (el.textContent && el.textContent.indexOf('#tickerWrap') !== -1) el.remove();
   });
-  // Now apply correct hide/show state from fresh settings
-  if (s['ticker_hide'] === 'true') { wrap.style.display = 'none'; return; }
-  wrap.style.display = '';
-  // Check if ALL 5 items are individually hidden — hide whole bar if so
-  var allItemsHidden = true;
-  for (var chk = 1; chk <= 5; chk++) {
-    if (s['ticker_' + chk + '_hide'] !== 'true') { allItemsHidden = false; break; }
+
+  // Step 2 — whole-bar toggle
+  if (s['ticker_hide'] === 'true') {
+    wrap.style.display = 'none';
+    return;
   }
-  if (allItemsHidden) { wrap.style.display = 'none'; return; }
+
+  // Step 3 — collect visible items (1-5)
+  var DEFAULTS = [
+    '🎁 Use code <strong>WELCOME50</strong> <span>·</span> ₹50 off your first order',
+    '🚚 Free shipping <span>·</span> On orders above ₹<span class="dynShipAmt">799</span> — Pan India',
+    '🌿 100% Natural <span>·</span> Lab-tested, pure',
+    '🏔️ Direct from farmers <span>·</span> 200+ mountain families',
+    '⭐ Rated 4.9/5 <span>·</span> 10,000+ happy customers'
+  ];
+
+  var visibleItems = [];
   for (var n = 1; n <= 5; n++) {
-    var items = document.querySelectorAll('[data-ticker="' + n + '"]');
-    var hide = s['ticker_' + n + '_hide'] === 'true';
-    var text = s['ticker_' + n + '_text'];
-    items.forEach(function(el) {
-      if (hide) { el.style.display = 'none'; return; }
-      el.style.display = '';
-      if (text) el.innerHTML = text;
-    });
+    if (s['ticker_' + n + '_hide'] === 'true') continue;
+    var text = (s['ticker_' + n + '_text'] && s['ticker_' + n + '_text'].trim())
+               ? s['ticker_' + n + '_text'].trim()
+               : DEFAULTS[n - 1];
+    visibleItems.push({ n: n, text: text });
   }
+
+  // Step 4 — if ALL items hidden, hide bar
+  if (visibleItems.length === 0) {
+    wrap.style.display = 'none';
+    return;
+  }
+
+  // Step 5 — show bar, rebuild track with visible items × 2 (seamless loop)
+  wrap.style.display = '';
+
+  var html = '';
+  // First copy
+  visibleItems.forEach(function(item) {
+    html += '<span class="ticker-item" data-ticker="' + item.n + '">' + item.text + '</span>';
+  });
+  // Second copy (identical — needed for translateX(-50%) seamless loop)
+  visibleItems.forEach(function(item) {
+    html += '<span class="ticker-item" data-ticker="' + item.n + '">' + item.text + '</span>';
+  });
+
+  track.innerHTML = html;
+
+  // Step 6 — adjust animation speed based on item count
+  // Fewer items = shorter total width = faster loop at same 28s = adjust
+  var speedSeconds = Math.max(12, visibleItems.length * 5.6); // ~5.6s per item, min 12s
+  track.style.animationDuration = speedSeconds + 's';
 }
 
 // ── HERO STATS — editable from admin Settings ─────────────────────
@@ -3262,12 +3327,20 @@ function initTrustBar(s) {
     if (subEl && sub) subEl.innerHTML = sub;
   });
 
-  // Always show the bar — individual badges can be hidden but bar itself never hides
-  bar.style.display = visibleCount > 0 ? 'grid' : 'none';
+  // Update column count to match visible items (avoids ghost columns)
+  if (visibleCount > 0) {
+    bar.style.display = 'grid';
+    bar.style.gridTemplateColumns = 'repeat(' + visibleCount + ',1fr)';
+  } else {
+    bar.style.display = 'none';
+  }
 }
 
 function animateCounters() {
   document.querySelectorAll('.hstat-num[data-target]').forEach(function(el) {
+    // Skip if already animated with same target (prevents double-flash on API re-call)
+    if (el.dataset.animated === el.dataset.target) return;
+    el.dataset.animated = el.dataset.target;
     var target = parseInt(el.dataset.target);
     var suffix = el.querySelector('em') ? el.querySelector('em').outerHTML : '';
     var current = 0;
