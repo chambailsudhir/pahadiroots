@@ -544,35 +544,53 @@ body.dark .cp-sec-title::after{background:linear-gradient(to right,#1e3a22,trans
 <script>
 window.IS_CATEGORY_PAGE = true;
 
-var CAT_META = {
-  honey:    {label:'Wild Honey',        tagline:'Pure mountain nectar, straight from the hive',          emoji:'🍯', badge:'Natural Honey', pills:['🐝 Raw & Unfiltered','🌸 Multifloral','🏔️ Rock Hive Harvested','🌿 Medicinal Grade'], re:/honey/i},
-  ghee:     {label:'A2 Bilona Ghee',    tagline:'Hand-churned from indigenous Himalayan cow milk',       emoji:'🥛', badge:'Traditional Process', pills:['🐄 Indigenous Cows','🧈 Bilona Method','🌄 High Altitude Farms','✨ Grainy Texture'], re:/ghee|butter/i},
-  saffron:  {label:'Kashmiri Saffron',  tagline:'The world\'s finest spice — thread by golden thread',  emoji:'🌸', badge:'Grade A Mongra', pills:['🌺 Pampore Valley','☀️ Hand-harvested','🧪 Lab Certified','👑 Grade A Only'], re:/saffron|kesar/i},
-  tea:      {label:'Himalayan Teas',    tagline:'First flush teas from misty high-altitude gardens',    emoji:'🍵', badge:'Single Estate', pills:['🌱 Single Estate','🏔️ High Altitude','🫖 Orthodox Process','🍃 Kangra & Assam'], re:/tea|chai/i},
-  spices:   {label:'Herbs & Spices',    tagline:'Ancient spices from mountain farms and wild forests',   emoji:'🌿', badge:'Pure & Potent', pills:['🌶️ Sun-dried','🧪 Lab Tested','🏔️ Wild Foraged','🌱 Chemical-free'], re:/spice|cardamom|turmeric|pepper|chilli|ginger|herb/i},
-  oil:      {label:'Natural Oils',      tagline:'Cold-pressed from the finest Himalayan seeds & nuts',  emoji:'🫚', badge:'Cold Pressed', pills:['❄️ Cold Pressed','🌿 No Additives','🏔️ Mountain Source','🧴 Culinary & Beauty'], re:/oil/i},
-  oils:     {label:'Natural Oils',      tagline:'Cold-pressed from the finest Himalayan seeds & nuts',  emoji:'🫚', badge:'Cold Pressed', pills:['❄️ Cold Pressed','🌿 No Additives'], re:/oil/i},
-  rice:     {label:'Heritage Rice',     tagline:'Heirloom varieties grown in ancient mountain valleys',  emoji:'🌾', badge:'Heirloom Variety', pills:['🌾 Heirloom Strain','🏔️ Altitude Grown','🧬 GI Certified','🍚 Aromatic'], re:/rice/i},
-  juice:    {label:'Mountain Juices',   tagline:'Wild-harvested Himalayan fruits, bottled pure',        emoji:'🧃', badge:'No Preservatives', pills:['🍑 Wild Fruits','🚫 No Preservatives','🏔️ High Altitude','🌿 100% Natural'], re:/juice|squash/i},
-  jams:     {label:'Jams & Preserves',  tagline:'Small-batch preserves from Himalayan orchards',       emoji:'🍓', badge:'Orchard Fresh', pills:['🍎 Fresh Fruit','🍯 Naturally Sweetened','🏔️ Orchard Fresh','🫙 Hand-packed'], re:/jam|preserve|marmalade/i},
-  nuts:     {label:'Dry Fruits & Nuts', tagline:'Sun-dried from Himalayan orchards and ancient forests', emoji:'🌰', badge:'Wild Sourced', pills:['🌰 Kagzi Walnuts','🥜 Chilgoza Pine','🍑 Wild Apricots','☀️ Sun Dried'], re:/walnut|almond|cashew|pistachio|dry.fruit|apricot|fig|nut/i},
-  shilajit: {label:'Shilajit',          tagline:'Ancient mineral resin from Ladakhi granite rock faces', emoji:'🪨', badge:'Lab Verified', pills:['🏔️ Ladakh Origin','🧪 Lab Verified','💪 Grade-A Resin','🌿 Ayurvedic'], re:/shilajit/i},
-  pulses:   {label:'Pulses & Dal',      tagline:'Nutritious mountain lentils and heritage beans',       emoji:'🫘', badge:'Mountain Grown', pills:['🌾 Pahadi Rajma','🏔️ High Altitude','🌱 Natural Farming','🍲 Heirloom'], re:/pulse|rajma|dal|lentil/i},
-};
+// ── Slug helpers ──────────────────────────────────────────────────────────────
+function _cpGetSlugFromUrl() {
+  var path = window.location.pathname;
+  var m = path.match(/^\/collections\/(.+)/);
+  if (m) return decodeURIComponent(m[1]).toLowerCase();
+  return (new URLSearchParams(window.location.search)).get('id') || '';
+}
 
-// Regex map for filtering "other" categories — must have real products
-var CAT_RE = {
-  honey:/honey/i, ghee:/ghee|butter/i, saffron:/saffron|kesar/i, tea:/tea|chai/i,
-  spices:/spice|cardamom|turmeric|pepper|chilli|ginger|herb/i, oil:/oil/i, oils:/oil/i,
-  rice:/rice/i, juice:/juice|squash/i, jams:/jam|preserve|marmalade/i,
-  nuts:/walnut|almond|cashew|pistachio|dry.fruit|apricot|fig|nut/i,
-  shilajit:/shilajit/i, pulses:/pulse|rajma|dal|lentil/i
-};
+function _cpToSlug(name) {
+  return (name || '')
+    .toLowerCase()
+    .replace(/&/g, 'and')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+}
 
-var _cpCatId = (new URLSearchParams(window.location.search)).get('id') || '';
+var _cpCatSlug = _cpGetSlugFromUrl();
 var _cpSortOrder = 'default';
 var _cpProducts = [];
 var _cpReady = false;
+var _cpMeta = null;
+
+function _cpBuildMeta(dbCat) {
+  var emojiMap = {
+    honey:'🍯', ghee:'🥛', butter:'🥛', saffron:'🌸', kesar:'🌸',
+    tea:'🍵', chai:'🍵', spice:'🌿', herb:'🌿', cardamom:'🌿',
+    oil:'🫚', rice:'🌾', juice:'🧃', jam:'🍓', preserve:'🍓',
+    walnut:'🌰', almond:'🌰', nut:'🌰', fruit:'🌰',
+    shilajit:'🪨', pulse:'🫘', dal:'🫘', rajma:'🫘', lentil:'🫘'
+  };
+  var name = dbCat.name || '';
+  var nameLower = name.toLowerCase();
+  var emoji = dbCat.emoji || '🌿';
+  if (!dbCat.emoji) {
+    for (var k in emojiMap) {
+      if (nameLower.indexOf(k) !== -1) { emoji = emojiMap[k]; break; }
+    }
+  }
+  return {
+    label:   name,
+    tagline: dbCat.description && dbCat.description !== 'EMPTY' ? dbCat.description : 'Authentic Himalayan ' + name.toLowerCase() + ' — sourced directly from mountain farmers',
+    emoji:   emoji,
+    badge:   'Himalayan',
+    pills:   [],
+    dbId:    String(dbCat.id)
+  };
+}
 
 window._onStoreDataReady = function() { _cpInit(); };
 
@@ -583,73 +601,77 @@ function _cpInit() {
   if (!products || !products.length) return;
   _cpReady = true;
 
-  var meta = CAT_META[_cpCatId];
-  if (!meta) {
-    var megaCat = (window.MEGA_CATEGORIES || []).find(function(c){ return c.key === _cpCatId; });
-    if (megaCat) meta = {label:megaCat.label, tagline:'Authentic Himalayan '+megaCat.label.toLowerCase(), emoji:megaCat.icon, badge:'Himalayan', pills:[], re:megaCat.re};
+  var dbCats = window.DB_CATEGORIES || [];
+  var matchedCat = null;
+  for (var i = 0; i < dbCats.length; i++) {
+    var c = dbCats[i];
+    var dbSlug = _cpToSlug(c.slug || c.name);
+    if (dbSlug === _cpCatSlug) { matchedCat = c; break; }
   }
 
-  if (!meta) {
+  if (!matchedCat) {
+    var megaCat = (window.MEGA_CATEGORIES || []).find(function(mc) { return mc.key === _cpCatSlug; });
+    if (megaCat) {
+      for (var j = 0; j < dbCats.length; j++) {
+        if (_cpToSlug(dbCats[j].name) === _cpToSlug(megaCat.label)) { matchedCat = dbCats[j]; break; }
+      }
+      if (!matchedCat) {
+        _cpMeta = {label:megaCat.label, tagline:'Authentic Himalayan '+megaCat.label.toLowerCase(), emoji:megaCat.icon, badge:'Himalayan', pills:[], dbId:null, re:megaCat.re};
+      }
+    }
+  }
+
+  if (matchedCat) _cpMeta = _cpBuildMeta(matchedCat);
+
+  if (!_cpMeta) {
     document.getElementById('cpHero').innerHTML = '';
     document.getElementById('cpSkeleton').style.display = 'none';
     document.getElementById('cp404').style.display = 'block';
     return;
   }
 
-  // SEO
-  var title = meta.label + ' – 5 Pahadi Roots | Himalayan Natural Store';
+  var canonicalSlug = matchedCat ? _cpToSlug(matchedCat.slug || matchedCat.name) : _cpCatSlug;
+  var title = _cpMeta.label + ' – 5 Pahadi Roots | Himalayan Natural Store';
   document.getElementById('pageTitle').textContent = title;
   document.title = title;
-  document.getElementById('pageDesc').setAttribute('content', 'Shop authentic Himalayan '+meta.label.toLowerCase()+' — '+meta.tagline+'. Sourced directly from mountain farmers at 5 Pahadi Roots.');
+  document.getElementById('pageDesc').setAttribute('content', 'Shop authentic Himalayan ' + _cpMeta.label.toLowerCase() + ' — ' + _cpMeta.tagline + '. Sourced directly from mountain farmers at 5 Pahadi Roots.');
   document.getElementById('ogTitle').setAttribute('content', title);
-  document.getElementById('pageCanonical').setAttribute('href', 'https://pahadiroots.com/category.html?id='+_cpCatId);
-
-  // Try to match by DB category_id first (exact, reliable)
-  // Fall back to regex on name+description if no category_id match found
-  var dbCats = window.DB_CATEGORIES || [];
-  var matchedCat = dbCats.find(function(c) {
-    return (c.slug || '').toLowerCase() === _cpCatId.toLowerCase();
-  });
-  var matchedCatId = matchedCat ? String(matchedCat.id) : null;
+  document.getElementById('pageCanonical').setAttribute('href', 'https://pahadiroots.com/collections/' + canonicalSlug);
 
   _cpProducts = products.filter(function(p) {
-    if (matchedCatId && p.category_id) {
-      return String(p.category_id) === matchedCatId;
-    }
-    return meta.re.test(p.name+' '+(p.description||'')+' '+(p.slug||''));
+    if (_cpMeta.dbId && p.category_id) return String(p.category_id) === _cpMeta.dbId;
+    if (_cpMeta.re) return _cpMeta.re.test(p.name + ' ' + (p.description || '') + ' ' + (p.slug || ''));
+    return false;
   });
 
-  var catImgUrl = (settings['coll_img_'+_cpCatId]||'').trim();
-  _cpRenderHero(meta, catImgUrl);
-  _cpRenderToolbar(meta);
-  _cpRenderProducts(meta);
-  _cpRenderOtherCats(meta, products, settings);
+  var catImgUrl = (settings['coll_img_' + canonicalSlug] || settings['coll_img_' + _cpCatSlug] || '').trim();
+  _cpRenderHero(_cpMeta, catImgUrl);
+  _cpRenderToolbar(_cpMeta, canonicalSlug);
+  _cpRenderProducts(_cpMeta);
+  _cpRenderOtherCats(_cpMeta, products, settings, dbCats);
 }
 
 function _cpRenderHero(meta, imgUrl) {
-  var pills = (meta.pills||[]).map(function(p){ return '<span class="cp-pill">'+p+'</span>'; }).join('');
-  var imgHtml = imgUrl ? '<img class="cp-hero-bg" src="'+imgUrl+'" alt="'+meta.label+'" loading="eager" onload="this.classList.add(\'loaded\')" onerror="this.style.display=\'none\'">' : '';
-  var iconHtml = imgUrl
-    ? '<img class="cp-cat-icon" src="'+imgUrl+'" alt="'+meta.label+'" loading="eager">'
-    : '<div class="cp-cat-icon-emo">'+meta.emoji+'</div>';
-
+  var pills = (meta.pills || []).map(function(p) { return '<span class="cp-pill">' + p + '</span>'; }).join('');
+  var imgHtml = imgUrl ? '<img class="cp-hero-bg" src="' + imgUrl + '" alt="' + meta.label + '" loading="eager" onload="this.classList.add('loaded')" onerror="this.style.display='none'">' : '';
+  var iconHtml = imgUrl ? '<img class="cp-cat-icon" src="' + imgUrl + '" alt="' + meta.label + '" loading="eager">' : '<div class="cp-cat-icon-emo">' + meta.emoji + '</div>';
   document.getElementById('cpHero').innerHTML =
-    '<div class="cp-hero">'+imgHtml+
-    '<div class="cp-hero-overlay"></div>'+
-    '<div class="cp-hero-content">'+
-      '<div class="cp-breadcrumb"><a href="/">Home</a><span>›</span><a href="/all-products.html">Shop All</a><span>›</span><span>'+meta.label+'</span></div>'+
-      (meta.badge ? '<div class="cp-hero-badge">✦ '+meta.badge+'</div>' : '')+
-      '<div class="cp-hero-top">'+iconHtml+'<div><div class="cp-cat-name">'+meta.label+'</div><div class="cp-cat-tagline">'+meta.tagline+'</div></div></div>'+
-      (pills ? '<div class="cp-pills">'+pills+'</div>' : '')+
+    '<div class="cp-hero">' + imgHtml + '<div class="cp-hero-overlay"></div>' +
+    '<div class="cp-hero-content">' +
+      '<div class="cp-breadcrumb"><a href="/">Home</a><span>›</span><a href="/all-products.html">Shop All</a><span>›</span><span>' + meta.label + '</span></div>' +
+      (meta.badge ? '<div class="cp-hero-badge">✦ ' + meta.badge + '</div>' : '') +
+      '<div class="cp-hero-top">' + iconHtml + '<div><div class="cp-cat-name">' + meta.label + '</div><div class="cp-cat-tagline">' + meta.tagline + '</div></div></div>' +
+      (pills ? '<div class="cp-pills">' + pills + '</div>' : '') +
     '</div></div>';
 }
 
-function _cpRenderToolbar(meta) {
+function _cpRenderToolbar(meta, currentSlug) {
   var count = _cpProducts.length;
-  document.getElementById('cpCount').innerHTML = '<strong>'+count+'</strong> product'+(count!==1?'s':'')+' in '+meta.label;
-  var allCats = window.MEGA_CATEGORIES || [];
-  var navHtml = allCats.slice(0,8).map(function(c) {
-    return '<a href="/category.html?id='+c.key+'" class="cp-nav-pill'+(c.key===_cpCatId?' active':'')+'" title="'+c.label+'">'+c.icon+' '+c.label+'</a>';
+  document.getElementById('cpCount').innerHTML = '<strong>' + count + '</strong> product' + (count !== 1 ? 's' : '') + ' in ' + meta.label;
+  var dbCats = window.DB_CATEGORIES || [];
+  var navHtml = dbCats.slice(0, 8).map(function(c) {
+    var s = _cpToSlug(c.slug || c.name);
+    return '<a href="/collections/' + s + '" class="cp-nav-pill' + (s === (currentSlug || _cpCatSlug) ? ' active' : '') + '" title="' + c.name + '">' + (c.emoji || '🌿') + ' ' + c.name + '</a>';
   }).join('');
   document.getElementById('cpNavCats').innerHTML = navHtml;
   document.getElementById('cpToolbar').style.display = 'flex';
@@ -661,75 +683,69 @@ function _cpRenderProducts(meta) {
   var empty = document.getElementById('cpEmpty');
   var titleEl = document.getElementById('cpTitle');
   skel.style.display = 'none';
-  if (!_cpProducts.length) { empty.style.display='block'; grid.style.display='none'; titleEl.style.display='none'; return; }
+  if (!_cpProducts.length) { empty.style.display = 'block'; grid.style.display = 'none'; titleEl.style.display = 'none'; return; }
   var sorted = _cpSortList(_cpProducts, _cpSortOrder);
-  titleEl.innerHTML = meta.emoji+' '+meta.label;
+  titleEl.innerHTML = meta.emoji + ' ' + meta.label;
   titleEl.style.display = 'flex';
-  grid.innerHTML = sorted.map(function(p){ return typeof mkProd==='function' ? mkProd(p) : _cpCard(p); }).join('');
+  grid.innerHTML = sorted.map(function(p) { return typeof mkProd === 'function' ? mkProd(p) : _cpCard(p); }).join('');
   grid.style.display = '';
   empty.style.display = 'none';
-  if (typeof observeRv==='function') observeRv();
+  if (typeof observeRv === 'function') observeRv();
 }
 
 function cpSortProducts(v) {
   _cpSortOrder = v;
-  var meta = CAT_META[_cpCatId] || {emoji:'🌿',label:'Products'};
-  _cpRenderProducts(meta);
+  _cpRenderProducts(_cpMeta || {emoji: '🌿', label: 'Products'});
 }
 
 function _cpSortList(list, order) {
   var a = list.slice();
-  if (order==='price_asc') a.sort(function(x,y){return x.price-y.price;});
-  else if (order==='price_desc') a.sort(function(x,y){return y.price-x.price;});
-  else if (order==='discount') a.sort(function(x,y){
-    var dx=x.original_price?((x.original_price-x.price)/x.original_price):0;
-    var dy=y.original_price?((y.original_price-y.price)/y.original_price):0;
-    return dy-dx;
+  if (order === 'price_asc') a.sort(function(x, y) { return x.price - y.price; });
+  else if (order === 'price_desc') a.sort(function(x, y) { return y.price - x.price; });
+  else if (order === 'discount') a.sort(function(x, y) {
+    var dx = x.original_price ? ((x.original_price - x.price) / x.original_price) : 0;
+    var dy = y.original_price ? ((y.original_price - y.price) / y.original_price) : 0;
+    return dy - dx;
   });
-  else if (order==='name') a.sort(function(x,y){return x.name.localeCompare(y.name);});
+  else if (order === 'name') a.sort(function(x, y) { return x.name.localeCompare(y.name); });
   return a;
 }
 
 function _cpCard(p) {
-  var disc = p.original_price ? Math.round((1-p.price/p.original_price)*100) : 0;
-  var ps = JSON.stringify(p).replace(/</g,'\\u003c').replace(/'/g,'\\u0027');
-  return '<div class="pcard" style="background:'+(p.card_bg||'#fff')+'"><div class="piw" style="background:#f0ebe2">'+
-    (p.image_url?'<img src="'+(typeof imgOpt==='function'?imgOpt(p.image_url,{w:400,q:80}):p.image_url)+'" alt="'+p.name+'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" loading="lazy" decoding="async">':'<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:60px">'+(p.emoji||'🌿')+'</div>')+
-    (disc>0?'<div class="pdis">-'+disc+'%</div>':'')+'</div>'+
-    '<div style="padding:12px 14px 14px"><div style="font-size:11px;color:#888;margin-bottom:4px;font-family:Lato,sans-serif">'+(p.region||'')+'</div>'+
-    '<div style="font-family:serif;font-size:15px;font-weight:700;color:#1a3a1e;margin-bottom:6px;line-height:1.3">'+p.name+'</div>'+
-    '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><span style="font-size:16px;font-weight:800;color:#1a3a1e">₹'+p.price+'</span>'+
-    (p.original_price?'<span style="font-size:12px;color:#aaa;text-decoration:line-through">₹'+p.original_price+'</span>':'')+
-    '<span style="font-size:11px;color:#888">'+(p.unit||'')+'</span></div>'+
-    '<button onclick="addToCart('+ps+')" style="width:100%;padding:9px;background:#1a3a1e;color:#fff;border:none;border-radius:20px;font-size:13px;font-weight:700;cursor:pointer;font-family:Lato,sans-serif;transition:opacity .2s" onmouseover="this.style.opacity=.85" onmouseout="this.style.opacity=1">Add to Cart</button></div></div>';
+  var disc = p.original_price ? Math.round((1 - p.price / p.original_price) * 100) : 0;
+  var ps = JSON.stringify(p).replace(/</g, '\u003c').replace(/'/g, '\u0027');
+  return '<div class="pcard" style="background:' + (p.card_bg || '#fff') + '"><div class="piw" style="background:#f0ebe2">' +
+    (p.image_url ? '<img src="' + (typeof imgOpt === 'function' ? imgOpt(p.image_url, {w:400,q:80}) : p.image_url) + '" alt="' + p.name + '" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" loading="lazy" decoding="async">' : '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:60px">' + (p.emoji || '🌿') + '</div>') +
+    (disc > 0 ? '<div class="pdis">-' + disc + '%</div>' : '') + '</div>' +
+    '<div style="padding:12px 14px 14px"><div style="font-size:11px;color:#888;margin-bottom:4px;font-family:Lato,sans-serif">' + (p.region || '') + '</div>' +
+    '<div style="font-family:serif;font-size:15px;font-weight:700;color:#1a3a1e;margin-bottom:6px;line-height:1.3">' + p.name + '</div>' +
+    '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><span style="font-size:16px;font-weight:800;color:#1a3a1e">₹' + p.price + '</span>' +
+    (p.original_price ? '<span style="font-size:12px;color:#aaa;text-decoration:line-through">₹' + p.original_price + '</span>' : '') +
+    '<span style="font-size:11px;color:#888">' + (p.unit || '') + '</span></div>' +
+    '<button onclick="addToCart(' + ps + ')" style="width:100%;padding:9px;background:#1a3a1e;color:#fff;border:none;border-radius:20px;font-size:13px;font-weight:700;cursor:pointer;font-family:Lato,sans-serif;transition:opacity .2s" onmouseover="this.style.opacity=.85" onmouseout="this.style.opacity=1">Add to Cart</button></div></div>';
 }
 
-function _cpRenderOtherCats(currentMeta, allProducts, settings) {
-  // Only show categories that have actual products in DB
-  var allCats = window.MEGA_CATEGORIES || Object.keys(CAT_META).filter(function(k){return k!=='oils';}).map(function(k){return {key:k,label:CAT_META[k].label,icon:CAT_META[k].emoji,re:CAT_META[k].re};});
-  var others = allCats.filter(function(c){
-    if (c.key === _cpCatId || c.key === 'oils') return false;
-    var re = CAT_RE[c.key] || c.re;
-    if (!re) return false;
-    return allProducts.some(function(p){
-      return re.test(p.name+' '+(p.description||'')+' '+(p.category_id||'')+' '+(p.slug||''));
-    });
+function _cpRenderOtherCats(currentMeta, allProducts, settings, dbCats) {
+  var cats = dbCats || window.DB_CATEGORIES || [];
+  var others = cats.filter(function(c) {
+    var s = _cpToSlug(c.slug || c.name);
+    if (s === _cpCatSlug) return false;
+    if (!c.is_active) return false;
+    return allProducts.some(function(p) { return String(p.category_id) === String(c.id); });
   });
   if (!others.length) return;
 
   var html = others.map(function(c, i) {
-    var imgUrl = (settings['coll_img_'+c.key]||'').trim();
-    var count = allProducts.filter(function(p){
-      var re = CAT_RE[c.key]||c.re;
-      return re && re.test(p.name+' '+(p.description||'')+' '+(p.category_id||''));
-    }).length;
+    var s = _cpToSlug(c.slug || c.name);
+    var imgUrl = (settings['coll_img_' + s] || '').trim();
+    var count = allProducts.filter(function(p) { return String(p.category_id) === String(c.id); }).length;
+    var emoji = c.emoji || '🌿';
     var imgHtml = imgUrl
-      ? '<div class="cp-other-img-wrap"><img src="'+imgUrl+'" alt="'+c.label+'" loading="lazy" onerror="this.parentNode.innerHTML=\'<div class=cp-other-img-emo>'+c.icon+'</div>\'"></div>'
-      : '<div class="cp-other-img-emo">'+c.icon+'</div>';
-    return '<a href="/category.html?id='+c.key+'" class="cp-other-card" style="animation:fadeUp .4s '+(i*0.04)+'s both">'+
-      imgHtml+
-      '<div class="cp-other-card-name">'+c.label+'</div>'+
-      (count?'<div class="cp-other-card-count">✦ '+count+' product'+(count!==1?'s':'')+'</div>':'')+
+      ? '<div class="cp-other-img-wrap"><img src="' + imgUrl + '" alt="' + c.name + '" loading="lazy" onerror="this.parentNode.innerHTML='<div class=cp-other-img-emo>' + emoji + '</div>'"></div>'
+      : '<div class="cp-other-img-emo">' + emoji + '</div>';
+    return '<a href="/collections/' + s + '" class="cp-other-card" style="animation:fadeUp .4s ' + (i * 0.04) + 's both">' +
+      imgHtml + '<div class="cp-other-card-name">' + c.name + '</div>' +
+      (count ? '<div class="cp-other-card-count">✦ ' + count + ' product' + (count !== 1 ? 's' : '') + '</div>' : '') +
       '</a>';
   }).join('');
 

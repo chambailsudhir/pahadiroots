@@ -1,5 +1,6 @@
 {
   "rewrites": [
+    { "source": "/collections/:slug*", "destination": "/category.html" },
     { "source": "/reset-password", "destination": "/reset-password.html" },
     { "source": "/terms", "destination": "/terms.html" },
     { "source": "/terms/:path*", "destination": "/terms.html" },

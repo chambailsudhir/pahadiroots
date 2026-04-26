@@ -680,7 +680,7 @@ function initCollectionImages(settings) {
 
     // <a> wraps ONLY the image box — not the label
     var card = document.createElement('a');
-    card.href      = '/category.html?id=' + slug;
+    card.href      = '/collections/' + slug;
     card.className = 'cc';
     card.setAttribute('aria-label', label);
 
@@ -1251,7 +1251,7 @@ function buildMegaMenu() {
       btn.innerHTML = cat.label;
       btn.onclick = (function(catKey) { return function() {
         closeMegaMenu();
-        window.location.href = '/category.html?id=' + catKey;
+        window.location.href = '/collections/' + catKey;
       }; })(cat.key);
       li.appendChild(btn);
       listColl.appendChild(li);
@@ -1421,12 +1421,12 @@ function buildMobMega() {
       });
       if (!hasProducts && PRODUCTS.length > 0) return;
       var a = document.createElement('a');
-      a.href = '/category.html?id=' + cat.key;
+      a.href = '/collections/' + cat.key;
       a.style.cssText = 'display:flex;align-items:center;gap:10px;padding:9px 14px;color:var(--tx);font-weight:600;border-radius:10px;font-size:14px;text-decoration:none';
       a.innerHTML = '<span style="font-size:16px;width:22px;text-align:center">' + cat.icon + '</span>' + cat.label;
       a.onclick = (function(catKey) { return function() {
         closeMobNav();
-        window.location.href = '/category.html?id=' + catKey;
+        window.location.href = '/collections/' + catKey;
         return false;
       }; })(cat.key);
       mobColl.appendChild(a);
