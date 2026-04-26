@@ -31,22 +31,23 @@
 @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
 
 /* ── Hero ── */
-.cp-hero{position:relative;min-height:480px;display:flex;align-items:flex-end;overflow:hidden;background:linear-gradient(135deg,#0d1a0f,#1a3a1e)}
-.cp-hero-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 25%;filter:brightness(.45) saturate(1.4);transform:scale(1.06);transition:transform 9s ease;will-change:transform}
+.cp-hero{position:relative;height:260px;display:flex;align-items:center;overflow:hidden;background:linear-gradient(135deg,#0d1a0f,#1a3a1e)}
+.cp-hero-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 30%;filter:brightness(.38) saturate(1.5);transform:scale(1.04);transition:transform 8s ease;will-change:transform}
 .cp-hero-bg.loaded{transform:scale(1)}
-.cp-hero-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.9) 0%,rgba(0,0,0,.4) 50%,rgba(0,0,0,.1) 100%)}
-.cp-hero-content{position:relative;z-index:2;padding:60px 64px 52px;width:100%;box-sizing:border-box;animation:heroIn .6s cubic-bezier(.22,1,.36,1) both}
-.cp-breadcrumb{font-size:11px;color:rgba(255,255,255,.55);margin-bottom:20px;display:flex;align-items:center;gap:8px;font-family:'Lato',sans-serif;letter-spacing:.5px;text-transform:uppercase}
-.cp-breadcrumb a{color:rgba(255,255,255,.55);text-decoration:none;transition:color .15s}.cp-breadcrumb a:hover{color:#c8920a}
-.cp-breadcrumb span{opacity:.4}
-.cp-hero-top{display:flex;align-items:center;gap:22px;margin-bottom:18px}
-.cp-cat-icon{width:72px;height:72px;border-radius:16px;object-fit:cover;flex-shrink:0;border:2px solid rgba(200,146,10,.4);box-shadow:0 4px 20px rgba(0,0,0,.4)}
-.cp-cat-icon-emo{width:72px;height:72px;border-radius:16px;background:linear-gradient(135deg,rgba(200,146,10,.2),rgba(200,146,10,.08));border:2px solid rgba(200,146,10,.3);display:flex;align-items:center;justify-content:center;font-size:36px;flex-shrink:0;box-shadow:0 4px 20px rgba(0,0,0,.3)}
-.cp-cat-name{font-family:'Playfair Display',serif;font-size:clamp(32px,5.5vw,60px);font-weight:700;color:#fff;line-height:1.05;text-shadow:0 2px 24px rgba(0,0,0,.5);letter-spacing:-.5px}
-.cp-cat-tagline{font-size:15px;color:rgba(255,255,255,.72);font-family:'Lato',sans-serif;margin-top:8px;letter-spacing:.2px;line-height:1.5}
-.cp-pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px}
-.cp-pill{background:rgba(200,146,10,.15);border:1px solid rgba(200,146,10,.3);border-radius:24px;padding:6px 14px;font-size:12px;color:rgba(255,255,255,.85);font-family:'Lato',sans-serif;backdrop-filter:blur(6px);letter-spacing:.2px}
-.cp-hero-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(200,146,10,.18);border:1px solid rgba(200,146,10,.35);border-radius:30px;padding:5px 14px;font-size:11px;font-weight:700;color:#c8920a;letter-spacing:1.2px;text-transform:uppercase;font-family:'Lato',sans-serif;margin-bottom:18px;backdrop-filter:blur(4px)}
+.cp-hero-overlay{position:absolute;inset:0;background:linear-gradient(105deg,rgba(0,0,0,.72) 0%,rgba(0,0,0,.3) 60%,rgba(0,0,0,.15) 100%)}
+.cp-hero-content{position:relative;z-index:2;padding:0 64px;width:100%;box-sizing:border-box;animation:heroIn .5s cubic-bezier(.22,1,.36,1) both;display:flex;align-items:center;gap:28px}
+.cp-breadcrumb{font-size:10px;color:rgba(255,255,255,.45);display:flex;align-items:center;gap:6px;font-family:'Lato',sans-serif;letter-spacing:.6px;text-transform:uppercase;margin-bottom:6px}
+.cp-breadcrumb a{color:rgba(255,255,255,.45);text-decoration:none;transition:color .15s}.cp-breadcrumb a:hover{color:#c8920a}
+.cp-breadcrumb span{opacity:.35}
+.cp-hero-top{display:flex;align-items:center;gap:18px}
+.cp-cat-icon{width:56px;height:56px;border-radius:12px;object-fit:cover;flex-shrink:0;border:1.5px solid rgba(200,146,10,.5);box-shadow:0 4px 16px rgba(0,0,0,.5)}
+.cp-cat-icon-emo{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,rgba(200,146,10,.25),rgba(200,146,10,.08));border:1.5px solid rgba(200,146,10,.35);display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+.cp-hero-text{flex:1}
+.cp-cat-name{font-family:'Playfair Display',serif;font-size:clamp(24px,4vw,44px);font-weight:700;color:#fff;line-height:1.08;text-shadow:0 2px 20px rgba(0,0,0,.6);letter-spacing:-.3px;margin:0}
+.cp-cat-tagline{font-size:13px;color:rgba(255,255,255,.65);font-family:'Lato',sans-serif;margin-top:4px;letter-spacing:.1px;line-height:1.4}
+.cp-pills{display:none}
+.cp-pill{display:none}
+.cp-hero-badge{display:inline-flex;align-items:center;background:rgba(200,146,10,.2);border:1px solid rgba(200,146,10,.4);border-radius:20px;padding:3px 10px;font-size:10px;font-weight:700;color:#c8920a;letter-spacing:1px;text-transform:uppercase;font-family:'Lato',sans-serif;margin-bottom:8px;backdrop-filter:blur(4px)}
 
 /* ── Sticky Toolbar ── */
 .cp-toolbar{display:none;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;padding:14px 40px;border-bottom:1px solid #ede8e0;background:#fffdf9;position:sticky;top:0;z-index:90;box-shadow:0 2px 12px rgba(0,0,0,.07)}
@@ -87,8 +88,8 @@
 
 /* ── Responsive ── */
 @media(max-width:820px){
-  .cp-hero-content{padding:32px 20px 36px}
-  .cp-hero{min-height:360px}
+  .cp-hero-content{padding:0 20px}
+  .cp-hero{height:200px}
   .cp-toolbar{padding:12px 16px}
   .cp-products-sec{padding:24px 16px 56px}
   .cp-other-cats{padding:36px 16px}
@@ -97,7 +98,7 @@
   .cp-other-img-wrap,.cp-other-img-emo{width:64px;height:64px}
 }
 @media(max-width:480px){
-  .cp-hero{min-height:300px}
+  .cp-hero{height:180px}
   .cp-cat-icon,.cp-cat-icon-emo{width:52px;height:52px;font-size:28px;border-radius:12px}
   .cp-hero-top{gap:14px}
   .cp-other-grid{grid-template-columns:repeat(3,1fr)}
@@ -683,43 +684,46 @@ function _cpRenderHero(meta, imgUrl) {
   var hc = document.createElement('div');
   hc.className = 'cp-hero-content';
 
+  // Icon (left side)
+  if (imgUrl) {
+    var icon = document.createElement('img');
+    icon.className = 'cp-cat-icon';
+    icon.src = imgUrl; icon.alt = meta.label; icon.loading = 'eager';
+    hc.appendChild(icon);
+  } else {
+    var iconEmo = document.createElement('div');
+    iconEmo.className = 'cp-cat-icon-emo';
+    iconEmo.textContent = meta.emoji;
+    hc.appendChild(iconEmo);
+  }
+
+  // Text block (right of icon)
+  var textWrap = document.createElement('div');
+  textWrap.className = 'cp-hero-text';
+
   var bc = document.createElement('div');
   bc.className = 'cp-breadcrumb';
   bc.innerHTML = '<a href="/">Home</a><span>›</span><a href="/all-products.html">Shop All</a><span>›</span><span>' + meta.label + '</span>';
-  hc.appendChild(bc);
+  textWrap.appendChild(bc);
 
   if (meta.badge) {
     var bd = document.createElement('div');
     bd.className = 'cp-hero-badge';
     bd.textContent = '✦ ' + meta.badge;
-    hc.appendChild(bd);
+    textWrap.appendChild(bd);
   }
 
-  var top = document.createElement('div');
-  top.className = 'cp-hero-top';
-  if (imgUrl) {
-    var icon = document.createElement('img');
-    icon.className = 'cp-cat-icon';
-    icon.src = imgUrl; icon.alt = meta.label; icon.loading = 'eager';
-    top.appendChild(icon);
-  } else {
-    var iconEmo = document.createElement('div');
-    iconEmo.className = 'cp-cat-icon-emo';
-    iconEmo.textContent = meta.emoji;
-    top.appendChild(iconEmo);
-  }
-  var nameWrap = document.createElement('div');
-  nameWrap.innerHTML = '<div class="cp-cat-name">' + meta.label + '</div><div class="cp-cat-tagline">' + meta.tagline + '</div>';
-  top.appendChild(nameWrap);
-  hc.appendChild(top);
+  var nameEl = document.createElement('div');
+  nameEl.className = 'cp-cat-name';
+  nameEl.textContent = meta.label;
+  textWrap.appendChild(nameEl);
 
-  if (meta.pills && meta.pills.length) {
-    var pillsDiv = document.createElement('div');
-    pillsDiv.className = 'cp-pills';
-    pillsDiv.innerHTML = meta.pills.map(function(p){ return '<span class="cp-pill">' + p + '</span>'; }).join('');
-    hc.appendChild(pillsDiv);
-  }
+  var tagEl = document.createElement('div');
+  tagEl.className = 'cp-cat-tagline';
+  tagEl.textContent = meta.tagline;
+  textWrap.appendChild(tagEl);
 
+  hc.appendChild(textWrap);
   hero.appendChild(hc);
   cpHero.appendChild(hero);
 }
