@@ -659,17 +659,69 @@ function _cpRun() {
 }
 
 function _cpRenderHero(meta, imgUrl) {
-  var pills = (meta.pills || []).map(function(p) { return '<span class="cp-pill">' + p + '</span>'; }).join('');
-  var imgHtml = imgUrl ? '<img class="cp-hero-bg" src="' + imgUrl + '" alt="' + meta.label + '" loading="eager" onload="this.classList.add('loaded')" onerror="this.style.display='none'">' : '';
-  var iconHtml = imgUrl ? '<img class="cp-cat-icon" src="' + imgUrl + '" alt="' + meta.label + '" loading="eager">' : '<div class="cp-cat-icon-emo">' + meta.emoji + '</div>';
-  document.getElementById('cpHero').innerHTML =
-    '<div class="cp-hero">' + imgHtml + '<div class="cp-hero-overlay"></div>' +
-    '<div class="cp-hero-content">' +
-      '<div class="cp-breadcrumb"><a href="/">Home</a><span>›</span><a href="/all-products.html">Shop All</a><span>›</span><span>' + meta.label + '</span></div>' +
-      (meta.badge ? '<div class="cp-hero-badge">✦ ' + meta.badge + '</div>' : '') +
-      '<div class="cp-hero-top">' + iconHtml + '<div><div class="cp-cat-name">' + meta.label + '</div><div class="cp-cat-tagline">' + meta.tagline + '</div></div></div>' +
-      (pills ? '<div class="cp-pills">' + pills + '</div>' : '') +
-    '</div></div>';
+  var cpHero = document.getElementById('cpHero');
+  cpHero.innerHTML = '';
+
+  var hero = document.createElement('div');
+  hero.className = 'cp-hero';
+
+  if (imgUrl) {
+    var bgImg = document.createElement('img');
+    bgImg.className = 'cp-hero-bg';
+    bgImg.src = imgUrl;
+    bgImg.alt = meta.label;
+    bgImg.loading = 'eager';
+    bgImg.onload  = function() { this.classList.add('loaded'); };
+    bgImg.onerror = function() { this.style.display = 'none'; };
+    hero.appendChild(bgImg);
+  }
+
+  var ov = document.createElement('div');
+  ov.className = 'cp-hero-overlay';
+  hero.appendChild(ov);
+
+  var hc = document.createElement('div');
+  hc.className = 'cp-hero-content';
+
+  var bc = document.createElement('div');
+  bc.className = 'cp-breadcrumb';
+  bc.innerHTML = '<a href="/">Home</a><span>›</span><a href="/all-products.html">Shop All</a><span>›</span><span>' + meta.label + '</span>';
+  hc.appendChild(bc);
+
+  if (meta.badge) {
+    var bd = document.createElement('div');
+    bd.className = 'cp-hero-badge';
+    bd.textContent = '✦ ' + meta.badge;
+    hc.appendChild(bd);
+  }
+
+  var top = document.createElement('div');
+  top.className = 'cp-hero-top';
+  if (imgUrl) {
+    var icon = document.createElement('img');
+    icon.className = 'cp-cat-icon';
+    icon.src = imgUrl; icon.alt = meta.label; icon.loading = 'eager';
+    top.appendChild(icon);
+  } else {
+    var iconEmo = document.createElement('div');
+    iconEmo.className = 'cp-cat-icon-emo';
+    iconEmo.textContent = meta.emoji;
+    top.appendChild(iconEmo);
+  }
+  var nameWrap = document.createElement('div');
+  nameWrap.innerHTML = '<div class="cp-cat-name">' + meta.label + '</div><div class="cp-cat-tagline">' + meta.tagline + '</div>';
+  top.appendChild(nameWrap);
+  hc.appendChild(top);
+
+  if (meta.pills && meta.pills.length) {
+    var pillsDiv = document.createElement('div');
+    pillsDiv.className = 'cp-pills';
+    pillsDiv.innerHTML = meta.pills.map(function(p){ return '<span class="cp-pill">' + p + '</span>'; }).join('');
+    hc.appendChild(pillsDiv);
+  }
+
+  hero.appendChild(hc);
+  cpHero.appendChild(hero);
 }
 
 function _cpRenderToolbar(meta, currentSlug) {
@@ -860,28 +912,61 @@ function _cpCard(p) {
 function _cpRenderOtherCats(currentMeta, allProducts, settings, dbCats) {
   var cats = dbCats || window.DB_CATEGORIES || [];
   var others = cats.filter(function(c) {
-    var s = _cpToSlug(c.slug || c.name);
-    if (s === _cpCatSlug) return false;
+    if (_cpToSlug(c.slug || c.name) === _cpCatSlug) return false;
     if (!c.is_active) return false;
     return allProducts.some(function(p) { return String(p.category_id) === String(c.id); });
   });
   if (!others.length) return;
 
-  var html = others.map(function(c, i) {
-    var s = _cpToSlug(c.slug || c.name);
-    var imgUrl = (settings['coll_img_' + s] || '').trim();
-    var count = allProducts.filter(function(p) { return String(p.category_id) === String(c.id); }).length;
-    var emoji = c.emoji || '🌿';
-    var imgHtml = imgUrl
-      ? '<div class="cp-other-img-wrap"><img src="' + imgUrl + '" alt="' + c.name + '" loading="lazy" onerror="this.parentNode.innerHTML='<div class=cp-other-img-emo>' + emoji + '</div>'"></div>'
-      : '<div class="cp-other-img-emo">' + emoji + '</div>';
-    return '<a href="/collections/' + s + '" class="cp-other-card" style="animation:fadeUp .4s ' + (i * 0.04) + 's both">' +
-      imgHtml + '<div class="cp-other-card-name">' + c.name + '</div>' +
-      (count ? '<div class="cp-other-card-count">✦ ' + count + ' product' + (count !== 1 ? 's' : '') + '</div>' : '') +
-      '</a>';
-  }).join('');
+  var grid = document.getElementById('cpOtherGrid');
+  grid.innerHTML = '';
 
-  document.getElementById('cpOtherGrid').innerHTML = html;
+  others.forEach(function(c, i) {
+    var s      = _cpToSlug(c.slug || c.name);
+    var imgUrl = (settings['coll_img_' + s] || settings['coll_img_' + c.name] || settings['coll_img_' + (c.name||'').toLowerCase()] || '').trim();
+    var count  = allProducts.filter(function(p) { return String(p.category_id) === String(c.id); }).length;
+    var emoji  = c.emoji || '🌿';
+
+    var a = document.createElement('a');
+    a.href = '/collections/' + s;
+    a.className = 'cp-other-card';
+    a.style.cssText = 'animation:fadeUp .4s ' + (i * 0.04) + 's both';
+
+    if (imgUrl) {
+      var wrap = document.createElement('div');
+      wrap.className = 'cp-other-img-wrap';
+      var img = document.createElement('img');
+      img.src = imgUrl; img.alt = c.name; img.loading = 'lazy';
+      img.onerror = function() {
+        var emo = document.createElement('div');
+        emo.className = 'cp-other-img-emo';
+        emo.textContent = emoji;
+        this.parentNode.replaceChild(emo, this);
+      };
+      wrap.appendChild(img);
+      a.appendChild(wrap);
+    } else {
+      var emoDiv = document.createElement('div');
+      emoDiv.className = 'cp-other-img-emo';
+      emoDiv.textContent = emoji;
+      a.appendChild(emoDiv);
+    }
+
+    var name = document.createElement('div');
+    name.className = 'cp-other-card-name';
+    name.textContent = c.name;
+    a.appendChild(name);
+
+    if (count) {
+      var cnt = document.createElement('div');
+      cnt.className = 'cp-other-card-count';
+      cnt.textContent = '✦ ' + count + ' product' + (count !== 1 ? 's' : '');
+      a.appendChild(cnt);
+    }
+
+    grid.appendChild(a);
+  });
+
   document.getElementById('cpOtherCats').style.display = 'block';
 }
 
