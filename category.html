@@ -548,7 +548,12 @@ window.IS_CATEGORY_PAGE = true;
 function _cpGetSlugFromUrl() {
   var path = window.location.pathname;
   var m = path.match(/^\/collections\/(.+)/);
-  if (m) return decodeURIComponent(m[1]).toLowerCase();
+  if (m) {
+    // Always normalise to clean slug regardless of what's in the URL
+    // "Himalayan%20Teas" → "himalayan-teas", "herbs-and-spices" → "herbs-and-spices"
+    var raw = decodeURIComponent(m[1]);
+    return _cpToSlug(raw);
+  }
   return (new URLSearchParams(window.location.search)).get('id') || '';
 }
 

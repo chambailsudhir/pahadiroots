@@ -229,6 +229,12 @@ function toggleDark() {
   applyTheme(currentTheme);
 }
 
+// ── COLLECTION SLUG HELPER ─────────────────────────────────────────
+// "Himalayan Teas" → "himalayan-teas", "Herbs & Spices" → "herbs-and-spices"
+function toCollectionSlug(name) {
+  return (name || '').toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+}
+
 // ── API BASE ───────────────────────────────────────────────────────
 function getStoreApiBase() {
   var override = localStorage.getItem('pr_api_base');
@@ -670,7 +676,7 @@ function initCollectionImages(settings) {
   // Structure: .cc-cell (flex item) > <a class="cc"> (image only) + .cc-lbl (sibling, outside <a>)
   cats.forEach(function(cat, i) {
     var url   = imgFor(cat);
-    var slug  = cat.slug || String(cat.id);
+    var slug  = toCollectionSlug(cat.slug || cat.name || String(cat.id));
     var label = cat.name;
     var emoji = emojiFor(cat);
 
