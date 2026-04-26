@@ -598,76 +598,60 @@ function _cpBuildMeta(dbCat) {
 }
 
 window._onStoreDataReady = function() {
-  _cpReady = false; // reset so _cpInit re-runs with fresh real DB products
-  _cpInit();
+  // Called by main.js after REAL DB products+categories are loaded
+  _cpDone = false;
+  _cpRun();
 };
 
-function _cpInit() {
-  if (_cpReady) return;
-  var products = (window.PRODUCTS && window.PRODUCTS.length) ? window.PRODUCTS : window.FALLBACK_PRODUCTS;
+// Single flag — prevents double-render
+var _cpDone = false;
+
+function _cpRun() {
+  if (_cpDone) return;
+
+  var products = window.PRODUCTS || [];
   var settings = window.SITE_SETTINGS || {};
-  if (!products || !products.length) return;
+  var dbCats   = window.DB_CATEGORIES || [];
 
-  // If DB_CATEGORIES not loaded yet, wait up to 3s then proceed anyway (regex fallback will kick in)
-  var dbCats = window.DB_CATEGORIES || [];
-  if (!dbCats.length) {
-    var _dbWait = 0;
-    var _dbPoll = setInterval(function() {
-      _dbWait++;
-      var cats = window.DB_CATEGORIES || [];
-      if (cats.length || _dbWait > 15) { // 15 × 200ms = 3s max wait
-        clearInterval(_dbPoll);
-        _cpInit();
-      }
-    }, 200);
-    return; // wait for DB_CATEGORIES
-  }
+  // Need real products (with category_id) AND categories
+  var hasReal = products.some(function(p){ return p.category_id != null; });
+  if (!hasReal || !dbCats.length) return; // not ready yet
 
-  _cpReady = true;
+  _cpDone = true;
 
-  var dbCats = window.DB_CATEGORIES || [];
+  // ── Match URL slug to DB category ─────────────────────────────────
   var matchedCat = null;
   for (var i = 0; i < dbCats.length; i++) {
     var c = dbCats[i];
-    var dbSlug = _cpToSlug(c.slug || c.name);
-    if (dbSlug === _cpCatSlug) { matchedCat = c; break; }
+    if (_cpToSlug(c.slug || c.name) === _cpCatSlug) { matchedCat = c; break; }
   }
 
   if (!matchedCat) {
-    var megaCat = (window.MEGA_CATEGORIES || []).find(function(mc) { return mc.key === _cpCatSlug; });
-    if (megaCat) {
-      for (var j = 0; j < dbCats.length; j++) {
-        if (_cpToSlug(dbCats[j].name) === _cpToSlug(megaCat.label)) { matchedCat = dbCats[j]; break; }
-      }
-      if (!matchedCat) {
-        _cpMeta = {label:megaCat.label, tagline:'Authentic Himalayan '+megaCat.label.toLowerCase(), emoji:megaCat.icon, badge:'Himalayan', pills:[], dbId:null, re:megaCat.re};
-      }
-    }
-  }
-
-  if (matchedCat) _cpMeta = _cpBuildMeta(matchedCat);
-
-  if (!_cpMeta) {
     document.getElementById('cpHero').innerHTML = '';
     document.getElementById('cpSkeleton').style.display = 'none';
     document.getElementById('cp404').style.display = 'block';
     return;
   }
 
-  var canonicalSlug = matchedCat ? _cpToSlug(matchedCat.slug || matchedCat.name) : _cpCatSlug;
+  _cpMeta = _cpBuildMeta(matchedCat);
+  var canonicalSlug = _cpToSlug(matchedCat.slug || matchedCat.name);
+
+  // ── SEO ────────────────────────────────────────────────────────────
   var title = _cpMeta.label + ' – 5 Pahadi Roots | Himalayan Natural Store';
   document.getElementById('pageTitle').textContent = title;
   document.title = title;
-  document.getElementById('pageDesc').setAttribute('content', 'Shop authentic Himalayan ' + _cpMeta.label.toLowerCase() + ' — ' + _cpMeta.tagline + '. Sourced directly from mountain farmers at 5 Pahadi Roots.');
+  document.getElementById('pageDesc').setAttribute('content', 'Shop authentic Himalayan ' + _cpMeta.label.toLowerCase() + ' — ' + _cpMeta.tagline + '.');
   document.getElementById('ogTitle').setAttribute('content', title);
   document.getElementById('pageCanonical').setAttribute('href', 'https://pahadiroots.com/collections/' + canonicalSlug);
 
-  // Filter products by DB category_id — clean, no regex, DB is source of truth
+  // ── Filter products by category_id ────────────────────────────────
+  var dbId = String(matchedCat.id);
   _cpProducts = products.filter(function(p) {
-    return _cpMeta.dbId && p.category_id && String(p.category_id) === _cpMeta.dbId;
+    return p.category_id && String(p.category_id) === dbId;
   });
 
-  var catImgUrl = (settings['coll_img_' + canonicalSlug] || settings['coll_img_' + _cpCatSlug] || '').trim();
+  // ── Render ────────────────────────────────────────────────────────
+  var catImgUrl = (settings['coll_img_' + canonicalSlug] || settings['coll_img_' + matchedCat.name] || settings['coll_img_' + (matchedCat.name||'').toLowerCase()] || settings['coll_img_' + matchedCat.id] || '').trim();
   _cpRenderHero(_cpMeta, catImgUrl);
   _cpRenderToolbar(_cpMeta, canonicalSlug);
   _cpRenderProducts(_cpMeta);
@@ -843,7 +827,7 @@ function _cpRenderProducts(meta) {
 
 function cpSortProducts(v) {
   _cpSortOrder = v;
-  _cpRenderProducts(_cpMeta || {emoji: '🌿', label: 'Products'});
+  if (_cpMeta) _cpRenderProducts(_cpMeta);
 }
 
 function _cpSortList(list, order) {
@@ -902,28 +886,19 @@ function _cpRenderOtherCats(currentMeta, allProducts, settings, dbCats) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-  // Try immediately if data already loaded (cache hit)
-  if (window.PRODUCTS && window.PRODUCTS.length) {
-    setTimeout(_cpInit, 50);
-    return;
-  }
-  // Otherwise poll — main.js fires _onStoreDataReady when ready, but as a safety net
-  // also poll every 200ms for up to 8 seconds
-  var _cpPollCount = 0;
-  var _cpPoll = setInterval(function() {
-    _cpPollCount++;
+  // Poll every 250ms until real DB data is ready, then run
+  // _onStoreDataReady also calls _cpRun when main.js fires it
+  var _poll = setInterval(function() {
     var prods = window.PRODUCTS || [];
-    // Wait for REAL DB products (they have category_id set), not just fallback products
-    var hasRealProds = prods.some(function(p){ return p.category_id != null; });
-    var hasCategories = (window.DB_CATEGORIES || []).length > 0;
-    if (hasRealProds && hasCategories) {
-      clearInterval(_cpPoll);
-      _cpInit();
-    } else if (_cpPollCount > 50) { // 10s max — give up and try anyway
-      clearInterval(_cpPoll);
-      _cpInit();
+    var cats  = window.DB_CATEGORIES || [];
+    var hasReal = prods.some(function(p){ return p.category_id != null; });
+    if (hasReal && cats.length) {
+      clearInterval(_poll);
+      _cpRun();
     }
-  }, 200);
+  }, 250);
+  // Safety: stop polling after 15s regardless
+  setTimeout(function(){ clearInterval(_poll); }, 15000);
 });
 </script>
 <script 
