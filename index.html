@@ -716,12 +716,7 @@
   <!-- Filter bar -->
   <div class="filter-bar" id="filterBar">
     <button class="filter-btn active" onclick="setFilter('all',this)">🌿 All</button>
-    <button class="filter-btn" onclick="setFilter('honey',this)">🍯 Honey</button>
-    <button class="filter-btn" onclick="setFilter('ghee',this)">🥛 Ghee</button>
-    <button class="filter-btn" onclick="setFilter('spices',this)">🌿 Spices</button>
-    <button class="filter-btn" onclick="setFilter('tea',this)">🍵 Tea</button>
-    <button class="filter-btn" onclick="setFilter('saffron',this)">🌸 Saffron</button>
-    <button class="filter-btn" onclick="setFilter('oil',this)">🫚 Oils</button>
+    <!-- DB-driven filter pills injected by buildFilterPills() in main.js -->
     <select class="filter-sort" onchange="setSortOrder(this.value)">
       <option value="default">Sort: Featured</option>
       <option value="price_asc">Price: Low → High</option>

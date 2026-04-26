@@ -632,10 +632,21 @@ function initCollectionImages(settings) {
   }
 
   function imgFor(cat) {
-    // Key matches exactly what admin saves: coll_img_{slug}
-    var key = cat.slug || String(cat.id);
-    var v = (settings['coll_img_' + key] || '').trim();
-    if (v) return v;
+    // Try multiple key formats to handle old and new slug formats:
+    // 1. New clean slug: coll_img_wild-honey
+    // 2. Old name-based: coll_img_Wild Honey  
+    // 3. DB slug as-is: coll_img_shilajit
+    // 4. Numeric ID: coll_img_1
+    var keysToTry = [
+      cat.slug,                                      // new: wild-honey
+      cat.name,                                      // old: Wild Honey
+      (cat.name||'').toLowerCase(),                  // old lowercase: wild honey
+      String(cat.id),                                // numeric: 1
+    ].filter(Boolean);
+    for (var ki = 0; ki < keysToTry.length; ki++) {
+      var v = (settings['coll_img_' + keysToTry[ki]] || '').trim();
+      if (v) return v;
+    }
     return (cat.image_url || '').trim();
   }
 
@@ -837,8 +848,8 @@ async function loadData() {
       PRODUCTS = _cached.products;
       renderProds();
       _cacheUsed = true;
-      // Also notify category.html if it's waiting for data
-      if (typeof window._onStoreDataReady === 'function') { try { setTimeout(window._onStoreDataReady, 0); } catch(e){} }
+      // NOTE: Don't fire _onStoreDataReady from cache — category.html polls for
+      // real DB products (with category_id). The real API call below will fire it.
     }
   } catch(e) {}
 

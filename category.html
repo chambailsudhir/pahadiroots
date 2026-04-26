@@ -597,7 +597,10 @@ function _cpBuildMeta(dbCat) {
   };
 }
 
-window._onStoreDataReady = function() { _cpInit(); };
+window._onStoreDataReady = function() {
+  _cpReady = false; // reset so _cpInit re-runs with fresh real DB products
+  _cpInit();
+};
 
 function _cpInit() {
   if (_cpReady) return;
@@ -799,11 +802,16 @@ document.addEventListener('DOMContentLoaded', function() {
   var _cpPollCount = 0;
   var _cpPoll = setInterval(function() {
     _cpPollCount++;
-    if (window.PRODUCTS && window.PRODUCTS.length) {
+    var prods = window.PRODUCTS || [];
+    // Wait for REAL DB products (they have category_id set), not just fallback products
+    var hasRealProds = prods.some(function(p){ return p.category_id != null; });
+    var hasCategories = (window.DB_CATEGORIES || []).length > 0;
+    if (hasRealProds && hasCategories) {
       clearInterval(_cpPoll);
       _cpInit();
-    } else if (_cpPollCount > 40) {
-      clearInterval(_cpPoll); // give up after 8s
+    } else if (_cpPollCount > 50) { // 10s max — give up and try anyway
+      clearInterval(_cpPoll);
+      _cpInit();
     }
   }, 200);
 });
