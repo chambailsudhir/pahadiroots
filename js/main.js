@@ -286,14 +286,20 @@ function imgOpt(url, opts) {
 function imgOptFallback(el, originalUrl) {
   if (!el || el.dataset.fbDone) return;
   el.dataset.fbDone = '1';
-  // If src is already the direct URL and still failing, hide it
+  // If src is already the direct URL and still failing, hide img gracefully
   if (originalUrl && el.src !== originalUrl) {
-    el.src = originalUrl;
+    el.src = originalUrl; // try raw URL once
   } else {
     el.style.display = 'none';
     var sk = el.previousElementSibling;
     if (sk && (sk.classList.contains('pimg-skel') || sk.classList.contains('hero-img-shimmer'))) {
       sk.style.display = 'none';
+    }
+    // Show emoji fallback so card isn't just blank
+    var piw = el.closest ? el.closest('.piw') : null;
+    if (piw) {
+      var emo = piw.querySelector('.pemo');
+      if (emo) emo.style.opacity = '1';
     }
   }
 }
@@ -606,9 +612,10 @@ function initCollectionImages(settings) {
     var st = document.createElement('style');
     st.id = 'ccat-style';
     st.textContent = [
-      '#cgrid{display:flex;overflow-x:scroll;overflow-y:hidden;scrollbar-width:none;width:100%;position:relative;}',
+      '#cgrid{display:flex;overflow-x:scroll;overflow-y:visible;scrollbar-width:none;width:100%;position:relative;padding-top:8px;margin-top:-8px;}',
       '#cgrid::-webkit-scrollbar{display:none;}',
       '.cc-cell{flex:0 0 16.666%;min-width:0;display:flex;flex-direction:column;align-items:center;gap:10px;padding:0 8px;box-sizing:border-box;}',
+      '.cc-cell{transition:transform .2s ease;}' +
       '.cc-cell:hover{transform:translateY(-5px);}',
       '.cc{display:block;width:100%;text-decoration:none;cursor:pointer;background:transparent;border:none;overflow:visible;box-shadow:none;}',
       '.cc-box{width:100%;aspect-ratio:1/1;border-radius:16px;border:2px solid #c9a84c;background:transparent;position:relative;overflow:hidden;box-shadow:0 2px 12px rgba(201,168,76,.18);}',
