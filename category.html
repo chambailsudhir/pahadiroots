@@ -802,7 +802,7 @@ function _cpRenderProducts(meta) {
       img.alt      = p.name;
       img.loading  = idx < 4 ? 'eager' : 'lazy';
       img.decoding = 'async';
-      img.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;display:block';
+      img.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;display:block;opacity:1';
       img.onerror = function() { this.style.display = 'none'; emo.style.opacity = '1'; };
       img.src = imgSrc; // set src AFTER attaching to DOM
       piw.appendChild(img);
