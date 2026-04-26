@@ -701,38 +701,144 @@ function _cpRenderToolbar(meta, currentSlug) {
 }
 
 function _cpRenderProducts(meta) {
-  var skel = document.getElementById('cpSkeleton');
-  var grid = document.getElementById('cpGrid');
-  var empty = document.getElementById('cpEmpty');
+  var skel    = document.getElementById('cpSkeleton');
+  var grid    = document.getElementById('cpGrid');
+  var empty   = document.getElementById('cpEmpty');
   var titleEl = document.getElementById('cpTitle');
+
   skel.style.display = 'none';
-  if (!_cpProducts.length) { empty.style.display = 'block'; grid.style.display = 'none'; titleEl.style.display = 'none'; return; }
-  var sorted = _cpSortList(_cpProducts, _cpSortOrder);
-  titleEl.innerHTML = meta.emoji + ' ' + meta.label;
-  titleEl.style.display = 'flex';
-  grid.innerHTML = sorted.map(function(p) { return typeof mkProd === 'function' ? mkProd(p) : _cpCard(p); }).join('');
-  grid.style.display = '';
-  empty.style.display = 'none';
-  if (typeof observeRv === 'function') observeRv();
-  // Force-reveal images — runs at 100ms, 600ms, 2000ms to catch all load timings
-  function _cpRevealImgs() {
-    grid.querySelectorAll('.piw img').forEach(function(img) {
-      if (img.complete && img.naturalWidth > 0) {
-        img.style.opacity = '1';
-        var sk = img.previousElementSibling;
-        if (sk) sk.style.display = 'none';
-        var piw = img.closest('.piw');
-        if (piw) piw.classList.add('img-ready');
-      }
-    });
+
+  if (!_cpProducts.length) {
+    empty.style.display  = 'block';
+    grid.style.display   = 'none';
+    titleEl.style.display = 'none';
+    return;
   }
-  // Poll every 300ms for 15s — reveals images as they load from Supabase
-  var _revealCount = 0;
-  var _revealInterval = setInterval(function() {
-    _cpRevealImgs();
-    _revealCount++;
-    if (_revealCount > 50) clearInterval(_revealInterval); // stop after 15s
-  }, 300);
+
+  titleEl.innerHTML     = meta.emoji + ' ' + meta.label;
+  titleEl.style.display = 'flex';
+  empty.style.display   = 'none';
+
+  var sorted = _cpSortList(_cpProducts, _cpSortOrder);
+
+  // Build cards via real DOM — no innerHTML strings, no opacity trick
+  grid.innerHTML = '';
+  sorted.forEach(function(p, idx) {
+    var pct   = p.original_price ? Math.round((1 - p.price / p.original_price) * 100) : 0;
+    var stock = (p.stock !== undefined && p.stock !== null) ? Number(p.stock) : 99;
+    var slug  = (typeof getProductSlug === 'function') ? getProductSlug(p) : (p.slug || String(p.id));
+    var rawImg = p.image_url || p.extra_image_url || '';
+    var imgSrc = (rawImg && typeof imgOpt === 'function') ? imgOpt(rawImg, {w:400, q:80}) : rawImg;
+
+    var card = document.createElement('div');
+    card.className = 'pcard';
+    card.style.position = 'relative';
+    card.dataset.slug = slug;
+    card.onclick = function() {
+      if (typeof goToProductPage === 'function') goToProductPage(slug);
+      else window.location.href = '/products/' + slug;
+    };
+
+    if (pct > 0) {
+      var ribbon = document.createElement('div');
+      ribbon.className = 'pdisc-ribbon';
+      ribbon.textContent = '-' + pct + '%';
+      card.appendChild(ribbon);
+    }
+
+    if (p.badge_label) {
+      var bw = document.createElement('div');
+      bw.className = 'pbadge-wrap';
+      bw.innerHTML = '<span class="pbadge-dot pbd-' + (p.badge_type||'bs') + '"></span><span class="pbadge-text">' + p.badge_label + '</span>';
+      card.appendChild(bw);
+    }
+
+    var piw = document.createElement('div');
+    piw.className = 'piw';
+    piw.style.background = p.card_bg || '#f9f4ec';
+
+    var emo = document.createElement('span');
+    emo.className = 'pemo';
+    emo.textContent = p.emoji || '🌿';
+
+    if (imgSrc) {
+      var img = document.createElement('img');
+      img.alt      = p.name;
+      img.loading  = idx < 4 ? 'eager' : 'lazy';
+      img.decoding = 'async';
+      img.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;display:block';
+      img.onerror = function() { this.style.display = 'none'; emo.style.opacity = '1'; };
+      img.src = imgSrc; // set src AFTER attaching to DOM
+      piw.appendChild(img);
+      emo.style.cssText = 'position:relative;z-index:0;opacity:0.08';
+    }
+
+    piw.appendChild(emo);
+
+    var overlay = document.createElement('div');
+    overlay.className = 'piw-hover-overlay';
+    if (typeof openQV === 'function') {
+      var qvBtn = document.createElement('button');
+      qvBtn.className = 'piw-qv-btn';
+      qvBtn.textContent = '👁 Quick View';
+      (function(pid) { qvBtn.onclick = function(e) { e.stopPropagation(); openQV(pid); }; })(p.id);
+      overlay.appendChild(qvBtn);
+    }
+    piw.appendChild(overlay);
+
+    if (typeof toggleWishlist === 'function') {
+      var inWL = (window.wishlist || []).some(function(x){ return String(x) === String(p.id); });
+      var wlBtn = document.createElement('button');
+      wlBtn.className = 'piw-wl-btn' + (inWL ? ' active' : '');
+      wlBtn.textContent = inWL ? '❤️' : '❤';
+      (function(pid) { wlBtn.onclick = function(e) { e.stopPropagation(); toggleWishlist(pid); }; })(p.id);
+      piw.appendChild(wlBtn);
+    }
+
+    card.appendChild(piw);
+
+    var body = document.createElement('div');
+    body.className = 'pbody';
+    body.innerHTML =
+      '<div class="pregion">📍 ' + (p.region || '') + '</div>' +
+      '<div class="pname">' + p.name + '</div>' +
+      '<div class="prating"><span class="pstars">★★★★★</span><span class="prc">(' + (p.review_count || (Math.floor(Math.random()*80)+20)) + ')</span></div>' +
+      '<div class="pdesc">' + (p.description || '') + '</div>' +
+      '<div class="pfoot" style="margin-top:8px"><div class="prow">' +
+        '<span class="pnow">₹' + p.price + '</span>' +
+        (p.original_price ? '<span class="pwas">₹' + p.original_price + '</span>' : '') +
+        '<span class="punt">' + (p.unit || '') + '</span>' +
+      '</div></div>';
+
+    if (stock <= 0) {
+      var nb = document.createElement('button');
+      nb.className = 'notify-btn pcard-atc-full';
+      nb.textContent = '🔔 Notify Me';
+      (function(pid) { nb.onclick = function(e) { e.stopPropagation(); if (typeof openNotify === 'function') openNotify(pid); }; })(p.id);
+      body.appendChild(nb);
+    } else {
+      var actions = document.createElement('div');
+      actions.className = 'pcard-actions';
+      var atcBtn = document.createElement('button');
+      atcBtn.className = 'atc pcard-atc-full';
+      atcBtn.id = 'atcBtn-' + p.id;
+      atcBtn.textContent = '🛒 Add to Cart';
+      (function(pid) { atcBtn.onclick = function(e) { e.stopPropagation(); if (typeof quickAddToCart === 'function') quickAddToCart(pid); }; })(p.id);
+      var vd = document.createElement('span');
+      vd.className = 'atc-hint view-details-link';
+      vd.textContent = 'View Details →';
+      (function(s) { vd.onclick = function(e) { e.stopPropagation(); if (typeof goToProductPage === 'function') goToProductPage(s); else window.location.href = '/products/' + s; }; })(slug);
+      actions.appendChild(atcBtn);
+      actions.appendChild(vd);
+      body.appendChild(actions);
+    }
+
+    card.appendChild(body);
+    grid.appendChild(card);
+  });
+
+  grid.style.display = '';
+  if (typeof observeRv === 'function') observeRv();
 }
 
 function cpSortProducts(v) {
