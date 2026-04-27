@@ -252,6 +252,11 @@ async function init() {
 
   // If cached profile exists, show it immediately — don't make user wait
   if (_authProfile && _authToken) {
+    // Also load cached orders so renderOrdersTab doesn't hit API immediately
+    try {
+      var cachedOrders = localStorage.getItem('pr_cached_orders');
+      if (cachedOrders) _orders = JSON.parse(cachedOrders);
+    } catch(e) {}
     showAccount();
     switchTab('orders');
     // Then refresh silently in background
@@ -260,7 +265,10 @@ async function init() {
       if (freshData && freshData.profile) {
         _authProfile = freshData.profile;
         _authUser = freshData.user;
-        if (freshData.orders) _orders = freshData.orders;
+        if (freshData.orders) {
+          _orders = freshData.orders;
+          try { localStorage.setItem('pr_cached_orders', JSON.stringify(_orders)); } catch(e){}
+        }
         try { localStorage.setItem('pr_auth_profile', JSON.stringify(freshData.profile)); } catch(e){}
         showAccount(); switchTab('orders'); // re-render with fresh data
       }
@@ -284,7 +292,10 @@ async function init() {
     clearTimeout(_timeout);
     _authProfile = data.profile;
     _authUser = data.user;
-    if (data.orders) _orders = data.orders;
+    if (data.orders) {
+      _orders = data.orders;
+      try { localStorage.setItem('pr_cached_orders', JSON.stringify(_orders)); } catch(e){}
+    }
     try { localStorage.setItem('pr_auth_profile', JSON.stringify(data.profile)); } catch(e){}
     if (!_authProfile) { showLoginWall(); return; }
     showAccount();
