@@ -114,7 +114,7 @@ img { max-width: 100%; }
   position: relative;
 }
 .hero-img-frame {
-  width: 100%; aspect-ratio: 3/4; max-width: 420px; margin: 0 auto;
+  width: 100%; aspect-ratio: 3/4; max-width: 520px; margin: 0 auto;
   background: transparent;
   border: none;
   position: relative; overflow: visible;
@@ -414,7 +414,7 @@ img { max-width: 100%; }
   .mob-menu-btn { display: block; }
   .hero-inner { grid-template-columns: 1fr; gap: 48px; }
   .hero-image-wrap { order: -1; }
-  .hero-img-frame { max-width: 280px; }
+  .hero-img-frame { max-width: 340px; }
   .story-grid { grid-template-columns: 1fr; gap: 48px; }
   .values-grid { grid-template-columns: 1fr; }
   .founder-grid { grid-template-columns: 1fr; gap: 48px; }
@@ -446,6 +446,85 @@ img { max-width: 100%; }
 /* Logo overrides for about page */
 .logo-name{font-family:'Playfair Display',serif;font-size:17px;font-weight:900;color:var(--g);line-height:1.1;display:block}
 .logo-tl{font-size:9px;color:var(--gold,#c8a45a);font-weight:700;letter-spacing:1.2px;text-transform:uppercase;display:block}
+
+/* ── MEGA MENU ─────────────────────────────────────────────── */
+.mega-parent{position:static}
+.mega-trigger{cursor:pointer;user-select:none;display:flex;align-items:center;gap:3px}
+.mega-trigger .arr{font-size:10px;transition:transform .25s ease;display:inline-block;margin-left:2px}
+.mega-parent.open .mega-trigger .arr{transform:rotate(180deg)}
+.mega-menu-backdrop{
+  position:fixed;top:var(--mega-top,64px);left:0;right:0;bottom:0;
+  z-index:500;
+  visibility:hidden;opacity:0;pointer-events:none;
+  transition:opacity .22s,visibility 0s linear .22s;
+}
+.mega-menu-backdrop.open{
+  visibility:visible;opacity:1;pointer-events:auto;
+  transition:opacity .22s,visibility 0s linear 0s;
+}
+.mega-menu{
+  position:fixed;top:var(--mega-top,64px);
+  left:50%;transform:translateX(-50%) translateY(-10px);
+  width:min(960px,92vw);
+  background:#fff;
+  border-radius:0 0 20px 20px;
+  box-shadow:0 20px 60px rgba(0,0,0,.14),0 4px 16px rgba(0,0,0,.06);
+  z-index:501;
+  display:flex;gap:0;align-items:stretch;
+  overflow:hidden;
+  visibility:hidden;opacity:0;pointer-events:none;
+  transition:opacity .22s cubic-bezier(.4,0,.2,1),transform .22s cubic-bezier(.4,0,.2,1),visibility 0s linear .22s;
+}
+.mega-menu.open{
+  visibility:visible;opacity:1;pointer-events:auto;
+  transform:translateX(-50%) translateY(0);
+  transition:opacity .22s cubic-bezier(.4,0,.2,1),transform .22s cubic-bezier(.4,0,.2,1),visibility 0s linear 0s;
+}
+.mega-col{min-width:0;padding:28px 28px 24px;display:flex;flex-direction:column}
+#megaColCollections{flex:1;background:#fff}
+#megaColStates{flex:1.5;background:#fff;border-left:1px solid #f0ede6;border-right:1px solid #f0ede6}
+#megaColCurated{flex:1;background:#f7f4ee}
+#megaColStates .mega-list{display:grid;grid-template-columns:1fr 1fr;gap:0 4px;overflow:visible}
+.mega-heading{
+  font-size:9px;font-weight:800;letter-spacing:2.4px;text-transform:uppercase;
+  color:#a89f92;margin-bottom:18px;flex-shrink:0;
+}
+.mega-list{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:1px}
+.mega-list li a,.mega-list li button{
+  display:flex;align-items:center;gap:0;
+  width:100%;padding:7px 10px;border-radius:8px;
+  font-size:13.5px;font-weight:500;color:#2c2c2c;
+  text-decoration:none;background:none;border:none;
+  cursor:pointer;text-align:left;
+  transition:background .15s,color .15s;white-space:nowrap;
+  letter-spacing:.1px;
+}
+.mega-list li a:hover,.mega-list li button:hover{background:rgba(26,58,30,.08);color:#1a3a1e}
+#megaColCurated .mega-list li a:hover{background:rgba(26,58,30,.08);color:#1a3a1e}
+.mega-list li .mega-icon{font-size:15px;width:20px;text-align:center;flex-shrink:0}
+.mega-state-thumb,.mega-state-thumb-wrap{display:none!important}
+@keyframes mega-skel{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.mega-divider{display:none}
+.mega-view-all{
+  display:inline-flex;align-items:center;gap:5px;
+  margin-top:18px;padding:0;
+  font-size:13px;font-weight:600;color:#1a3a1e;
+  text-decoration:none;transition:gap .15s;
+  border-top:1px solid #edeae2;padding-top:14px;
+  letter-spacing:.1px;
+}
+.mega-view-all:hover{gap:9px}
+#megaListCurated li a{font-weight:600;color:#2c2c2c}
+#megaListCurated li a:hover{color:#1a3a1e}
+body.dark .mega-menu{background:#0f1f11;box-shadow:0 20px 60px rgba(0,0,0,.4)}
+body.dark #megaColCollections{background:#0f1f11}
+body.dark #megaColStates{background:#0f1f11;border-color:#1e3a22}
+body.dark #megaColCurated{background:#0a1a0c}
+body.dark .mega-list li a,body.dark .mega-list li button{color:#d4e8d4}
+body.dark .mega-list li a:hover,body.dark .mega-list li button:hover{background:rgba(255,255,255,.06);color:#7ec87e}
+body.dark .mega-heading{color:#4a6b4a}
+body.dark .mega-view-all{color:#7ec87e;border-color:#1e3a22}
+@media(max-width:820px){.mega-menu{display:none!important}}
 </style>
 <link rel="stylesheet" href="/css/main.css">
 </head>
@@ -471,7 +550,7 @@ img { max-width: 100%; }
 <nav id="mNav">
   <a href="https://pahadiroots.com" class="logo">
     <div class="logo-icon"><img src="https://ulyrhnpoiypuvaurlqqi.supabase.co/storage/v1/object/public/pahadi-images/5%20pahadi%20roots.png" alt="5 Pahadi Roots" style="height:40px;width:40px;object-fit:contain" onerror="this.style.display='none'"></div>
-    <div class="logo-words"><div class="logo-name">5 Pahadi Roots</div><div class="logo-tl">Himalayan Natural Store</div></div>
+    <div class="logo-words"><div class="logo-name">5 Pahadi Roots</div><div class="logo-tl">Nature's Best, From Every Mountain</div></div>
   </a>
   <ul class="nav-links">
     <li><a href="/">Home</a></li>
@@ -805,7 +884,7 @@ img { max-width: 100%; }
     </div>
     <div class="f-brand-col">
       <div class="f-brand-name">5 Pahadi Roots</div>
-      <div class="f-brand-sub">Himalayan Natural Store</div>
+      <div class="f-brand-sub">Nature's Best, From Every Mountain</div>
       <p class="f-brand-desc">Born in the mountains, delivered to your doorstep. Pure Himalayan natural products, sourced with love from farming communities across 10 Himalayan states.</p>
     </div>
     <div class="f-vine-panel">
