@@ -114,7 +114,7 @@ img { max-width: 100%; }
   position: relative;
 }
 .hero-img-frame {
-  width: 100%; aspect-ratio: 3/4; max-width: 520px; margin: 0 auto;
+  width: 100%; aspect-ratio: 3/4; max-width: 380px; margin: 40px auto 0;
   background: transparent;
   border: none;
   position: relative; overflow: visible;
@@ -1028,6 +1028,130 @@ body.dark .mega-view-all{color:#7ec87e;border-color:#1e3a22}
 </footer>
 
 <script>
+// ── MEGA MENU for about/our-story page ──────────────────────────
+(function() {
+  var _megaOpen = false;
+  var _megaBuilt = false;
+
+  var FALLBACK_CATEGORIES = [
+    {name:'Wild Honey',emoji:'🍯',slug:'honey'},
+    {name:'Ghee & Dairy',emoji:'🥛',slug:'ghee'},
+    {name:'Saffron & Spices',emoji:'🌸',slug:'spices'},
+    {name:'Tea & Drinks',emoji:'🍵',slug:'tea'},
+    {name:'Dry Fruits & Nuts',emoji:'🌰',slug:'nuts'},
+    {name:'Health & Superfoods',emoji:'🌿',slug:'superfoods'},
+  ];
+  var FALLBACK_STATES = [
+    {name:'Himachal Pradesh',emoji:'🏔️',id:'hp'},
+    {name:'Uttarakhand',emoji:'🏔️',id:'uk'},
+    {name:'J&K / Kashmir',emoji:'🌷',id:'jk'},
+    {name:'Ladakh',emoji:'❄️',id:'la'},
+    {name:'Sikkim',emoji:'🌺',id:'sk'},
+    {name:'Assam',emoji:'🍵',id:'as'},
+    {name:'Meghalaya',emoji:'🌧️',id:'ml'},
+    {name:'Nagaland',emoji:'🌶️',id:'nl'},
+    {name:'Manipur',emoji:'💃',id:'mn'},
+    {name:'Tripura',emoji:'🏛️',id:'tr'},
+  ];
+  var FALLBACK_CURATED = [
+    {name:'Bestsellers',emoji:'⭐',url:'/all-products.html?filter=bs'},
+    {name:'New Arrivals',emoji:'✨',url:'/all-products.html?filter=nw'},
+    {name:'Gift Sets',emoji:'🎁',url:'/all-products.html?filter=gift'},
+    {name:'Premium Picks',emoji:'🏆',url:'/all-products.html?filter=pm'},
+  ];
+
+  function buildMegaMenu() {
+    if (_megaBuilt) return;
+    var listColl = document.getElementById('megaListCollections');
+    if (listColl) {
+      var cats = (window.MEGA_CATEGORIES && window.MEGA_CATEGORIES.length) ? window.MEGA_CATEGORIES : FALLBACK_CATEGORIES;
+      listColl.innerHTML = cats.map(function(c) {
+        var url = c.slug ? '/category.html?cat=' + encodeURIComponent(c.slug) : '/all-products.html';
+        return '<li><a href="' + url + '"><span class="mega-icon">' + (c.emoji||'🌿') + '</span>' + c.name + '</a></li>';
+      }).join('');
+    }
+    var listStates = document.getElementById('megaListStates');
+    if (listStates) {
+      var states = (window.STATES && window.STATES.length) ? window.STATES : FALLBACK_STATES;
+      listStates.innerHTML = states.slice(0,10).map(function(s) {
+        var url = '/state.html?id=' + (s.id||s.slug||'');
+        return '<li><a href="' + url + '"><span class="mega-icon">' + (s.emoji||'🏔️') + '</span>' + s.name + '</a></li>';
+      }).join('');
+    }
+    var listCurated = document.getElementById('megaListCurated');
+    if (listCurated) {
+      listCurated.innerHTML = FALLBACK_CURATED.map(function(c) {
+        return '<li><a href="' + c.url + '"><span class="mega-icon">' + c.emoji + '</span>' + c.name + '</a></li>';
+      }).join('');
+    }
+    _megaBuilt = true;
+  }
+
+  function openMegaMenu() {
+    buildMegaMenu();
+    var menu = document.getElementById('shopMegaMenu');
+    var li = document.getElementById('shopNavLi');
+    if (!menu || !li) return;
+    menu.classList.add('open');
+    li.classList.add('open');
+    _megaOpen = true;
+  }
+
+  function closeMegaMenu() {
+    var menu = document.getElementById('shopMegaMenu');
+    var li = document.getElementById('shopNavLi');
+    if (!menu || !li) return;
+    menu.classList.remove('open');
+    li.classList.remove('open');
+    _megaOpen = false;
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    var li = document.getElementById('shopNavLi');
+    var trigger = document.getElementById('shopNavTrigger');
+    var menu = document.getElementById('shopMegaMenu');
+    if (!li || !trigger || !menu) return;
+
+    function updateMegaTop() {
+      var nav = document.getElementById('mNav');
+      if (nav) {
+        var rect = nav.getBoundingClientRect();
+        document.documentElement.style.setProperty('--mega-top', rect.bottom + 'px');
+      }
+    }
+    updateMegaTop();
+    window.addEventListener('scroll', updateMegaTop, {passive:true});
+    window.addEventListener('resize', updateMegaTop, {passive:true});
+
+    trigger.addEventListener('click', function(e) {
+      e.preventDefault();
+      updateMegaTop();
+      _megaOpen ? closeMegaMenu() : openMegaMenu();
+    });
+
+    document.addEventListener('click', function(e) {
+      if (_megaOpen && !li.contains(e.target) && !menu.contains(e.target)) {
+        closeMegaMenu();
+      }
+    });
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && _megaOpen) closeMegaMenu();
+    });
+
+    // Try to enrich with real data from API
+    fetch('/api/store-data').then(function(r){ return r.json(); }).then(function(data) {
+      if (data && data.categories && data.categories.length) {
+        window.MEGA_CATEGORIES = data.categories.filter(function(c){ return c.is_active !== false; });
+      }
+      if (data && data.states && data.states.length) {
+        window.STATES = data.states;
+      }
+      _megaBuilt = false; // force rebuild with real data
+    }).catch(function(){});
+  });
+})();
+
 // Scroll animations
 const observer = new IntersectionObserver((entries) => {
   entries.forEach(e => {
