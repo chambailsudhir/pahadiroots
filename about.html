@@ -444,8 +444,11 @@ img { max-width: 100%; }
 .theme-check{margin-left:auto;color:var(--g);font-size:16px;opacity:0}
 .theme-opt.active .theme-check{opacity:1}
 /* Logo overrides for about page */
-.logo-name{font-family:'Playfair Display',serif;font-size:17px;font-weight:900;color:var(--g);line-height:1.1;display:block}
-.logo-tl{font-size:9px;color:var(--gold,#c8a45a);font-weight:700;letter-spacing:1.2px;text-transform:uppercase;display:block}
+.logo-name{font-family:'Playfair Display',serif;font-size:19px;font-weight:900;color:var(--g);line-height:1.1;display:block}
+.logo-tl{font-size:10.5px;color:var(--gold,#c8a45a);font-weight:600;letter-spacing:.5px;display:block}
+nav#mNav{height:72px}
+.logo{align-items:center}
+.logo-icon img{height:52px!important;width:52px!important;margin-top:-2px}
 
 /* ── MEGA MENU ─────────────────────────────────────────────── */
 .mega-parent{position:static}
@@ -549,7 +552,7 @@ body.dark .mega-view-all{color:#7ec87e;border-color:#1e3a22}
 </div>
 <nav id="mNav">
   <a href="https://pahadiroots.com" class="logo">
-    <div class="logo-icon"><img src="https://ulyrhnpoiypuvaurlqqi.supabase.co/storage/v1/object/public/pahadi-images/5%20pahadi%20roots.png" alt="5 Pahadi Roots" style="height:40px;width:40px;object-fit:contain" onerror="this.style.display='none'"></div>
+    <div class="logo-icon"><img src="https://ulyrhnpoiypuvaurlqqi.supabase.co/storage/v1/object/public/pahadi-images/5%20pahadi%20roots.png" alt="5 Pahadi Roots" style="height:52px;width:52px;object-fit:contain" onerror="this.style.display='none'"></div>
     <div class="logo-words"><div class="logo-name">5 Pahadi Roots</div><div class="logo-tl">Nature's Best, From Every Mountain</div></div>
   </a>
   <ul class="nav-links">
@@ -575,8 +578,6 @@ body.dark .mega-view-all{color:#7ec87e;border-color:#1e3a22}
         </div>
       </div>
     </li>
-    <li><a href="/all-states.html">By State</a></li>
-    <li><a href="/our-story">Our Story</a></li>
     <li><a href="/#contact">Contact</a></li>
   </ul>
   <div class="nav-right">
@@ -1054,10 +1055,12 @@ body.dark .mega-view-all{color:#7ec87e;border-color:#1e3a22}
     {name:'Tripura',emoji:'🏛️',id:'tr'},
   ];
   var FALLBACK_CURATED = [
-    {name:'Bestsellers',emoji:'⭐',url:'/all-products.html?filter=bs'},
-    {name:'New Arrivals',emoji:'✨',url:'/all-products.html?filter=nw'},
-    {name:'Gift Sets',emoji:'🎁',url:'/all-products.html?filter=gift'},
-    {name:'Premium Picks',emoji:'🏆',url:'/all-products.html?filter=pm'},
+    {name:'Best Sellers',    emoji:'✦', url:'/all-products.html?filter=bestseller'},
+    {name:'New Arrivals',    emoji:'✦', url:'/all-products.html?filter=new'},
+    {name:'Gift Sets',       emoji:'✦', url:'/all-products.html?filter=gift'},
+    {name:'Pahadi Wellness', emoji:'✦', url:'/all-products.html?filter=wellness'},
+    {name:'Natural Honey',   emoji:'✦', url:'/all-products.html?filter=honey'},
+    {name:'Pure Spices',     emoji:'✦', url:'/all-products.html?filter=spices'},
   ];
 
   function buildMegaMenu() {
@@ -1077,6 +1080,15 @@ body.dark .mega-view-all{color:#7ec87e;border-color:#1e3a22}
         var url = '/state.html?id=' + (s.id||s.slug||'');
         return '<li><a href="' + url + '"><span class="mega-icon">' + (s.emoji||'🏔️') + '</span>' + s.name + '</a></li>';
       }).join('');
+      // Add View All Regions link below states
+      var existingViewAll = listStates.parentNode.querySelector('.mega-view-all-states');
+      if (!existingViewAll) {
+        var viewAllStates = document.createElement('a');
+        viewAllStates.href = '/all-states.html';
+        viewAllStates.className = 'mega-view-all mega-view-all-states';
+        viewAllStates.innerHTML = 'View All Regions →';
+        listStates.parentNode.appendChild(viewAllStates);
+      }
     }
     var listCurated = document.getElementById('megaListCurated');
     if (listCurated) {
