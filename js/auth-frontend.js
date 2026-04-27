@@ -727,7 +727,7 @@ function showResetPasswordModal(token) {
     '<div style="background:linear-gradient(135deg,#1a3a1e,#2d6a4f);padding:28px 24px 20px;text-align:center;position:sticky;top:0;z-index:2">' +
       '<div style="font-size:32px;margin-bottom:6px">🌿</div>' +
       '<div style="font-size:18px;font-weight:800;color:#fff;">5 Pahadi Roots</div>' +
-      '<div style="font-size:12px;color:rgba(255,255,255,.6);margin-top:2px">Himalayan Organic Store</div>' +
+      '<div style="font-size:12px;color:rgba(255,255,255,.6);margin-top:2px">Nature's Best, From Every Mountain</div>' +
     '</div>' +
     '<div style="padding:32px 24px">' +
       '<div style="text-align:center;margin-bottom:28px">' +

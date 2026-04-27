@@ -32,6 +32,12 @@
 <link rel="prefetch" href="/css/main.css">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Lato:wght@300;400;700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <noscript><link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Lato:wght@400;700&display=swap" rel="stylesheet"></noscript>
+<title>Buy Organic & Natural Himalayan Products Online | 5 Pahadi Roots</title>
+<meta name="description" content="Shop all organic & natural Himalayan products — wild honey, shilajit, Kangra tea, heritage rice, cold-pressed oils, herbs & spices. 100% pure, sourced from 10 Himalayan states. Free shipping, COD available.">
+<meta name="keywords" content="buy organic products online india, natural products online, himalayan organic food, buy wild honey online, organic spices india, himalayan herbs buy, natural products india, organic food online india">
+<meta property="og:title" content="Buy Organic Himalayan Natural Products | 5 Pahadi Roots">
+<meta property="og:description" content="100% pure organic products from Himalayan farming communities. Wild honey, shilajit, teas, spices, oils & more.">
+<link rel="canonical" href="https://pahadiroots.com/all-products.html">
 <link rel="stylesheet" href="/css/main.css">
 <script src="https://checkout.razorpay.com/v1/checkout.js" defer></script>
 
@@ -268,7 +274,7 @@ body .filter-bar,
 <nav id="mNav">
   <a href="https://pahadiroots.com" class="logo">
     <div class="logo-icon"><img src="https://ulyrhnpoiypuvaurlqqi.supabase.co/storage/v1/object/public/pahadi-images/5%20pahadi%20roots.png" alt="5 Pahadi Roots" style="height:40px;width:40px;object-fit:contain" onerror="this.style.display='none'"></div>
-    <div class="logo-words"><div class="logo-name">5 Pahadi Roots</div><div class="logo-tl">Himalayan Natural Store</div></div>
+    <div class="logo-words"><div class="logo-name">5 Pahadi Roots</div><div class="logo-tl">Nature's Best, From Every Mountain</div></div>
   </a>
   <ul class="nav-links">
     <li><a href="/">Home</a></li><li><a href="/our-story">Our Story</a></li><li><a href="/all-products.html" style="color:var(--g);font-weight:900">Shop</a></li>
@@ -542,7 +548,7 @@ body .filter-bar,
     </div>
     <div class="f-brand-col">
       <div class="f-brand-name">5 Pahadi Roots</div>
-      <div class="f-brand-sub">Himalayan Natural Store</div>
+      <div class="f-brand-sub">Nature's Best, From Every Mountain</div>
       <p class="f-brand-desc">Born in the mountains, delivered to your doorstep. Pure Himalayan natural products, sourced with love from farming communities across 10 Himalayan states.</p>
     </div>
     <div class="f-vine-panel">
@@ -904,8 +910,23 @@ function buildSidebarCats() {
   }).join('');
 }
 window.addEventListener('pahadiDataReady', buildSidebarCats);
+// Also hook into rebuildMegaCategories (cache path)
+var _origRebuild = window.rebuildMegaCategories;
+window.rebuildMegaCategories = function() {
+  if (_origRebuild) _origRebuild.apply(this, arguments);
+  buildSidebarCats();
+};
 document.addEventListener('DOMContentLoaded', function() {
-  setTimeout(buildSidebarCats, 1000);
+  // Try immediately if already loaded
+  if (window.DB_CATEGORIES && window.DB_CATEGORIES.length) buildSidebarCats();
+  // Then poll as fallback
+  var _poll = setInterval(function() {
+    if (window.DB_CATEGORIES && window.DB_CATEGORIES.length) {
+      buildSidebarCats();
+      clearInterval(_poll);
+    }
+  }, 300);
+  setTimeout(function(){ clearInterval(_poll); }, 10000);
 });
 </script>
 
