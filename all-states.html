@@ -256,16 +256,34 @@ var _asProducts = [];
 var _asReady = false;
 
 function _asInit() {
-  if (_asReady) return;
-  var states = (window.STATES && window.STATES.length) ? window.STATES : window.FALLBACK_STATES;
-  var products = (window.PRODUCTS && window.PRODUCTS.length) ? window.PRODUCTS : window.FALLBACK_PRODUCTS;
-  if (!states || !states.length) return;
+  // Wait for real DB states (they have _uploadedImgs or cover_photo_url set)
+  // Don't lock on FALLBACK_STATES which have no images
+  var states   = window.STATES   || [];
+  var products = window.PRODUCTS || [];
+  var hasRealStates = states.some(function(s) {
+    return s._uploadedImgs && s._uploadedImgs.length || s.cover_photo_url;
+  });
+  // If real states with images aren't loaded yet, wait
+  if (!hasRealStates && !_asReady) {
+    // Use fallback for initial render so page isn't blank
+    var fbStates = window.FALLBACK_STATES || [];
+    if (fbStates.length && !_asReady) {
+      _asReady = true;
+      _asAllStates = fbStates;
+      _asProducts  = window.FALLBACK_PRODUCTS || [];
+      document.getElementById('asStatStates').textContent = fbStates.length;
+      document.getElementById('asStatProducts').textContent = '—';
+      _asRender(fbStates);
+    }
+    return;
+  }
+  // Real data arrived — always re-render with images
   _asReady = true;
-  _asAllStates = states;
-  _asProducts = products;
-  document.getElementById('asStatStates').textContent = states.length;
-  document.getElementById('asStatProducts').textContent = products.length || '—';
-  _asRender(states);
+  _asAllStates = states.length ? states : (window.FALLBACK_STATES || []);
+  _asProducts  = products.length ? products : (window.FALLBACK_PRODUCTS || []);
+  document.getElementById('asStatStates').textContent = _asAllStates.length;
+  document.getElementById('asStatProducts').textContent = _asProducts.length || '—';
+  _asRender(_asAllStates);
 }
 
 function _asRender(states) {
@@ -316,7 +334,10 @@ function asFilter(q) {
   _asRender(filtered);
 }
 
-window.addEventListener('pahadiDataReady', _asInit);
+window.addEventListener('pahadiDataReady', function() {
+  _asReady = false; // reset so real data always re-renders
+  _asInit();
+});
 document.addEventListener('DOMContentLoaded', function(){
   setTimeout(function(){
     if (window.PRODUCTS && window.PRODUCTS.length) _asInit();
