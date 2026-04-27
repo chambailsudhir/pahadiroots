@@ -635,7 +635,7 @@ function _spRenderOtherStates(currentState, states, products) {
       ? '<img class="sp-state-card-img" src="' + imgSrc + '" alt="' + s.name + '" loading="lazy" onerror="this.style.display=\'none\'">' 
       : '<div class="sp-state-card-emo" style="background:' + (s.panel_bg||'linear-gradient(135deg,#1a3a1e,#2d5233)') + '">' + s.emoji + '</div>';
     return '<a href="/state.html?id=' + s.id + '" class="sp-state-card" style="animation-delay:' + (i*.05) + 's">' + img +
-      '<div class="sp-state-card-body"><div class="sp-state-card-name">' + s.emoji + ' ' + s.name + '</div><div class="sp-state-card-tag">' + (s.tagline||'') + '</div>' +
+      '<div class="sp-state-card-body"><div class="sp-state-card-name">' + s.name + '</div><div class="sp-state-card-tag">' + (s.tagline||'') + '</div>' +
       (count ? '<div class="sp-state-card-count">✦ ' + count + ' product' + (count!==1?'s':'') + '</div>' : '') +
       '</div></a>';
   }).join('');
@@ -644,7 +644,10 @@ function _spRenderOtherStates(currentState, states, products) {
 }
 
 // Boot: try immediately, poll until data ready, and listen for data ready event
-window.addEventListener('pahadiDataReady', _spInit);
+window.addEventListener('pahadiDataReady', function() {
+  _spReady = false; // reset so real state images always re-render
+  _spInit();
+});
 document.addEventListener('DOMContentLoaded', function(){
   // Poll up to 8 seconds for data to be loaded from main.js (async fetch)
   var _spPollCount = 0;
