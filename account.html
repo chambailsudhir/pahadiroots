@@ -402,7 +402,19 @@ async function renderOrdersTab() {
     window._lastOrders = _orders;
     setPanel(buildOrdersHtml(_orders));
   } catch(e) {
-    setPanel('<div class="card"><p style="color:var(--tx3)">Orders load nahi ho sake. Dobara try karein.</p></div>');
+    // 401 = token expired — try refresh, else show login
+    if (e && (e.message === '401' || e.status === 401 || (e.message && e.message.includes('401')))) {
+      var rt = null;
+      try { rt = localStorage.getItem('pr_auth_refresh'); } catch(ex){}
+      if (rt) {
+        try { await tryRefreshThenInit(rt); return; } catch(ex2){}
+      }
+      // Refresh also failed — clear and show login
+      try { localStorage.removeItem('pr_auth_token'); localStorage.removeItem('pr_auth_profile'); localStorage.removeItem('pr_cached_orders'); } catch(ex){}
+      showLoginWall();
+    } else {
+      setPanel('<div class="card"><p style="color:var(--tx3)">Orders load nahi ho sake. Dobara try karein.</p></div>');
+    }
   }
 }
 
