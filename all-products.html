@@ -103,6 +103,136 @@
     .ap-products-sec { padding: 20px 12px 40px; }
   }
 </style>
+<style>
+/* ── Page background ─────────────────────────── */
+body { background: #faf6ee !important; }
+
+/* ── Layout: sidebar + products ─────────────── */
+.ap-layout {
+  display: flex;
+  align-items: flex-start;
+  gap: 28px;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 32px 40px 64px;
+  box-sizing: border-box;
+}
+
+/* ── Left Sidebar ───────────────────────────── */
+.ap-sidebar {
+  width: 240px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 80px;
+  background: #fdfaf4;
+  border: 1px solid rgba(200,146,10,.2);
+  border-radius: 16px;
+  padding: 24px 20px;
+  box-shadow: 0 4px 20px rgba(26,58,30,.07);
+}
+.ap-sidebar-section { margin-bottom: 24px; }
+.ap-sidebar-section:last-child { margin-bottom: 0; }
+.ap-sidebar-heading {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+  color: #c8920a;
+  font-family: 'Lato', sans-serif;
+  margin-bottom: 10px;
+}
+.ap-sb-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  padding: 9px 12px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-family: 'Lato', sans-serif;
+  color: #2d4a30;
+  cursor: pointer;
+  transition: background .15s, color .15s;
+  margin-bottom: 2px;
+}
+.ap-sb-item:hover { background: rgba(26,58,30,.06); color: #1a3a1e; }
+.ap-sb-item.active {
+  background: #1a3a1e;
+  color: #fff;
+  font-weight: 700;
+}
+.ap-sb-item.active .ap-sb-emoji { filter: brightness(10); }
+.ap-sb-emoji { margin-right: 7px; }
+.ap-sb-divider { height: 1px; background: rgba(200,146,10,.15); margin: 16px 0; }
+.ap-sb-sort-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-family: 'Lato', sans-serif;
+  color: #2d4a30;
+  cursor: pointer;
+  margin-bottom: 2px;
+  transition: background .15s;
+}
+.ap-sb-sort-item:hover { background: rgba(26,58,30,.06); }
+.ap-sb-sort-item.active { background: rgba(26,58,30,.08); font-weight: 700; color: #1a3a1e; }
+.ap-sb-check {
+  width: 16px; height: 16px;
+  border: 2px solid rgba(26,58,30,.3);
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+}
+.ap-sb-sort-item.active .ap-sb-check {
+  background: #1a3a1e;
+  border-color: #1a3a1e;
+}
+.ap-sb-avail {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  cursor: pointer;
+  font-size: 14px;
+  font-family: 'Lato', sans-serif;
+  color: #2d4a30;
+  border-radius: 10px;
+  transition: background .15s;
+}
+.ap-sb-avail:hover { background: rgba(26,58,30,.06); }
+.ap-sb-avail input[type=checkbox] {
+  width: 16px; height: 16px;
+  accent-color: #1a3a1e;
+  cursor: pointer;
+}
+
+/* ── Products main area ─────────────────────── */
+.ap-main { flex: 1; min-width: 0; }
+.ap-products-sec { padding: 0 !important; background: transparent !important; }
+.ap-count-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  font-size: 13px;
+  color: #666;
+  font-family: 'Lato', sans-serif;
+}
+.ap-count-bar strong { color: #1a3a1e; }
+
+/* ── Hide old filter bar (sidebar replaces it) ─ */
+.filter-bar { display: none !important; }
+
+@media (max-width: 768px) {
+  .ap-layout { flex-direction: column; padding: 16px; }
+  .ap-sidebar { width: 100%; position: static; }
+  .filter-bar { display: flex !important; }
+}
+</style>
 </head>
 <body data-theme="pahadi">
 
@@ -217,9 +347,59 @@
   <div class="ap-count-badge">🌿 <span id="apProductCount">—</span> Products</div>
 </div>
 
-<!-- Products Section -->
+<!-- Products Layout -->
+<div class="ap-layout">
+
+  <!-- Left Sidebar -->
+  <aside class="ap-sidebar" id="apSidebar">
+    <!-- Collections -->
+    <div class="ap-sidebar-section">
+      <div class="ap-sidebar-heading">Collections</div>
+      <button class="ap-sb-item active" onclick="apSbFilter('all',this)">
+        <span class="ap-sb-emoji">🌿</span> All Products
+      </button>
+      <div id="apSbCats"><!-- filled by JS --></div>
+    </div>
+
+    <div class="ap-sb-divider"></div>
+
+    <!-- Sort By -->
+    <div class="ap-sidebar-section">
+      <div class="ap-sidebar-heading">Sort By</div>
+      <div class="ap-sb-sort-item active" onclick="apSbSort('default',this)">
+        <span class="ap-sb-check"></span> Newest First
+      </div>
+      <div class="ap-sb-sort-item" onclick="apSbSort('price_asc',this)">
+        <span class="ap-sb-check"></span> ↑ Price: Low → High
+      </div>
+      <div class="ap-sb-sort-item" onclick="apSbSort('price_desc',this)">
+        <span class="ap-sb-check"></span> ↓ Price: High → Low
+      </div>
+      <div class="ap-sb-sort-item" onclick="apSbSort('discount',this)">
+        <span class="ap-sb-check"></span> ⭐ Best Sellers
+      </div>
+    </div>
+
+    <div class="ap-sb-divider"></div>
+
+    <!-- Availability -->
+    <div class="ap-sidebar-section">
+      <div class="ap-sidebar-heading">Availability</div>
+      <label class="ap-sb-avail">
+        <input type="checkbox" id="apInStockOnly" onchange="apSbAvail(this)">
+        In Stock Only
+      </label>
+    </div>
+  </aside>
+
+  <!-- Main Products Area -->
+  <div class="ap-main">
+    <div class="ap-count-bar">
+      <span><strong id="apProductCount">—</strong> products</span>
+    </div>
+
 <section class="ap-products-sec">
-  <!-- Filter bar -->
+  <!-- Filter bar (hidden on desktop, used by JS) -->
   <div class="filter-bar" id="filterBar">
     <button class="filter-btn active" onclick="setFilter('all',this)">🌿 All</button>
     <!-- DB-driven filter pills injected here by buildFilterPills() in main.js -->
@@ -253,8 +433,10 @@
   <!-- Invisible sentinel for infinite scroll -->
   <div id="apScrollSentinel" style="height:1px;margin-top:-1px"></div>
 </section>
+  </div><!-- .ap-main -->
+</div><!-- .ap-layout -->
 
-<!-- Footer — identical to index.html -->
+<!-- Footer -->
 
 <section class="newsletter-bridge">
   <div class="f-newsletter">
@@ -679,6 +861,48 @@
 </script>
 <script src="/js/main.js"></script>
 <script src="/js/auth-frontend.js"></script>
+
+
+<script>
+// Wire sidebar to existing filter/sort functions
+function apSbFilter(key, el) {
+  // Update sidebar active state
+  document.querySelectorAll('.ap-sb-item').forEach(function(b){ b.classList.remove('active'); });
+  el.classList.add('active');
+  // Call existing setFilter
+  if (typeof setFilter === 'function') {
+    var fakeBtn = document.querySelector('.filter-btn[data-filter="' + key + '"]') ||
+                  document.querySelector('.filter-btn.active');
+    setFilter(key, fakeBtn || el);
+  }
+}
+function apSbSort(val, el) {
+  document.querySelectorAll('.ap-sb-sort-item').forEach(function(b){ b.classList.remove('active'); });
+  el.classList.add('active');
+  if (typeof setSortOrder === 'function') setSortOrder(val);
+}
+function apSbAvail(cb) {
+  if (typeof _apInStockFilter !== 'undefined') _apInStockFilter = cb.checked;
+  if (typeof renderProds === 'function') renderProds();
+}
+
+// Build sidebar category list from DB
+function buildSidebarCats() {
+  var cats = window.DB_CATEGORIES || [];
+  var el = document.getElementById('apSbCats');
+  if (!el || !cats.length) return;
+  el.innerHTML = cats.filter(function(c){ return c.is_active !== false; }).map(function(c) {
+    var slug = (c.slug || c.name || '').toLowerCase().replace(/&/g,'and').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+    var emoji = c.emoji || '🌿';
+    return '<button class="ap-sb-item" onclick="apSbFilter('' + slug + '',this)" data-filter="' + slug + '">' +
+      '<span class="ap-sb-emoji">' + emoji + '</span> ' + c.name + '</button>';
+  }).join('');
+}
+window.addEventListener('pahadiDataReady', buildSidebarCats);
+document.addEventListener('DOMContentLoaded', function() {
+  setTimeout(buildSidebarCats, 1000);
+});
+</script>
 
 </body>
 </html>
