@@ -228,7 +228,7 @@ async function callAuth(action, body, useToken) {
   var headers = { 'Content-Type': 'application/json' };
   if (useToken && _authToken) headers['Authorization'] = 'Bearer ' + _authToken;
   var controller = new AbortController();
-  var _t = setTimeout(function() { controller.abort(); }, 10000);
+  var _t = setTimeout(function() { controller.abort(); }, 5000);
   try {
     var res = await fetch(API_BASE + '/auth', {
       method: 'POST', headers,
@@ -250,21 +250,33 @@ async function callAuth(action, body, useToken) {
 async function init() {
   if (!_authToken) { showLoginWall(); return; }
 
-  // Set a hard timeout — agar 12 sec mein response nahi aaya toh login wall dikhao
+  // If cached profile exists, show it immediately — don't make user wait
+  if (_authProfile && _authToken) {
+    showAccount();
+    switchTab('orders');
+    // Then refresh silently in background
+    try {
+      var freshData = await callAuth('get_profile', {}, true);
+      if (freshData && freshData.profile) {
+        _authProfile = freshData.profile;
+        _authUser = freshData.user;
+        if (freshData.orders) _orders = freshData.orders;
+        try { localStorage.setItem('pr_auth_profile', JSON.stringify(freshData.profile)); } catch(e){}
+        showAccount(); switchTab('orders'); // re-render with fresh data
+      }
+    } catch(e) { /* silent fail — cached data already showing */ }
+    return;
+  }
+
+  // No cache — fetch fresh with timeout
   var _initDone = false;
   var _timeout = setTimeout(function() {
     if (!_initDone) {
-      console.warn('Account init timed out');
-      // Try refresh token before giving up
       var rt = null;
       try { rt = localStorage.getItem('pr_auth_refresh'); } catch(e){}
-      if (rt) {
-        tryRefreshThenInit(rt);
-      } else {
-        showLoginWall();
-      }
+      if (rt) { tryRefreshThenInit(rt); } else { showLoginWall(); }
     }
-  }, 10000);
+  }, 4000);
 
   try {
     var data = await callAuth('get_profile', {}, true);
