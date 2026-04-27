@@ -224,8 +224,17 @@ body { background: #faf6ee !important; }
 }
 .ap-count-bar strong { color: #1a3a1e; }
 
-/* ── Hide old filter bar (sidebar replaces it) ─ */
-.filter-bar { display: none !important; }
+/* ── Hide old filter bar on desktop (sidebar replaces it) ─ */
+body .filter-bar,
+.ap-products-sec .filter-bar,
+#filterBar {
+  display: none !important;
+  visibility: hidden !important;
+  height: 0 !important;
+  overflow: hidden !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
 
 @media (max-width: 768px) {
   .ap-layout { flex-direction: column; padding: 16px; }
@@ -394,10 +403,6 @@ body { background: #faf6ee !important; }
 
   <!-- Main Products Area -->
   <div class="ap-main">
-    <div class="ap-count-bar">
-      <span><strong id="apProductCount">—</strong> products</span>
-    </div>
-
 <section class="ap-products-sec">
   <!-- Filter bar (hidden on desktop, used by JS) -->
   <div class="filter-bar" id="filterBar">
