@@ -134,7 +134,7 @@ img { max-width: 100%; }
 }
 .hero-img-frame {
   width: 100%; aspect-ratio: 3/4; max-width: 420px; margin: 0 auto;
-  background: linear-gradient(135deg, rgba(45,106,79,0.3), rgba(26,58,30,0.8));
+  background: linear-gradient(160deg, #1a3a1e 0%, #0d1f0f 100%);
   border: 1px solid rgba(200,164,90,0.2);
   position: relative; overflow: hidden;
   display: flex; align-items: center; justify-content: center;
@@ -553,62 +553,12 @@ img { max-width: 100%; }
     </div>
     <div class="hero-image-wrap fade-up" style="transition-delay:0.2s">
       <div class="hero-img-frame" id="heroImgFrame">
-        <svg viewBox="0 0 400 520" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;position:absolute;inset:0">
-          <!-- Sky gradient -->
-          <defs>
-            <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#0a1f0c"/>
-              <stop offset="100%" stop-color="#1a3a1e"/>
-            </linearGradient>
-            <linearGradient id="mtn1" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#2d5233"/>
-              <stop offset="100%" stop-color="#1a3a1e"/>
-            </linearGradient>
-            <linearGradient id="mtn2" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#3d6b45"/>
-              <stop offset="100%" stop-color="#2d5233"/>
-            </linearGradient>
-            <linearGradient id="goldGlow" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#e8c87a" stop-opacity="0.9"/>
-              <stop offset="100%" stop-color="#c8a45a" stop-opacity="0.3"/>
-            </linearGradient>
-          </defs>
-          <!-- Background -->
-          <rect width="400" height="520" fill="url(#skyGrad)"/>
-          <!-- Stars -->
-          <circle cx="60" cy="40" r="1.5" fill="#c8a45a" opacity="0.6"/>
-          <circle cx="180" cy="25" r="1" fill="#c8a45a" opacity="0.5"/>
-          <circle cx="310" cy="55" r="1.5" fill="#c8a45a" opacity="0.4"/>
-          <circle cx="340" cy="30" r="1" fill="#c8a45a" opacity="0.6"/>
-          <circle cx="90" cy="70" r="1" fill="#fff" opacity="0.3"/>
-          <circle cx="250" cy="45" r="1.2" fill="#fff" opacity="0.3"/>
-          <!-- Moon -->
-          <circle cx="320" cy="60" r="18" fill="#c8a45a" opacity="0.15"/>
-          <circle cx="330" cy="54" r="14" fill="#0a1f0c" opacity="0.9"/>
-          <!-- Back mountains -->
-          <polygon points="0,280 80,140 160,220 240,120 320,200 400,160 400,340 0,340" fill="url(#mtn1)" opacity="0.5"/>
-          <!-- Snow caps back -->
-          <polygon points="80,140 65,175 95,175" fill="white" opacity="0.3"/>
-          <polygon points="240,120 225,158 255,158" fill="white" opacity="0.3"/>
-          <!-- Front mountains -->
-          <polygon points="0,340 60,200 130,260 200,160 270,240 340,180 400,220 400,400 0,400" fill="url(#mtn2)"/>
-          <!-- Snow caps front -->
-          <polygon points="200,160 183,202 217,202" fill="white" opacity="0.5"/>
-          <polygon points="340,180 326,212 354,212" fill="white" opacity="0.4"/>
-          <!-- Ground/forest -->
-          <rect x="0" y="390" width="400" height="130" fill="#0f2410"/>
-          <!-- Trees -->
-          <polygon points="40,390 52,350 64,390" fill="#1a3a1e"/>
-          <polygon points="80,390 92,345 104,390" fill="#1a3a1e"/>
-          <polygon points="290,390 302,348 314,390" fill="#1a3a1e"/>
-          <polygon points="330,390 345,352 360,390" fill="#1a3a1e"/>
-          <!-- Gold line accent -->
-          <line x1="0" y1="400" x2="400" y2="400" stroke="#c8a45a" stroke-width="1" opacity="0.3"/>
-          <!-- Text overlay -->
-          <image href="https://ulyrhnpoiypuvaurlqqi.supabase.co/storage/v1/object/public/pahadi-images/5%20pahadi%20roots.png" x="150" y="410" width="100" height="100" preserveAspectRatio="xMidYMid meet" onerror="this.style.display='none'"/>
-          <text x="200" y="465" text-anchor="middle" font-family="Georgia, serif" font-size="13" fill="#c8a45a" opacity="0.7" letter-spacing="4">PAHADI ROOTS</text>
-          <text x="200" y="483" text-anchor="middle" font-family="Georgia, serif" font-size="10" fill="#c8a45a" opacity="0.4" letter-spacing="2">EST. 2026</text>
-        </svg>
+        <img 
+  src="https://ulyrhnpoiypuvaurlqqi.supabase.co/storage/v1/object/public/pahadi-images/5%20pahadi%20roots.png" 
+  alt="5 Pahadi Roots" 
+  style="width:100%;height:100%;object-fit:contain;position:absolute;inset:0;padding:32px;box-sizing:border-box"
+  onerror="this.style.display='none'"
+>
       </div>
     </div>
   </div>
