@@ -555,7 +555,7 @@ function _spRenderHero(state) {
     '<div class="sp-hero-overlay"></div>' +
     '<div class="sp-hero-content">' +
       '<div class="sp-breadcrumb"><a href="/">Home</a><span>›</span><a href="/all-states.html">All Regions</a><span>›</span><span>' + state.name + '</span></div>' +
-      '<div class="sp-hero-top"><span class="sp-state-emoji">' + state.emoji + '</span><div><div class="sp-state-name">' + state.name + '</div><div class="sp-state-tagline">' + (state.tagline||'') + '</div></div></div>' +
+      '<div class="sp-hero-top"><div><div class="sp-state-name">' + state.name + '</div><div class="sp-state-tagline">' + (state.tagline||'') + '</div></div></div>' +
       (pills ? '<div class="sp-pills">' + pills + '</div>' : '') +
       (state.description ? '<div class="sp-desc collapsed" id="spDesc">' + state.description + '</div><button class="sp-read-more" onclick="_spToggleDesc()">Read more ↓</button>' : '') +
     '</div></div>';
