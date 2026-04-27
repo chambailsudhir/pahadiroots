@@ -2429,7 +2429,7 @@ async function checkoutRazorpay() {
     amount: final * 100, // paise
     currency: 'INR',
     name: '5 Pahadi Roots',
-    description: 'India's Mountain Natural Products',
+    description: 'Himalayan Organic Products',
     image: 'https://pahadiroots.com/favicon.ico',
     prefill: {
       name: name.trim(),
@@ -3574,7 +3574,7 @@ function injectProductSchema() {
   s.textContent = JSON.stringify({
     "@context": "https://schema.org",
     "@type": "ItemList",
-    "name": "5 Pahadi Roots — India's Mountain Natural Products",
+    "name": "5 Pahadi Roots — Himalayan Organic Products",
     "itemListElement": items.map(function(item, i) {
       return {"@type":"ListItem","position":i+1,"item":item};
     })
