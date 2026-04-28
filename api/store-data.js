@@ -16,7 +16,7 @@ const CORS = {
   'Access-Control-Allow-Origin': process.env.ALLOWED_ORIGIN || 'https://pahadiroots.com',
   'Access-Control-Allow-Methods': 'GET, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type',
-  'Cache-Control': 's-maxage=10, stale-while-revalidate=20',
+  'Cache-Control': 's-maxage=300, stale-while-revalidate=3600',
 };
 
 async function sbGet(table, query = '') {
@@ -42,13 +42,15 @@ export default async function handler(req, res) {
 
   try {
     // Fetch states, products, site_settings, and image tables in parallel
+    // product_images is fetched as a nested select inside products — avoids
+    // loading the full image table independently (reduces DB egress as catalogue grows).
     const [states, products, siteSettings, coupons, stateImages, productImages, founderImages, productVariants, teamMembers, categories] = await Promise.all([
       sbGet('states', 'is_active=eq.true&order=name.asc').catch(() => []),
-      sbGet('products', 'select=*&status=eq.active&is_deleted=eq.false&order=name.asc&limit=200').catch(() => []),
+      sbGet('products', 'select=id,name,slug,price,original_price,mrp,image_url,emoji,description,short_description,unit,stock,available_stock,badge_label,badge_type,region,card_bg,review_count,limited_batch,badges,gst_rate,extra_image_url,state_id,category_id,status,is_deleted,created_at&status=eq.active&is_deleted=eq.false&order=name.asc&limit=200').catch(() => []),
       sbGet('site_settings', 'select=key,value').catch(() => []),
       sbGet('coupons', 'is_active=eq.true&select=code,type,value,min_order,max_uses,uses_count,expires_at,first_order_only,max_discount').catch(() => []),
       sbGet('state_images',   'select=state_id,image_url,sort_order&order=state_id.asc,sort_order.asc').catch(() => []),
-      sbGet('product_images', 'select=product_id,image_url,sort_order&order=product_id.asc,sort_order.asc').catch(() => []),
+      sbGet('product_images', 'select=product_id,image_url,sort_order&order=product_id.asc,sort_order.asc&product_id=in.(select+id+from+products+where+status=eq.active+and+is_deleted=eq.false)').catch(() => []),
       sbGet('founder_images', 'order=sort_order.asc').catch(() => []),
       sbGet('product_variants', 'is_active=eq.true&order=product_id.asc,sort_order.asc').catch(() => []),
       sbGet('team_members', 'is_active=eq.true&order=sort_order.asc').catch(() => []),

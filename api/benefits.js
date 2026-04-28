@@ -13,6 +13,18 @@
 const memCache = {};
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
 
+// Rate limiter — max 30 requests per IP per minute
+const rateLimitMap = new Map();
+function isRateLimited(ip) {
+  const now = Date.now();
+  const entry = rateLimitMap.get(ip) || { count: 0, start: now };
+  if (now - entry.start > 60000) { rateLimitMap.set(ip, { count: 1, start: now }); return false; }
+  if (entry.count >= 30) return true;
+  entry.count++;
+  rateLimitMap.set(ip, entry);
+  return false;
+}
+
 export default async function handler(req, res) {
 
   // ── CORS headers ──
@@ -29,6 +41,12 @@ export default async function handler(req, res) {
   // Only allow GET
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  // ── Rate limit — prevent AI API abuse ──
+  const ip = (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.socket?.remoteAddress || 'unknown';
+  if (isRateLimited(ip)) {
+    return res.status(429).json({ error: 'Too many requests — please slow down' });
   }
 
   // ── ADMIN KILL SWITCH ──

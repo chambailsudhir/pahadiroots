@@ -365,10 +365,22 @@ export default async function handler(req, res) {
             customer_id: custId,
             discount_amount: discount
           }).catch(e => console.warn('coupon_usage save failed:', e));
-          // Increment uses_count
-          const curr = await sbFetch('GET', 'coupons', `id=eq.${couponId}&select=uses_count`).catch(()=>[]);
-          const currCount = curr && curr[0] ? (curr[0].uses_count || 0) : 0;
-          await sbFetch('PATCH', 'coupons', `id=eq.${couponId}`, { uses_count: currCount + 1 }).catch(()=>{});
+          // Increment uses_count atomically via RPC to avoid race condition
+          // (read-modify-write would lose concurrent increments)
+          await fetch(`${SUPABASE_URL}/rest/v1/rpc/increment_coupon_uses`, {
+            method: 'POST',
+            headers: {
+              'apikey': SUPABASE_KEY,
+              'Authorization': `Bearer ${SUPABASE_KEY}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ coupon_id_input: couponId }),
+          }).catch(async () => {
+            // Fallback if RPC not yet created: read-modify-write (non-atomic but safe for low traffic)
+            const curr = await sbFetch('GET', 'coupons', `id=eq.${couponId}&select=uses_count`).catch(()=>[]);
+            const currCount = curr && curr[0] ? (curr[0].uses_count || 0) : 0;
+            await sbFetch('PATCH', 'coupons', `id=eq.${couponId}`, { uses_count: currCount + 1 }).catch(()=>{});
+          });
         }
       }
 

@@ -254,7 +254,8 @@ function getStoreApiBase() {
 //   hero_slide_1_coupon_label, hero_slide_1_coupon_offer, hero_slide_1_coupon_code
 //   (repeat for _2_ and _3_)
 // ══════════════════════════════════════════════════════════════
-// ── IMAGE HELPER — direct Supabase URLs (no transform add-on required) ──
+// ── IMAGE HELPER — Supabase Image Transformation + Unsplash CDN ──
+// Requires: Supabase Image Transformation add-on enabled in Storage → Settings
 function imgOpt(url, opts) {
   if (!url) return url;
   opts = opts || {};
@@ -271,12 +272,15 @@ function imgOpt(url, opts) {
       u.searchParams.set('fit', 'crop');
       return u.toString();
     }
-    // Supabase Storage — do NOT add transform params unless Image Transformation
-    // add-on is enabled on the project. Appending ?width= without the add-on
-    // causes Supabase to return a 400 error and the image fails to load entirely.
-    // Return the raw URL so images always load correctly.
+    // Supabase Storage — Image Transformation add-on enabled.
+    // Appends width, quality, and WebP format params so Supabase resizes
+    // server-side — drastically reduces egress vs serving raw originals.
     if (url.indexOf('supabase.co/storage') !== -1) {
-      return url;
+      var u = new URL(url);
+      u.searchParams.set('width', w);
+      u.searchParams.set('quality', q);
+      u.searchParams.set('format', 'webp');
+      return u.toString();
     }
   } catch(e) {}
   return url;
@@ -1146,11 +1150,13 @@ async function loadData() {
         var cachePayload = {
           ts: Date.now(),
           products: PRODUCTS.map(function(p) {
+            // long_description excluded from cache — it's large text only used on product
+            // detail page which always fetches fresh. Keeps localStorage payload small.
             return { id:p.id, slug:p.slug, name:p.name, price:p.price,
               original_price:p.original_price, mrp:p.mrp, image_url:p.image_url,
               _images:p._images||[], category_id:p.category_id,
               state_id:p.state_id, description:p.description,
-              short_description:p.short_description, long_description:p.long_description,
+              short_description:p.short_description,
               unit:p.unit, stock:p.stock, available_stock:p.available_stock,
               emoji:p.emoji, badge_label:p.badge_label, badge_type:p.badge_type,
               region:p.region, card_bg:p.card_bg, review_count:p.review_count,
@@ -1177,21 +1183,9 @@ async function loadData() {
       // Fire callback for category.html
       if (typeof window._onStoreDataReady === 'function') { try { window._onStoreDataReady(); } catch(e){} }
       // Preload state + collection images immediately after data loads (eliminates mega menu delay)
-      setTimeout(function() {
-        var statesData = (STATES && STATES.length) ? STATES : FALLBACK_STATES;
-        statesData.forEach(function(st) {
-          var src = st.cover_photo_url || st.tab_photo_url || '';
-          if (src) { var img = new Image(); img.src = imgOpt(src, {w:800, q:75}); }
-        });
-        if (window.SITE_SETTINGS) {
-          Object.keys(window.SITE_SETTINGS).forEach(function(k) {
-            if (k.startsWith('coll_img_')) {
-              var src = window.SITE_SETTINGS[k];
-              if (src && src.trim()) { var img = new Image(); img.src = imgOpt(src.trim(), {w:320, q:75}); }
-            }
-          });
-        }
-      }, 500); // small delay so critical page content renders first
+      // Prefetch removed — images use loading="lazy" and browser handles it.
+      // Eager JS prefetch was downloading images before user scrolled,
+      // burning Supabase Storage egress unnecessarily.
       // Update homepage "View All" count if present
       var tpc2 = document.getElementById('totalProdCount');
       if (tpc2 && PRODUCTS.length) tpc2.textContent = '(' + PRODUCTS.length + ')';
@@ -1403,13 +1397,10 @@ function toggleMegaMenu() {
 // ── Preload state images before menu opens ──
 var _stateImgsPreloaded = false;
 function preloadStateImages() {
+  // Prefetch disabled — Supabase Storage egress reduction.
+  // Native lazy loading handles image loading as user scrolls.
   if (_stateImgsPreloaded) return;
   _stateImgsPreloaded = true;
-  var statesData = (STATES && STATES.length) ? STATES : FALLBACK_STATES;
-  statesData.forEach(function(st) {
-    var src = st.cover_photo_url || st.tab_photo_url || '';
-    if (src) { var img = new Image(); img.src = imgOpt(src, {w:800, q:75}); }
-  });
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -2937,7 +2928,7 @@ function openQV(id) {
     '<button class="qv-close" onclick="closeQV()">✕</button>' +
     '<div class="qv-inner">' +
       '<div class="qv-img-col">' + (p.emoji||'🌿') +
-        (p.image_url ? '<div class="qv-img-wrap" style="position:relative"><div class="pimg-skel" style="position:absolute;inset:0;border-radius:12px"></div><img src="' + imgOpt(p.image_url,{w:600,q:80}) + '" alt="' + p.name + '" loading="eager" fetchpriority="high" style="position:relative;z-index:1;opacity:0;transition:opacity .4s;width:100%;height:100%;object-fit:cover;border-radius:12px" onload="this.style.opacity=1;var sk=this.previousElementSibling;if(sk)sk.style.display=\'none\'" onerror="this.style.display=\'none\'">' + '</div>' : '') +
+        (p.image_url ? '<div class="qv-img-wrap" style="position:relative"><div class="pimg-skel" style="position:absolute;inset:0;border-radius:12px"></div><img src="' + imgOpt(p.image_url,{w:600,q:80}) + '" alt="' + p.name + '" loading="eager" style="position:relative;z-index:1;opacity:0;transition:opacity .4s;width:100%;height:100%;object-fit:cover;border-radius:12px" onload="this.style.opacity=1;var sk=this.previousElementSibling;if(sk)sk.style.display=\'none\'" onerror="this.style.display=\'none\'">' + '</div>' : '') +
       '</div>' +
       '<div class="qv-content">' +
         '<div class="qv-region">📍 ' + (p.region||'') + '</div>' +
