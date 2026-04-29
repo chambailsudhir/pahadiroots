@@ -899,7 +899,7 @@ function buildSidebarCats() {
   el.innerHTML = cats.filter(function(c){ return c.is_active !== false; }).map(function(c) {
     var slug = (c.slug || c.name || '').toLowerCase().replace(/&/g,'and').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
     var emoji = c.emoji || '🌿';
-    return '<button class="ap-sb-item" onclick="apSbFilter('' + slug + '',this)" data-filter="' + slug + '">' +
+    return '<button class="ap-sb-item" onclick="apSbFilter(\'' + slug + '\',this)" data-filter="' + slug + '">' +
       '<span class="ap-sb-emoji">' + emoji + '</span> ' + c.name + '</button>';
   }).join('');
 }
