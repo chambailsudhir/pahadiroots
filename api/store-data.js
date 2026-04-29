@@ -50,7 +50,7 @@ export default async function handler(req, res) {
       sbGet('site_settings', 'select=key,value').catch(() => []),
       sbGet('coupons', 'is_active=eq.true&select=code,type,value,min_order,max_uses,uses_count,expires_at,first_order_only,max_discount').catch(() => []),
       sbGet('state_images',   'select=state_id,image_url,sort_order&order=state_id.asc,sort_order.asc').catch(() => []),
-      sbGet('product_images', 'select=product_id,image_url,sort_order&order=product_id.asc,sort_order.asc&product_id=in.(select+id+from+products+where+status=eq.active+and+is_deleted=eq.false)').catch(() => []),
+      sbGet('product_images', 'select=product_id,image_url,sort_order&order=product_id.asc,sort_order.asc').catch(() => []),
       sbGet('founder_images', 'order=sort_order.asc').catch(() => []),
       sbGet('product_variants', 'is_active=eq.true&order=product_id.asc,sort_order.asc').catch(() => []),
       sbGet('team_members', 'is_active=eq.true&order=sort_order.asc').catch(() => []),
