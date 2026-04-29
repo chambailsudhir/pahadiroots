@@ -228,7 +228,7 @@ async function callAuth(action, body, useToken) {
   var headers = { 'Content-Type': 'application/json' };
   if (useToken && _authToken) headers['Authorization'] = 'Bearer ' + _authToken;
   var controller = new AbortController();
-  var _t = setTimeout(function() { controller.abort(); }, 5000);
+  var _t = setTimeout(function() { controller.abort(); }, 8000);
   try {
     var res = await fetch(API_BASE + '/auth', {
       method: 'POST', headers,
@@ -237,6 +237,7 @@ async function callAuth(action, body, useToken) {
     });
     clearTimeout(_t);
     var data = await res.json();
+    if (res.status === 401) throw new Error('Session expired — please login again');
     if (!res.ok) throw new Error(data.error || 'Error');
     return data;
   } catch(e) {
@@ -391,6 +392,34 @@ async function renderOrdersTab() {
     window._lastOrders = _orders;
     setPanel(buildOrdersHtml(_orders));
   } catch(e) {
+    // Check if it's a 401/session expired error — try token refresh first
+    var errMsg = (e && e.message) ? e.message.toLowerCase() : '';
+    var isAuthError = errMsg.includes('session expired') || errMsg.includes('not logged in') || errMsg.includes('401') || errMsg.includes('error');
+    if (isAuthError) {
+      // Try refreshing the token
+      var rt = null;
+      try { rt = localStorage.getItem('pr_auth_refresh'); } catch(ex){}
+      if (rt) {
+        try {
+          var r = await callAuth('refresh_token', { refresh_token: rt }, false);
+          if (r && r.access_token) {
+            _authToken = r.access_token;
+            try { localStorage.setItem('pr_auth_token', r.access_token); } catch(ex){};
+            if (r.refresh_token) { try { localStorage.setItem('pr_auth_refresh', r.refresh_token); } catch(ex){} }
+            // Retry fetching orders with fresh token
+            var data2 = await callAuth('get_profile', {}, true);
+            _orders = data2.orders || [];
+            window._lastOrders = _orders;
+            setPanel(buildOrdersHtml(_orders));
+            return;
+          }
+        } catch(ex2) { /* refresh failed — fall through to login wall */ }
+      }
+      // Token refresh failed or no refresh token — show login wall
+      showLoginWall();
+      return;
+    }
+    // Network or other error
     setPanel('<div class="card"><p style="color:var(--tx3)">Orders load nahi ho sake. Dobara try karein.</p></div>');
   }
 }
