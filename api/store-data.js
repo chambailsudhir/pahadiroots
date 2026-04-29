@@ -46,7 +46,7 @@ export default async function handler(req, res) {
     // loading the full image table independently (reduces DB egress as catalogue grows).
     const [states, products, siteSettings, coupons, stateImages, productImages, founderImages, productVariants, teamMembers, categories] = await Promise.all([
       sbGet('states', 'is_active=eq.true&order=name.asc').catch(() => []),
-      sbGet('products', 'select=id,name,slug,price,original_price,mrp,image_url,emoji,description,short_description,unit,stock,available_stock,badge_label,badge_type,region,card_bg,review_count,limited_batch,badges,gst_rate,extra_image_url,state_id,category_id,status,is_deleted,created_at&status=eq.active&is_deleted=eq.false&order=name.asc&limit=200').catch(() => []),
+      sbGet('products', 'select=*&status=eq.active&is_deleted=eq.false&order=name.asc&limit=200').catch(() => []),
       sbGet('site_settings', 'select=key,value').catch(() => []),
       sbGet('coupons', 'is_active=eq.true&select=code,type,value,min_order,max_uses,uses_count,expires_at,first_order_only,max_discount').catch(() => []),
       sbGet('state_images',   'select=state_id,image_url,sort_order&order=state_id.asc,sort_order.asc').catch(() => []),
