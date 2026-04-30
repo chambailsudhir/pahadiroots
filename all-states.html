@@ -520,7 +520,7 @@ function _asRender(states) {
     var pills = (s.pills||[]).slice(0,3).map(function(p){ return '<span class="as-card-pill">' + p + '</span>'; }).join('');
     var shortDesc = (s.description||'Authentic products from the mountains of ' + s.name + '.').substring(0, 110) + '…';
     var img = imgSrc 
-      ? '<img class="as-card-img" src="' + imgSrc + '" alt="' + s.name + '" loading="' + (i<4?'eager':'lazy') + '" onerror="this.style.display=\'none\'">' 
+      ? '<img class="as-card-img" src="' + imgOpt(imgSrc,{w:600,q:75}) + '" srcset="' + imgOpt(imgSrc,{w:400,q:75}) + ' 400w,' + imgOpt(imgSrc,{w:600,q:75}) + ' 600w,' + imgOpt(imgSrc,{w:800,q:70}) + ' 800w" sizes="(max-width:600px) 90vw,(max-width:1024px) 45vw,320px" alt="' + s.name + '" loading="' + (i<4?'eager':'lazy') + '" decoding="async" onerror="this.style.display=\'none\'">' 
       : '';
     return '<a href="/state.html?id=' + s.id + '" class="as-card" style="animation-delay:' + (i*.06) + 's">' +
       '<div class="as-card-img-wrap">' +
