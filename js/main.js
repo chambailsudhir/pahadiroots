@@ -864,6 +864,24 @@ async function loadData() {
     }
   } catch(e) {}
 
+  // Load cached state images — renders images instantly on repeat visits
+  try {
+    var _cachedStateImgs = JSON.parse(localStorage.getItem('pr_state_images') || 'null');
+    if (_cachedStateImgs && (Date.now() - (_cachedStateImgs.ts || 0)) < 10 * 60 * 1000) {
+      (_cachedStateImgs.images || []).forEach(function(row) {
+        var st = STATES.find(function(s){ return s.id === row.state_id; });
+        if (st && row.urls && row.urls.length) {
+          st._uploadedImgs   = row.urls;
+          st.cover_photo_url = row.urls[0];
+          st.tab_photo_url   = row.urls[0];
+        }
+      });
+      renderStates();
+      // Fire pahadiDataReady so all-states.html renders immediately from cache
+      try { window.dispatchEvent(new CustomEvent('pahadiDataReady', {detail:{states:STATES,products:PRODUCTS}})); } catch(e) {}
+    }
+  } catch(e) {}
+
   // Also render hero + collection cards instantly from cached settings
   try {
     var _cachedSettings = JSON.parse(localStorage.getItem('pr_site_settings') || 'null');
@@ -1098,6 +1116,7 @@ async function loadData() {
         if (!byState[row.state_id]) byState[row.state_id] = [];
         byState[row.state_id].push(row);
       });
+      var _cacheableStateImgs = [];
       Object.keys(byState).forEach(function(sid) {
         var imgs = byState[sid].sort(function(a,b){ return (a.sort_order||0)-(b.sort_order||0); });
         var urls = imgs.map(function(r){ return r.image_url; }).filter(Boolean);
@@ -1108,7 +1127,10 @@ async function loadData() {
           st.cover_photo_url = urls[0];
           st.tab_photo_url   = urls[0];
         }
+        _cacheableStateImgs.push({state_id: sid, urls: urls});
       });
+      // Save to localStorage so next visit renders images instantly
+      try { localStorage.setItem('pr_state_images', JSON.stringify({ts: Date.now(), images: _cacheableStateImgs})); } catch(e) {}
       updated = true;
     }
 
@@ -1171,11 +1193,6 @@ async function loadData() {
       var activeStateEl = document.querySelector('.spnl.active');
       var activeStateId = activeStateEl ? activeStateEl.id.replace('p-','') : null;
       renderProds(); renderStates(); observeRv(); injectProductSchema(); renderUpsell();
-      // Re-render story cards now that real state images are loaded from API
-      if (document.getElementById('storyCards')) {
-        var _activeSC = document.querySelector('.spnl.active');
-        renderStoryCards(_activeSC ? _activeSC.id.replace('p-','') : null);
-      }
       refreshMegaMenu(); // Rebuild mega menu with real product categories
       // Re-render collection cards now that products are loaded (removes fake categories)
       if (window.SITE_SETTINGS && document.getElementById('cgrid')) {
@@ -1803,11 +1820,10 @@ function renderStoryCards(activeId) {
   var el = document.getElementById('storyCards');
   if (!el) return;
   var storyStates = STATES.slice(0, 5); // Show only 5 on homepage
-  el.innerHTML = storyStates.map(function(s, si) {
+  el.innerHTML = storyStates.map(function(s) {
     var imgSrc = (s._uploadedImgs && s._uploadedImgs[0]) || s._uploadedImg || s.tab_photo_url || '';
-    var loadAttr = si < 4 ? 'eager' : 'lazy';
     var imgHtml = imgSrc
-      ? '<img class="story-card-img" src="' + imgOpt(imgSrc,{w:400,q:75}) + '" alt="' + s.name + '" loading="' + loadAttr + '" decoding="async" onload="this.parentElement.classList.add(\'img-ready\')" onerror="this.style.display=\'none\'">'
+      ? '<img class="story-card-img" src="' + imgOpt(imgSrc,{w:400,q:75}) + '" alt="' + s.name + '" loading="lazy" style="opacity:0;transition:opacity .4s" onload="this.style.opacity=1" onerror="this.style.display=\'none\'">'
       : '<div class="story-card-emo" style="background:' + (s.panel_bg||'linear-gradient(135deg,#1a3a1e,#2d5233)') + '">' + s.emoji + '</div>';
     var snippet = _storySnippets[s.id] || s.description.substring(0, 90) + '…';
     var isActive = s.id === (activeId || STATES[0].id);
