@@ -272,9 +272,23 @@ function imgOpt(url, opts) {
       u.searchParams.set('fit', 'crop');
       return u.toString();
     }
-    // Supabase Storage — Image Transformation add-on enabled.
-    // Appends width, quality, and WebP format params so Supabase resizes
-    // server-side — drastically reduces egress vs serving raw originals.
+    // Supabase Storage — use the render/image transform endpoint which
+    // is served via Supabase's CDN edge (much faster than raw storage URLs).
+    // Route: /storage/v1/object/public/<bucket>/<path>
+    //    ->  /storage/v1/render/image/public/<bucket>/<path>?width=&quality=&format=
+    if (url.indexOf('supabase.co/storage/v1/object/public/') !== -1) {
+      var renderUrl = url.replace(
+        '/storage/v1/object/public/',
+        '/storage/v1/render/image/public/'
+      );
+      var u = new URL(renderUrl);
+      u.searchParams.set('width', w);
+      u.searchParams.set('quality', q);
+      u.searchParams.set('format', 'webp');
+      u.searchParams.set('resize', 'cover');
+      return u.toString();
+    }
+    // Fallback: Supabase URL in other forms — append query params directly
     if (url.indexOf('supabase.co/storage') !== -1) {
       var u = new URL(url);
       u.searchParams.set('width', w);
@@ -284,6 +298,15 @@ function imgOpt(url, opts) {
     }
   } catch(e) {}
   return url;
+}
+
+// Returns a srcset string for responsive images (2 sizes: 1x and 2x)
+function imgSrcset(url, baseW, q) {
+  if (!url) return '';
+  q = q || 75;
+  var w1x = imgOpt(url, {w: baseW, q: q});
+  var w2x = imgOpt(url, {w: baseW * 2, q: Math.max(q - 10, 50)});
+  return w1x + ' 1x, ' + w2x + ' 2x';
 }
 
 // onerror fallback — hides broken img cleanly
@@ -1551,7 +1574,7 @@ function mkProd(p, idx) {
   var imgPri  = (typeof idx === 'number' && idx < 4) ? ' fetchpriority="high"' : '';
   var resolvedImg = p.image_url || p.extra_image_url || '';
   var imgHtml = resolvedImg
-    ? '<div class="pimg-skel" style="position:absolute;inset:0;z-index:0;border-radius:inherit"></div><img src="' + imgOpt(resolvedImg,{w:400,q:75}) + '" alt="' + p.name + '" loading="' + imgLoad + '"' + imgPri + ' decoding="async" width="400" height="500" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;opacity:0;transition:opacity .45s" onload="this.style.opacity=1;var sk=this.previousElementSibling;if(sk)sk.style.display=\'none\';this.closest(\'.piw\')&&this.closest(\'.piw\').classList.add(\'img-ready\')" onerror="imgOptFallback(this,\''+resolvedImg+'\')">'
+    ? '<div class="pimg-skel" style="position:absolute;inset:0;z-index:0;border-radius:inherit"></div><img src="' + imgOpt(resolvedImg,{w:400,q:75}) + '" srcset="' + imgSrcset(resolvedImg,400,75) + '" sizes="(max-width:600px) 45vw,(max-width:1024px) 30vw,280px" alt="' + p.name + '" loading="' + imgLoad + '"' + imgPri + ' decoding="async" width="400" height="500" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;opacity:0;transition:opacity .45s" onload="this.style.opacity=1;var sk=this.previousElementSibling;if(sk)sk.style.display=\'none\';this.closest(\'.piw\')&&this.closest(\'.piw\').classList.add(\'img-ready\')" onerror="imgOptFallback(this,\''+resolvedImg+'\')">'
     : '';
   var img = '<div class="piw" style="background:' + (p.card_bg||'#f9f4ec') + '">' +
     imgHtml +
