@@ -112,9 +112,12 @@ img { max-width: 100%; }
 }
 .hero-image-wrap {
   position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .hero-img-frame {
-  width: 100%; aspect-ratio: 3/4; max-width: 380px; margin: 40px auto 0;
+  width: 100%; aspect-ratio: 3/4; max-width: 460px; margin: 0 auto;
   background: transparent;
   border: none;
   position: relative; overflow: visible;
@@ -139,40 +142,86 @@ img { max-width: 100%; }
 
 
 /* ── TEAM ── */
+.team-sec {
+  background: linear-gradient(160deg, #0d1f0e 0%, #1a3a1e 50%, #0f2410 100%);
+  padding: 100px 40px;
+  position: relative;
+  overflow: hidden;
+}
+.team-sec::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.018'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  pointer-events: none;
+}
+.team-sec .section-inner { position: relative; z-index: 1; }
+.team-sec .section-tag { color: var(--gold); border-color: rgba(200,164,90,0.35); }
+.team-sec .section-title { color: var(--cream); }
+.team-sec .section-title em { color: var(--gold); }
+.team-sec .divider-gold { margin: 0 auto; }
+
+.team-grid-styled {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 28px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
 .team-card {
   text-align: center;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(200,164,90,0.18);
+  border-radius: 20px;
+  padding: 36px 24px 28px;
+  transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+  position: relative;
+}
+.team-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.35);
+  border-color: rgba(200,164,90,0.5);
 }
 .team-photo {
-  width: 160px; height: 160px; border-radius: 50%;
-  margin: 0 auto 16px;
-  background: var(--cream2);
-  border: 3px solid rgba(200,164,90,0.3);
+  width: 120px; height: 120px; border-radius: 50%;
+  margin: 0 auto 20px;
+  background: rgba(200,164,90,0.12);
+  border: 2px solid rgba(200,164,90,0.4);
   overflow: hidden;
   display: flex; align-items: center; justify-content: center;
-  font-size: 56px;
+  font-size: 44px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
 }
 .team-photo img {
   width: 100%; height: 100%; object-fit: cover; object-position: top;
 }
 .team-name {
   font-family: 'Cormorant Garamond', serif;
-  font-size: 20px; font-weight: 600;
-  color: var(--g); margin-bottom: 4px;
+  font-size: 22px; font-weight: 600;
+  color: var(--cream); margin-bottom: 6px;
 }
 .team-role {
-  font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase;
-  color: var(--gold); margin-bottom: 10px;
+  font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 0;
 }
 .team-bio {
-  font-size: 13px; line-height: 1.7; color: var(--tx2);
+  font-size: 13px; line-height: 1.7;
+  color: rgba(248,244,237,0.55);
+  margin-top: 12px;
 }
 .team-founder-badge {
   display: inline-block;
   font-size: 10px; font-weight: 700; letter-spacing: 1.5px;
   text-transform: uppercase; color: var(--g);
-  background: rgba(200,164,90,0.2);
-  border: 1px solid rgba(200,164,90,0.4);
-  padding: 3px 10px; margin-bottom: 10px;
+  background: var(--gold);
+  border: none;
+  padding: 4px 12px; margin-bottom: 12px;
+  border-radius: 2px;
+}
+@media(max-width:768px) {
+  .team-sec { padding: 60px 20px; }
+  .team-grid-styled { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  .team-photo { width: 90px; height: 90px; font-size: 32px; }
+  .team-name { font-size: 18px; }
 }
 
 /* ── SCROLL LINE ── */
@@ -414,7 +463,8 @@ img { max-width: 100%; }
   .mob-menu-btn { display: block; }
   .hero-inner { grid-template-columns: 1fr; gap: 48px; }
   .hero-image-wrap { order: -1; }
-  .hero-img-frame { max-width: 340px; }
+  .hero-img-frame { max-width: 300px; }
+  .hero-img-frame img { height: 300px; }
   .story-grid { grid-template-columns: 1fr; gap: 48px; }
   .values-grid { grid-template-columns: 1fr; }
   .founder-grid { grid-template-columns: 1fr; gap: 48px; }
@@ -637,7 +687,7 @@ body.dark .mega-view-all{color:#7ec87e;border-color:#1e3a22}
         <img 
   src="https://ulyrhnpoiypuvaurlqqi.supabase.co/storage/v1/object/public/pahadi-images/5%20pahadi%20roots.png" 
   alt="5 Pahadi Roots" 
-  style="width:100%;height:auto;object-fit:contain;position:relative;filter:drop-shadow(0 12px 40px rgba(0,0,0,.5))"
+  style="width:auto;height:420px;max-width:100%;object-fit:contain;position:relative;filter:drop-shadow(0 16px 48px rgba(0,0,0,.55));display:block;margin:0 auto"
   onerror="this.style.display='none'"
 >
       </div>
@@ -671,6 +721,20 @@ body.dark .mega-view-all{color:#7ec87e;border-color:#1e3a22}
         </div>
       </div>
 
+    </div>
+  </div>
+</section>
+
+<!-- MEET THE TEAM -->
+<section class="team-sec" id="team">
+  <div class="section-inner">
+    <div class="fade-up" style="text-align:center; max-width:600px; margin: 0 auto 60px;">
+      <span class="section-tag">The People Behind It</span>
+      <h2 class="section-title">Meet the <em>Team</em></h2>
+      <div class="divider-gold" style="margin: 0 auto;"></div>
+    </div>
+    <div id="team-grid-about" class="team-grid-styled">
+      <div style="text-align:center;color:rgba(248,244,237,0.5);padding:40px;grid-column:1/-1">Loading team…</div>
     </div>
   </div>
 </section>
@@ -759,20 +823,7 @@ body.dark .mega-view-all{color:#7ec87e;border-color:#1e3a22}
 
 
 
-<!-- MEET THE TEAM -->
-<section class="section" id="team" style="background: var(--white);">
-  <div class="section-inner">
-    <div class="fade-up" style="text-align:center; max-width:600px; margin: 0 auto 60px;">
-      <span class="section-tag">The People Behind It</span>
-      <h2 class="section-title">Meet the <em>Team</em></h2>
-      <div class="divider-gold" style="margin: 0 auto;"></div>
-    </div>
-    <div id="team-grid-about" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:32px; max-width:1000px; margin:0 auto;">
-      <!-- Loaded from Supabase -->
-      <div style="text-align:center;color:#888;padding:40px;grid-column:1/-1">Loading team…</div>
-    </div>
-  </div>
-</section>
+
 
 <!-- CTA -->
 <section class="cta-sec fade-up">
@@ -1232,7 +1283,7 @@ async function loadTeamSection() {
     if (data.settings) { initAnnBar(data.settings); initTickerBar(data.settings); }
     const members = data.team_members || [];
     if (!members.length) {
-      grid.innerHTML = '<div style="text-align:center;color:#888;padding:40px;grid-column:1/-1">Team profiles coming soon.</div>';
+      grid.innerHTML = '<div style="text-align:center;color:rgba(248,244,237,0.4);padding:40px;grid-column:1/-1">Team profiles coming soon.</div>';
       return;
     }
     grid.innerHTML = members.map(m => `
