@@ -320,8 +320,10 @@ section.sec{padding:52px 40px}
 .story-card.active-state .story-card-name{color:#fff}
 .story-card.active-state .story-card-tag{color:var(--gd2)}
 .story-card.active-state .story-card-line{color:rgba(255,255,255,.65)}
+#storyCards{display:flex;flex-direction:row;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:8px;margin-bottom:20px;-webkit-overflow-scrolling:touch}
 #storyCards:empty{display:none}
 #storyCards::-webkit-scrollbar{display:none}
+#storyCards .story-card{min-width:160px;max-width:200px;flex-shrink:0;scroll-snap-align:start}
 .stabs{display:flex;flex-wrap:wrap;background:#f0e8d4;border:none;padding:14px 8px 0;gap:14px}
 .stabs::-webkit-scrollbar{display:none}
 .stab{flex:0 0 auto;width:200px;padding:0;border:none;border-radius:14px;background:#fff;cursor:pointer;display:flex;flex-direction:column;align-items:stretch;transition:transform .3s,box-shadow .3s;position:relative;font-family:'Lato',sans-serif;box-shadow:0 3px 14px rgba(0,0,0,.1);overflow:hidden}
