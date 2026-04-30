@@ -272,23 +272,9 @@ function imgOpt(url, opts) {
       u.searchParams.set('fit', 'crop');
       return u.toString();
     }
-    // Supabase Storage — use the render/image transform endpoint which
-    // is served via Supabase's CDN edge (much faster than raw storage URLs).
-    // Route: /storage/v1/object/public/<bucket>/<path>
-    //    ->  /storage/v1/render/image/public/<bucket>/<path>?width=&quality=&format=
-    if (url.indexOf('supabase.co/storage/v1/object/public/') !== -1) {
-      var renderUrl = url.replace(
-        '/storage/v1/object/public/',
-        '/storage/v1/render/image/public/'
-      );
-      var u = new URL(renderUrl);
-      u.searchParams.set('width', w);
-      u.searchParams.set('quality', q);
-      u.searchParams.set('format', 'webp');
-      u.searchParams.set('resize', 'cover');
-      return u.toString();
-    }
-    // Fallback: Supabase URL in other forms — append query params directly
+    // Supabase Storage — Image Transformation add-on enabled.
+    // Appends width, quality, and WebP format params so Supabase resizes
+    // server-side — drastically reduces egress vs serving raw originals.
     if (url.indexOf('supabase.co/storage') !== -1) {
       var u = new URL(url);
       u.searchParams.set('width', w);
@@ -298,15 +284,6 @@ function imgOpt(url, opts) {
     }
   } catch(e) {}
   return url;
-}
-
-// Returns a srcset string for responsive images (2 sizes: 1x and 2x)
-function imgSrcset(url, baseW, q) {
-  if (!url) return '';
-  q = q || 75;
-  var w1x = imgOpt(url, {w: baseW, q: q});
-  var w2x = imgOpt(url, {w: baseW * 2, q: Math.max(q - 10, 50)});
-  return w1x + ' 1x, ' + w2x + ' 2x';
 }
 
 // onerror fallback — hides broken img cleanly
@@ -867,7 +844,7 @@ function initCollectionImages(settings) {
 async function loadData() {
   // Step 1: render states fallback only — skip fake products to avoid price flash
   STATES   = FALLBACK_STATES.map(s => Object.assign({}, s));
-  renderStates(); renderStoryCards(); uCart(); observeRv();
+  renderStates(); uCart(); observeRv();
   initAllStateSlides(); initProductHoverImages();
 
   // ── INSTANT RENDER from localStorage cache (stale-while-revalidate) ──
@@ -1194,7 +1171,7 @@ async function loadData() {
       var activeStateEl = document.querySelector('.spnl.active');
       var activeStateId = activeStateEl ? activeStateEl.id.replace('p-','') : null;
       renderProds(); renderStates(); observeRv(); injectProductSchema(); renderUpsell();
-      // Re-render story cards now that state images are loaded from API
+      // Re-render story cards now that real state images are loaded from API
       if (document.getElementById('storyCards')) {
         var _activeSC = document.querySelector('.spnl.active');
         renderStoryCards(_activeSC ? _activeSC.id.replace('p-','') : null);
@@ -1579,7 +1556,7 @@ function mkProd(p, idx) {
   var imgPri  = (typeof idx === 'number' && idx < 4) ? ' fetchpriority="high"' : '';
   var resolvedImg = p.image_url || p.extra_image_url || '';
   var imgHtml = resolvedImg
-    ? '<div class="pimg-skel" style="position:absolute;inset:0;z-index:0;border-radius:inherit"></div><img src="' + imgOpt(resolvedImg,{w:400,q:75}) + '" srcset="' + imgSrcset(resolvedImg,400,75) + '" sizes="(max-width:600px) 45vw,(max-width:1024px) 30vw,280px" alt="' + p.name + '" loading="' + imgLoad + '"' + imgPri + ' decoding="async" width="400" height="500" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;opacity:0;transition:opacity .45s" onload="this.style.opacity=1;var sk=this.previousElementSibling;if(sk)sk.style.display=\'none\';this.closest(\'.piw\')&&this.closest(\'.piw\').classList.add(\'img-ready\')" onerror="imgOptFallback(this,\''+resolvedImg+'\')">'
+    ? '<div class="pimg-skel" style="position:absolute;inset:0;z-index:0;border-radius:inherit"></div><img src="' + imgOpt(resolvedImg,{w:400,q:75}) + '" alt="' + p.name + '" loading="' + imgLoad + '"' + imgPri + ' decoding="async" width="400" height="500" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;opacity:0;transition:opacity .45s" onload="this.style.opacity=1;var sk=this.previousElementSibling;if(sk)sk.style.display=\'none\';this.closest(\'.piw\')&&this.closest(\'.piw\').classList.add(\'img-ready\')" onerror="imgOptFallback(this,\''+resolvedImg+'\')">'
     : '';
   var img = '<div class="piw" style="background:' + (p.card_bg||'#f9f4ec') + '">' +
     imgHtml +
@@ -1830,7 +1807,7 @@ function renderStoryCards(activeId) {
     var imgSrc = (s._uploadedImgs && s._uploadedImgs[0]) || s._uploadedImg || s.tab_photo_url || '';
     var loadAttr = si < 4 ? 'eager' : 'lazy';
     var imgHtml = imgSrc
-      ? '<img class="story-card-img" src="' + imgOpt(imgSrc,{w:400,q:75}) + '" alt="' + s.name + '" loading="' + loadAttr + '" decoding="async" onload="var c=this.parentElement;if(c&&c.classList.contains(\'story-card\'))c.classList.add(\'img-ready\')" onerror="this.style.display=\'none\'">'
+      ? '<img class="story-card-img" src="' + imgOpt(imgSrc,{w:400,q:75}) + '" alt="' + s.name + '" loading="' + loadAttr + '" decoding="async" onload="this.parentElement.classList.add(\'img-ready\')" onerror="this.style.display=\'none\'">'
       : '<div class="story-card-emo" style="background:' + (s.panel_bg||'linear-gradient(135deg,#1a3a1e,#2d5233)') + '">' + s.emoji + '</div>';
     var snippet = _storySnippets[s.id] || s.description.substring(0, 90) + '…';
     var isActive = s.id === (activeId || STATES[0].id);
