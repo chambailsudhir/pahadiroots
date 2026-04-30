@@ -115,13 +115,17 @@ img { max-width: 100%; }
   display: flex;
   align-items: center;
   justify-content: center;
+  height: 100%;
 }
 .hero-img-frame {
-  width: 100%; aspect-ratio: 3/4; max-width: 460px; margin: 0 auto;
+  width: 100%;
+  max-width: 440px;
+  margin: 0 auto;
   background: transparent;
   border: none;
-  position: relative; overflow: visible;
-  display: flex; align-items: center; justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .upload-btn-wrap {
   position: absolute; bottom: 20px; right: 20px;
@@ -143,84 +147,101 @@ img { max-width: 100%; }
 
 /* ── TEAM ── */
 .team-sec {
-  background: linear-gradient(160deg, #0d1f0e 0%, #1a3a1e 50%, #0f2410 100%);
+  background: var(--cream, #f8f4ed);
   padding: 100px 40px;
   position: relative;
-  overflow: hidden;
 }
-.team-sec::before {
-  content: '';
-  position: absolute; inset: 0;
-  background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.018'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-  pointer-events: none;
-}
-.team-sec .section-inner { position: relative; z-index: 1; }
-.team-sec .section-tag { color: var(--gold); border-color: rgba(200,164,90,0.35); }
-.team-sec .section-title { color: var(--cream); }
-.team-sec .section-title em { color: var(--gold); }
+.team-sec .section-tag { color: var(--g); border-color: rgba(26,58,30,0.25); }
+.team-sec .section-title { color: var(--g); }
+.team-sec .section-title em { color: var(--g2, #2d5233); font-style: italic; }
 .team-sec .divider-gold { margin: 0 auto; }
 
 .team-grid-styled {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 28px;
-  max-width: 1100px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+  max-width: 1000px;
   margin: 0 auto;
 }
+/* Founder card spans full width */
+.team-card-founder { grid-column: 1 / -1; }
+
 .team-card {
-  text-align: center;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(200,164,90,0.18);
-  border-radius: 20px;
-  padding: 36px 24px 28px;
-  transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  background: #fff;
+  border-radius: 16px;
+  padding: 28px 32px;
+  border-left: 4px solid var(--gold, #c8a45a);
+  box-shadow: 0 4px 24px rgba(26,58,30,0.07);
+  transition: transform 0.25s, box-shadow 0.25s;
   position: relative;
+  overflow: hidden;
+}
+.team-card::after {
+  content: '';
+  position: absolute; top: 0; right: 0;
+  width: 80px; height: 80px;
+  background: radial-gradient(circle at top right, rgba(200,164,90,0.08), transparent 70%);
+  pointer-events: none;
 }
 .team-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 20px 50px rgba(0,0,0,0.35);
-  border-color: rgba(200,164,90,0.5);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(26,58,30,0.13);
 }
 .team-photo {
-  width: 120px; height: 120px; border-radius: 50%;
-  margin: 0 auto 20px;
+  width: 90px; height: 90px;
+  border-radius: 50%;
+  flex-shrink: 0;
   background: rgba(200,164,90,0.12);
-  border: 2px solid rgba(200,164,90,0.4);
+  border: 2px solid rgba(200,164,90,0.5);
   overflow: hidden;
   display: flex; align-items: center; justify-content: center;
-  font-size: 44px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  font-size: 36px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+}
+/* Founder gets a bigger photo */
+.team-card-founder .team-photo {
+  width: 120px; height: 120px; font-size: 48px;
 }
 .team-photo img {
   width: 100%; height: 100%; object-fit: cover; object-position: top;
 }
+.team-info { flex: 1; }
+.team-founder-badge {
+  display: inline-block;
+  font-size: 9px; font-weight: 800; letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #fff;
+  background: var(--g, #1a3a1e);
+  padding: 3px 10px; margin-bottom: 8px;
+  border-radius: 2px;
+}
 .team-name {
   font-family: 'Cormorant Garamond', serif;
   font-size: 22px; font-weight: 600;
-  color: var(--cream); margin-bottom: 6px;
+  color: var(--g); margin-bottom: 4px; line-height: 1.2;
 }
+.team-card-founder .team-name { font-size: 26px; }
 .team-role {
   font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
-  color: var(--gold); margin-bottom: 0;
+  color: var(--gold, #c8a45a); margin-bottom: 0;
 }
 .team-bio {
   font-size: 13px; line-height: 1.7;
-  color: rgba(248,244,237,0.55);
-  margin-top: 12px;
+  color: var(--tx2, #4a4a4a);
+  margin-top: 10px;
 }
-.team-founder-badge {
-  display: inline-block;
-  font-size: 10px; font-weight: 700; letter-spacing: 1.5px;
-  text-transform: uppercase; color: var(--g);
-  background: var(--gold);
-  border: none;
-  padding: 4px 12px; margin-bottom: 12px;
-  border-radius: 2px;
+@media(max-width:900px) {
+  .team-grid-styled { grid-template-columns: 1fr; }
+  .team-card-founder { grid-column: auto; }
 }
-@media(max-width:768px) {
+@media(max-width:600px) {
   .team-sec { padding: 60px 20px; }
-  .team-grid-styled { grid-template-columns: repeat(2, 1fr); gap: 16px; }
-  .team-photo { width: 90px; height: 90px; font-size: 32px; }
+  .team-card { padding: 20px; gap: 18px; }
+  .team-photo { width: 72px; height: 72px; font-size: 28px; }
+  .team-card-founder .team-photo { width: 90px; height: 90px; }
   .team-name { font-size: 18px; }
 }
 
@@ -687,7 +708,7 @@ body.dark .mega-view-all{color:#7ec87e;border-color:#1e3a22}
         <img 
   src="https://ulyrhnpoiypuvaurlqqi.supabase.co/storage/v1/object/public/pahadi-images/5%20pahadi%20roots.png" 
   alt="5 Pahadi Roots" 
-  style="width:auto;height:420px;max-width:100%;object-fit:contain;position:relative;filter:drop-shadow(0 16px 48px rgba(0,0,0,.55));display:block;margin:0 auto"
+  style="width:auto;height:clamp(300px,42vh,460px);max-width:100%;object-fit:contain;display:block;margin:0 auto;filter:drop-shadow(0 16px 48px rgba(0,0,0,.55))"
   onerror="this.style.display='none'"
 >
       </div>
@@ -1283,20 +1304,22 @@ async function loadTeamSection() {
     if (data.settings) { initAnnBar(data.settings); initTickerBar(data.settings); }
     const members = data.team_members || [];
     if (!members.length) {
-      grid.innerHTML = '<div style="text-align:center;color:rgba(248,244,237,0.4);padding:40px;grid-column:1/-1">Team profiles coming soon.</div>';
+      grid.innerHTML = '<div style="text-align:center;color:#aaa;padding:40px;grid-column:1/-1">Team profiles coming soon.</div>';
       return;
     }
     grid.innerHTML = members.map(m => `
-      <div class="team-card fade-up">
+      <div class="team-card fade-up ${m.is_founder ? 'team-card-founder' : ''}">
         <div class="team-photo">
           ${m.image_url
             ? `<img src="${m.image_url}" alt="${m.name||''}" loading="lazy" onerror="this.style.display='none';this.parentElement.textContent='👤'">`
             : '👤'}
         </div>
-        ${m.is_founder ? '<div class="team-founder-badge">Founder</div>' : ''}
-        <div class="team-name">${m.name || '—'}</div>
-        <div class="team-role">${m.role || 'Co-Founder'}</div>
-        ${m.bio ? `<div class="team-bio">${m.bio}</div>` : ''}
+        <div class="team-info">
+          ${m.is_founder ? '<div class="team-founder-badge">Founder</div>' : ''}
+          <div class="team-name">${m.name || '—'}</div>
+          <div class="team-role">${m.role || 'Co-Founder'}</div>
+          ${m.bio ? `<div class="team-bio">${m.bio}</div>` : ''}
+        </div>
       </div>
     `).join('');
     // Trigger animations
