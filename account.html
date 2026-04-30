@@ -248,28 +248,35 @@ async function callAuth(action, body, useToken) {
 
 
 // ── Init ──
+// FIX: Three-stage init — cache → show UI → background profile refresh.
+//      Orders are NEVER fetched here; renderOrdersTab() calls get_orders lazily.
 async function init() {
   if (!_authToken) { showLoginWall(); return; }
 
-  // If cached profile exists, show it immediately — don't make user wait
+  // STAGE 1: Cached profile exists — show sidebar instantly, open orders tab
+  //          (orders will be fetched lazily by renderOrdersTab).
   if (_authProfile && _authToken) {
     showAccount();
     switchTab('orders');
-    // Then refresh silently in background
+
+    // STAGE 2: Background profile-only refresh (no orders) — update name/email
+    //          silently. Invalidate cached orders so next tab-open re-fetches.
     try {
       var freshData = await callAuth('get_profile', {}, true);
       if (freshData && freshData.profile) {
         _authProfile = freshData.profile;
-        _authUser = freshData.user;
-        if (freshData.orders) _orders = freshData.orders;
+        _authUser    = freshData.user;
         try { localStorage.setItem('pr_auth_profile', JSON.stringify(freshData.profile)); } catch(e){}
-        showAccount(); switchTab('orders'); // re-render with fresh data
+        showAccount(); // update avatar/name in sidebar only
+        // If user is still on orders tab and orders haven't loaded yet, let
+        // the existing renderOrdersTab() promise finish — don't re-trigger it.
       }
-    } catch(e) { /* silent fail — cached data already showing */ }
+    } catch(e) { /* silent — cached data already showing */ }
     return;
   }
 
-  // No cache — fetch fresh with timeout
+  // STAGE 3: Cold load — no cache. Fetch profile only (fast), then show UI.
+  //          Orders tab will fetch its own data when it renders.
   var _initDone = false;
   var _timeout = setTimeout(function() {
     if (!_initDone) {
@@ -284,8 +291,7 @@ async function init() {
     _initDone = true;
     clearTimeout(_timeout);
     _authProfile = data.profile;
-    _authUser = data.user;
-    if (data.orders) _orders = data.orders;
+    _authUser    = data.user;
     try { localStorage.setItem('pr_auth_profile', JSON.stringify(data.profile)); } catch(e){}
     if (!_authProfile) { showLoginWall(); return; }
     showAccount();
@@ -293,14 +299,9 @@ async function init() {
   } catch(e) {
     _initDone = true;
     clearTimeout(_timeout);
-    // Token expired — try refresh
     var rt = null;
     try { rt = localStorage.getItem('pr_auth_refresh'); } catch(e2){}
-    if (rt) {
-      await tryRefreshThenInit(rt);
-    } else {
-      showLoginWall();
-    }
+    if (rt) { await tryRefreshThenInit(rt); } else { showLoginWall(); }
   }
 }
 
@@ -311,9 +312,9 @@ async function tryRefreshThenInit(refreshToken) {
       _authToken = r.access_token;
       try { localStorage.setItem('pr_auth_token', r.access_token); } catch(e){}
       if (r.refresh_token) { try { localStorage.setItem('pr_auth_refresh', r.refresh_token); } catch(e){} }
+      // FIX: get_profile only — orders loaded lazily by renderOrdersTab
       var data = await callAuth('get_profile', {}, true);
       _authProfile = data.profile; _authUser = data.user;
-      if (data.orders) _orders = data.orders;
       try { localStorage.setItem('pr_auth_profile', JSON.stringify(data.profile)); } catch(e){}
       if (!_authProfile) { showLoginWall(); return; }
       showAccount();
@@ -381,22 +382,21 @@ function switchTab(tab, btn) {
 // ══════════════════════════════════════════════
 // ORDERS TAB
 // ══════════════════════════════════════════════
+// FIX: Uses get_orders (new dedicated action) instead of get_profile.
+//      Called lazily — only when the user actually opens the Orders tab.
 async function renderOrdersTab() {
   setPanel('<div class="loading"><div class="spinner"></div></div>');
   try {
     if (!_orders) {
-      // Reload from server if needed
-      var data = await callAuth('get_profile', {}, true);
+      var data = await callAuth('get_orders', {}, true);
       _orders = data.orders || [];
     }
     window._lastOrders = _orders;
     setPanel(buildOrdersHtml(_orders));
   } catch(e) {
-    // Check if it's a 401/session expired error — try token refresh first
     var errMsg = (e && e.message) ? e.message.toLowerCase() : '';
-    var isAuthError = errMsg.includes('session expired') || errMsg.includes('not logged in') || errMsg.includes('401') || errMsg.includes('error');
+    var isAuthError = errMsg.includes('session expired') || errMsg.includes('not logged in') || errMsg.includes('401');
     if (isAuthError) {
-      // Try refreshing the token
       var rt = null;
       try { rt = localStorage.getItem('pr_auth_refresh'); } catch(ex){}
       if (rt) {
@@ -404,22 +404,19 @@ async function renderOrdersTab() {
           var r = await callAuth('refresh_token', { refresh_token: rt }, false);
           if (r && r.access_token) {
             _authToken = r.access_token;
-            try { localStorage.setItem('pr_auth_token', r.access_token); } catch(ex){};
+            try { localStorage.setItem('pr_auth_token', r.access_token); } catch(ex){}
             if (r.refresh_token) { try { localStorage.setItem('pr_auth_refresh', r.refresh_token); } catch(ex){} }
-            // Retry fetching orders with fresh token
-            var data2 = await callAuth('get_profile', {}, true);
+            var data2 = await callAuth('get_orders', {}, true);
             _orders = data2.orders || [];
             window._lastOrders = _orders;
             setPanel(buildOrdersHtml(_orders));
             return;
           }
-        } catch(ex2) { /* refresh failed — fall through to login wall */ }
+        } catch(ex2) { /* refresh failed */ }
       }
-      // Token refresh failed or no refresh token — show login wall
       showLoginWall();
       return;
     }
-    // Network or other error
     setPanel('<div class="card"><p style="color:var(--tx3)">Orders load nahi ho sake. Dobara try karein.</p></div>');
   }
 }
