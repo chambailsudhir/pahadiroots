@@ -867,7 +867,7 @@ function initCollectionImages(settings) {
 async function loadData() {
   // Step 1: render states fallback only — skip fake products to avoid price flash
   STATES   = FALLBACK_STATES.map(s => Object.assign({}, s));
-  renderStates(); uCart(); observeRv();
+  renderStates(); renderStoryCards(); uCart(); observeRv();
   initAllStateSlides(); initProductHoverImages();
 
   // ── INSTANT RENDER from localStorage cache (stale-while-revalidate) ──
@@ -1194,6 +1194,11 @@ async function loadData() {
       var activeStateEl = document.querySelector('.spnl.active');
       var activeStateId = activeStateEl ? activeStateEl.id.replace('p-','') : null;
       renderProds(); renderStates(); observeRv(); injectProductSchema(); renderUpsell();
+      // Re-render story cards now that state images are loaded from API
+      if (document.getElementById('storyCards')) {
+        var _activeSC = document.querySelector('.spnl.active');
+        renderStoryCards(_activeSC ? _activeSC.id.replace('p-','') : null);
+      }
       refreshMegaMenu(); // Rebuild mega menu with real product categories
       // Re-render collection cards now that products are loaded (removes fake categories)
       if (window.SITE_SETTINGS && document.getElementById('cgrid')) {
