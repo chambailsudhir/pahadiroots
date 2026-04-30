@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>My Account — 5 Pahadi Roots</title>
 <meta name="robots" content="noindex">
+<link rel="icon" type="image/png" href="https://ulyrhnpoiypuvaurlqqi.supabase.co/storage/v1/object/public/pahadi-images/5%20pahadi%20roots.png">
+<link rel="apple-touch-icon" href="https://ulyrhnpoiypuvaurlqqi.supabase.co/storage/v1/object/public/pahadi-images/5%20pahadi%20roots.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Lato:wght@300;400;700;900&display=swap" rel="stylesheet">
 <style>
@@ -166,7 +168,7 @@ body{font-family:'Lato',sans-serif;background:#f7f3ee;min-height:100vh;color:var
 
 <nav class="nav">
   <a href="/" class="logo">
-    <div class="logo-icon">🌿</div>
+    <div class="logo-icon"><img src="https://ulyrhnpoiypuvaurlqqi.supabase.co/storage/v1/object/public/pahadi-images/5%20pahadi%20roots.png" alt="5 Pahadi Roots" style="height:40px;width:40px;object-fit:contain" onerror="this.style.display='none'"></div>
     <div><div class="logo-name">5 Pahadi Roots</div><div class="logo-tl">Himalayan Organic Store</div></div>
   </a>
   <div class="nav-right" style="display:flex;align-items:center;gap:12px">
@@ -217,11 +219,32 @@ var API_BASE = '/api';
 var _authToken = null, _authUser = null, _authProfile = null;
 var _currentTab = 'orders';
 var _orders = null;
+var _ORDERS_CACHE_KEY = 'pr_orders_cache';
+var _ORDERS_CACHE_TTL = 5 * 60 * 1000; // 5 min
 
 // ── Restore session ──
 try { _authToken = localStorage.getItem('pr_auth_token') || null; } catch(e){}
 try { _authUser = JSON.parse(localStorage.getItem('pr_auth_user') || 'null'); } catch(e){}
 try { _authProfile = JSON.parse(localStorage.getItem('pr_auth_profile') || 'null'); } catch(e){}
+
+// Restore cached orders if still fresh
+try {
+  var _oc = JSON.parse(localStorage.getItem(_ORDERS_CACHE_KEY) || 'null');
+  if (_oc && _oc.ts && (Date.now() - _oc.ts) < _ORDERS_CACHE_TTL) { _orders = _oc.orders; }
+} catch(e){}
+
+// Keep-warm: ping the API immediately so Vercel + Supabase wake up in the
+// background while the user reads their profile sidebar. By the time they
+// click Orders the cold-start penalty is already paid.
+function keepWarm() {
+  try { fetch(API_BASE + '/auth', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ action:'_ping' }) }).catch(function(){}); } catch(e){}
+}
+function saveOrdersCache(orders) {
+  try { localStorage.setItem(_ORDERS_CACHE_KEY, JSON.stringify({ ts: Date.now(), orders: orders })); } catch(e){}
+}
+function clearOrdersCache() {
+  try { localStorage.removeItem(_ORDERS_CACHE_KEY); } catch(e){}
+}
 
 // ── API helpers ──
 async function callAuth(action, body, useToken) {
@@ -257,6 +280,7 @@ async function init() {
   //          (orders will be fetched lazily by renderOrdersTab).
   if (_authProfile && _authToken) {
     showAccount();
+    keepWarm(); // wake up Vercel + Supabase in background
     switchTab('orders');
 
     // STAGE 2: Background profile-only refresh (no orders) — update name/email
@@ -295,6 +319,7 @@ async function init() {
     try { localStorage.setItem('pr_auth_profile', JSON.stringify(data.profile)); } catch(e){}
     if (!_authProfile) { showLoginWall(); return; }
     showAccount();
+    keepWarm();
     switchTab('orders');
   } catch(e) {
     _initDone = true;
@@ -382,17 +407,54 @@ function switchTab(tab, btn) {
 // ══════════════════════════════════════════════
 // ORDERS TAB
 // ══════════════════════════════════════════════
-// FIX: Uses get_orders (new dedicated action) instead of get_profile.
-//      Called lazily — only when the user actually opens the Orders tab.
+function ordersSkeletonHtml() {
+  var card = '<div style="background:#fdfaf4;border-radius:20px;margin-bottom:20px;overflow:hidden;border:1px solid rgba(200,146,10,.15);box-shadow:0 4px 20px rgba(26,58,30,.06)">' +
+    '<div style="height:5px;background:linear-gradient(90deg,#e8e8e8,#f0f0f0)"></div>' +
+    '<div style="padding:20px 24px">' +
+      '<div style="display:flex;justify-content:space-between;margin-bottom:16px">' +
+        '<div style="display:flex;gap:24px">' +
+          '<div><div style="height:10px;width:80px;background:#ececec;border-radius:4px;margin-bottom:6px"></div><div style="height:13px;width:90px;background:#e4e4e4;border-radius:4px"></div></div>' +
+          '<div><div style="height:10px;width:50px;background:#ececec;border-radius:4px;margin-bottom:6px"></div><div style="height:15px;width:70px;background:#e4e4e4;border-radius:4px"></div></div>' +
+        '</div>' +
+        '<div style="text-align:right"><div style="height:10px;width:60px;background:#ececec;border-radius:4px;margin-bottom:6px"></div><div style="height:22px;width:80px;background:#e4e4e4;border-radius:20px"></div></div>' +
+      '</div>' +
+      '<div style="display:flex;gap:10px;margin-bottom:14px">' +
+        '<div style="width:72px;height:72px;border-radius:10px;background:#ececec"></div>' +
+        '<div style="width:72px;height:72px;border-radius:10px;background:#e8e8e8"></div>' +
+        '<div style="width:72px;height:72px;border-radius:10px;background:#f0f0f0"></div>' +
+      '</div>' +
+      '<div style="height:12px;width:60%;background:#ececec;border-radius:4px;margin-bottom:10px"></div>' +
+      '<div style="height:11px;width:40%;background:#f0f0f0;border-radius:4px;margin-bottom:18px"></div>' +
+      '<div style="border-top:1px solid #f0f0f0;padding-top:14px;display:flex;gap:10px">' +
+        '<div style="height:30px;width:110px;background:#ececec;border-radius:20px"></div>' +
+        '<div style="height:30px;width:80px;background:#f0f0f0;border-radius:20px"></div>' +
+      '</div>' +
+    '</div>' +
+  '</div>';
+  // Pulse animation via inline style tag
+  return '<style>@keyframes pr-pulse{0%,100%{opacity:1}50%{opacity:.5}}' +
+    '.pr-skel *{animation:pr-pulse 1.4s ease-in-out infinite}</style>' +
+    '<div class="card"><div class="card-title">📦 My Orders</div>' +
+    '<div class="pr-skel">' + card + card + card + '</div></div>';
+}
+
 async function renderOrdersTab() {
-  setPanel('<div class="loading"><div class="spinner"></div></div>');
-  try {
-    if (!_orders) {
-      var data = await callAuth('get_orders', {}, true);
-      _orders = data.orders || [];
-    }
+  // Show cached orders immediately if available, skeleton otherwise
+  if (_orders) {
     window._lastOrders = _orders;
     setPanel(buildOrdersHtml(_orders));
+  } else {
+    setPanel(ordersSkeletonHtml());
+  }
+
+  // Always fetch fresh in background (or foreground if no cache)
+  try {
+    var data = await callAuth('get_orders', {}, true);
+    var fresh = data.orders || [];
+    _orders = fresh;
+    window._lastOrders = fresh;
+    saveOrdersCache(fresh);   // cache for next visit
+    setPanel(buildOrdersHtml(fresh));
   } catch(e) {
     var errMsg = (e && e.message) ? e.message.toLowerCase() : '';
     var isAuthError = errMsg.includes('session expired') || errMsg.includes('not logged in') || errMsg.includes('401');
@@ -409,6 +471,7 @@ async function renderOrdersTab() {
             var data2 = await callAuth('get_orders', {}, true);
             _orders = data2.orders || [];
             window._lastOrders = _orders;
+            saveOrdersCache(_orders);
             setPanel(buildOrdersHtml(_orders));
             return;
           }
@@ -417,7 +480,10 @@ async function renderOrdersTab() {
       showLoginWall();
       return;
     }
-    setPanel('<div class="card"><p style="color:var(--tx3)">Orders load nahi ho sake. Dobara try karein.</p></div>');
+    // Network/server error — if we already showed cached data, leave it up
+    if (!_orders) {
+      setPanel('<div class="card"><p style="color:var(--tx3)">Orders load nahi ho sake. Dobara try karein.</p></div>');
+    }
   }
 }
 
@@ -439,6 +505,7 @@ async function cancelOrder(orderId, orderNum) {
     if (res.ok) {
       showToast('✅ Order ' + orderNum + ' cancelled');
       _orders = null; // force reload
+      clearOrdersCache();
       renderOrdersTab();
     } else { showToast('❌ Cancel failed. Contact support.'); }
   } catch(e) { showToast('❌ Network error'); }
@@ -945,7 +1012,7 @@ async function doChangePassword() {
 // ── Logout ──
 async function doLogout() {
   try { await callAuth('logout', {}, true); } catch(e){}
-  try { localStorage.removeItem('pr_auth_token'); localStorage.removeItem('pr_auth_user'); localStorage.removeItem('pr_auth_profile'); localStorage.removeItem('pr_auth_refresh'); } catch(e){}
+  try { localStorage.removeItem('pr_auth_token'); localStorage.removeItem('pr_auth_user'); localStorage.removeItem('pr_auth_profile'); localStorage.removeItem('pr_auth_refresh'); clearOrdersCache(); } catch(e){}
   window.location.href = '/';
 }
 
