@@ -1826,10 +1826,11 @@ function renderStoryCards(activeId) {
   var el = document.getElementById('storyCards');
   if (!el) return;
   var storyStates = STATES.slice(0, 5); // Show only 5 on homepage
-  el.innerHTML = storyStates.map(function(s) {
+  el.innerHTML = storyStates.map(function(s, si) {
     var imgSrc = (s._uploadedImgs && s._uploadedImgs[0]) || s._uploadedImg || s.tab_photo_url || '';
+    var loadAttr = si < 4 ? 'eager' : 'lazy';
     var imgHtml = imgSrc
-      ? '<img class="story-card-img" src="' + imgOpt(imgSrc,{w:400,q:75}) + '" alt="' + s.name + '" loading="lazy" style="opacity:0;transition:opacity .4s" onload="this.style.opacity=1" onerror="this.style.display=\'none\'">'
+      ? '<img class="story-card-img" src="' + imgOpt(imgSrc,{w:400,q:75}) + '" alt="' + s.name + '" loading="' + loadAttr + '" decoding="async" onload="var c=this.parentElement;if(c&&c.classList.contains(\'story-card\'))c.classList.add(\'img-ready\')" onerror="this.style.display=\'none\'">'
       : '<div class="story-card-emo" style="background:' + (s.panel_bg||'linear-gradient(135deg,#1a3a1e,#2d5233)') + '">' + s.emoji + '</div>';
     var snippet = _storySnippets[s.id] || s.description.substring(0, 90) + '…';
     var isActive = s.id === (activeId || STATES[0].id);
