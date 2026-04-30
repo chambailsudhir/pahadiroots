@@ -170,6 +170,9 @@ export default async function handler(req, res) {
 
   const { action } = body;
 
+  // ── Keep-warm ping (no-op, just wakes Vercel + triggers DB connection) ──
+  if (action === '_ping') return ok({ ok: true });
+
   if (action === 'send_otp') {
     const { phone } = body;
     if (!phone) return err(400, 'Phone required');
