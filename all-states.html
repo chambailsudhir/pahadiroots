@@ -474,33 +474,19 @@ var _asProducts = [];
 var _asReady = false;
 
 function _asInit() {
-  // Wait for real DB states (they have _uploadedImgs or cover_photo_url set)
-  // Don't lock on FALLBACK_STATES which have no images
   var states   = window.STATES   || [];
   var products = window.PRODUCTS || [];
   var hasRealStates = states.some(function(s) {
-    return s._uploadedImgs && s._uploadedImgs.length || s.cover_photo_url;
+    return (s._uploadedImgs && s._uploadedImgs.length) || s.cover_photo_url;
   });
-  // If real states with images aren't loaded yet, wait
-  if (!hasRealStates && !_asReady) {
-    // Use fallback for initial render so page isn't blank
-    var fbStates = window.FALLBACK_STATES || [];
-    if (fbStates.length && !_asReady) {
-      _asReady = true;
-      _asAllStates = fbStates;
-      _asProducts  = window.FALLBACK_PRODUCTS || [];
-      document.getElementById('asStatStates').textContent = fbStates.length;
-      document.getElementById('asStatProducts').textContent = '—';
-      _asRender(fbStates);
-    }
-    return;
-  }
-  // Real data arrived — always re-render with images
+  // Skip fallback render — keep skeleton showing until real images are ready
+  // This avoids the double-render flash (emoji → blank → images)
+  if (!hasRealStates) return;
   _asReady = true;
-  _asAllStates = states.length ? states : (window.FALLBACK_STATES || []);
-  _asProducts  = products.length ? products : (window.FALLBACK_PRODUCTS || []);
+  _asAllStates = states;
+  _asProducts  = products;
   document.getElementById('asStatStates').textContent = _asAllStates.length;
-  document.getElementById('asStatProducts').textContent = _asProducts.length || '—';
+  document.getElementById('asStatProducts').textContent = _asProducts.length || '200+';
   _asRender(_asAllStates);
 }
 
@@ -520,7 +506,7 @@ function _asRender(states) {
     var pills = (s.pills||[]).slice(0,3).map(function(p){ return '<span class="as-card-pill">' + p + '</span>'; }).join('');
     var shortDesc = (s.description||'Authentic products from the mountains of ' + s.name + '.').substring(0, 110) + '…';
     var img = imgSrc 
-      ? '<img class="as-card-img" src="' + imgOpt(imgSrc,{w:600,q:75}) + '" srcset="' + imgOpt(imgSrc,{w:400,q:75}) + ' 400w,' + imgOpt(imgSrc,{w:600,q:75}) + ' 600w,' + imgOpt(imgSrc,{w:800,q:70}) + ' 800w" sizes="(max-width:600px) 90vw,(max-width:1024px) 45vw,320px" alt="' + s.name + '" loading="' + (i<4?'eager':'lazy') + '" decoding="async" onerror="this.style.display=\'none\'">' 
+      ? '<img class="as-card-img" src="' + imgOpt(imgSrc,{w:600,q:75}) + '" srcset="' + imgOpt(imgSrc,{w:400,q:75}) + ' 400w,' + imgOpt(imgSrc,{w:600,q:75}) + ' 600w,' + imgOpt(imgSrc,{w:900,q:70}) + ' 900w" sizes="(max-width:600px) 90vw,(max-width:1024px) 45vw,320px" alt="' + s.name + '" loading="' + (i<4?'eager':'lazy') + '" decoding="async" onerror="this.style.display=\'none\'">' 
       : '';
     return '<a href="/state.html?id=' + s.id + '" class="as-card" style="animation-delay:' + (i*.06) + 's">' +
       '<div class="as-card-img-wrap">' +
