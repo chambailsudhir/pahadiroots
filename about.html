@@ -898,14 +898,9 @@ body.dark .mega-view-all{color:#7ec87e;border-color:#1e3a22}
               <rect x="0" y="380" width="400" height="80" fill="url(#fogGrad)"/>
               <!-- Foreground dark valley -->
               <ellipse cx="200" cy="533" rx="260" ry="100" fill="#0a1a0e" opacity="0.8"/>
-              <!-- Gold accent line at bottom -->
-              <rect x="0" y="525" width="400" height="2" fill="#c8a45a" opacity="0.4"/>
-              <!-- Subtle text watermark -->
-              <text x="200" y="510" text-anchor="middle" font-family="serif" font-size="10" fill="rgba(200,164,90,0.4)" letter-spacing="4">KANGRA · HIMACHAL</text>
             </svg>
           </div>
           <img src="" alt="Sudhir Chambail — Founder, 5 Pahadi Roots" id="founderImg" style="display:none; position:absolute; inset:0; width:100%; height:100%; object-fit:cover;">
-          <div class="founder-badge">Founder</div>
         </div>
         <!-- Admin upload option - hidden by default -->
         <input type="file" id="founderPhotoInput" accept="image/*" style="display:none" onchange="previewFounderPhoto(this)">
@@ -1412,9 +1407,25 @@ async function loadTeamSection() {
       { bg: ['#0a1a2a','#051020'], hills: '#102840', hills2: '#1a3850', snow: '#c8e0f0', accent: '#c8a45a' },
       { bg: ['#1a0a2a','#100520'], hills: '#2a1040', hills2: '#3a1858', snow: '#e0d0f0', accent: '#d0908a' },
     ];
-    grid.innerHTML = members.map((m, i) => {
+    // Filter out placeholder/unnamed members (names like "Co-Founder 2", "Co-Founder 3" etc.)
+    const realMembers = members.filter(m => {
+      const n = (m.name || '').trim().toLowerCase();
+      if (!n || n === '—') return false;
+      // Hide if name looks like a generic placeholder
+      if (/^co-?founder\s*\d*$/i.test(n)) return false;
+      if (/^founder\s*\d*$/i.test(n)) return false;
+      if (/^team member\s*\d*$/i.test(n)) return false;
+      return true;
+    });
+
+    if (!realMembers.length) {
+      grid.innerHTML = '<div style="text-align:center;color:#aaa;padding:40px;grid-column:1/-1">Team profiles coming soon.</div>';
+      return;
+    }
+
+    grid.innerHTML = realMembers.map((m, i) => {
       const p = palettes[i % palettes.length];
-      const placeholder = `<svg class="team-photo-placeholder-svg" viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg">
+      const svgPlaceholder = `<svg class="team-photo-placeholder-svg" viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <linearGradient id="tpbg${i}" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stop-color="${p.bg[0]}"/>
@@ -1424,42 +1435,39 @@ async function loadTeamSection() {
         </defs>
         <circle cx="45" cy="45" r="44" fill="url(#tpbg${i})"/>
         <g clip-path="url(#tpclip${i})">
-          <!-- Stars -->
           <circle cx="15" cy="12" r="0.7" fill="#fff" opacity="0.6"/>
           <circle cx="35" cy="8" r="0.9" fill="#fff" opacity="0.7"/>
           <circle cx="60" cy="15" r="0.7" fill="#fff" opacity="0.5"/>
           <circle cx="75" cy="10" r="0.8" fill="#fff" opacity="0.6"/>
           <circle cx="22" cy="22" r="0.6" fill="#fff" opacity="0.4"/>
           <circle cx="68" cy="25" r="0.6" fill="#fff" opacity="0.4"/>
-          <!-- Moon -->
           <circle cx="70" cy="18" r="5" fill="${p.snow}" opacity="0.7"/>
           <circle cx="72.5" cy="16" r="3.8" fill="${p.bg[0]}" opacity="0.9"/>
-          <!-- Far mountains -->
           <polygon points="0,60 20,35 40,55 60,28 80,50 100,38 100,65 0,65" fill="${p.hills}" opacity="0.6"/>
-          <!-- Main peaks -->
           <polygon points="-5,90 15,48 35,72 55,38 75,62 95,42 105,55 105,90" fill="${p.hills2}"/>
-          <!-- Snow caps -->
           <polygon points="15,48 8,60 22,60" fill="${p.snow}" opacity="0.9"/>
           <polygon points="55,38 46,52 64,52" fill="${p.snow}" opacity="0.9"/>
-          <!-- Pine trees -->
           <polygon points="5,90 8,78 11,90" fill="${p.bg[0]}" opacity="0.8"/>
           <polygon points="18,90 21,80 24,90" fill="${p.bg[0]}" opacity="0.8"/>
           <polygon points="66,90 69,79 72,90" fill="${p.bg[0]}" opacity="0.8"/>
           <polygon points="78,90 81,76 84,90" fill="${p.bg[0]}" opacity="0.8"/>
-          <!-- Gold shimmer line -->
           <rect x="0" y="87" width="90" height="1" fill="${p.accent}" opacity="0.4"/>
         </g>
         <circle cx="45" cy="45" r="43" fill="none" stroke="${p.accent}" stroke-width="1.5" opacity="0.5"/>
       </svg>`;
+
+      // Show image only if url exists; SVG placeholder shown otherwise (never both)
+      const photoHTML = m.image_url
+        ? `<img src="${m.image_url}" alt="${m.name||''}" loading="lazy" style="width:100%;height:100%;object-fit:cover;object-position:top;border-radius:50%;position:absolute;inset:0;" onerror="this.remove();this.parentElement.querySelector('svg').style.display='block'">`
+        : svgPlaceholder;
+
       return `
       <div class="team-card fade-up ${m.is_founder ? 'team-card-founder' : ''}">
-        <div class="team-photo">
-          ${m.image_url
-            ? `<img src="${m.image_url}" alt="${m.name||''}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">${placeholder}`
-            : placeholder}
+        <div class="team-photo" style="position:relative;">
+          ${photoHTML}
         </div>
         <div class="team-info">
-          <div class="team-name">${m.name || '—'}</div>
+          <div class="team-name">${m.name}</div>
           ${m.bio ? `
             <button class="team-bio-toggle" onclick="toggleTeamBio(this)" aria-expanded="false">
               <span class="toggle-label">About</span>
