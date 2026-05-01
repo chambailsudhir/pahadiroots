@@ -194,44 +194,52 @@ img { max-width: 100%; }
   width: 90px; height: 90px;
   border-radius: 50%;
   flex-shrink: 0;
-  background: rgba(200,164,90,0.12);
+  background: transparent;
   border: 2px solid rgba(200,164,90,0.5);
   overflow: hidden;
   display: flex; align-items: center; justify-content: center;
   font-size: 36px;
   box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+  position: relative;
 }
 /* Founder gets a bigger photo */
 .team-card-founder .team-photo {
   width: 120px; height: 120px; font-size: 48px;
 }
+.team-photo-placeholder-svg {
+  width: 100%; height: 100%; border-radius: 50%;
+}
 .team-photo img {
   width: 100%; height: 100%; object-fit: cover; object-position: top;
 }
 .team-info { flex: 1; }
-.team-founder-badge {
-  display: inline-block;
-  font-size: 9px; font-weight: 800; letter-spacing: 2px;
-  text-transform: uppercase;
-  color: #fff;
-  background: var(--g, #1a3a1e);
-  padding: 3px 10px; margin-bottom: 8px;
-  border-radius: 2px;
-}
 .team-name {
   font-family: 'Cormorant Garamond', serif;
   font-size: 22px; font-weight: 600;
   color: var(--g); margin-bottom: 4px; line-height: 1.2;
 }
 .team-card-founder .team-name { font-size: 26px; }
-.team-role {
-  font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
-  color: var(--gold, #c8a45a); margin-bottom: 0;
+.team-bio-toggle {
+  display: inline-flex; align-items: center; gap: 5px;
+  margin-top: 8px;
+  background: none; border: none; cursor: pointer; padding: 0;
+  font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase;
+  color: var(--gold, #c8a45a); font-weight: 600;
+  transition: opacity 0.2s;
 }
-.team-bio {
+.team-bio-toggle:hover { opacity: 0.75; }
+.team-bio-toggle .toggle-arrow {
+  transition: transform 0.25s ease;
+}
+.team-bio-toggle[aria-expanded="true"] .toggle-arrow {
+  transform: rotate(180deg);
+}
+.team-bio-panel {
   font-size: 13px; line-height: 1.7;
   color: var(--tx2, #4a4a4a);
-  margin-top: 10px;
+  margin-top: 8px;
+  border-left: 2px solid rgba(200,164,90,0.3);
+  padding-left: 10px;
 }
 @media(max-width:900px) {
   .team-grid-styled { grid-template-columns: 1fr; }
@@ -351,7 +359,7 @@ img { max-width: 100%; }
 }
 .founder-photo {
   width: 100%; aspect-ratio: 3/4;
-  background: linear-gradient(135deg, rgba(45,106,79,0.4), rgba(15,36,16,0.9));
+  background: linear-gradient(160deg, #0d2b1a 0%, #1a4a2e 40%, #0a1f12 100%);
   border: 1px solid rgba(200,164,90,0.25);
   display: flex; align-items: center; justify-content: center;
   position: relative; overflow: hidden;
@@ -359,8 +367,16 @@ img { max-width: 100%; }
 .founder-photo img {
   width: 100%; height: 100%; object-fit: cover; object-position: top;
 }
+/* Mountain illustration shown only when no photo */
+.founder-mountain-art {
+  position: absolute; inset: 0;
+  display: flex; align-items: flex-end; justify-content: center;
+  overflow: hidden;
+}
+.founder-mountain-art svg { width: 100%; height: 100%; }
 .founder-photo-placeholder {
-  text-align: center;
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  text-align: center; z-index: 2;
 }
 .founder-photo-placeholder .ph-icon { font-size: 80px; margin-bottom: 12px; }
 .founder-photo-placeholder p {
@@ -809,11 +825,86 @@ body.dark .mega-view-all{color:#7ec87e;border-color:#1e3a22}
     <div class="founder-grid">
       <div class="founder-photo-wrap fade-up">
         <div class="founder-photo" id="founderPhotoWrap">
-          <div class="founder-photo-placeholder" id="founderPlaceholder">
-            <div class="ph-icon">👤</div>
-            <p>Photo coming soon</p>
+          <!-- Mountain landscape art — shown when no photo uploaded -->
+          <div class="founder-mountain-art" id="founderPlaceholder">
+            <svg viewBox="0 0 400 533" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+              <!-- Sky gradient -->
+              <defs>
+                <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#0a1520"/>
+                  <stop offset="45%" stop-color="#0d2b3e"/>
+                  <stop offset="100%" stop-color="#1a4a2e"/>
+                </linearGradient>
+                <linearGradient id="snowGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#e8f4f0"/>
+                  <stop offset="100%" stop-color="#c8ddd8"/>
+                </linearGradient>
+                <linearGradient id="mtnGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#2a5c3f"/>
+                  <stop offset="100%" stop-color="#1a3a28"/>
+                </linearGradient>
+                <linearGradient id="fogGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="rgba(200,220,210,0.0)"/>
+                  <stop offset="100%" stop-color="rgba(200,220,210,0.18)"/>
+                </linearGradient>
+                <radialGradient id="moonGlow" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stop-color="rgba(220,200,150,0.35)"/>
+                  <stop offset="100%" stop-color="rgba(220,200,150,0)"/>
+                </radialGradient>
+              </defs>
+              <!-- Background sky -->
+              <rect width="400" height="533" fill="url(#skyGrad)"/>
+              <!-- Stars -->
+              <circle cx="40" cy="30" r="1" fill="#fff" opacity="0.6"/>
+              <circle cx="80" cy="55" r="1.2" fill="#fff" opacity="0.8"/>
+              <circle cx="130" cy="20" r="0.8" fill="#fff" opacity="0.5"/>
+              <circle cx="200" cy="40" r="1.4" fill="#fff" opacity="0.7"/>
+              <circle cx="270" cy="15" r="1" fill="#fff" opacity="0.6"/>
+              <circle cx="320" cy="50" r="0.8" fill="#fff" opacity="0.5"/>
+              <circle cx="360" cy="25" r="1.2" fill="#fff" opacity="0.8"/>
+              <circle cx="50" cy="80" r="0.8" fill="#fff" opacity="0.4"/>
+              <circle cx="170" cy="70" r="1" fill="#fff" opacity="0.5"/>
+              <circle cx="310" cy="80" r="0.9" fill="#fff" opacity="0.4"/>
+              <circle cx="380" cy="65" r="1" fill="#fff" opacity="0.6"/>
+              <!-- Moon glow -->
+              <circle cx="320" cy="70" r="50" fill="url(#moonGlow)"/>
+              <!-- Moon -->
+              <circle cx="320" cy="70" r="18" fill="#f0e8c8" opacity="0.9"/>
+              <circle cx="328" cy="64" r="14" fill="#0d2235" opacity="0.85"/>
+              <!-- Far snow peaks (lightest) -->
+              <polygon points="0,320 60,180 120,310 180,160 240,290 300,140 360,280 400,200 400,340 0,340" fill="#1e4030" opacity="0.5"/>
+              <!-- Snow caps far -->
+              <polygon points="60,180 40,230 80,230" fill="url(#snowGrad)" opacity="0.7"/>
+              <polygon points="180,160 155,210 205,210" fill="url(#snowGrad)" opacity="0.7"/>
+              <polygon points="300,140 272,200 328,200" fill="url(#snowGrad)" opacity="0.9"/>
+              <!-- Main mountain range -->
+              <polygon points="-10,533 50,280 110,420 170,220 230,380 290,180 350,320 410,240 410,533" fill="url(#mtnGrad)"/>
+              <!-- Snow on main peaks -->
+              <polygon points="170,220 148,268 192,268" fill="url(#snowGrad)" opacity="0.95"/>
+              <polygon points="290,180 264,240 316,240" fill="url(#snowGrad)" opacity="0.95"/>
+              <polygon points="410,240 388,285 410,290" fill="url(#snowGrad)" opacity="0.8"/>
+              <!-- Pine trees silhouette -->
+              <g fill="#0d1f12" opacity="0.9">
+                <polygon points="20,533 26,490 32,533"/>
+                <polygon points="50,533 58,482 66,533"/>
+                <polygon points="80,533 88,475 96,533"/>
+                <polygon points="110,533 118,488 126,533"/>
+                <polygon points="280,533 288,478 296,533"/>
+                <polygon points="310,533 318,486 326,533"/>
+                <polygon points="345,533 353,480 361,533"/>
+                <polygon points="375,533 383,488 391,533"/>
+              </g>
+              <!-- Mist / fog layer -->
+              <rect x="0" y="380" width="400" height="80" fill="url(#fogGrad)"/>
+              <!-- Foreground dark valley -->
+              <ellipse cx="200" cy="533" rx="260" ry="100" fill="#0a1a0e" opacity="0.8"/>
+              <!-- Gold accent line at bottom -->
+              <rect x="0" y="525" width="400" height="2" fill="#c8a45a" opacity="0.4"/>
+              <!-- Subtle text watermark -->
+              <text x="200" y="510" text-anchor="middle" font-family="serif" font-size="10" fill="rgba(200,164,90,0.4)" letter-spacing="4">KANGRA · HIMACHAL</text>
+            </svg>
           </div>
-          <img src="" alt="Sudhir Chambail — Founder, 5 Pahadi Roots" id="founderImg" style="display:none; position:absolute; inset:0;">
+          <img src="" alt="Sudhir Chambail — Founder, 5 Pahadi Roots" id="founderImg" style="display:none; position:absolute; inset:0; width:100%; height:100%; object-fit:cover;">
           <div class="founder-badge">Founder</div>
         </div>
         <!-- Admin upload option - hidden by default -->
@@ -1294,6 +1385,12 @@ function initTickerBar(s) {
   }
 }
 
+function toggleTeamBio(btn) {
+  const panel = btn.nextElementSibling;
+  const expanded = btn.getAttribute('aria-expanded') === 'true';
+  btn.setAttribute('aria-expanded', !expanded);
+  if (expanded) { panel.hidden = true; } else { panel.hidden = false; }
+}
 async function loadTeamSection() {
   const grid = document.getElementById('team-grid-about');
   if (!grid) return;
@@ -1307,21 +1404,72 @@ async function loadTeamSection() {
       grid.innerHTML = '<div style="text-align:center;color:#aaa;padding:40px;grid-column:1/-1">Team profiles coming soon.</div>';
       return;
     }
-    grid.innerHTML = members.map(m => `
+    // Palette variations for each member
+    const palettes = [
+      { bg: ['#0d2b1a','#1a4a2e'], hills: '#1e4030', hills2: '#2a5c3f', snow: '#d8eee8', accent: '#c8a45a' },
+      { bg: ['#1a2040','#0d1830'], hills: '#1e2d50', hills2: '#2a3d6a', snow: '#d0d8f0', accent: '#b8905a' },
+      { bg: ['#2a1a0a','#1a0d00'], hills: '#3a2010', hills2: '#4a2c18', snow: '#f0e0c0', accent: '#d4a055' },
+      { bg: ['#0a1a2a','#051020'], hills: '#102840', hills2: '#1a3850', snow: '#c8e0f0', accent: '#c8a45a' },
+      { bg: ['#1a0a2a','#100520'], hills: '#2a1040', hills2: '#3a1858', snow: '#e0d0f0', accent: '#d0908a' },
+    ];
+    grid.innerHTML = members.map((m, i) => {
+      const p = palettes[i % palettes.length];
+      const placeholder = `<svg class="team-photo-placeholder-svg" viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="tpbg${i}" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="${p.bg[0]}"/>
+            <stop offset="100%" stop-color="${p.bg[1]}"/>
+          </linearGradient>
+          <clipPath id="tpclip${i}"><circle cx="45" cy="45" r="44"/></clipPath>
+        </defs>
+        <circle cx="45" cy="45" r="44" fill="url(#tpbg${i})"/>
+        <g clip-path="url(#tpclip${i})">
+          <!-- Stars -->
+          <circle cx="15" cy="12" r="0.7" fill="#fff" opacity="0.6"/>
+          <circle cx="35" cy="8" r="0.9" fill="#fff" opacity="0.7"/>
+          <circle cx="60" cy="15" r="0.7" fill="#fff" opacity="0.5"/>
+          <circle cx="75" cy="10" r="0.8" fill="#fff" opacity="0.6"/>
+          <circle cx="22" cy="22" r="0.6" fill="#fff" opacity="0.4"/>
+          <circle cx="68" cy="25" r="0.6" fill="#fff" opacity="0.4"/>
+          <!-- Moon -->
+          <circle cx="70" cy="18" r="5" fill="${p.snow}" opacity="0.7"/>
+          <circle cx="72.5" cy="16" r="3.8" fill="${p.bg[0]}" opacity="0.9"/>
+          <!-- Far mountains -->
+          <polygon points="0,60 20,35 40,55 60,28 80,50 100,38 100,65 0,65" fill="${p.hills}" opacity="0.6"/>
+          <!-- Main peaks -->
+          <polygon points="-5,90 15,48 35,72 55,38 75,62 95,42 105,55 105,90" fill="${p.hills2}"/>
+          <!-- Snow caps -->
+          <polygon points="15,48 8,60 22,60" fill="${p.snow}" opacity="0.9"/>
+          <polygon points="55,38 46,52 64,52" fill="${p.snow}" opacity="0.9"/>
+          <!-- Pine trees -->
+          <polygon points="5,90 8,78 11,90" fill="${p.bg[0]}" opacity="0.8"/>
+          <polygon points="18,90 21,80 24,90" fill="${p.bg[0]}" opacity="0.8"/>
+          <polygon points="66,90 69,79 72,90" fill="${p.bg[0]}" opacity="0.8"/>
+          <polygon points="78,90 81,76 84,90" fill="${p.bg[0]}" opacity="0.8"/>
+          <!-- Gold shimmer line -->
+          <rect x="0" y="87" width="90" height="1" fill="${p.accent}" opacity="0.4"/>
+        </g>
+        <circle cx="45" cy="45" r="43" fill="none" stroke="${p.accent}" stroke-width="1.5" opacity="0.5"/>
+      </svg>`;
+      return `
       <div class="team-card fade-up ${m.is_founder ? 'team-card-founder' : ''}">
         <div class="team-photo">
           ${m.image_url
-            ? `<img src="${m.image_url}" alt="${m.name||''}" loading="lazy" onerror="this.style.display='none';this.parentElement.textContent='👤'">`
-            : '👤'}
+            ? `<img src="${m.image_url}" alt="${m.name||''}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">${placeholder}`
+            : placeholder}
         </div>
         <div class="team-info">
-          ${m.is_founder ? '<div class="team-founder-badge">Founder</div>' : ''}
           <div class="team-name">${m.name || '—'}</div>
-          <div class="team-role">${m.role || 'Co-Founder'}</div>
-          ${m.bio ? `<div class="team-bio">${m.bio}</div>` : ''}
+          ${m.bio ? `
+            <button class="team-bio-toggle" onclick="toggleTeamBio(this)" aria-expanded="false">
+              <span class="toggle-label">About</span>
+              <svg class="toggle-arrow" width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <div class="team-bio-panel" hidden>${m.bio}</div>
+          ` : ''}
         </div>
       </div>
-    `).join('');
+    `}).join('');
     // Trigger animations
     grid.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
   } catch(e) {
