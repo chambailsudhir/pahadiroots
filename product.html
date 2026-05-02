@@ -1270,12 +1270,11 @@ function renderProduct(p, images, related, data, stateMap, stateImgMap) {
     '<div class="product-wrap">' +
       '<div class="img-section">' + mainImgHtml + thumbHtml + '</div>' +
       '<div class="info-section">' +
+        '<div class="prod-vendor">'+regionEmoji+' '+regionName+'</div>' +
         (function(){
           var vendor = p.vendor_id ? VENDOR_MAP[String(p.vendor_id)] : null;
-          if (vendor) {
-            return '<div class="prod-vendor">🏪 ' + vendor.business_name + '</div>';
-          }
-          return '<div class="prod-vendor">🏪 5 Pahadi Roots</div>';
+          var vname = vendor ? vendor.business_name : '5 Pahadi Roots';
+          return '<div style="font-size:10px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--g);margin-bottom:10px;font-family:Josefin Sans,sans-serif">VENDOR : ' + vname + '</div>';
         })() +
         '<h1 class="prod-name">'+p.name+'</h1>' +
         (function(){
@@ -1321,6 +1320,11 @@ function renderProduct(p, images, related, data, stateMap, stateImgMap) {
           '<input class="pincode-input" type="text" placeholder="Enter PIN" maxlength="6" id="pincode-input">' +
           '<button class="pincode-check" onclick="checkPin()">Check</button>' +
           '<button class="btn-icon '+(wishlist.indexOf(p.id)>-1?'wl-active':'')+'" onclick="toggleWL()" id="wl-btn" style="margin-left:auto">'+(wishlist.indexOf(p.id)>-1?'❤️':'🤍')+'</button>' +
+          (function(){
+            var vendor = p.vendor_id ? VENDOR_MAP[String(p.vendor_id)] : null;
+            var vname = vendor ? vendor.business_name : '5 Pahadi Roots';
+            return '<span style="font-size:10.5px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:var(--g);white-space:nowrap;font-family:Josefin Sans,sans-serif">VENDOR : ' + vname + '</span>';
+          })() +
         '</div>' +
         '<div class="qty-atc">' +
           '<div class="qty-row">' +
