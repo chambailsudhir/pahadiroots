@@ -876,6 +876,7 @@ body{letter-spacing:.01em}
 <script>
 /* ══ GLOBALS ══ */
 var PRODUCT = null;
+var VENDOR_MAP = {}; // vendor id → { business_name, region }
 var VARIANTS = [];
 var ALL_PRODUCTS = [];
 var selectedVariant = null;
@@ -1017,6 +1018,7 @@ async function loadProduct() {
       if (!cp) cp = cached.products.find(function(p){ return String(p.id) === String(slug); });
       if (cp) {
         ALL_PRODUCTS = cached.products;
+        (cached.vendors || []).forEach(function(v){ VENDOR_MAP[String(v.id)] = v; });
         renderProduct(cp, [], [], {}, {}, {});
         _renderedFromCache = true;
       }
@@ -1031,6 +1033,7 @@ async function loadProduct() {
     if (!res.ok) throw new Error('Server error ' + res.status);
     var data = await res.json();
     ALL_PRODUCTS = data.products || [];
+    (data.vendors || []).forEach(function(v){ VENDOR_MAP[String(v.id)] = v; });
     // Update back bar product count
     var bbc = document.getElementById('backBarCount');
     if (bbc && ALL_PRODUCTS.length) bbc.textContent = ALL_PRODUCTS.length + '+';
@@ -1267,7 +1270,13 @@ function renderProduct(p, images, related, data, stateMap, stateImgMap) {
     '<div class="product-wrap">' +
       '<div class="img-section">' + mainImgHtml + thumbHtml + '</div>' +
       '<div class="info-section">' +
-        '<div class="prod-vendor">📍 '+regionName+'</div>' +
+        (function(){
+          var vendor = p.vendor_id ? VENDOR_MAP[String(p.vendor_id)] : null;
+          if (vendor) {
+            return '<div class="prod-vendor">🏪 ' + vendor.business_name + '</div>';
+          }
+          return '<div class="prod-vendor">🏪 5 Pahadi Roots</div>';
+        })() +
         '<h1 class="prod-name">'+p.name+'</h1>' +
         (function(){
           /* Tagline: short_description → first sentence of ai_description → empty placeholder */

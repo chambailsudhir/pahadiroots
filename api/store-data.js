@@ -44,7 +44,7 @@ export default async function handler(req, res) {
     // Fetch states, products, site_settings, and image tables in parallel
     // product_images is fetched as a nested select inside products — avoids
     // loading the full image table independently (reduces DB egress as catalogue grows).
-    const [states, products, siteSettings, coupons, stateImages, productImages, founderImages, productVariants, teamMembers, categories] = await Promise.all([
+    const [states, products, siteSettings, coupons, stateImages, productImages, founderImages, productVariants, teamMembers, categories, vendors] = await Promise.all([
       sbGet('states', 'is_active=eq.true&order=name.asc').catch(() => []),
       sbGet('products', 'select=*&status=eq.active&is_deleted=eq.false&order=name.asc&limit=200').catch(() => []),
       sbGet('site_settings', 'select=key,value').catch(() => []),
@@ -55,6 +55,7 @@ export default async function handler(req, res) {
       sbGet('product_variants', 'is_active=eq.true&order=product_id.asc,sort_order.asc').catch(() => []),
       sbGet('team_members', 'is_active=eq.true&order=sort_order.asc').catch(() => []),
       sbGet('categories', 'select=id,name,slug,emoji,description,image_url,sort_order&is_active=eq.true&order=sort_order.asc,name.asc').catch(() => []),
+      sbGet('vendors', 'select=id,business_name,region,state_id,status&status=eq.active').catch(() => []),
     ]);
 
     // Convert site_settings array to object
@@ -64,6 +65,7 @@ export default async function handler(req, res) {
     res.status(200).json({
       states:           states          || [],
       products:         products        || [],
+      vendors:          vendors         || [],
       settings,
       coupons:          coupons         || [],
       state_images:     stateImages     || [],

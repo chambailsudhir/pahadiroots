@@ -2058,7 +2058,7 @@ function addToCart(id) {
   }
   var displayName = p.name + (variantLabel ? ' (' + variantLabel + ')' : '');
   if (ex) ex.qty++;
-  else cart.push({cartKey:cartKey, id:p.id, variantId:variantId||null, name:displayName, emoji:p.emoji, image:p.image_url||'', price:price, gst_rate:p.gst_rate||5, qty:1});
+  else cart.push({cartKey:cartKey, id:p.id, variantId:variantId||null, name:displayName, emoji:p.emoji, image:p.image_url||'', price:price, gst_rate:p.gst_rate||5, qty:1, vendor_id:p.vendor_id||null});
   sv(); uCart();
   showToast('✅ ' + displayName + ' added to cart! <span onclick="openCart()" style="text-decoration:underline;cursor:pointer;font-weight:900">View Cart →</span>');
   return true;
@@ -2455,7 +2455,7 @@ async function checkoutRazorpay() {
       email:   email.trim(),
       address: addr.trim()+', '+city.trim()+', '+state+' - '+pin.trim(),
       // items passed as JSON so webhook can recover order if admin-api fails
-      items:   JSON.stringify(cart.map(function(i){ return {id:i.id,variantId:i.variantId||null,qty:i.qty,price:i.price,name:i.name}; }))
+      items:   JSON.stringify(cart.map(function(i){ return {id:i.id,variantId:i.variantId||null,qty:i.qty,price:i.price,name:i.name,vendor_id:i.vendor_id||null}; }))
     },
     theme: { color: '#2d6a4f' },
     handler: async function(response) {
@@ -2518,7 +2518,7 @@ async function saveOrderToDB(name, phone, email, addr, city, state, pin, final, 
         gstAmount: gstAmount || 0,
         couponCode: activeCoupon ? activeCoupon.code : null,
         auth_user_id: (_authUser && _authUser.id) ? _authUser.id : null,
-        items: itemsToSave.map(function(i){ return {id:i.id||null, variantId:i.variantId||null, qty:i.qty, price:i.price, name:i.name||''}; })
+        items: itemsToSave.map(function(i){ return {id:i.id||null, variantId:i.variantId||null, qty:i.qty, price:i.price, name:i.name||'', vendor_id:i.vendor_id||null}; })
       })
     });
     var data = await res.json();
@@ -3001,7 +3001,7 @@ function addToCartQty(id, qty) {
   var addQty = (stockNum !== null && !isNaN(stockNum)) ? Math.min(qty, stockNum - currentQty) : qty;
   if (addQty <= 0) { showToast('⚠️ Only ' + stockNum + ' in stock!'); return; }
   if (ex) ex.qty += addQty;
-  else cart.push({id:p.id, name:p.name, emoji:p.emoji, image:p.image_url||'', price:p.price, gst_rate:p.gst_rate||5, qty:addQty, cartKey:cartKey, variantId:null});
+  else cart.push({id:p.id, name:p.name, emoji:p.emoji, image:p.image_url||'', price:p.price, gst_rate:p.gst_rate||5, qty:addQty, cartKey:cartKey, variantId:null, vendor_id:p.vendor_id||null});
   sv(); uCart();
   closeQV();
   showToast('✅ ' + p.name + ' × ' + addQty + ' added! <span onclick="openCart()" style="text-decoration:underline;cursor:pointer;font-weight:900">View Cart →</span>');

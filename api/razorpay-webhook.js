@@ -167,6 +167,7 @@ async function saveOrderFromWebhook(payment) {
       variant_id:     i.variantId || null,
       quantity:       i.qty    || 1,
       price_at_time:  i.price  || 0,
+      vendor_id:      i.vendor_id || null,
     }));
     await sbFetch('POST', 'order_items', '', orderItems).catch(e => {
       console.warn('[Webhook] order_items insert failed:', e.message);
