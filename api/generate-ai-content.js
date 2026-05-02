@@ -102,6 +102,7 @@ export default async function handler(req, res) {
     `Write ALL of the following content for this product.\n` +
     `Respond ONLY with valid JSON — no markdown, no backticks, no explanation:\n\n` +
     `{\n` +
+    `  "short_description": "One punchy sentence, max 15 words. What makes this ${name} special + its Himalayan origin. No generic phrases.",\n` +
     `  "description": "2-3 sentences: what the product is, its Himalayan/regional origin, why it's special. Honest, no hyperbole.",\n` +
     `  "benefits": [\n` +
     `    {"icon": "relevant health emoji", "title": "3-4 word benefit title", "desc": "One specific sentence, 12-15 words, about this benefit for ${name}."}\n` +
@@ -119,6 +120,7 @@ export default async function handler(req, res) {
     `  "who_should_buy": "2 sentences describing who benefits most from this product and why."\n` +
     `}\n\n` +
     `Rules:\n` +
+    `- "short_description": max 15 words, punchy tagline, avoid generic words like 'premium quality'\n` +
     `- "benefits": exactly 5 items, specific to ${name}, not generic\n` +
     `- "how_to_use": 3-5 practical steps\n` +
     `- "storage_tips": 3-4 tips\n` +
@@ -171,19 +173,35 @@ export default async function handler(req, res) {
   }
 
   // ── Save to Supabase ──
+  // short_description: only fill if currently empty — never overwrite admin's manual copy
+  let shortDescPatch = {};
+  if (parsed.short_description) {
+    // Check if field is already set
+    try {
+      const check = await fetch(`${SUPABASE_URL}/rest/v1/products?id=eq.${productId}&select=short_description`, {
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` },
+      });
+      const rows = await check.json();
+      const existing = rows && rows[0] && rows[0].short_description;
+      if (!existing || existing.trim().length < 5) {
+        shortDescPatch = { short_description: parsed.short_description };
+      }
+    } catch (e) { /* silent — don't block on this */ }
+  }
+
   try {
     await sbPatch('products', `id=eq.${productId}`, {
-      ai_description:   parsed.description,
+      ...shortDescPatch,
+      ai_description:     parsed.description,
       ai_health_benefits: JSON.stringify(parsed.benefits),
-      ai_how_to_use:    JSON.stringify(parsed.how_to_use || []),
-      ai_storage_tips:  JSON.stringify(parsed.storage_tips || []),
-      ai_who_should_buy: parsed.who_should_buy || null,
-      ai_generated_at:  new Date().toISOString(),
-      ai_provider:      'claude',
+      ai_how_to_use:      JSON.stringify(parsed.how_to_use || []),
+      ai_storage_tips:    JSON.stringify(parsed.storage_tips || []),
+      ai_who_should_buy:  parsed.who_should_buy || null,
+      ai_generated_at:    new Date().toISOString(),
+      ai_provider:        'claude',
     });
   } catch (dbErr) {
     console.error('Supabase save error:', dbErr);
-    // Return the generated content even if save fails — admin can retry
     return res.status(207).json({
       success: false,
       warning: 'Content generated but failed to save to database. Please try again.',
